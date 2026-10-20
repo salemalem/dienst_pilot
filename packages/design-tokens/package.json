@@ -1,0 +1,23 @@
+{
+  "name": "@dienstpilot/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "DienstPilot design tokens, built from design/reference/design-system/project/tokens.json.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./native": "./src/index.ts",
+    "./tokens.css": "./dist/tokens.css",
+    "./tailwind.css": "./dist/tailwind.css",
+    "./fonts/*": "./dist/fonts/*"
+  },
+  "scripts": {
+    "build": "node scripts/build.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "vitest": "^5.0.5"
+  }
+}
