@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>W13 AI transparency</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="en" copilot="closed" person="Dr. Thomas Brandt" persona-role="Senior physician · Planner" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="en" active="w13" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 28px">
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 class="display" style="margin: 0">8 components. None of them can change the roster.</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted); max-width: 920px">Only the planner can approve and publish. Project status October 2026: every component is designed, none is built or trained yet. Metrics appear here only once the scripts in eval/ write them to eval/results.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; background: var(--sheet); border: 1px solid var(--rule)">
+<div style="padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid var(--rule)">
+<span class="label" style="color: var(--ink-muted)">Optimization and rules · C1, C2</span>
+<span class="body">Find and check valid plans. Rules are never broken.</span>
+</div>
+<div style="padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid var(--rule)">
+<span class="label" style="color: var(--ink-muted)">Machine learning · C3 to C6</span>
+<span class="body">Estimate what is uncertain. An estimate never becomes a shift assignment.</span>
+</div>
+<div style="padding: 16px 20px; display: flex; flex-direction: column; gap: 4px">
+<span class="label" style="color: var(--ink-muted)">Language models · C7, C8</span>
+<span class="body">Read and explain language. A sentence never becomes a shift assignment.</span>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{cards}}" as="c" hint-placeholder-count="8">
+<article style="background: var(--sheet); border: 1px solid var(--rule); padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<span class="num-small" style="color: var(--ink-muted)">{{c.id}}</span>
+<span class="caption" style="border: 1px solid var(--rule-strong); border-radius: var(--radius-mark); padding: 1px 8px">{{c.kind}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 class="heading" style="margin: 0">{{c.name}}</h2>
+<span class="caption" style="color: var(--ink-muted)">{{c.de}}</span>
+</div>
+<p class="label" style="margin: 0">{{c.q}}</p>
+<dl style="margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); row-gap: 6px; column-gap: 12px">
+<dt class="caption" style="color: var(--ink-muted)">Method</dt><dd class="caption" style="margin: 0">{{c.m}}</dd>
+<dt class="caption" style="color: var(--ink-muted)">Status</dt><dd class="caption" style="margin: 0">Designed, not built</dd>
+<dt class="caption" style="color: var(--ink-muted)">Version</dt><dd class="caption" style="margin: 0">none yet</dd>
+<dt class="caption" style="color: var(--ink-muted)">Trained</dt><dd class="caption" style="margin: 0">{{c.tr}}</dd>
+<dt class="caption" style="color: var(--ink-muted)">Metric</dt><dd class="caption" style="margin: 0">{{c.k}}: pending</dd>
+</dl>
+<a class="label" href="#" style="display: inline-flex; gap: 6px; align-items: center">Model card<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg></a>
+<div style="margin-top: auto; border-top: 1px solid var(--rule-strong); padding-top: 12px; display: flex; flex-direction: column; gap: 2px">
+<span class="body-strong">Can change the roster: No</span>
+<span class="caption" style="color: var(--ink-muted)">{{c.a}}</span>
+</div>
+</article>
+</sc-for>
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var none = 'no training needed';
+    var no = 'not trained yet';
+    var cards = [
+      ['C1', 'Optimization', 'Roster Optimizer', 'Dienstplan-Optimierer', 'Which valid roster is best?', 'Constraint optimization, OR-Tools CP-SAT', none, 'Rule violations, wish rate, burden spread vs. manual planning', 'Proposes variants only.'],
+      ['C2', 'Deterministic', 'Rule and Compliance Validator', 'Regelprüfung', 'Does this plan break any rule?', 'Pure check function, independent of the optimizer', none, 'Property tests, under 50 ms per month', 'Checks only and holds back invalid changes.'],
+      ['C3', 'ML, time series', 'Absence Forecaster', 'Ausfallprognose', 'How many absences should we expect per day?', 'LightGBM with Poisson objective vs. GLM baseline', no, 'MAE, coverage of the 80% interval', 'Department level only, never individuals.'],
+      ['C4', 'ML, Bayesian', 'Preference Learner', 'Wunschprofil', 'What does this person probably prefer?', 'Hierarchical Beta-Binomial model', no, 'Log-likelihood vs. pooled baseline', 'Suggestions only, confirmed by the person.'],
+      ['C5', 'ML, classification', 'Cover Acceptance Ranker', 'Vertretungsvorschlag', 'Whom should we ask first?', 'Calibrated classifier plus fairness policy', no, 'ROC-AUC, Brier score, calibration error', 'Orders candidates only. Least burdened first.'],
+      ['C6', 'ML, simulation', 'Leave Feasibility Surrogate', 'Urlaubs-Schnellprüfung', 'Is this leave request likely coverable?', 'Classifier trained on optimizer runs', no, 'Precision for coverable, agreement with C1', 'A hint only. The optimizer confirms.'],
+      ['C7', 'LLM', 'Request Intake Agent', 'Wunsch-Assistent', 'What did this person mean?', 'Language model with structured output', 'no own training', 'Field accuracy on 200 test sentences, DE and EN', 'The person confirms before anything is saved.'],
+      ['C8', 'LLM agent', 'Planner Copilot', 'Planungs-Assistent', 'Why does the plan look like this, and what if?', 'Agent with MCP tools and rule search (RAG)', 'no own training', '50 planner tasks, refusal and injection tests', 'Creates proposals only. Has no tool to approve.']
+    ].map(function (r) {
+      return { id: r[0], kind: r[1], name: r[2], de: r[3], q: r[4], m: r[5], tr: r[6], k: r[7], a: r[8] };
+    });
+    return { cards: cards };
+  }
+}
+</script>
+</body>
+</html>

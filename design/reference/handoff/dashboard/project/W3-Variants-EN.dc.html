@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>W3 Variants</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="en" copilot="closed" person="Dr. Thomas Brandt" persona-role="Senior physician · Planner" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="en" active="w3" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 32px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="display" style="margin: 0">3 valid variants for December, none breaks a rule</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Trial run on 20 Oct, 10:30, with the 21 wish lists submitted so far · every variant confirmed by the rule check</p>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<button type="button" class="dp-btn dp-btn--quiet" aria-label="Previous month" style="width: 40px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></button>
+<span class="body-strong" style="min-width: 128px; text-align: center">December 2026</span>
+<button type="button" class="dp-btn dp-btn--quiet" aria-label="Next month" style="width: 40px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start">
+
+<article class="dp-sugg" style="max-width: none; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Suggestion</span>
+<span class="label" style="border: 1px solid var(--ink); border-radius: var(--radius-mark); padding: 2px 8px">Recommended</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 class="title" style="margin: 0">Variant A</h2>
+<span class="label" style="color: var(--ink-muted)">Weighting: wishes first</span>
+</div>
+<p class="dp-sugg-body body">Variant A: 91% of wishes granted, nights evenly balanced, 12 hours overtime.</p>
+<dl style="margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; column-gap: 16px; padding: 12px 0; border-top: 1px dashed var(--pencil); border-bottom: 1px dashed var(--pencil)">
+<dt class="label" style="color: var(--ink-muted)">Wishes granted</dt><dd class="num-time" style="margin: 0; text-align: right">91%</dd>
+<dt class="label" style="color: var(--ink-muted)">Important wishes granted</dt><dd class="num-time" style="margin: 0; text-align: right">40 of 41</dd>
+<dt class="label" style="color: var(--ink-muted)">Burden spread, max minus min</dt><dd class="num-time" style="margin: 0; text-align: right">6 points</dd>
+<dt class="label" style="color: var(--ink-muted)">Overtime</dt><dd class="num-time" style="margin: 0; text-align: right">12 h</dd>
+<dt class="label" style="color: var(--ink-muted)">Rule violations</dt><dd class="num-time" style="margin: 0; text-align: right">0</dd>
+</dl>
+<div class="dp-sugg-actions">
+<a class="dp-btn dp-btn--primary label" href="W4-Roster-Editor-EN.dc.html">Open as draft</a>
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Why?</button>
+</div>
+<div class="dp-sugg-why">
+<p class="body-strong" style="margin: 0">Recommended because it grants the most wishes and spreads the 12 hours of overtime across 4 people who are below their yearly average.</p>
+<ul class="label">
+<li>7 percentage points more wishes granted than variant B.</li>
+<li>Nights: 2 to 4 per person, no isolated single night.</li>
+<li>Most overtime for one person: 5 h, Dr. Wagner, within his contract hours band. <cite>Contract, master data</cite></li>
+</ul>
+</div>
+</article>
+
+<article class="dp-sugg" style="max-width: none; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Suggestion</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 class="title" style="margin: 0">Variant B</h2>
+<span class="label" style="color: var(--ink-muted)">Weighting: zero overtime</span>
+</div>
+<p class="dp-sugg-body body">Variant B: 84% of wishes granted, zero overtime, Dr. Weber gets one weekend more than the average.</p>
+<dl style="margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; column-gap: 16px; padding: 12px 0; border-top: 1px dashed var(--pencil); border-bottom: 1px dashed var(--pencil)">
+<dt class="label" style="color: var(--ink-muted)">Wishes granted</dt><dd class="num-time" style="margin: 0; text-align: right">84%</dd>
+<dt class="label" style="color: var(--ink-muted)">Important wishes granted</dt><dd class="num-time" style="margin: 0; text-align: right">37 of 41</dd>
+<dt class="label" style="color: var(--ink-muted)">Burden spread, max minus min</dt><dd class="num-time" style="margin: 0; text-align: right">8 points</dd>
+<dt class="label" style="color: var(--ink-muted)">Overtime</dt><dd class="num-time" style="margin: 0; text-align: right">0 h</dd>
+<dt class="label" style="color: var(--ink-muted)">Rule violations</dt><dd class="num-time" style="margin: 0; text-align: right">0</dd>
+</dl>
+<div class="dp-sugg-actions">
+<button type="button" class="dp-btn dp-btn--secondary label">Open as draft</button>
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Why?</button>
+</div>
+</article>
+
+<article class="dp-sugg" style="max-width: none; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Suggestion</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 class="title" style="margin: 0">Variant C</h2>
+<span class="label" style="color: var(--ink-muted)">Weighting: balanced</span>
+</div>
+<p class="dp-sugg-body body">Variant C: 88% of wishes granted, burden spread most evenly, 4 hours overtime.</p>
+<dl style="margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; column-gap: 16px; padding: 12px 0; border-top: 1px dashed var(--pencil); border-bottom: 1px dashed var(--pencil)">
+<dt class="label" style="color: var(--ink-muted)">Wishes granted</dt><dd class="num-time" style="margin: 0; text-align: right">88%</dd>
+<dt class="label" style="color: var(--ink-muted)">Important wishes granted</dt><dd class="num-time" style="margin: 0; text-align: right">39 of 41</dd>
+<dt class="label" style="color: var(--ink-muted)">Burden spread, max minus min</dt><dd class="num-time" style="margin: 0; text-align: right">5 points</dd>
+<dt class="label" style="color: var(--ink-muted)">Overtime</dt><dd class="num-time" style="margin: 0; text-align: right">4 h</dd>
+<dt class="label" style="color: var(--ink-muted)">Rule violations</dt><dd class="num-time" style="margin: 0; text-align: right">0</dd>
+</dl>
+<div class="dp-sugg-actions">
+<button type="button" class="dp-btn dp-btn--secondary label">Open as draft</button>
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Why?</button>
+</div>
+</article>
+</div>
+
+<section style="background: var(--sheet); border: 1px solid var(--rule); display: flex; flex-direction: column">
+<h2 class="heading" style="margin: 0; padding: 20px 24px 12px">Where the variants differ for individual people</h2>
+<div class="label" style="display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); gap: 16px; padding: 8px 24px; background: var(--sheet-sunk); color: var(--ink-muted); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule-strong)">
+<span>Person and measure</span><span style="text-align: right">Variant A</span><span style="text-align: right">Variant B</span><span style="text-align: right">Variant C</span>
+</div>
+<sc-for list="{{diffs}}" as="r" hint-placeholder-count="4">
+<div style="display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); gap: 16px; padding: 0 24px; min-height: 44px; align-items: center; border-bottom: 1px solid var(--rule)">
+<span class="body">{{r.k}}</span>
+<span class="num-time" style="text-align: right">{{r.a}}</span>
+<span class="num-time" style="text-align: right">{{r.b}}</span>
+<span class="num-time" style="text-align: right">{{r.c}}</span>
+</div>
+</sc-for>
+<p class="caption" style="margin: 0; padding: 12px 24px 16px; color: var(--ink-muted)">The AI only suggests. Only you can approve and publish, in the roster editor.</p>
+</section>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      diffs: [
+        { k: 'Dr. Jonas Weber, weekend duties', a: '3', b: '3', c: '2' },
+        { k: 'Dr. Aylin Kaya, night shifts', a: '3', b: '4', c: '3' },
+        { k: 'Dr. Lea Lorenz, wishes granted', a: '5 of 5', b: '3 of 5', c: '4 of 5' },
+        { k: 'Dr. Felix Wagner, overtime', a: '5 h', b: '0 h', c: '2 h' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

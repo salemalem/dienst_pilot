@@ -1,0 +1,69 @@
+/* DienstPilot tokens as CSS custom properties, transcribed from ds/dienstpilot/tokens.json.
+   Light is the fallback on :root; add class "dp-dark" to an artboard root for the dark (night) theme. */
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("ds/dienstpilot/fonts/AtkinsonHyperlegibleNext-Variable.woff2") format("woff2");
+  font-weight: 200 800; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("ds/dienstpilot/fonts/AtkinsonHyperlegibleNext-Variable-Italic.woff2") format("woff2");
+  font-weight: 200 800; font-style: italic; font-display: swap;
+}
+
+:root, .dp-light {
+  --font-sans: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --paper: #F6F8F9; --sheet: #FFFFFF; --sheet-sunk: #EDF1F4;
+  --ink: #1C2B36; --ink-muted: #4D5D69; --on-ink: #FFFFFF;
+  --rule: #D6DDE2; --rule-strong: #7A8793;
+  --action: #1F5FD1; --action-wash: #E6EEFB; --on-action: #FFFFFF; --focus: #1F5FD1;
+  --pencil: #566370; --pencil-wash: #F2F4F6;
+  --alert: #B3261E; --alert-wash: #FBEAE8; --on-alert: #FFFFFF;
+  --shift-frueh: #E3A72F; --on-shift-frueh: #1C2B36; --shift-frueh-wash: #FAEFDA; --shift-frueh-ink: #7A4F00;
+  --shift-spaet: #8B5FBF; --on-shift-spaet: #FFFFFF; --shift-spaet-wash: #EEE7F6; --shift-spaet-ink: #5D3A93;
+  --shift-nacht: #24345E; --on-shift-nacht: #FFFFFF; --shift-nacht-wash: #DDE1EA; --shift-nacht-ink: #24345E; --shift-nacht-edge: #24345E;
+  --shift-bereitschaft: #2A7F5B; --on-shift-bereitschaft: #FFFFFF; --shift-bereitschaft-wash: #DCEBE3; --shift-bereitschaft-ink: #1C5C40;
+  --shift-frei: #9AA5B1; --on-shift-frei: #1C2B36; --shift-frei-wash: #EEF0F2; --shift-frei-ink: #47525D;
+  --env: #5C4A00; --env-wash: #FFF6D6;
+  --shadow-sheet: 0 1px 2px rgba(28,43,54,0.06);
+  --shadow-raise: 0 2px 8px rgba(28,43,54,0.12);
+  --shadow-overlay: 0 16px 40px rgba(28,43,54,0.20);
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px;
+  --radius-sheet: 0px; --radius-mark: 3px; --radius-control: 6px; --radius-panel: 10px;
+  --cell-w: 36px; --cell-h: 34px; --rowhead-w: 184px; --touch-min: 48px; --control-h: 40px;
+}
+
+.dp-dark {
+  --paper: #12191F; --sheet: #1A232B; --sheet-sunk: #151D23;
+  --ink: #E4EAEE; --ink-muted: #A5B2BC; --on-ink: #12191F;
+  --rule: #2C3843; --rule-strong: #6E7C88;
+  --action: #86AAF2; --action-wash: #1E2C45; --on-action: #0E1A2E; --focus: #86AAF2;
+  --pencil: #A0ACB6; --pencil-wash: #1F2830;
+  --alert: #F28B82; --alert-wash: #3A2324; --on-alert: #1A0E0E;
+  --shift-frueh: #F5AE39; --on-shift-frueh: #11181E; --shift-frueh-wash: #3C3426; --shift-frueh-ink: #F7C771;
+  --shift-spaet: #825EB9; --on-shift-spaet: #FFFFFF; --shift-spaet-wash: #2E2A42; --shift-spaet-ink: #CDB5F0;
+  --shift-nacht: #203876; --on-shift-nacht: #FFFFFF; --shift-nacht-wash: #1F2B45; --shift-nacht-ink: #AFC0F2; --shift-nacht-edge: #6F86C6;
+  --shift-bereitschaft: #389560; --on-shift-bereitschaft: #11181E; --shift-bereitschaft-wash: #20382F; --shift-bereitschaft-ink: #86D6A9;
+  --shift-frei: #A7B1BB; --on-shift-frei: #11181E; --shift-frei-wash: #262F37; --shift-frei-ink: #C7CED5;
+  --env: #F1D27A; --env-wash: #2F2A17;
+  --shadow-sheet: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-raise: 0 2px 8px rgba(0,0,0,0.5);
+  --shadow-overlay: 0 16px 40px rgba(0,0,0,0.6);
+  color-scheme: dark;
+}
+
+/* Type styles (tokens.json › type) */
+.display { font-size: 32px; line-height: 40px; font-weight: 650; letter-spacing: -0.01em; }
+.title { font-size: 24px; line-height: 32px; font-weight: 650; }
+.heading { font-size: 19px; line-height: 26px; font-weight: 650; }
+.body { font-size: 16px; line-height: 24px; font-weight: 400; }
+.body-strong { font-size: 16px; line-height: 24px; font-weight: 650; }
+.label { font-size: 14px; line-height: 20px; font-weight: 550; }
+.caption { font-size: 13px; line-height: 18px; font-weight: 450; }
+.num-figure { font-size: 32px; line-height: 36px; font-weight: 650; }
+.num-time { font-size: 16px; line-height: 24px; font-weight: 550; }
+.num-small { font-size: 13px; line-height: 16px; font-weight: 550; }
+.grid-letter { font-size: 15px; line-height: 1; font-weight: 750; }
+.grid-name { font-size: 14px; line-height: 18px; font-weight: 550; }
+.display, .title, .heading, .body, .body-strong, .label, .caption, .num-figure, .num-time, .num-small { margin: 0; }

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>W10 Protokoll</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="de" copilot="closed" person="Dr. Thomas Brandt" persona-role="Oberarzt · Planer" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="de" active="w10" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 24px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="display" style="margin: 0; display: flex; gap: 12px; align-items: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>Protokoll vollständig und unverändert</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Hash-Kette zuletzt geprüft heute um 03:00 · jeder Eintrag ist mit dem vorherigen verkettet und nicht änderbar</p>
+</div>
+<button type="button" class="dp-btn dp-btn--secondary label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>Protokoll exportieren</button>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end">
+<div class="dp-field" style="width: 200px">
+<label class="dp-field-label label" for="w10-range">Zeitraum</label>
+<span class="dp-select"><select id="w10-range" class="dp-input"><option>Heute</option><option>Letzte 7 Tage</option><option>Dezember-Planung</option></select><span class="dp-select-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></span>
+</div>
+<div class="dp-field" style="width: 220px">
+<label class="dp-field-label label" for="w10-kind">Ereignisart</label>
+<span class="dp-select"><select id="w10-kind" class="dp-input"><option>Alle</option><option>Freigaben</option><option>Vorschläge der KI</option><option>Vertretungen</option></select><span class="dp-select-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></span>
+</div>
+<div class="dp-field" style="width: 240px">
+<label class="dp-field-label label" for="w10-person">Person</label>
+<input id="w10-person" class="dp-input" type="text" placeholder="Name eingeben">
+</div>
+<button type="button" class="dp-btn dp-btn--secondary label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M7 12h10"></path><path d="M10 18h4"></path></svg>Filtern</button>
+<span class="label" style="margin-left: auto; color: var(--ink-muted)">12 Einträge</span>
+</div>
+
+<section style="background: var(--sheet); border: 1px solid var(--rule); display: flex; flex-direction: column">
+<div class="label" style="display: grid; grid-template-columns: 96px minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1.2fr) 112px; gap: 16px; padding: 10px 24px; background: var(--sheet-sunk); color: var(--ink-muted); border-bottom: 1px solid var(--rule-strong)">
+<span>Zeit</span><span>Ereignis</span><span>Wer</span><span>Was</span><span>Freigabe</span><span>Hash</span>
+</div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+<div style="display: grid; grid-template-columns: 96px minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1.2fr) 112px; gap: 16px; padding: 10px 24px; align-items: baseline; border-bottom: 1px solid var(--rule); background: {{r.bg}}">
+<span class="num-small" style="color: var(--ink-muted)">{{r.t}}</span>
+<span class="label">{{r.e}}</span>
+<span class="label" style="color: {{r.whoColor}}; font-style: {{r.whoStyle}}">{{r.w}}</span>
+<span class="label">{{r.x}}</span>
+<span class="label" style="color: var(--ink-muted)">{{r.a}}</span>
+<span class="num-small" style="color: var(--ink-muted)">{{r.h}}</span>
+</div>
+</sc-for>
+</section>
+<p class="caption" style="margin: 0; color: var(--ink-muted)">Kursiv und grau hinterlegt: Einträge der KI. Sie schlagen nur vor und ändern keinen Dienstplan. Abwesenheiten werden ohne Diagnose oder Grund gespeichert.</p>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var raw = [
+      ['10:48', 'Vorschlag erstellt', 'Copilot', 'Wochenende 19./20.12.: Dr. Klein statt Dr. Weber', 'offen, bei Dr. Brandt', '7c1e…a90b', 1],
+      ['10:44', 'Vertretung angefragt', 'System', 'Nachtdienst 21./22.10. an Dr. Klein', 'nicht nötig', '3f8d…19c2', 0],
+      ['10:42', 'Entwurf geändert', 'Dr. Thomas Brandt', 'Frühdienst 15.12. an Dr. Lorenz, Entwurf Dezember', 'Entwurf, nicht veröffentlicht', 'b20a…e417', 0],
+      ['10:34', 'Keine Antwort', 'Dr. Anna Lehmann', 'Vertretungsanfrage nach 15 Minuten beendet', 'nicht nötig', 'd91f…0c6e', 0],
+      ['10:30', 'Varianten erzeugt', 'Optimierer', '3 Varianten Dezember, Probelauf, alle geprüft', 'wartet auf Planer', '5ab3…77d1', 1],
+      ['10:19', 'Vertretung abgelehnt', 'Dr. Paul Richter', 'Nachtdienst 21./22.10.', 'nicht nötig', 'e4c7…2b98', 0],
+      ['10:10', 'Abwesenheit gemeldet', 'Dr. Mira Okafor', 'ab 21.10., ohne Diagnose', 'gilt sofort', '0d6e…f3a5', 0],
+      ['09:12', 'Urlaubsantrag', 'Dr. Aylin Kaya', '14.–27.07.2027, mit Tausch', 'offen, bei Dr. Brandt', '91b2…4cd0', 0],
+      ['06:44', 'Vertretung übernommen', 'Dr. Sofía Alvarez', 'Frühdienst 20.10., Station 4B', 'automatisch, Regeln geprüft', 'a7f0…6e13', 0],
+      ['06:42', 'Vertretung angefragt', 'System', 'Frühdienst 20.10. an Dr. Alvarez', 'nicht nötig', '2e59…b8a4', 0],
+      ['06:40', 'Abwesenheit gemeldet', 'Dr. Jonas Weber', 'ab 20.10., ohne Diagnose', 'gilt sofort', 'c13d…9f72', 0],
+      ['gestern 18:12', 'Tausch bestätigt', 'Dr. Lea Lorenz', 'Nachtdienst Sa 24.10. von Dr. Mehta', 'automatisch, Regeln geprüft', '68ea…d051', 0]
+    ];
+    var rows = raw.map(function (r) {
+      return {
+        t: r[0], e: r[1], w: r[2], x: r[3], a: r[4], h: r[5],
+        bg: r[6] ? 'var(--pencil-wash)' : 'var(--sheet)',
+        whoColor: r[6] ? 'var(--pencil)' : 'var(--ink)',
+        whoStyle: r[6] ? 'italic' : 'normal'
+      };
+    });
+    return { rows: rows };
+  }
+}
+</script>
+</body>
+</html>

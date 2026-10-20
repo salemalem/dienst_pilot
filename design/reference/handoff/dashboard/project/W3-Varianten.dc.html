@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>W3 Varianten</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="de" copilot="closed" person="Dr. Thomas Brandt" persona-role="Oberarzt · Planer" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="de" active="w3" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 32px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="display" style="margin: 0">3 gültige Varianten für Dezember, alle ohne Regelverstoß</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Probelauf am 20.10., 10:30, mit den 21 bisher abgegebenen Wunschlisten · alle Varianten von der Regelprüfung bestätigt</p>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<button type="button" class="dp-btn dp-btn--quiet" aria-label="Vormonat" style="width: 40px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></button>
+<span class="body-strong" style="min-width: 128px; text-align: center">Dezember 2026</span>
+<button type="button" class="dp-btn dp-btn--quiet" aria-label="Folgemonat" style="width: 40px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start">
+
+<article class="dp-sugg" style="max-width: none; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Vorschlag</span>
+<span class="label" style="border: 1px solid var(--ink); border-radius: var(--radius-mark); padding: 2px 8px">Empfohlen</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 class="title" style="margin: 0">Variante A</h2>
+<span class="label" style="color: var(--ink-muted)">Gewichtung: Wünsche zuerst</span>
+</div>
+<p class="dp-sugg-body body">Variante A: 91 % der Wünsche erfüllt, Nachtdienste gleichmäßig verteilt, 12 Überstunden.</p>
+<dl style="margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; column-gap: 16px; padding: 12px 0; border-top: 1px dashed var(--pencil); border-bottom: 1px dashed var(--pencil)">
+<dt class="label" style="color: var(--ink-muted)">Wünsche erfüllt</dt><dd class="num-time" style="margin: 0; text-align: right">91 %</dd>
+<dt class="label" style="color: var(--ink-muted)">Wichtige Wünsche erfüllt</dt><dd class="num-time" style="margin: 0; text-align: right">40 von 41</dd>
+<dt class="label" style="color: var(--ink-muted)">Lastspreizung, max. minus min.</dt><dd class="num-time" style="margin: 0; text-align: right">6 Punkte</dd>
+<dt class="label" style="color: var(--ink-muted)">Überstunden</dt><dd class="num-time" style="margin: 0; text-align: right">12 h</dd>
+<dt class="label" style="color: var(--ink-muted)">Regelverstöße</dt><dd class="num-time" style="margin: 0; text-align: right">0</dd>
+</dl>
+<div class="dp-sugg-actions">
+<a class="dp-btn dp-btn--primary label" href="W4-Dienstplan-Editor.dc.html">Als Entwurf öffnen</a>
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Warum?</button>
+</div>
+<div class="dp-sugg-why">
+<p class="body-strong" style="margin: 0">Empfohlen, weil sie die meisten Wünsche erfüllt und die 12 Überstunden auf 4 Personen unter ihrem Jahresdurchschnitt verteilt.</p>
+<ul class="label">
+<li>7 Prozentpunkte mehr erfüllte Wünsche als Variante B.</li>
+<li>Nachtdienste: jede Person 2 bis 4, kein einzelner Nachtdienst.</li>
+<li>Höchste Überstunden einer Person: 5 h, Dr. Wagner, innerhalb seines Stundenrahmens. <cite>Vertrag, Stammdaten</cite></li>
+</ul>
+</div>
+</article>
+
+<article class="dp-sugg" style="max-width: none; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Vorschlag</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 class="title" style="margin: 0">Variante B</h2>
+<span class="label" style="color: var(--ink-muted)">Gewichtung: keine Überstunden</span>
+</div>
+<p class="dp-sugg-body body">Variante B: 84 % der Wünsche erfüllt, keine Überstunden, Dr. Weber erhält ein Wochenende mehr als der Durchschnitt.</p>
+<dl style="margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; column-gap: 16px; padding: 12px 0; border-top: 1px dashed var(--pencil); border-bottom: 1px dashed var(--pencil)">
+<dt class="label" style="color: var(--ink-muted)">Wünsche erfüllt</dt><dd class="num-time" style="margin: 0; text-align: right">84 %</dd>
+<dt class="label" style="color: var(--ink-muted)">Wichtige Wünsche erfüllt</dt><dd class="num-time" style="margin: 0; text-align: right">37 von 41</dd>
+<dt class="label" style="color: var(--ink-muted)">Lastspreizung, max. minus min.</dt><dd class="num-time" style="margin: 0; text-align: right">8 Punkte</dd>
+<dt class="label" style="color: var(--ink-muted)">Überstunden</dt><dd class="num-time" style="margin: 0; text-align: right">0 h</dd>
+<dt class="label" style="color: var(--ink-muted)">Regelverstöße</dt><dd class="num-time" style="margin: 0; text-align: right">0</dd>
+</dl>
+<div class="dp-sugg-actions">
+<button type="button" class="dp-btn dp-btn--secondary label">Als Entwurf öffnen</button>
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Warum?</button>
+</div>
+</article>
+
+<article class="dp-sugg" style="max-width: none; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Vorschlag</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 class="title" style="margin: 0">Variante C</h2>
+<span class="label" style="color: var(--ink-muted)">Gewichtung: ausgewogen</span>
+</div>
+<p class="dp-sugg-body body">Variante C: 88 % der Wünsche erfüllt, Lasten am gleichmäßigsten verteilt, 4 Überstunden.</p>
+<dl style="margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; column-gap: 16px; padding: 12px 0; border-top: 1px dashed var(--pencil); border-bottom: 1px dashed var(--pencil)">
+<dt class="label" style="color: var(--ink-muted)">Wünsche erfüllt</dt><dd class="num-time" style="margin: 0; text-align: right">88 %</dd>
+<dt class="label" style="color: var(--ink-muted)">Wichtige Wünsche erfüllt</dt><dd class="num-time" style="margin: 0; text-align: right">39 von 41</dd>
+<dt class="label" style="color: var(--ink-muted)">Lastspreizung, max. minus min.</dt><dd class="num-time" style="margin: 0; text-align: right">5 Punkte</dd>
+<dt class="label" style="color: var(--ink-muted)">Überstunden</dt><dd class="num-time" style="margin: 0; text-align: right">4 h</dd>
+<dt class="label" style="color: var(--ink-muted)">Regelverstöße</dt><dd class="num-time" style="margin: 0; text-align: right">0</dd>
+</dl>
+<div class="dp-sugg-actions">
+<button type="button" class="dp-btn dp-btn--secondary label">Als Entwurf öffnen</button>
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Warum?</button>
+</div>
+</article>
+</div>
+
+<section style="background: var(--sheet); border: 1px solid var(--rule); display: flex; flex-direction: column">
+<h2 class="heading" style="margin: 0; padding: 20px 24px 12px">Wo sich die Varianten für einzelne Personen unterscheiden</h2>
+<div class="label" style="display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); gap: 16px; padding: 8px 24px; background: var(--sheet-sunk); color: var(--ink-muted); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule-strong)">
+<span>Person und Kennzahl</span><span style="text-align: right">Variante A</span><span style="text-align: right">Variante B</span><span style="text-align: right">Variante C</span>
+</div>
+<sc-for list="{{diffs}}" as="r" hint-placeholder-count="4">
+<div style="display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); gap: 16px; padding: 0 24px; min-height: 44px; align-items: center; border-bottom: 1px solid var(--rule)">
+<span class="body">{{r.k}}</span>
+<span class="num-time" style="text-align: right">{{r.a}}</span>
+<span class="num-time" style="text-align: right">{{r.b}}</span>
+<span class="num-time" style="text-align: right">{{r.c}}</span>
+</div>
+</sc-for>
+<p class="caption" style="margin: 0; padding: 12px 24px 16px; color: var(--ink-muted)">Die KI schlägt nur vor. Freigeben und veröffentlichen können nur Sie, im Dienstplan-Editor.</p>
+</section>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      diffs: [
+        { k: 'Dr. Jonas Weber, Wochenenddienste', a: '3', b: '3', c: '2' },
+        { k: 'Dr. Aylin Kaya, Nachtdienste', a: '3', b: '4', c: '3' },
+        { k: 'Dr. Lea Lorenz, erfüllte Wünsche', a: '5 von 5', b: '3 von 5', c: '4 von 5' },
+        { k: 'Dr. Felix Wagner, Überstunden', a: '5 h', b: '0 h', c: '2 h' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

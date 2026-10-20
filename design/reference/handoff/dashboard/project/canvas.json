@@ -1,0 +1,63 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-20T10:51:57Z"},
+  "title": "DienstPilot Planer-Dashboard",
+  "launch": {"view": "canvas", "page": "de"},
+  "pages": [
+    {"id": "de", "name": "Deutsch W1–W13"},
+    {"id": "en", "name": "English W3, W4, W13"},
+    {"id": "parts", "name": "Bausteine"}
+  ],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1440, "h": 1100, "title": "W1 Übersicht", "page": "de", "expand": "fill"},
+    "W2-Wunschphase.dc.html": {"x": 1520, "y": 0, "w": 1440, "h": 1500, "title": "W2 Wunschphase", "page": "de", "expand": "fill"},
+    "W3-Varianten.dc.html": {"x": 3040, "y": 0, "w": 1440, "h": 1200, "title": "W3 Varianten", "page": "de", "expand": "fill"},
+    "W4-Dienstplan-Editor.dc.html": {"x": 4560, "y": 0, "w": 1440, "h": 1560, "title": "W4 Dienstplan-Editor", "page": "de", "expand": "fill"},
+    "W5-Freigabe.dc.html": {"x": 0, "y": 1680, "w": 1440, "h": 1000, "title": "W5 Freigabe", "page": "de", "expand": "fill"},
+    "W6-Anfragen.dc.html": {"x": 1520, "y": 1680, "w": 1440, "h": 1200, "title": "W6 Anfragen", "page": "de", "expand": "fill"},
+    "W7-Ausfaelle.dc.html": {"x": 3040, "y": 1680, "w": 1440, "h": 1200, "title": "W7 Ausfälle live", "page": "de", "expand": "fill"},
+    "W8-Fairness-Compliance.dc.html": {"x": 4560, "y": 1680, "w": 1440, "h": 1560, "title": "W8 Fairness und Compliance", "page": "de", "expand": "fill"},
+    "W9-Copilot.dc.html": {"x": 0, "y": 3360, "w": 1440, "h": 1300, "title": "W9 Copilot-Panel", "page": "de", "expand": "fill"},
+    "W10-Protokoll.dc.html": {"x": 1520, "y": 3360, "w": 1440, "h": 1100, "title": "W10 Protokoll", "page": "de", "expand": "fill"},
+    "W11-Regeln-Stammdaten.dc.html": {"x": 3040, "y": 3360, "w": 1440, "h": 1700, "title": "W11 Regeln und Stammdaten", "page": "de", "expand": "fill"},
+    "W12-Aufsicht.dc.html": {"x": 4560, "y": 3360, "w": 1440, "h": 1100, "title": "W12 Aufsicht", "page": "de", "expand": "fill"},
+    "W13-KI-Transparenz.dc.html": {"x": 0, "y": 5180, "w": 1440, "h": 1300, "title": "W13 KI-Transparenz", "page": "de", "expand": "fill"},
+    "W7b-Eskalation.dc.html": {"x": 1520, "y": 5180, "w": 1440, "h": 1200, "title": "W7b Eskalation", "page": "de", "expand": "fill"},
+    "W3-Variants-EN.dc.html": {"x": 0, "y": 0, "w": 1440, "h": 1200, "title": "W3 Variants (EN)", "page": "en", "expand": "fill"},
+    "W4-Roster-Editor-EN.dc.html": {"x": 1520, "y": 0, "w": 1440, "h": 1560, "title": "W4 Roster editor (EN)", "page": "en", "expand": "fill"},
+    "W13-AI-Transparency-EN.dc.html": {"x": 3040, "y": 0, "w": 1440, "h": 1300, "title": "W13 AI transparency (EN)", "page": "en", "expand": "fill"},
+    "TopBar.dc.html": {"x": 0, "y": 0, "w": 1440, "h": 56, "title": "Baustein: Kopfzeile", "page": "parts"},
+    "Nav.dc.html": {"x": 0, "y": 176, "w": 232, "h": 760, "title": "Baustein: Navigation", "page": "parts"},
+    "RosterGrid.dc.html": {"x": 352, "y": 176, "w": 1360, "h": 1180, "title": "Baustein: Dienstplan-Raster", "page": "parts"}
+  },
+  "order": [
+    "Main.dc.html",
+    "W2-Wunschphase.dc.html",
+    "W3-Varianten.dc.html",
+    "W4-Dienstplan-Editor.dc.html",
+    "W5-Freigabe.dc.html",
+    "W6-Anfragen.dc.html",
+    "W7-Ausfaelle.dc.html",
+    "W8-Fairness-Compliance.dc.html",
+    "W9-Copilot.dc.html",
+    "W10-Protokoll.dc.html",
+    "W11-Regeln-Stammdaten.dc.html",
+    "W12-Aufsicht.dc.html",
+    "W13-KI-Transparenz.dc.html",
+    "W7b-Eskalation.dc.html",
+    "W3-Variants-EN.dc.html",
+    "W4-Roster-Editor-EN.dc.html",
+    "W13-AI-Transparency-EN.dc.html",
+    "TopBar.dc.html",
+    "Nav.dc.html",
+    "RosterGrid.dc.html"
+  ],
+  "notes": {
+    "titleDe": {"x": 0, "y": -300, "text": "Planer-Dashboard W1–W13 · Deutsch · Dr. Thomas Brandt · 20.10.2026", "kind": "title1", "maxW": 6000, "page": "de"},
+    "titleEn": {"x": 0, "y": -300, "text": "Planner dashboard · English · W3, W4, W13", "kind": "title1", "maxW": 4480, "page": "en"},
+    "titleParts": {"x": 0, "y": -300, "text": "Bausteine: Kopfzeile, Navigation, Raster", "kind": "title1", "maxW": 1712, "page": "parts"}
+  },
+  "designSystems": [
+    {"title": "DienstPilot", "namespace": "dienstpilot", "artifact": "https://claude.ai/code/artifact/2566532a-f94a-41e2-ab6e-fa6bf670e580", "version": "1792493080-0b47", "copiedAt": "2026-10-20T10:51:57Z"}
+  ]
+}

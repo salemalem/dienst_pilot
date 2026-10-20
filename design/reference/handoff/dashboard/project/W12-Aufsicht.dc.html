@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>W12 Aufsicht</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="de" copilot="closed" person="Katrin Vogel" persona-role="Personalabteilung · Aufsicht" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="de" active="w12" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 28px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span class="label" style="align-self: flex-start; display: inline-flex; gap: 8px; align-items: center; padding: 4px 10px; border: 1px solid var(--rule-strong); border-radius: var(--radius-mark); background: var(--sheet)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>Nur Lesezugriff</span>
+<h1 class="display" style="margin: 0">Oktober 2026: alle Regeln eingehalten</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Klinik für Innere Medizin · Stand 20.10.2026 · Sie sehen Zahlen und Protokoll, Dienste ändern können Sie hier nicht.</p>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<button type="button" class="dp-btn dp-btn--secondary label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>Protokoll exportieren</button>
+<button type="button" class="dp-btn dp-btn--secondary label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>Compliance-Bericht September exportieren</button>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+<div style="background: var(--sheet); border: 1px solid var(--rule); padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<span class="label" style="color: var(--ink-muted)">Ruhezeit eingehalten</span><span class="num-figure">100 %</span><span class="caption" style="color: var(--ink-muted)">Oktober, alle Dienstwechsel</span>
+</div>
+<div style="background: var(--sheet); border: 1px solid var(--rule); padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<span class="label" style="color: var(--ink-muted)">Überstunden</span><span class="num-figure">38 h</span><span class="caption" style="color: var(--ink-muted)">Oktober bis heute, Abteilung</span>
+</div>
+<div style="background: var(--sheet); border: 1px solid var(--rule); padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<span class="label" style="color: var(--ink-muted)">Kosten Überstunden</span><span class="num-figure">2.090 €</span><span class="caption" style="color: var(--ink-muted)">Oktober bis heute, synthetischer Stundensatz</span>
+</div>
+<div style="background: var(--sheet); border: 1px solid var(--rule); padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<span class="label" style="color: var(--ink-muted)">Wochenenddienste 2026</span><span class="num-figure">9–14</span><span class="caption" style="color: var(--ink-muted)">pro Person, ohne Chefärztin</span>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<section style="flex: 999 1 640px; min-width: 0; background: var(--sheet); border: 1px solid var(--rule); display: flex; flex-direction: column">
+<h2 class="heading" style="margin: 0; padding: 20px 24px 12px">Monatsberichte 2026</h2>
+<div class="label" style="display: grid; grid-template-columns: minmax(0, 1fr) repeat(4, minmax(0, 1fr)) 120px; gap: 16px; padding: 8px 24px; background: var(--sheet-sunk); color: var(--ink-muted); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule-strong)">
+<span>Monat</span><span style="text-align: right">Ruhezeit</span><span style="text-align: right">Überstunden</span><span style="text-align: right">Wünsche erfüllt</span><span style="text-align: right">Planänderungen</span><span>Bericht</span>
+</div>
+<sc-for list="{{months}}" as="m" hint-placeholder-count="9">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) repeat(4, minmax(0, 1fr)) 120px; gap: 16px; padding: 0 24px; min-height: 40px; align-items: center; border-bottom: 1px solid var(--rule)">
+<span class="body">{{m.k}}</span>
+<span class="num-small" style="text-align: right">100 %</span>
+<span class="num-small" style="text-align: right">{{m.o}}</span>
+<span class="num-small" style="text-align: right">{{m.w}}</span>
+<span class="num-small" style="text-align: right">{{m.c}}</span>
+<a class="label" href="#">PDF ansehen</a>
+</div>
+</sc-for>
+</section>
+
+<section style="flex: 1 1 360px; min-width: 0; background: var(--sheet); border: 1px solid var(--rule); padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 class="heading" style="margin: 0; display: flex; gap: 10px; align-items: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>Protokoll vollständig und unverändert</h2>
+<p class="body" style="margin: 0">Jede Freigabe, jeder Vorschlag und jede Änderung ist mit Person und Zeit festgehalten. Die Hash-Kette wurde heute um 03:00 geprüft.</p>
+<dl style="margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; column-gap: 16px; padding-top: 12px; border-top: 1px solid var(--rule)">
+<dt class="label" style="color: var(--ink-muted)">Freigaben 2026</dt><dd class="num-small" style="margin: 0; text-align: right">11</dd>
+<dt class="label" style="color: var(--ink-muted)">Vorschläge der KI, angenommen</dt><dd class="num-small" style="margin: 0; text-align: right">64 von 97</dd>
+<dt class="label" style="color: var(--ink-muted)">Vom System ohne Planer bestätigt</dt><dd class="num-small" style="margin: 0; text-align: right">nur Tausch und Vertretung</dd>
+</dl>
+<p class="caption" style="margin: 0; color: var(--ink-muted)">Keine Leistungsbewertung einzelner Personen. Abwesenheiten erscheinen nur als Status und Datum.</p>
+</section>
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var m = [['Januar', 52, 86, 3], ['Februar', 61, 84, 6], ['März', 48, 88, 4], ['April', 40, 89, 2], ['Mai', 35, 90, 2], ['Juni', 44, 87, 5], ['Juli', 58, 85, 7], ['August', 63, 83, 6], ['September', 41, 90, 3]];
+    return { months: m.map(function (r) { return { k: r[0] + ' 2026', o: r[1] + ' h', w: r[2] + ' %', c: String(r[3]) }; }) };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>W6 Anfragen</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="de" copilot="closed" person="Dr. Thomas Brandt" persona-role="Oberarzt · Planer" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="de" active="w6" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 24px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="display" style="margin: 0">3 Anfragen, keine davon dringend</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">1 Urlaubsantrag · 1 angehaltener Tausch · 1 Vorschlag des Copilots</p>
+</div>
+<button type="button" class="dp-btn dp-btn--secondary label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M7 12h10"></path><path d="M10 18h4"></path></svg>Filtern</button>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+<ul style="list-style: none; margin: 0; padding: 0; flex: 1 1 340px; max-width: 400px; background: var(--sheet); border: 1px solid var(--rule); display: flex; flex-direction: column">
+<li style="padding: 16px 20px; border-bottom: 1px solid var(--rule); box-shadow: inset 0 0 0 2px var(--action); display: flex; flex-direction: column; gap: 4px">
+<span class="caption" style="color: var(--ink-muted)">Urlaubsantrag · heute, 09:12</span>
+<span class="body-strong">Dr. Aylin Kaya, 14.–27.07.2027</span>
+<span class="label">Abdeckbar mit Tausch, keine Überstunden</span>
+</li>
+<li style="padding: 16px 20px; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 4px">
+<span class="caption" style="color: var(--ink-muted)">Tausch angehalten · gestern, 16:40</span>
+<span class="body-strong">Dr. Nowak an Dr. Becker, Spätdienst Fr 06.11.</span>
+<span class="label" style="display: flex; gap: 6px; align-items: flex-start; color: var(--alert)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg><span><strong style="font-weight: 650">Dr. Becker käme 6 Stunden über ihren Stundenrahmen.</strong> <span style="color: var(--ink)">Genehmigen Sie mit Überstunden oder lehnen Sie mit Begründung ab.</span></span></span>
+</li>
+<li style="padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; background: var(--pencil-wash)">
+<span class="caption" style="color: var(--pencil); display: flex; gap: 6px; align-items: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Vorschlag des Copilots · heute, 10:48</span>
+<span class="body-strong">Wochenende 19./20.12.: Dr. Klein statt Dr. Weber</span>
+<span class="label">Erstellt aus Ihrer Frage im Copilot-Panel</span>
+</li>
+</ul>
+
+<section style="flex: 999 1 560px; min-width: 0; background: var(--sheet); border: 1px solid var(--rule); padding: 24px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="caption" style="color: var(--ink-muted)">Urlaubsantrag · eingegangen heute, 09:12 · mit Tausch beantragt</span>
+<h2 class="title" style="margin: 0">Dr. Aylin Kaya, 14.–27.07.2027</h2>
+<span class="label" style="display: flex; gap: 6px; align-items: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>Wichtig: Dr. Kaya hat diesen Wunsch als wichtig markiert.</span>
+</div>
+
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="padding: 16px; border: 1px solid var(--rule); display: flex; flex-direction: column; gap: 4px">
+<dt class="label" style="color: var(--ink-muted)">Besetzung</dt>
+<dd class="body" style="margin: 0">Abdeckbar, weil Dr. Kaya das Wochenende 19./20.06.2027 abgibt. Mindestbesetzung an allen 14 Tagen erfüllt.</dd>
+</div>
+<div style="padding: 16px; border: 1px solid var(--rule); display: flex; flex-direction: column; gap: 4px">
+<dt class="label" style="color: var(--ink-muted)">Überschneidungen</dt>
+<dd class="body" style="margin: 0">2 Kolleg:innen haben in diesem Zeitraum Urlaub: Dr. Okafor 14.–20.07., Dr. Richter 21.–31.07.</dd>
+</div>
+<div style="padding: 16px; border: 1px solid var(--rule); display: flex; flex-direction: column; gap: 4px">
+<dt class="label" style="color: var(--ink-muted)">Überstunden</dt>
+<dd class="num-figure" style="margin: 0">0 h</dd>
+</div>
+<div style="padding: 16px; border: 1px solid var(--rule); display: flex; flex-direction: column; gap: 4px">
+<dt class="label" style="color: var(--ink-muted)">Urlaub 2027 im Vergleich</dt>
+<dd class="body" style="margin: 0">Mit diesem Antrag 10 von 30 Tagen. Abteilung bisher im Schnitt 8 Tage.</dd>
+</div>
+</dl>
+
+<div class="dp-sugg" style="max-width: none">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Vorschlag</span>
+<p class="dp-sugg-body body">Wer die Dienste von Dr. Kaya übernehmen würde: Frühdienste Dr. Lehmann und Dr. Arslan, Nachtdienste 20./21.07. Dr. Klein.</p>
+<div class="dp-sugg-actions">
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Warum?</button>
+</div>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid var(--rule)">
+<span class="caption" style="color: var(--ink-muted)">Schnellprüfung und vollständige Prüfung stimmen überein, 20.10., 09:13</span>
+<div style="display: flex; gap: 8px">
+<button type="button" class="dp-btn dp-btn--secondary label">Ablehnen mit Begründung</button>
+<button type="button" class="dp-btn dp-btn--primary label">Genehmigen</button>
+</div>
+</div>
+</section>
+
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

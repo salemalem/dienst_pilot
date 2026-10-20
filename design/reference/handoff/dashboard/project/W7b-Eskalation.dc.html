@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>W7b Eskalation</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="de" copilot="closed" person="Dr. Thomas Brandt" persona-role="Oberarzt · Planer" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="de" active="w7" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 28px">
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="display" style="margin: 0; display: flex; gap: 12px; align-items: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>Nachtdienst morgen ist noch offen: Ihre Entscheidung</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Nachtdienst 21./22.10., 21:30–08:00 · abwesend: Dr. Okafor · alle 3 möglichen Kolleg:innen haben abgelehnt oder nicht geantwortet</p>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+<section style="flex: 1 1 360px; max-width: 420px; background: var(--sheet); border: 1px solid var(--rule); padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 class="heading" style="margin: 0">Verlauf der Suche</h2>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<li style="display: grid; grid-template-columns: 52px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">10:19</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg></span>
+<span class="body"><strong style="font-weight: 650">Abgelehnt:</strong> Dr. Richter</span>
+</li>
+<li style="display: grid; grid-template-columns: 52px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">10:34</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"></path><path d="M4.6 11a8 8 0 0 0 1.7 8.7 8 8 0 0 0 8.7 1.7"></path><path d="M7.4 7.4a8 8 0 0 1 10.3 1 8 8 0 0 1 .9 10.2"></path><path d="m2 2 20 20"></path><path d="M12 12v-2"></path></svg></span>
+<span class="body"><strong style="font-weight: 650">Keine Antwort:</strong> Dr. Lehmann</span>
+</li>
+<li style="display: grid; grid-template-columns: 52px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">10:52</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg></span>
+<span class="body"><strong style="font-weight: 650">Abgelehnt:</strong> Dr. Klein</span>
+</li>
+<li style="display: grid; grid-template-columns: 52px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">10:52</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg></span>
+<span class="body"><strong style="font-weight: 650">An Sie weitergeleitet:</strong> keine weitere Person darf den Dienst ohne Überstunden übernehmen.</span>
+</li>
+</ol>
+</section>
+
+<section class="dp-sugg" style="flex: 999 1 640px; min-width: 0; max-width: none; gap: 16px">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Vorschlag: Optionen in dieser Reihenfolge</span>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 12px">
+<legend class="body-strong" style="padding: 0; margin-bottom: 12px">Wie soll der Nachtdienst besetzt werden?</legend>
+
+<label for="w7b-o1" style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 12px; background: var(--sheet); border: 1px solid var(--rule-strong); border-radius: var(--radius-control); padding: 16px; cursor: pointer">
+<input id="w7b-o1" type="radio" name="w7b-option" value="overtime" style="width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ink)">
+<span style="display: flex; flex-direction: column; gap: 6px">
+<span class="label" style="color: var(--ink-muted)">Option 1 · Überstunden</span>
+<span class="body-strong">Dr. Wagner fragen, ob er mit Überstunden übernimmt</span>
+<span class="label"><strong style="font-weight: 650">Folge:</strong> 9,75 Überstunden im Oktober, im Stundenrahmen von ± 10 %. Er ist am 21.10. dienstfrei, die Ruhezeit ist eingehalten. Er kann ablehnen.</span>
+</span>
+</label>
+
+<label for="w7b-o2" style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 12px; background: var(--sheet); border: 1px solid var(--rule-strong); border-radius: var(--radius-control); padding: 16px; cursor: pointer">
+<input id="w7b-o2" type="radio" name="w7b-option" value="locum" style="width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ink)">
+<span style="display: flex; flex-direction: column; gap: 6px">
+<span class="label" style="color: var(--ink-muted)">Option 2 · Externe Vertretung</span>
+<span class="body-strong">Honorarärzt:in über den Rahmenvertrag anfragen</span>
+<span class="label"><strong style="font-weight: 650">Folge:</strong> Kosten laut Rahmenvertrag [Stundensatz]. Übergabe auf Station 4B und Zugang zum Kliniksystem nötig. Keine Überstunden im Team.</span>
+</span>
+</label>
+
+<label for="w7b-o3" style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 12px; background: var(--sheet); border: 1px solid var(--rule-strong); border-radius: var(--radius-control); padding: 16px; cursor: pointer">
+<input id="w7b-o3" type="radio" name="w7b-option" value="department" style="width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ink)">
+<span style="display: flex; flex-direction: column; gap: 6px">
+<span class="label" style="color: var(--ink-muted)">Option 3 · Andere Abteilung</span>
+<span class="body-strong">Ärzt:in aus einer anderen Abteilung anfragen</span>
+<span class="label"><strong style="font-weight: 650">Folge:</strong> Die Planung der anderen Abteilung muss zustimmen. Einsatz außerhalb des eigenen Fachs; die oberärztliche Rufbereitschaft wird informiert.</span>
+</span>
+</label>
+</fieldset>
+
+<div class="dp-sugg-why">
+<span class="label" style="color: var(--ink-muted)">Warum diese Reihenfolge</span>
+<ul class="label">
+<li>Option 1 vor 2: kein externer Einsatz, die Überstunden bleiben im Stundenrahmen.</li>
+<li>Option 2 vor 3: keine Zustimmung einer anderen Abteilung nötig.</li>
+</ul>
+</div>
+
+<div class="dp-sugg-actions">
+<span id="w7b-hint" class="dp-sugg-note caption">Die KI schlägt nur vor. Wählen Sie eine Option.</span>
+<button type="button" class="dp-btn dp-btn--primary label dp-sugg-why-btn" aria-disabled="true" aria-describedby="w7b-hint">Option ausführen</button>
+</div>
+</section>
+
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

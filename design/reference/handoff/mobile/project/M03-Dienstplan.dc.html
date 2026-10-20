@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>M3 Mein Dienstplan</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="dp-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+.cal-wk{background:var(--sheet-sunk)}
+.cal-out{color:var(--ink-muted);opacity:.55}
+</style>
+</helmet>
+<div class="dp-root" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: var(--font-sans); overflow: hidden">
+  <div style="height: 47px; flex: none" aria-hidden="true"></div>
+  <div class="dp-env dp-env--bar caption" role="status">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"></path><path d="M6.453 15h11.094"></path><path d="M8.5 2h7"></path></svg>
+    <span>Demo-Umgebung, synthetische Daten</span>
+  </div>
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding: 16px 16px 0 16px; overflow: hidden">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <h1 class="title">Mein Dienstplan</h1>
+      <span class="caption" style="color: var(--ink-muted)">November 2026, veröffentlicht am 19.10. von Dr. Thomas Brandt</span>
+    </div>
+    <a href="M09-Fairness.dc.html" style="display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control); text-decoration: none; color: var(--ink)">
+      <span class="label" style="color: var(--ink-muted)">Fairness</span>
+      <span class="body-strong" style="flex-grow: 1">Nachtdienste: 2 unter dem Durchschnitt</span>
+      <span class="label" style="color: var(--action); text-decoration: underline; text-underline-offset: 3px">Bilanz</span>
+    </a>
+    <div class="dp-seg" role="radiogroup" aria-label="Monat">
+      <label><input type="radio" name="month" value="10"><span class="label">Oktober</span></label>
+      <label><input type="radio" name="month" value="11" checked=""><span class="label">November</span></label>
+      <label><input type="radio" name="month" value="12"><span class="label">Dezember</span></label>
+    </div>
+    <div class="dp-sheet" style="display: block; overflow: hidden">
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-bottom: 1px solid var(--rule-strong)">
+        <sc-for list="{{weekdays}}" as="w" hint-placeholder-count="7">
+          <span class="num-small {{w.cls}}" style="height: 24px; display: flex; align-items: center; justify-content: center; color: var(--ink-muted)">{{w.t}}</span>
+        </sc-for>
+      </div>
+      <div role="grid" aria-label="November 2026, Dr. Aylin Kaya" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
+        <sc-for list="{{days}}" as="c" hint-placeholder-count="42">
+          <div class="{{c.wrap}}" style="position: relative; height: 44px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); display: flex; flex-direction: column">
+            <span class="num-small" style="position: absolute; left: 4px; top: 3px; z-index: 3; font-size: 11px; line-height: 12px">{{c.d}}</span>
+            <div class="{{c.cell}}" role="gridcell" aria-label="{{c.aria}}" style="width: 100%; min-width: 0; height: 44px; border: 0">
+              <span class="dp-letter grid-letter" aria-hidden="true">{{c.letter}}</span>
+              <sc-if value="{{c.granted}}" hint-placeholder-val="{{false}}">
+                <span class="dp-mark dp-mark--granted" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span>
+              </sc-if>
+              <sc-if value="{{c.missed}}" hint-placeholder-val="{{false}}">
+                <span class="dp-mark dp-mark--missed" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M22 2 2 22"></path></svg></span>
+              </sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div class="dp-legend caption" role="note" style="padding: 8px 12px; gap: 4px 12px">
+        <span class="dp-legend-item"><span class="dp-chip dp-chip--sm dp-shift--frueh" aria-hidden="true"><span>F</span></span>Früh</span>
+        <span class="dp-legend-item"><span class="dp-chip dp-chip--sm dp-shift--spaet" aria-hidden="true"><span>S</span></span>Spät</span>
+        <span class="dp-legend-item"><span class="dp-chip dp-chip--sm dp-shift--nacht" aria-hidden="true"><span>N</span></span>Nacht</span>
+        <span class="dp-legend-item"><span class="dp-chip dp-chip--sm dp-shift--bereitschaft" aria-hidden="true"><span>B</span></span>Bereitschaft</span>
+        <span class="dp-legend-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Wunsch erfüllt</span>
+        <span class="dp-legend-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M22 2 2 22"></path></svg>Wunsch nicht erfüllt</span>
+      </div>
+    </div>
+    <label class="dp-switch" style="display: flex; padding: 0 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+      <span class="body">Mit Kalender synchronisieren</span>
+      <span style="display: inline-flex; align-items: center; gap: 8px">
+        <span class="dp-switch-state caption" aria-hidden="true">An</span>
+        <input type="checkbox" role="switch" checked="">
+        <span class="dp-switch-track" aria-hidden="true"></span>
+      </span>
+    </label>
+    <section style="display: flex; flex-direction: column" aria-labelledby="list">
+      <h2 class="label" id="list" style="color: var(--ink-muted); padding-bottom: 4px">Liste</h2>
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="2">
+        <div style="display: flex; align-items: center; gap: 12px; height: 40px; border-bottom: 1px solid var(--rule)">
+          <span class="num-time" style="width: 92px">{{r.date}}</span>
+          <span class="dp-chip dp-chip--sm {{r.chip}}" aria-hidden="true"><span>{{r.letter}}</span></span>
+          <span class="body" style="flex-grow: 1">{{r.name}}</span>
+          <span class="num-time">{{r.time}}</span>
+        </div>
+      </sc-for>
+    </section>
+  </main>
+  <nav aria-label="Hauptnavigation" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--sheet); border-top: 1px solid var(--rule)">
+    <a class="label" href="M02-Heute.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--ink-muted)">Heute</a>
+    <a class="label" href="M03-Dienstplan.dc.html" aria-current="page" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--action); box-shadow: inset 0 3px 0 var(--action)">Dienstplan</a>
+    <a class="label" href="M11-Mitteilungen.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--ink-muted)">Mitteilungen</a>
+    <a class="label" href="M09-Fairness.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--ink-muted)">Mehr</a>
+  </nav>
+  <div style="height: 34px; flex: none; background: var(--sheet)" aria-hidden="true"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var KEY = { F: 'frueh', S: 'spaet', N: 'nacht', B: 'bereitschaft' };
+    var NAME = { F: 'Früh', S: 'Spät', N: 'Nacht', B: 'Bereitschaft' };
+    var TIME = { F: '07:30–16:00', S: '13:30–22:00', N: '21:30–08:00', B: '16:00–07:30' };
+    var WD = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+    // Dr. Kaya, November 2026 (1 Nov is a Sunday). '' = frei
+    var plan = ['', 'F', 'F', 'S', 'S', '', 'N', 'N', '', '', 'F', 'F', 'S', '', '', 'B', 'F', 'F', '', 'N', 'N', '', '', 'S', 'S', 'F', 'F', 'B', '', 'F'];
+    var granted = { 14: true, 15: true, 24: true };
+    var missed = { 21: true };
+    var days = [];
+    for (var i = 0; i < 42; i++) {
+      var col = i % 7, weekend = col >= 5;
+      var d = i - 5; // grid starts Mon 26 Oct
+      var inMonth = d >= 1 && d <= 30;
+      var s = inMonth ? plan[d - 1] : '';
+      var label = !inMonth ? '' : (WD[col] + ' ' + (d < 10 ? '0' + d : d) + '.11.: ' + (s ? NAME[s] : 'frei') + (granted[d] ? ', Wunsch erfüllt' : '') + (missed[d] ? ', Wunsch nicht erfüllt' : ''));
+      days.push({
+        d: inMonth ? String(d) : (d < 1 ? String(31 + d) : String(d - 30)),
+        wrap: (weekend ? 'cal-wk' : '') + (inMonth ? '' : ' cal-out'),
+        cell: 'dp-cell' + (s ? ' has-shift dp-shift--' + KEY[s] : ''),
+        letter: s, aria: label,
+        granted: !!(inMonth && granted[d]), missed: !!(inMonth && missed[d])
+      });
+    }
+    return {
+      weekdays: WD.map(function (t, i) { return { t: t, cls: i >= 5 ? 'cal-wk' : '' }; }),
+      days: days,
+      rows: [
+        { date: 'Mo 02.11.', letter: 'F', chip: 'dp-shift--frueh', name: 'Früh', time: TIME.F },
+        { date: 'Di 03.11.', letter: 'F', chip: 'dp-shift--frueh', name: 'Früh', time: TIME.F }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

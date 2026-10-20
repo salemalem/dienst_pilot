@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Navigation</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<nav aria-label="{{t.nav}}" style="width: {{width}}; flex: none; box-sizing: border-box; padding: 16px 8px; display: flex; flex-direction: column; gap: 2px; font-family: var(--font-sans); color: var(--ink); background: var(--paper)">
+
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="caption" style="color: var(--ink-muted); padding: 4px 12px 6px">{{t.g1}}</span></sc-if>
+
+<a href="{{h.w1}}" aria-label="{{t.w1}}" title="{{t.w1}}" aria-current="{{cur.w1}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w1}}; background: {{b.w1}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label">{{t.w1}}</span></sc-if>
+</a>
+
+<a href="{{h.w2}}" aria-label="{{t.w2}}" title="{{t.w2}}" aria-current="{{cur.w2}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w2}}; background: {{b.w2}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 14v2.2l1.6 1"></path><path d="M16 2v4"></path><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"></path><path d="M3 10h5"></path><path d="M8 2v4"></path><circle cx="16" cy="16" r="6"></circle></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label">{{t.w2}}</span></sc-if>
+</a>
+
+<a href="{{h.w3}}" aria-label="{{t.w3}}" title="{{t.w3}}" aria-current="{{cur.w3}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w3}}; background: {{b.w3}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="M15 3v18"></path></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label">{{t.w3}}</span></sc-if>
+</a>
+
+<a href="{{h.w4}}" aria-label="{{t.w4}}" title="{{t.w4}}" aria-current="{{cur.w4}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w4}}; background: {{b.w4}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path><path d="M16 18h.01"></path></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label">{{t.w4}}</span></sc-if>
+</a>
+
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="caption" style="color: var(--ink-muted); padding: 16px 12px 6px">{{t.g2}}</span></sc-if>
+<sc-if value="{{rail}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="height: 1px; background: var(--rule); margin: 8px 4px"></span></sc-if>
+
+<a href="{{h.w6}}" aria-label="{{t.w6}}" title="{{t.w6}}" aria-current="{{cur.w6}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w6}}; background: {{b.w6}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label" style="flex: 1 1 auto">{{t.w6}}</span><span class="num-small" style="color: var(--ink-muted)">3</span></sc-if>
+</a>
+
+<a href="{{h.w7}}" aria-label="{{t.w7}}" title="{{t.w7}}" aria-current="{{cur.w7}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w7}}; background: {{b.w7}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="17" x2="22" y1="8" y2="13"></line><line x1="22" x2="17" y1="8" y2="13"></line></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label">{{t.w7}}</span></sc-if>
+</a>
+
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="caption" style="color: var(--ink-muted); padding: 16px 12px 6px">{{t.g3}}</span></sc-if>
+<sc-if value="{{rail}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="height: 1px; background: var(--rule); margin: 8px 4px"></span></sc-if>
+
+<a href="{{h.w8}}" aria-label="{{t.w8}}" title="{{t.w8}}" aria-current="{{cur.w8}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w8}}; background: {{b.w8}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="M7 21h10"></path><path d="M12 3v18"></path><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label">{{t.w8}}</span></sc-if>
+</a>
+
+<a href="{{h.w10}}" aria-label="{{t.w10}}" title="{{t.w10}}" aria-current="{{cur.w10}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w10}}; background: {{b.w10}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 12h-5"></path><path d="M15 8h-5"></path><path d="M19 17V5a2 2 0 0 0-2-2H4"></path><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"></path></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label">{{t.w10}}</span></sc-if>
+</a>
+
+<a href="{{h.w12}}" aria-label="{{t.w12}}" title="{{t.w12}}" aria-current="{{cur.w12}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w12}}; background: {{b.w12}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label">{{t.w12}}</span></sc-if>
+</a>
+
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="caption" style="color: var(--ink-muted); padding: 16px 12px 6px">{{t.g4}}</span></sc-if>
+<sc-if value="{{rail}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="height: 1px; background: var(--rule); margin: 8px 4px"></span></sc-if>
+
+<a href="{{h.w11}}" aria-label="{{t.w11}}" title="{{t.w11}}" aria-current="{{cur.w11}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w11}}; background: {{b.w11}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label">{{t.w11}}</span></sc-if>
+</a>
+
+<a href="{{h.w13}}" aria-label="{{t.w13}}" title="{{t.w13}}" aria-current="{{cur.w13}}" style="display: flex; align-items: center; justify-content: {{jc}}; gap: 12px; height: 40px; padding: {{pad}}; border-radius: var(--radius-control); text-decoration: none; color: {{c.w13}}; background: {{b.w13}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg>
+<sc-if value="{{labels}}" hint-placeholder-val="{{true}}"><span class="label">{{t.w13}}</span></sc-if>
+</a>
+
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"locale":{"editor":"enum","options":["de","en"],"default":"de"},"active":{"editor":"enum","options":["w1","w2","w3","w4","w6","w7","w8","w10","w11","w12","w13","none"],"default":"w1"},"rail":{"editor":"enum","options":["no","yes"],"default":"no"},"$preview":{"width":232,"height":760}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var de = (this.props.locale || 'de') !== 'en';
+    var active = this.props.active || 'w1';
+    var rail = (this.props.rail || 'no') === 'yes';
+    var ids = ['w1', 'w2', 'w3', 'w4', 'w6', 'w7', 'w8', 'w10', 'w11', 'w12', 'w13'];
+    var hDe = {
+      w1: 'Main.dc.html', w2: 'W2-Wunschphase.dc.html', w3: 'W3-Varianten.dc.html', w4: 'W4-Dienstplan-Editor.dc.html',
+      w6: 'W6-Anfragen.dc.html', w7: 'W7-Ausfaelle.dc.html', w8: 'W8-Fairness-Compliance.dc.html', w10: 'W10-Protokoll.dc.html',
+      w11: 'W11-Regeln-Stammdaten.dc.html', w12: 'W12-Aufsicht.dc.html', w13: 'W13-KI-Transparenz.dc.html'
+    };
+    var h = {};
+    ids.forEach(function (id) { h[id] = hDe[id]; });
+    if (!de) { h.w3 = 'W3-Variants-EN.dc.html'; h.w4 = 'W4-Roster-Editor-EN.dc.html'; h.w13 = 'W13-AI-Transparency-EN.dc.html'; }
+    var c = {}, b = {}, cur = {};
+    ids.forEach(function (id) {
+      var on = id === active;
+      c[id] = on ? 'var(--action)' : 'var(--ink)';
+      b[id] = on ? 'var(--action-wash)' : 'transparent';
+      cur[id] = on ? 'page' : undefined;
+    });
+    var t = de ? {
+      nav: 'Hauptnavigation', g1: 'Planung Dezember 2026', g2: 'Laufender Betrieb', g3: 'Auswertung', g4: 'System',
+      w1: 'Übersicht', w2: 'Wunschphase', w3: 'Varianten', w4: 'Dienstplan-Editor', w6: 'Anfragen', w7: 'Ausfälle live',
+      w8: 'Fairness und Compliance', w10: 'Protokoll', w11: 'Regeln und Stammdaten', w12: 'Aufsicht', w13: 'KI-Transparenz'
+    } : {
+      nav: 'Main navigation', g1: 'Planning December 2026', g2: 'Daily operation', g3: 'Reporting', g4: 'System',
+      w1: 'Overview', w2: 'Request window', w3: 'Variants', w4: 'Roster editor', w6: 'Requests', w7: 'Absences live',
+      w8: 'Fairness and compliance', w10: 'Audit trail', w11: 'Rules and master data', w12: 'Oversight', w13: 'AI transparency'
+    };
+    return {
+      t: t, h: h, c: c, b: b, cur: cur,
+      labels: !rail, rail: rail,
+      width: rail ? '56px' : '232px',
+      pad: rail ? '0' : '0 12px',
+      jc: rail ? 'center' : 'flex-start'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>M6 Dienst tauschen</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="dp-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div class="dp-root" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: var(--font-sans); overflow: hidden">
+  <div style="height: 47px; flex: none" aria-hidden="true"></div>
+  <div class="dp-env dp-env--bar caption" role="status">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"></path><path d="M6.453 15h11.094"></path><path d="M8.5 2h7"></path></svg>
+    <span>Demo-Umgebung, synthetische Daten</span>
+  </div>
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; padding: 12px 16px 0 16px; overflow: hidden">
+    <div style="display: flex; align-items: flex-start; gap: 8px">
+      <div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1">
+        <span class="caption" style="color: var(--ink-muted)">Dienst tauschen, Dr. Rohan Mehta</span>
+        <h1 class="title">Nachtdienst am Samstag anbieten</h1>
+      </div>
+      <a class="dp-btn dp-btn--quiet label" href="M02-Heute.dc.html"><span>Abbrechen</span></a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+      <span class="dp-chip dp-chip--lg dp-shift--nacht" role="img" aria-label="Nacht" title="Nacht"><span aria-hidden="true">N</span></span>
+      <div style="display: flex; flex-direction: column">
+        <span class="body-strong">Sa 24./So 25.10., Nachtdienst</span>
+        <span class="num-time">21:30–08:00, Station 4B</span>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; padding: 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+      <span class="body-strong">Angebot geht an 4 Kolleg:innen, die diesen Dienst übernehmen dürfen</span>
+      <ul class="body" style="margin: 0; padding-left: 20px; color: var(--ink-muted)">
+        <li>qualifiziert für den Nachtdienst auf Station 4B</li>
+        <li>Ruhezeit von 11 Stunden bleibt eingehalten</li>
+        <li>nicht über den vertraglichen Stunden im Oktober</li>
+      </ul>
+      <span class="caption" style="color: var(--ink-muted)">Namen sehen Sie erst, wenn jemand annimmt.</span>
+    </div>
+    <label class="dp-check">
+      <input type="checkbox" checked="">
+      <span class="dp-check-box" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span>
+      <span class="body">Gegentausch anbieten<span class="caption" style="display: block; color: var(--ink-muted)">Sie übernehmen dafür einen Dienst der Person, die annimmt.</span></span>
+    </label>
+    <div class="dp-field">
+      <label class="dp-field-label label" for="msg">Nachricht an die Kolleg:innen (optional)</label>
+      <textarea class="dp-input" id="msg" placeholder="z. B. Grund oder Wunschtermin für den Gegentausch" style="min-height: 72px"></textarea>
+    </div>
+  </main>
+  <div style="display: flex; flex-direction: column; gap: 8px; padding: 16px">
+    <span class="caption" style="color: var(--ink-muted)">Nimmt jemand an und bleiben alle Regeln eingehalten, ist der Tausch sofort bestätigt. Sonst entscheidet Dr. Thomas Brandt.</span>
+    <button class="dp-btn dp-btn--primary dp-btn--lg dp-btn--block body-strong" type="button"><span>Dienst anbieten</span></button>
+  </div>
+  <div style="height: 34px; flex: none" aria-hidden="true"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

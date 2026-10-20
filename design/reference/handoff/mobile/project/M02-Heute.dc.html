@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>M2 Heute</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="dp-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div class="dp-root" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: var(--font-sans); overflow: hidden">
+  <div style="height: 47px; flex: none" aria-hidden="true"></div>
+  <div class="dp-env dp-env--bar caption" role="status">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"></path><path d="M6.453 15h11.094"></path><path d="M8.5 2h7"></path></svg>
+    <span>Demo-Umgebung, synthetische Daten</span>
+  </div>
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 24px; padding: 16px 16px 0 16px; overflow: hidden">
+    <section style="display: flex; flex-direction: column; gap: 12px" aria-labelledby="next">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span class="caption" style="color: var(--ink-muted)">Dienstag, 20.10.2026, Dr. Aylin Kaya</span>
+        <h1 class="title" id="next">Ihr nächster Dienst</h1>
+      </div>
+      <div style="display: flex; flex-direction: column; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 16px">
+          <span class="dp-chip dp-chip--lg dp-shift--spaet" role="img" aria-label="Spät" title="Spät"><span aria-hidden="true">S</span></span>
+          <div style="display: flex; flex-direction: column">
+            <span class="body-strong">Heute, Spätdienst</span>
+            <span class="num-time">13:30–22:00</span>
+          </div>
+          <span class="label" style="margin-left: auto; padding: 4px 8px; border: 1px solid var(--rule-strong); border-radius: var(--radius-mark)">Station 4B</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-top: 1px solid var(--rule)">
+          <span class="caption" style="color: var(--ink-muted)">Im Dienst mit</span>
+          <span class="body">Dr. Lea Lorenz, Dr. Marek Nowak, Dr. Hannah Schulz</span>
+        </div>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 12px" aria-labelledby="tasks">
+      <h2 class="heading" id="tasks">Offene Aufgaben (2)</h2>
+      <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span class="body-strong">Wünsche für Dezember abgeben, noch 6 Tage</span>
+          <span class="caption" style="color: var(--ink-muted)">Die Wunschphase endet am Mo 26.10. um 23:59.</span>
+        </div>
+        <a class="dp-btn dp-btn--secondary label" href="M04-Wuensche.dc.html" style="align-self: flex-start"><span>Wünsche eintragen</span></a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <span class="caption" style="color: var(--ink-muted)">Vertretungsanfrage</span>
+          <span class="body-strong">Können Sie am Do 22.10. den Spätdienst übernehmen?</span>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="dp-chip dp-chip--sm dp-shift--spaet" role="img" aria-label="Spät" title="Spät"><span aria-hidden="true">S</span></span>
+            <span class="num-time">13:30–22:00, Station 4B</span>
+          </div>
+          <span class="caption num-small" style="color: var(--ink-muted)">Antwort bis heute 18:00</span>
+        </div>
+        <button class="dp-btn dp-btn--secondary label" type="button" style="align-self: flex-start"><span>Anfrage ansehen</span></button>
+      </div>
+    </section>
+  </main>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 16px">
+    <a class="dp-btn dp-btn--secondary dp-btn--lg body-strong" href="M07-Krank.dc.html"><span>Krank melden</span></a>
+    <a class="dp-btn dp-btn--secondary dp-btn--lg body-strong" href="M06-Tauschen.dc.html"><span>Dienst tauschen</span></a>
+  </div>
+  <nav aria-label="Hauptnavigation" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--sheet); border-top: 1px solid var(--rule)">
+    <a class="label" href="M02-Heute.dc.html" aria-current="page" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--action); box-shadow: inset 0 3px 0 var(--action)">Heute</a>
+    <a class="label" href="M03-Dienstplan.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--ink-muted)">Dienstplan</a>
+    <a class="label" href="M11-Mitteilungen.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--ink-muted)">Mitteilungen</a>
+    <a class="label" href="M09-Fairness.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--ink-muted)">Mehr</a>
+  </nav>
+  <div style="height: 34px; flex: none; background: var(--sheet)" aria-hidden="true"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

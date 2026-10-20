@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>W9 Copilot-Panel</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="de" copilot="open" person="Dr. Thomas Brandt" persona-role="Oberarzt · Planer" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="de" active="w4" rail="yes" hint-size="56px,760px"></dc-import>
+<main style="flex: 999 1 480px; min-width: 0; box-sizing: border-box; padding: 24px 16px 40px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="title" style="margin: 0">Noch 1 Regelverstoß und 1 Lücke bis zur Freigabe</h1>
+<p class="label" style="margin: 0; color: var(--ink-muted)">Dienstplan Dezember 2026 · Entwurf aus Variante A · nur für Sie sichtbar</p>
+</div>
+<dc-import name="RosterGrid" locale="de" hint-size="100%,1180px"></dc-import>
+</main>
+
+<aside aria-label="Copilot, Planungs-Assistent" style="flex: 1 1 420px; max-width: 440px; box-sizing: border-box; background: var(--sheet); border-left: 1px solid var(--rule); padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 class="heading" style="margin: 0">Copilot</h2>
+<span class="caption" style="color: var(--ink-muted)">Planungs-Assistent. Liest den Entwurf, erklärt und schlägt vor.</span>
+</div>
+<button type="button" class="dp-btn dp-btn--quiet" aria-label="Copilot-Panel schließen" style="width: 40px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+</div>
+
+<div style="align-self: flex-end; max-width: 85%; background: var(--sheet-sunk); border-radius: var(--radius-panel); padding: 10px 14px">
+<p class="body" style="margin: 0">Warum hat Dr. Weber drei Wochenenden?</p>
+</div>
+
+<article class="dp-sugg" style="max-width: none">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Antwort des Copilots</span>
+<p class="dp-sugg-body body">Dr. Weber hat im Entwurf drei Bereitschaftsdienste am Wochenende: 05.12., 13.12. und 19.12. Das ist zulässig, die Grenze liegt bei drei Wochenenden pro Monat <sup class="caption">[1]</sup>.</p>
+<p class="dp-sugg-body body">Der Grund ist der Fairness-Ausgleich: Dr. Weber hatte 2026 bisher 9 Wochenenddienste, der Durchschnitt der Abteilung liegt bei 11,1 <sup class="caption">[2]</sup>. Er hat für Dezember kein Wochenende als „kann nicht“ markiert.</p>
+<div class="dp-sugg-why" style="gap: 10px">
+<span class="label" style="color: var(--ink-muted)">Quellen</span>
+<span class="label" style="display: flex; gap: 8px; align-items: flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M12 7v14"></path><path d="M16 12h2"></path><path d="M16 8h2"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path><path d="M6 12h2"></path><path d="M6 8h2"></path></svg><span>[1] <a href="W11-Regeln-Stammdaten.dc.html">Betriebsvereinbarung Dienstplanung (synthetisch), § 4 Abs. 2</a><br><cite class="caption" style="font-style: normal; color: var(--ink-muted)">Version 2026-1, gültig ab 01.01.2026</cite></span></span>
+<span class="label" style="display: flex; gap: 8px; align-items: flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M12 7v14"></path><path d="M16 12h2"></path><path d="M16 8h2"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path><path d="M6 12h2"></path><path d="M6 8h2"></path></svg><span>[2] <a href="W8-Fairness-Compliance.dc.html">Fairness-Bilanz 2026</a><br><cite class="caption" style="font-style: normal; color: var(--ink-muted)">Stand 20.10.2026, veröffentlichte Pläne Januar bis November</cite></span></span>
+</div>
+</article>
+
+<article class="dp-sugg" style="max-width: none">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Vorschlag</span>
+<p class="dp-sugg-body body-strong">Was wäre, wenn Dr. Klein den Bereitschaftsdienst am 19.12. übernimmt?</p>
+<ul class="label" style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px">
+<li>Dr. Weber hätte 2 Wochenenden, Dr. Klein 1.</li>
+<li>Keine Regel verletzt, alle Ruhezeiten eingehalten.</li>
+<li>Lastspreizung bleibt bei 6 Punkten.</li>
+</ul>
+<div class="dp-sugg-actions">
+<button type="button" class="dp-btn dp-btn--pencil label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Vorschlag erstellen</button>
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Warum?</button>
+</div>
+<p class="dp-sugg-note caption" style="margin: 0">Ein Vorschlag landet in Ihren Anfragen. Ändern und veröffentlichen können nur Sie.</p>
+</article>
+
+<div class="dp-field" style="margin-top: auto">
+<label class="dp-field-label label" for="w9-ask">Frage an den Copilot</label>
+<div style="display: flex; gap: 8px; align-items: flex-end">
+<textarea id="w9-ask" class="dp-input" rows="2" placeholder="Zum Beispiel: Was passiert, wenn Dr. Kaya am 24.12. frei hat?" style="min-height: 64px; flex: 1 1 auto"></textarea>
+<button type="button" class="dp-btn dp-btn--secondary" aria-label="Frage senden" style="width: 40px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"></path><path d="M6 12h16"></path></svg></button>
+</div>
+<span class="dp-field-hint caption">Der Copilot sieht nur pseudonymisierte Daten und keine Begründungen von Abwesenheiten.</span>
+</div>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

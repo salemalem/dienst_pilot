@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>W7 Ausfälle live</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="de" copilot="closed" person="Dr. Thomas Brandt" persona-role="Oberarzt · Planer" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="de" active="w7" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 32px">
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="display" style="margin: 0">1 Lücke geschlossen, 1 Suche läuft</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Heute, 20.10. · Die Suche fragt eine Person nach der anderen, jeweils mit 15 Minuten Zeit.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start">
+
+<section style="background: var(--sheet); border: 1px solid var(--rule); padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span class="caption" style="color: var(--ink-muted)">Frühdienst heute, 07:30–16:00, Station 4B</span>
+<h2 class="heading" style="margin: 0; display: flex; gap: 8px; align-items: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>Lücke geschlossen: Dr. Alvarez übernimmt</h2>
+<span class="label" style="color: var(--ink-muted)">Abwesend: Dr. Weber, gemeldet um 06:40</span>
+</div>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<li style="display: grid; grid-template-columns: 56px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">06:41</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>
+<span class="body">3 Kolleg:innen dürfen vertreten: qualifiziert, ausgeruht, im Stundenrahmen</span>
+</li>
+<li style="display: grid; grid-template-columns: 56px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">06:42</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M22 8c0-2.3-.8-4.3-2-6"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path><path d="M4 2C2.8 3.7 2 5.7 2 8"></path></svg></span>
+<span class="body"><strong style="font-weight: 650">Angefragt:</strong> Dr. Alvarez, Antwort bis 06:57</span>
+</li>
+<li style="display: grid; grid-template-columns: 56px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">06:44</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg></span>
+<span class="body"><strong style="font-weight: 650">Übernommen:</strong> Dr. Alvarez. Regelprüfung bestanden, Dienstplan für alle aktualisiert.</span>
+</li>
+</ol>
+<p class="caption" style="margin: 0; color: var(--ink-muted)">Keine Aktion nötig. Sie wurden um 06:44 informiert.</p>
+</section>
+
+<section style="background: var(--sheet); border: 1px solid var(--rule); padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span class="caption" style="color: var(--ink-muted)">Nachtdienst morgen, 21./22.10., 21:30–08:00</span>
+<h2 class="heading" style="margin: 0">Suche läuft: dritte Anfrage, Antwort bis 10:59</h2>
+<span class="label" style="color: var(--ink-muted)">Abwesend ab 21.10.: Dr. Okafor, gemeldet um 10:10</span>
+</div>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<li style="display: grid; grid-template-columns: 56px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">10:11</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M22 8c0-2.3-.8-4.3-2-6"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path><path d="M4 2C2.8 3.7 2 5.7 2 8"></path></svg></span>
+<span class="body"><strong style="font-weight: 650">Angefragt:</strong> Dr. Richter</span>
+</li>
+<li style="display: grid; grid-template-columns: 56px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">10:19</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg></span>
+<span class="body"><strong style="font-weight: 650">Abgelehnt:</strong> Dr. Richter</span>
+</li>
+<li style="display: grid; grid-template-columns: 56px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">10:19</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M22 8c0-2.3-.8-4.3-2-6"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path><path d="M4 2C2.8 3.7 2 5.7 2 8"></path></svg></span>
+<span class="body"><strong style="font-weight: 650">Angefragt:</strong> Dr. Lehmann</span>
+</li>
+<li style="display: grid; grid-template-columns: 56px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start">
+<span class="num-small" style="color: var(--ink-muted); padding-top: 3px">10:34</span>
+<span style="display: flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"></path><path d="M4.6 11a8 8 0 0 0 1.7 8.7 8 8 0 0 0 8.7 1.7"></path><path d="M7.4 7.4a8 8 0 0 1 10.3 1 8 8 0 0 1 .9 10.2"></path><path d="m2 2 20 20"></path><path d="M12 12v-2"></path></svg></span>
+<span class="body"><strong style="font-weight: 650">Keine Antwort:</strong> Dr. Lehmann, nach 15 Minuten weiter</span>
+</li>
+<li style="display: grid; grid-template-columns: 56px 24px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: start; background: var(--action-wash)">
+<span class="num-small" style="color: var(--ink-muted); padding: 3px 0 0 6px">10:44</span>
+<span style="display: flex; color: var(--action)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M22 8c0-2.3-.8-4.3-2-6"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path><path d="M4 2C2.8 3.7 2 5.7 2 8"></path></svg></span>
+<span class="body"><strong style="font-weight: 650">Angefragt:</strong> Dr. Klein, Antwort bis 10:59</span>
+</li>
+</ol>
+</section>
+
+<section class="dp-sugg" style="grid-column: 1 / -1; max-width: none; gap: 16px">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Vorschlag für den Fall, dass Dr. Klein ablehnt</span>
+<p class="dp-sugg-body body-strong">Dann ist die Liste erschöpft und die Entscheidung liegt bei Ihnen. Diese Optionen bleiben, in dieser Reihenfolge:</p>
+<ol style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<li style="background: var(--sheet); border: 1px solid var(--rule); padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span class="label" style="color: var(--ink-muted)">Option 1</span>
+<span class="body-strong">Dr. Wagner übernimmt</span>
+<span class="label">Folge: 9,75 Überstunden im Oktober. Ruhezeit und Nachtdienst-Grenze bleiben eingehalten.</span>
+<button type="button" class="dp-btn dp-btn--secondary label" style="align-self: flex-start">Dr. Wagner anfragen</button>
+</li>
+<li style="background: var(--sheet); border: 1px solid var(--rule); padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span class="label" style="color: var(--ink-muted)">Option 2</span>
+<span class="body-strong">Externe Vertretung</span>
+<span class="label">Folge: Kosten laut Rahmenvertrag, Übergabe auf Station 4B nötig.</span>
+<button type="button" class="dp-btn dp-btn--secondary label" style="align-self: flex-start">Externe Vertretung anfragen</button>
+</li>
+<li style="background: var(--sheet); border: 1px solid var(--rule); padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span class="label" style="color: var(--ink-muted)">Option 3</span>
+<span class="body-strong">Ärzt:in aus einer anderen Abteilung</span>
+<span class="label">Folge: Die Planung der anderen Abteilung muss zustimmen.</span>
+<button type="button" class="dp-btn dp-btn--secondary label" style="align-self: flex-start">Andere Abteilung anfragen</button>
+</li>
+</ol>
+<div class="dp-sugg-actions">
+<span class="dp-sugg-note caption">Die KI schlägt nur vor. Entscheiden müssen Sie.</span>
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Warum diese Reihenfolge?</button>
+</div>
+</section>
+
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

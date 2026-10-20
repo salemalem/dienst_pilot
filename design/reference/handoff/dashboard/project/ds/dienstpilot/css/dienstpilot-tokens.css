@@ -1,0 +1,207 @@
+/*
+ * DienstPilot design tokens: the official stylesheet. GENERATED from tokens.json (DienstPilot v1) by css/build-tokens-css.mjs.
+ * Do not edit by hand: change tokens.json, then run  node css/build-tokens-css.mjs
+ *
+ * Light theme is the default on :root.
+ * Dark theme: add the class "dp-dark" to <html> (or to any container; everything inside switches).
+ *   document.documentElement.classList.toggle("dp-dark", isNight)   // staff app: 20:00-07:00
+ * Type: use the classes (.body, .label, .num-time ...) or the properties: font: var(--type-body);
+ *   numeric styles (num-*, grid-letter) also need font-variant-numeric: tabular-nums after the font shorthand,
+ *   which resets it. The classes already include it.
+ */
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("../fonts/AtkinsonHyperlegibleNext-Variable.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("../fonts/AtkinsonHyperlegibleNext-Variable-Italic.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+  --paper: #F6F8F9;
+  --sheet: #FFFFFF;
+  --sheet-sunk: #EDF1F4;
+  --ink: #1C2B36;
+  --ink-muted: #4D5D69;
+  --on-ink: #FFFFFF;
+  --rule: #D6DDE2;
+  --rule-strong: #7A8793;
+  --action: #1F5FD1;
+  --action-wash: #E6EEFB;
+  --on-action: #FFFFFF;
+  --focus: var(--action);
+  --pencil: #566370;
+  --pencil-wash: #F2F4F6;
+  --alert: #B3261E;
+  --alert-wash: #FBEAE8;
+  --on-alert: #FFFFFF;
+  --shift-frueh: #E3A72F;
+  --on-shift-frueh: #1C2B36;
+  --shift-frueh-wash: #FAEFDA;
+  --shift-frueh-ink: #7A4F00;
+  --shift-spaet: #8B5FBF;
+  --on-shift-spaet: #FFFFFF;
+  --shift-spaet-wash: #EEE7F6;
+  --shift-spaet-ink: #5D3A93;
+  --shift-nacht: #24345E;
+  --on-shift-nacht: #FFFFFF;
+  --shift-nacht-wash: #DDE1EA;
+  --shift-nacht-ink: #24345E;
+  --shift-bereitschaft: #2A7F5B;
+  --on-shift-bereitschaft: #FFFFFF;
+  --shift-bereitschaft-wash: #DCEBE3;
+  --shift-bereitschaft-ink: #1C5C40;
+  --shift-frei: #9AA5B1;
+  --on-shift-frei: #1C2B36;
+  --shift-frei-wash: #EEF0F2;
+  --shift-frei-ink: #47525D;
+  --shift-nacht-edge: #24345E;
+  --env: #5C4A00;
+  --env-wash: #FFF6D6;
+  --shadow-sheet: 0 1px 2px rgba(28,43,54,0.06);
+  --shadow-raise: 0 2px 8px rgba(28,43,54,0.12);
+  --shadow-overlay: 0 16px 40px rgba(28,43,54,0.20);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --radius-sheet: 0px;
+  --radius-mark: 3px;
+  --radius-control: 6px;
+  --radius-panel: 10px;
+  --cell-w: 36px;
+  --cell-h: 34px;
+  --rowhead-w: 184px;
+  --touch-min: 48px;
+  --control-h: 40px;
+  --font-sans: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --type-display: 650 32px/40px var(--font-sans);
+  --type-display-tracking: -0.01em;
+  --type-title: 650 24px/32px var(--font-sans);
+  --type-heading: 650 19px/26px var(--font-sans);
+  --type-body: 400 16px/24px var(--font-sans);
+  --type-body-strong: 650 16px/24px var(--font-sans);
+  --type-label: 550 14px/20px var(--font-sans);
+  --type-caption: 450 13px/18px var(--font-sans);
+  --type-num-figure: 650 32px/36px var(--font-sans);
+  --type-num-time: 550 16px/24px var(--font-sans);
+  --type-num-small: 550 13px/16px var(--font-sans);
+  --type-grid-letter: 750 15px/1 var(--font-sans);
+  --type-grid-name: 550 14px/18px var(--font-sans);
+}
+
+.dp-dark {
+  color-scheme: dark;
+  --paper: #12191F;
+  --sheet: #1A232B;
+  --sheet-sunk: #151D23;
+  --ink: #E4EAEE;
+  --ink-muted: #A5B2BC;
+  --on-ink: #12191F;
+  --rule: #2C3843;
+  --rule-strong: #6E7C88;
+  --action: #86AAF2;
+  --action-wash: #1E2C45;
+  --on-action: #0E1A2E;
+  --focus: var(--action);
+  --pencil: #A0ACB6;
+  --pencil-wash: #1F2830;
+  --alert: #F28B82;
+  --alert-wash: #3A2324;
+  --on-alert: #1A0E0E;
+  --shift-frueh: #F5AE39;
+  --on-shift-frueh: #11181E;
+  --shift-frueh-wash: #3C3426;
+  --shift-frueh-ink: #F7C771;
+  --shift-spaet: #825EB9;
+  --on-shift-spaet: #FFFFFF;
+  --shift-spaet-wash: #2E2A42;
+  --shift-spaet-ink: #CDB5F0;
+  --shift-nacht: #203876;
+  --on-shift-nacht: #FFFFFF;
+  --shift-nacht-wash: #1F2B45;
+  --shift-nacht-ink: #AFC0F2;
+  --shift-bereitschaft: #389560;
+  --on-shift-bereitschaft: #11181E;
+  --shift-bereitschaft-wash: #20382F;
+  --shift-bereitschaft-ink: #86D6A9;
+  --shift-frei: #A7B1BB;
+  --on-shift-frei: #11181E;
+  --shift-frei-wash: #262F37;
+  --shift-frei-ink: #C7CED5;
+  --shift-nacht-edge: #6F86C6;
+  --env: #F1D27A;
+  --env-wash: #2F2A17;
+  --shadow-sheet: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-raise: 0 2px 8px rgba(0,0,0,0.5);
+  --shadow-overlay: 0 16px 40px rgba(0,0,0,0.6);
+}
+
+/* Type style classes */
+
+.display {
+  font: var(--type-display);
+  letter-spacing: var(--type-display-tracking);
+}
+
+.title {
+  font: var(--type-title);
+}
+
+.heading {
+  font: var(--type-heading);
+}
+
+.body {
+  font: var(--type-body);
+}
+
+.body-strong {
+  font: var(--type-body-strong);
+}
+
+.label {
+  font: var(--type-label);
+}
+
+.caption {
+  font: var(--type-caption);
+}
+
+.num-figure {
+  font: var(--type-num-figure);
+  font-variant-numeric: tabular-nums;
+}
+
+.num-time {
+  font: var(--type-num-time);
+  font-variant-numeric: tabular-nums;
+}
+
+.num-small {
+  font: var(--type-num-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.grid-letter {
+  font: var(--type-grid-letter);
+  font-variant-numeric: tabular-nums;
+}
+
+.grid-name {
+  font: var(--type-grid-name);
+}
+

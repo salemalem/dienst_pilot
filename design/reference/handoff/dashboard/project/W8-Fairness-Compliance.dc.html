@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>W8 Fairness und Compliance</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="de" copilot="closed" person="Dr. Thomas Brandt" persona-role="Oberarzt · Planer" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="de" active="w8" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 32px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="display" style="margin: 0">Alle veröffentlichten Pläne 2026 halten die Ruhezeiten ein</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Januar bis November 2026, veröffentlichte Dienstpläne · Stand 20.10.2026</p>
+</div>
+<div class="dp-seg" role="group" aria-label="Zeitraum">
+<button type="button" class="label" aria-pressed="true" style="height: 34px; padding: 0 12px; border: 0; border-radius: 4px; font-family: var(--font-sans); background: var(--action); color: var(--on-action)">2026</button>
+<button type="button" class="label" aria-pressed="false" style="height: 34px; padding: 0 12px; border: 0; border-radius: 4px; font-family: var(--font-sans); background: transparent; color: var(--ink)">Letzte 12 Monate</button>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+<div style="background: var(--sheet); border: 1px solid var(--rule); padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<span class="label" style="color: var(--ink-muted)">Ruhezeit eingehalten</span>
+<span class="num-figure">100 %</span>
+<span class="caption" style="color: var(--ink-muted)">aller Dienstwechsel in veröffentlichten Plänen</span>
+</div>
+<div style="background: var(--sheet); border: 1px solid var(--rule); padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<span class="label" style="color: var(--ink-muted)">Wochenenddienste pro Person</span>
+<span class="num-figure">9–14</span>
+<span class="caption" style="color: var(--ink-muted)">Spanne ohne Chefärztin, Durchschnitt aller {{avgW}}</span>
+</div>
+<div style="background: var(--sheet); border: 1px solid var(--rule); padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<span class="label" style="color: var(--ink-muted)">Überstunden Oktober</span>
+<span class="num-figure">38 h</span>
+<span class="caption" style="color: var(--ink-muted)">Abteilung gesamt, bis heute</span>
+</div>
+<div style="background: var(--sheet); border: 1px solid var(--rule); padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<span class="label" style="color: var(--ink-muted)">Entwurf Dezember</span>
+<span class="label" style="display: flex; gap: 6px; align-items: flex-start; color: var(--alert)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg><strong style="font-weight: 650">1 Regelverstoß offen (Dr. Lorenz, 14./15.12.)</strong></span>
+<a class="caption" href="W4-Dienstplan-Editor.dc.html">Im Dienstplan-Editor korrigieren</a>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+<section style="flex: 999 1 640px; min-width: 0; background: var(--sheet); border: 1px solid var(--rule); display: flex; flex-direction: column">
+<div style="padding: 20px 24px 12px; display: flex; flex-direction: column; gap: 4px">
+<h2 class="heading" style="margin: 0">Verteilung Wochenenddienste 2026</h2>
+<span class="label" style="color: var(--ink-muted)">Gestrichelte Linie: Durchschnitt {{avgW}}. Lastpunkte: Nacht 1, Wochenende 2, Feiertag 3.</span>
+</div>
+<div class="label" style="display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 2fr) 56px 56px 64px 72px; gap: 12px; padding: 8px 24px; background: var(--sheet-sunk); color: var(--ink-muted); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule-strong)">
+<span>Person</span><span>Wochenenden</span><span style="text-align: right">Nächte</span><span style="text-align: right">Feiert.</span><span style="text-align: right">Lastp.</span><span style="text-align: right">Überst.</span>
+</div>
+<sc-for list="{{people}}" as="p" hint-placeholder-count="28">
+<div style="display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 2fr) 56px 56px 64px 72px; gap: 12px; padding: 0 24px; height: 32px; align-items: center; border-bottom: 1px solid var(--rule)">
+<span class="label" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.n}}</span>
+<span style="position: relative; height: 14px; display: flex; align-items: center; gap: 8px">
+<span style="position: relative; flex: 1 1 auto; height: 14px">
+<span aria-hidden="true" style="position: absolute; left: 0; top: 2px; height: 10px; width: {{p.wBar}}; background: var(--ink)"></span>
+<span aria-hidden="true" style="position: absolute; left: {{avgPos}}; top: -6px; bottom: -6px; border-left: 1.5px dashed var(--ink-muted)"></span>
+</span>
+<span class="num-small" style="width: 20px; text-align: right">{{p.w}}</span>
+</span>
+<span class="num-small" style="text-align: right">{{p.nights}}</span>
+<span class="num-small" style="text-align: right">{{p.hol}}</span>
+<span class="num-small" style="text-align: right">{{p.pts}}</span>
+<span class="num-small" style="text-align: right">{{p.ot}}</span>
+</div>
+</sc-for>
+</section>
+
+<section style="flex: 1 1 360px; min-width: 0; background: var(--sheet); border: 1px solid var(--rule); padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 class="heading" style="margin: 0">Überstunden pro Monat</h2>
+<span class="label" style="color: var(--ink-muted)">Abteilung gesamt, Stunden. Oktober bis heute.</span>
+</div>
+<div style="display: flex; align-items: flex-end; gap: 8px; height: 200px; border-bottom: 1px solid var(--rule-strong); padding-top: 16px">
+<sc-for list="{{ot}}" as="m" hint-placeholder-count="10">
+<div style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%">
+<span class="num-small" style="color: var(--ink-muted)">{{m.v}}</span>
+<span aria-hidden="true" style="width: 100%; height: {{m.h}}; background: {{m.bg}}"></span>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 8px">
+<sc-for list="{{ot}}" as="m" hint-placeholder-count="10">
+<span class="caption" style="flex: 1 1 0; text-align: center; color: var(--ink-muted)">{{m.k}}</span>
+</sc-for>
+</div>
+<p class="label" style="margin: 0">Seit dem Sommer sinken die Überstunden. Höchster Wert: August mit 63 h.</p>
+<div style="border-top: 1px solid var(--rule); padding-top: 16px; display: flex; flex-direction: column; gap: 8px">
+<h3 class="body-strong" style="margin: 0">Regelgrundlage</h3>
+<span class="label" style="display: flex; gap: 8px; align-items: flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M12 7v14"></path><path d="M16 12h2"></path><path d="M16 8h2"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path><path d="M6 12h2"></path><path d="M6 8h2"></path></svg>Ruhezeit: § 5 ArbZG, Regelversion 2026-1</span>
+<span class="label" style="display: flex; gap: 8px; align-items: flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M12 7v14"></path><path d="M16 12h2"></path><path d="M16 8h2"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path><path d="M6 12h2"></path><path d="M6 8h2"></path></svg>Wochenenden: Betriebsvereinbarung Dienstplanung (synthetisch), § 4 Abs. 2</span>
+</div>
+</section>
+
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1560}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var raw = [
+      ['Prof. Dr. Claudia Hoffmann', 4, 0, 1, 0], ['Dr. Thomas Brandt', 10, 0, 2, 22], ['Dr. Marek Nowak', 11, 0, 1, 18],
+      ['Dr. Hannah Schulz', 12, 0, 2, 15], ['Synth. Ärzt:in 18', 11, 0, 1, 9], ['Dr. Lea Lorenz', 12, 20, 1, 12],
+      ['Dr. Yusuf Demir', 13, 22, 2, 16], ['Dr. Ines Becker', 11, 19, 1, 8], ['Dr. Felix Wagner', 14, 24, 2, 31],
+      ['Synth. Ärzt:in 19', 12, 21, 1, 10], ['Synth. Ärzt:in 20', 10, 23, 1, 6], ['Synth. Ärzt:in 21', 11, 22, 2, 11],
+      ['Dr. Aylin Kaya', 12, 20, 1, 7], ['Dr. Rohan Mehta', 11, 21, 1, 9], ['Dr. Jonas Weber', 9, 22, 1, 5],
+      ['Dr. Sofía Alvarez', 13, 21, 2, 14], ['Dr. Mira Okafor', 10, 23, 1, 4], ['Dr. Paul Richter', 12, 24, 2, 12],
+      ['Dr. Anna Lehmann', 11, 20, 1, 6], ['Dr. Tobias Klein', 10, 25, 1, 8], ['Dr. Elif Arslan', 12, 19, 1, 3],
+      ['Synth. Ärzt:in 22', 11, 22, 1, 10], ['Synth. Ärzt:in 23', 13, 21, 2, 13], ['Synth. Ärzt:in 24', 12, 23, 1, 9],
+      ['Synth. Ärzt:in 25', 10, 20, 1, 2], ['Synth. Ärzt:in 26', 11, 22, 1, 7], ['Synth. Ärzt:in 27', 12, 21, 2, 11],
+      ['Synth. Ärzt:in 28', 11, 24, 1, 8]
+    ];
+    var max = 16, sum = 0;
+    raw.forEach(function (r) { sum += r[1]; });
+    var avg = sum / raw.length;
+    var people = raw.map(function (r) {
+      return {
+        n: r[0], w: String(r[1]), wBar: (r[1] / max * 100).toFixed(1) + '%',
+        nights: String(r[2]), hol: String(r[3]), pts: String(r[2] + 2 * r[1] + 3 * r[3]), ot: r[4] + ' h'
+      };
+    });
+    var months = [['Jan', 52], ['Feb', 61], ['Mär', 48], ['Apr', 40], ['Mai', 35], ['Jun', 44], ['Jul', 58], ['Aug', 63], ['Sep', 41], ['Okt', 38]];
+    var ot = months.map(function (m, i) {
+      return { k: m[0], v: String(m[1]), h: Math.round(m[1] / 70 * 150) + 'px', bg: i === months.length - 1 ? 'var(--rule-strong)' : 'var(--ink)' };
+    });
+    return {
+      people: people, ot: ot,
+      avgW: avg.toFixed(1).replace('.', ','),
+      avgPos: (avg / max * 100).toFixed(1) + '%'
+    };
+  }
+}
+</script>
+</body>
+</html>

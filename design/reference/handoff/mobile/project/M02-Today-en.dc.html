@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>M2 Today (EN)</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="dp-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+.tab{border:0;background:none;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;height:56px;color:var(--ink-muted)}
+.tab[aria-current="page"]{color:var(--action);box-shadow:inset 0 3px 0 var(--action)}
+</style>
+</helmet>
+<div class="dp-root" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: var(--font-sans); overflow: hidden">
+  <div style="height: 47px; flex: none" aria-hidden="true"></div>
+  <div class="dp-env dp-env--bar caption" role="status">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"></path><path d="M6.453 15h11.094"></path><path d="M8.5 2h7"></path></svg>
+    <span>Demo environment, synthetic data</span>
+  </div>
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 24px; padding: 16px 16px 0 16px; overflow: hidden">
+    <section style="display: flex; flex-direction: column; gap: 12px" aria-labelledby="next">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span class="caption" style="color: var(--ink-muted)">Tuesday, 20 Oct 2026, Dr. Aylin Kaya</span>
+        <h1 class="title" id="next">Your next shift</h1>
+      </div>
+      <div style="display: flex; flex-direction: column; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 16px">
+          <span class="dp-chip dp-chip--lg dp-shift--spaet" role="img" aria-label="Late" title="Late"><span aria-hidden="true">L</span></span>
+          <div style="display: flex; flex-direction: column">
+            <span class="body-strong">Today, late shift</span>
+            <span class="num-time">13:30–22:00</span>
+          </div>
+          <span class="label" style="margin-left: auto; padding: 4px 8px; border: 1px solid var(--rule-strong); border-radius: var(--radius-mark)">Ward 4B</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-top: 1px solid var(--rule)">
+          <span class="caption" style="color: var(--ink-muted)">On shift with</span>
+          <span class="body">Dr. Lea Lorenz, Dr. Marek Nowak, Dr. Hannah Schulz</span>
+        </div>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 12px" aria-labelledby="tasks">
+      <h2 class="heading" id="tasks">Open tasks (2)</h2>
+      <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span class="body-strong">Submit your wishes for December, 6 days left</span>
+          <span class="caption" style="color: var(--ink-muted)">The request window closes on Mon 26 Oct at 23:59.</span>
+        </div>
+        <button class="dp-btn dp-btn--secondary label" type="button" style="align-self: flex-start"><span>Enter wishes</span></button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <span class="caption" style="color: var(--ink-muted)">Cover request</span>
+          <span class="body-strong">Can you take the late shift on Thu 22 Oct?</span>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="dp-chip dp-chip--sm dp-shift--spaet" role="img" aria-label="Late" title="Late"><span aria-hidden="true">L</span></span>
+            <span class="num-time">13:30–22:00, Ward 4B</span>
+          </div>
+          <span class="caption num-small" style="color: var(--ink-muted)">Reply by 18:00 today</span>
+        </div>
+        <button class="dp-btn dp-btn--secondary label" type="button" style="align-self: flex-start"><span>View request</span></button>
+      </div>
+    </section>
+  </main>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 16px">
+    <a class="dp-btn dp-btn--secondary dp-btn--lg body-strong" href="M07-Sick-en.dc.html"><span>Report sick</span></a>
+    <button class="dp-btn dp-btn--secondary dp-btn--lg body-strong" type="button"><span>Swap a shift</span></button>
+  </div>
+  <nav aria-label="Main navigation" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--sheet); border-top: 1px solid var(--rule)">
+    <button class="tab label" type="button" aria-current="page">Today</button>
+    <button class="tab label" type="button">Roster</button>
+    <button class="tab label" type="button">Notifications</button>
+    <button class="tab label" type="button">More</button>
+  </nav>
+  <div style="height: 34px; flex: none; background: var(--sheet)" aria-hidden="true"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

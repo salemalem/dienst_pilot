@@ -1,0 +1,41 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-20T11:00:00Z"},
+  "title": "DienstPilot Staff-App",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 390, "h": 844, "title": "M1 Anmeldung", "is_interactive": true, "radius": 44},
+    "M02-Heute.dc.html": {"x": 470, "y": 0, "w": 390, "h": 844, "title": "M2 Heute", "is_interactive": true, "radius": 44},
+    "M03-Dienstplan.dc.html": {"x": 940, "y": 0, "w": 390, "h": 844, "title": "M3 Mein Dienstplan", "is_interactive": true, "radius": 44},
+    "M04-Wuensche.dc.html": {"x": 1410, "y": 0, "w": 390, "h": 1160, "title": "M4 Wünsche (ganze Seite)", "is_interactive": true, "radius": 44},
+    "M05-Urlaub.dc.html": {"x": 1880, "y": 0, "w": 390, "h": 844, "title": "M5 Urlaub beantragen", "is_interactive": true, "radius": 44},
+    "M06-Tauschen.dc.html": {"x": 2350, "y": 0, "w": 390, "h": 844, "title": "M6 Dienst tauschen (Dr. Mehta)", "is_interactive": true, "radius": 44},
+    "M07-Krank.dc.html": {"x": 0, "y": 1280, "w": 390, "h": 844, "title": "M7 Krank melden (Dr. Weber)", "is_interactive": true, "radius": 44},
+    "M08-Vertretung.dc.html": {"x": 470, "y": 1280, "w": 390, "h": 844, "title": "M8 Vertretungsanfrage (Dr. Alvarez)", "is_interactive": true, "radius": 44},
+    "M09-Fairness.dc.html": {"x": 940, "y": 1280, "w": 390, "h": 844, "title": "M9 Fairness-Bilanz", "is_interactive": true, "radius": 44},
+    "M10-Stunden.dc.html": {"x": 1410, "y": 1280, "w": 390, "h": 844, "title": "M10 Stunden", "is_interactive": true, "radius": 44},
+    "M11-Mitteilungen.dc.html": {"x": 1880, "y": 1280, "w": 390, "h": 844, "title": "M11 Mitteilungen", "is_interactive": true, "radius": 44},
+    "M12-Einstellungen.dc.html": {"x": 2350, "y": 1280, "w": 390, "h": 844, "title": "M12 Einstellungen", "is_interactive": true, "radius": 44},
+    "M02-Today-en.dc.html": {"x": 0, "y": 2540, "w": 390, "h": 844, "title": "M2 Today (EN)", "radius": 44},
+    "M05-Leave-en.dc.html": {"x": 470, "y": 2540, "w": 390, "h": 844, "title": "M5 Request leave (EN)", "radius": 44},
+    "M07-Sick-en.dc.html": {"x": 940, "y": 2540, "w": 390, "h": 844, "title": "M7 Report sick (EN)", "radius": 44},
+    "M08-Cover-en.dc.html": {"x": 1410, "y": 2540, "w": 390, "h": 844, "title": "M8 Cover request (EN)", "radius": 44},
+    "M02-Heute-dark.dc.html": {"x": 0, "y": 3800, "w": 390, "h": 844, "title": "M2 Heute, dunkel", "radius": 44},
+    "M08-Vertretung-dark.dc.html": {"x": 470, "y": 3800, "w": 390, "h": 844, "title": "M8 Vertretungsanfrage, dunkel", "radius": 44}
+  },
+  "order": [
+    "Main.dc.html", "M02-Heute.dc.html", "M03-Dienstplan.dc.html", "M04-Wuensche.dc.html", "M05-Urlaub.dc.html", "M06-Tauschen.dc.html",
+    "M07-Krank.dc.html", "M08-Vertretung.dc.html", "M09-Fairness.dc.html", "M10-Stunden.dc.html", "M11-Mitteilungen.dc.html", "M12-Einstellungen.dc.html",
+    "M02-Today-en.dc.html", "M05-Leave-en.dc.html", "M07-Sick-en.dc.html", "M08-Cover-en.dc.html",
+    "M02-Heute-dark.dc.html", "M08-Vertretung-dark.dc.html"
+  ],
+  "notes": {
+    "rowDe": {"x": 0, "y": -300, "text": "Staff-App, Deutsch: M1–M12", "kind": "title1", "maxW": 2740},
+    "rowEn": {"x": 0, "y": 2240, "text": "English: M2, M5, M7, M8", "kind": "title1", "maxW": 1840},
+    "rowDark": {"x": 0, "y": 3500, "text": "Dunkel / Dark: M2, M8", "kind": "title1", "maxW": 1840}
+  },
+  "designSystems": [
+    {"title": "DienstPilot", "namespace": "dienstpilot", "artifact": "https://claude.ai/code/artifact/2566532a-f94a-41e2-ab6e-fa6bf670e580", "version": "1792491234-613d", "copiedAt": "2026-10-20T11:00:00Z"}
+  ]
+}

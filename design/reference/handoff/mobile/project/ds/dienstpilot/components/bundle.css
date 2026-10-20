@@ -1,0 +1,240 @@
+/* DienstPilot components. Every value comes from tokens.css (var(--…)); nothing here re-declares a token. */
+
+.dp-root, .dp-chip, .dp-btn, .dp-field, .dp-check, .dp-switch, .dp-seg, .dp-sugg, .dp-rule, .dp-env, .dp-sheet {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  box-sizing: border-box;
+}
+.dp-root *, .dp-sheet *, .dp-sugg *, .dp-rule * { box-sizing: border-box; }
+.num-figure, .num-time, .num-small, .grid-letter, .dp-tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+/* Focus: one ring everywhere. 2px solid ballpoint blue, 2px offset in the surface colour. */
+.dp-focusable:focus-visible, .dp-btn:focus-visible, .dp-input:focus-visible, .dp-check input:focus-visible + .dp-check-box,
+.dp-switch input:focus-visible + .dp-switch-track, .dp-seg input:focus-visible + span, .dp-cell[tabindex]:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.dp-cell[tabindex]:focus-visible { outline-offset: -3px; z-index: 2; }
+
+/* ───────── Shift chip ───────── */
+.dp-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 24px; height: 24px; padding: 0 var(--space-1);
+  border-radius: var(--radius-mark);
+  font-size: 13px; font-weight: 750; line-height: 1; letter-spacing: 0.02em;
+  background: var(--chip-bg); color: var(--chip-fg);
+  box-shadow: inset 0 0 0 1px var(--chip-edge, transparent);
+}
+.dp-chip--lg { min-width: 32px; height: 32px; font-size: 16px; }
+.dp-chip--sm { min-width: 20px; height: 20px; font-size: 12px; }
+.dp-shift--frueh { --chip-bg: var(--shift-frueh); --chip-fg: var(--on-shift-frueh); --wash: var(--shift-frueh-wash); --letter: var(--shift-frueh-ink); --mark: var(--shift-frueh); }
+.dp-shift--spaet { --chip-bg: var(--shift-spaet); --chip-fg: var(--on-shift-spaet); --wash: var(--shift-spaet-wash); --letter: var(--shift-spaet-ink); --mark: var(--shift-spaet); }
+.dp-shift--nacht { --chip-bg: var(--shift-nacht); --chip-fg: var(--on-shift-nacht); --chip-edge: var(--shift-nacht-edge); --wash: var(--shift-nacht-wash); --letter: var(--shift-nacht-ink); --mark: var(--shift-nacht-edge); }
+.dp-shift--bereitschaft { --chip-bg: var(--shift-bereitschaft); --chip-fg: var(--on-shift-bereitschaft); --wash: var(--shift-bereitschaft-wash); --letter: var(--shift-bereitschaft-ink); --mark: var(--shift-bereitschaft); }
+.dp-shift--frei { --chip-fg: var(--on-shift-frei); --wash: var(--shift-frei-wash); --letter: var(--shift-frei-ink); --mark: var(--shift-frei); }
+.dp-chip.dp-shift--frei {
+  background: repeating-linear-gradient(135deg, var(--shift-frei) 0 2px, var(--shift-frei-wash) 2px 5px);
+  box-shadow: inset 0 0 0 1px var(--shift-frei);
+}
+.dp-chip.dp-shift--frei > span { background: var(--shift-frei); padding: 1px 2px; border-radius: 2px; }
+.dp-chiplabel { display: inline-flex; align-items: center; gap: var(--space-2); }
+.dp-chiplabel-text { display: inline-flex; flex-direction: column; }
+
+/* ───────── Roster sheet & grid ───────── */
+.dp-sheet {
+  background: var(--sheet);
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--shadow-sheet), 0 0 0 1px var(--rule);
+  display: inline-block; max-width: 100%; overflow-x: auto;
+}
+.dp-grid { border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+.dp-grid th, .dp-grid td { padding: 0; }
+.dp-grid thead th {
+  height: 40px; background: var(--sheet-sunk); color: var(--ink-muted);
+  border-bottom: 1px solid var(--rule-strong); border-right: 1px solid var(--rule);
+  font-weight: 550; vertical-align: middle; text-align: center;
+}
+.dp-grid thead th.is-weekend { color: var(--ink); }
+.dp-grid thead th.is-today { background: var(--action); color: var(--on-action); border-right-color: var(--action); }
+.dp-grid .dp-day { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.dp-grid .dp-day b { font-weight: 750; color: inherit; }
+.dp-grid .dp-rowhead {
+  width: var(--rowhead-w); min-width: var(--rowhead-w); text-align: left;
+  padding: 0 var(--space-3); border-right: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule);
+  background: var(--sheet); position: sticky; left: 0; z-index: 1;
+}
+.dp-grid thead .dp-rowhead { background: var(--sheet-sunk); color: var(--ink-muted); z-index: 3; }
+.dp-grid .dp-rowhead small { display: block; color: var(--ink-muted); font-size: 12px; line-height: 14px; font-weight: 450; }
+.dp-grid .dp-total {
+  width: 56px; min-width: 56px; text-align: right; padding-right: var(--space-2);
+  border-left: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule); color: var(--ink);
+}
+.dp-grid thead .dp-total { color: var(--ink-muted); }
+.dp-grid tfoot td, .dp-grid tfoot th { border-top: 2px solid var(--rule-strong); }
+.dp-grid tfoot .dp-rowhead { color: var(--ink-muted); }
+.dp-grid .is-weekend-col { background: var(--sheet-sunk); }
+.dp-grid td.is-today-col { box-shadow: inset 1px 0 0 var(--action), inset -1px 0 0 var(--action); }
+
+/* A cell. Content: shift letter + marker underline; annotations sit in the corners. */
+.dp-cell {
+  position: relative; width: var(--cell-w); min-width: var(--cell-w); height: var(--cell-h);
+  border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+}
+td > .dp-cell { border: 0; }
+.dp-grid td { border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.dp-cell.has-shift { background: var(--wash); }
+.dp-cell .dp-letter { color: var(--letter); position: relative; z-index: 1; padding-bottom: 3px; }
+.dp-cell.has-shift::after {
+  content: ""; position: absolute; left: 50%; bottom: 6px; width: 14px; height: 3px; margin-left: -7px;
+  background: var(--mark); border-radius: 1px;
+}
+/* Leave: 45° hatching, the letter on a small clear patch. */
+.dp-cell.is-leave { background: repeating-linear-gradient(135deg, var(--shift-frei) 0 1.5px, var(--shift-frei-wash) 1.5px 6px); }
+.dp-cell.is-leave::after { display: none; }
+.dp-cell.is-leave .dp-letter { background: var(--shift-frei-wash); padding: 2px 3px; border-radius: 2px; }
+/* Wish marks, top-right corner, shape-coded. */
+.dp-mark { position: absolute; top: 1px; right: 1px; width: 12px; height: 12px; z-index: 2; }
+.dp-mark svg { display: block; }
+.dp-mark--granted { color: var(--ink); }
+.dp-mark--missed { color: var(--ink-muted); }
+/* Rule violation: a red-pen ellipse around the letter plus a Lucide circle-alert badge. */
+.dp-cell.is-violation::before {
+  content: ""; position: absolute; inset: 5px 4px 4px 4px; z-index: 1;
+  border: 2px solid var(--alert); border-radius: 50%; transform: rotate(-8deg);
+}
+.dp-bang {
+  position: absolute; top: 0; left: 0; z-index: 3; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--sheet); color: var(--alert);
+}
+.dp-bang svg { display: block; }
+/* Gap: nobody assigned where demand exists. Dashed, empty, the missing shift letter in muted ink. */
+.dp-cell.is-gap { background: var(--sheet); }
+.dp-cell.is-gap::before {
+  content: ""; position: absolute; inset: 3px; border: 2px dashed var(--ink); border-radius: 0;
+}
+/* The missing shift as a hollow letter: an empty slot in the shape of what is needed. */
+.dp-cell.is-gap .dp-letter { color: transparent; -webkit-text-stroke: 1.2px var(--ink); font-weight: 800; padding: 0; }
+/* Suggested (pencilled): an AI proposal not yet accepted. */
+.dp-cell.is-suggested { background: var(--pencil-wash); }
+.dp-cell.is-suggested::before { content: ""; position: absolute; inset: 3px; border: 1.5px dashed var(--pencil); }
+.dp-cell.is-suggested::after { display: none; }
+.dp-cell.is-suggested .dp-letter { color: var(--pencil); font-style: italic; font-weight: 650; padding: 0; }
+.dp-cell.is-selected { box-shadow: inset 0 0 0 2px var(--action); }
+/* Coverage row values */
+.dp-cov { font-size: 12px; color: var(--ink-muted); }
+.dp-cov svg { display: block; }
+.dp-cov-ok { color: var(--ink-muted); }
+
+.dp-legend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); align-items: center; padding: var(--space-3) var(--space-4); border-top: 1px solid var(--rule); color: var(--ink-muted); }
+.dp-legend-item { display: inline-flex; align-items: center; gap: var(--space-2); }
+.dp-legend .dp-cell { border: 1px solid var(--rule); width: 30px; min-width: 30px; height: 28px; }
+.dp-legend .dp-cell .grid-letter { font-size: 13px; }
+
+/* ───────── Buttons ───────── */
+.dp-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  height: var(--control-h); padding: 0 var(--space-4);
+  border-radius: var(--radius-control); border: 1px solid transparent;
+  cursor: pointer; white-space: nowrap; text-decoration: none;
+  transition: background-color .12s ease, border-color .12s ease;
+}
+.dp-btn--lg { height: var(--touch-min); padding: 0 var(--space-5); }
+.dp-btn--block { display: flex; width: 100%; }
+.dp-btn--primary { background: var(--ink); color: var(--on-ink); }
+.dp-btn--primary:hover { background: var(--ink-muted); }
+.dp-btn--secondary { background: var(--sheet); color: var(--ink); border-color: var(--rule-strong); }
+.dp-btn--secondary:hover { background: var(--sheet-sunk); }
+.dp-btn--quiet { background: transparent; color: var(--ink); }
+.dp-btn--quiet:hover { background: var(--sheet-sunk); }
+.dp-btn--link { background: transparent; color: var(--action); padding: 0 var(--space-1); text-decoration: underline; text-underline-offset: 3px; height: auto; }
+.dp-btn--pencil { background: transparent; color: var(--pencil); border: 1.5px dashed var(--pencil); }
+.dp-btn--pencil:hover { background: var(--pencil-wash); }
+.dp-btn[disabled], .dp-btn[aria-disabled="true"] { background: var(--sheet-sunk); color: var(--ink-muted); border-color: var(--rule); cursor: not-allowed; }
+.dp-btn svg { flex: none; }
+
+/* ───────── Form controls ───────── */
+.dp-field { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.dp-field-label { color: var(--ink); }
+.dp-field-hint { color: var(--ink-muted); }
+.dp-input {
+  box-sizing: border-box; height: var(--control-h); padding: 0 var(--space-3); width: 100%;
+  background: var(--sheet); color: var(--ink);
+  border: 1px solid var(--rule-strong); border-radius: var(--radius-control);
+  font: inherit; font-size: 16px;
+}
+.dp-input::placeholder { color: var(--ink-muted); }
+textarea.dp-input { height: auto; min-height: 88px; padding: var(--space-2) var(--space-3); line-height: 24px; resize: vertical; }
+select.dp-input { appearance: none; -webkit-appearance: none; padding-right: 36px; }
+.dp-select { position: relative; display: block; }
+.dp-select-icon { position: absolute; right: 12px; top: 50%; margin-top: -8px; color: var(--ink); pointer-events: none; }
+.dp-field.is-invalid .dp-input { border: 2px solid var(--alert); }
+.dp-field-error { color: var(--alert); display: flex; gap: var(--space-1); align-items: flex-start; }
+.dp-field-error svg { flex: none; margin-top: 1px; }
+.dp-field-error strong { font-weight: 650; }
+
+.dp-check { display: inline-flex; align-items: flex-start; gap: var(--space-2); cursor: pointer; min-height: 24px; }
+.dp-check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.dp-check-box { flex: none; width: 20px; height: 20px; margin-top: 2px; border: 1.5px solid var(--rule-strong); border-radius: var(--radius-mark); background: var(--sheet); display: grid; place-items: center; }
+.dp-check-box svg { opacity: 0; color: var(--on-ink); }
+.dp-check input:checked + .dp-check-box { background: var(--ink); border-color: var(--ink); }
+.dp-check input:checked + .dp-check-box svg { opacity: 1; }
+
+.dp-switch { display: inline-flex; align-items: center; justify-content: space-between; gap: var(--space-3); cursor: pointer; min-height: var(--touch-min); }
+.dp-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.dp-switch-track { flex: none; position: relative; width: 44px; height: 26px; border-radius: 13px; background: var(--sheet); border: 1.5px solid var(--rule-strong); transition: background-color .12s ease; }
+.dp-switch-track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 17px; height: 17px; border-radius: 50%; background: var(--ink-muted); transition: transform .12s ease; }
+.dp-switch input:checked + .dp-switch-track { background: var(--ink); border-color: var(--ink); }
+.dp-switch input:checked + .dp-switch-track::after { transform: translateX(18px); background: var(--on-ink); }
+.dp-switch-state { color: var(--ink-muted); min-width: 2.5em; text-align: right; }
+
+.dp-seg { align-self: flex-start; display: inline-flex; border: 1px solid var(--rule-strong); border-radius: var(--radius-control); padding: 2px; background: var(--sheet); gap: 2px; }
+.dp-seg label { position: relative; cursor: pointer; }
+.dp-seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.dp-seg span { display: inline-flex; align-items: center; height: 34px; padding: 0 var(--space-3); border-radius: 4px; color: var(--ink); }
+.dp-seg input:checked + span { background: var(--action); color: var(--on-action); }
+
+/* ───────── Suggestion (pencil) ───────── */
+.dp-sugg {
+  background: var(--pencil-wash); border: 1.5px dashed var(--pencil); border-radius: var(--radius-panel);
+  padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); max-width: 520px;
+}
+.dp-sugg-tag { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--pencil); }
+.dp-sugg-tag svg { flex: none; }
+.dp-sugg-body { color: var(--ink); margin: 0; }
+.dp-sugg-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.dp-sugg-why-btn { margin-left: auto; }
+.dp-sugg-why { border-top: 1px dashed var(--pencil); padding-top: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }
+.dp-sugg-why[hidden] { display: none; }
+.dp-sugg-why ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: var(--space-1); }
+.dp-sugg-why li { color: var(--ink); }
+.dp-sugg-why cite { font-style: normal; color: var(--ink-muted); }
+.dp-sugg-note { color: var(--ink-muted); }
+.dp-sugg--inline { align-self: flex-start; flex-direction: row; align-items: center; gap: var(--space-2); border-radius: var(--radius-control); padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3); max-width: none; display: inline-flex; flex-wrap: wrap; }
+.dp-sugg--inline .dp-btn { height: 32px; padding: 0 var(--space-2); }
+.dp-iconbtn { width: 32px; padding: 0 !important; }
+
+/* ───────── Rule message (C2) ───────── */
+.dp-rule {
+  display: flex; gap: var(--space-3); align-items: flex-start; flex-wrap: wrap;
+  background: var(--alert-wash); border-radius: var(--radius-control); padding: var(--space-3) var(--space-4);
+  max-width: 640px;
+}
+.dp-rule-icon { flex: none; color: var(--alert); margin-top: 2px; }
+.dp-rule-icon svg { display: block; }
+.dp-rule-text { flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px; }
+.dp-rule-text strong { color: var(--alert); font-weight: 650; }
+.dp-rule-actions { display: flex; gap: var(--space-2); margin-left: 32px; }
+
+/* ───────── Environment badge ───────── */
+.dp-env {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  height: 26px; padding: 0 var(--space-2); border-radius: var(--radius-mark);
+  background: var(--env-wash); color: var(--env); border: 1px solid var(--env);
+  white-space: nowrap;
+}
+.dp-env svg { flex: none; }
+.dp-env--bar { display: flex; height: 28px; border-radius: 0; border-width: 0 0 1px 0; justify-content: center; }
+
+@media (prefers-reduced-motion: reduce) { .dp-btn, .dp-switch-track, .dp-switch-track::after { transition: none; } }

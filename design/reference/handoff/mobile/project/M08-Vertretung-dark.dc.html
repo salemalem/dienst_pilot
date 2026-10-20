@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>M8 Vertretungsanfrage, dunkel</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="dp-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div class="dp-root dp-dark" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: var(--font-sans); overflow: hidden">
+  <div style="height: 47px; flex: none" aria-hidden="true"></div>
+  <div class="dp-env dp-env--bar caption" role="status">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"></path><path d="M6.453 15h11.094"></path><path d="M8.5 2h7"></path></svg>
+    <span>Demo-Umgebung, synthetische Daten</span>
+  </div>
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; padding: 12px 16px 0 16px; overflow: hidden">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span class="caption" style="color: var(--ink-muted)">Vertretungsanfrage an Dr. Sofía Alvarez, heute 06:42</span>
+      <h1 class="title">Können Sie heute den Frühdienst übernehmen?</h1>
+    </div>
+    <div style="display: flex; flex-direction: column; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 16px">
+        <span class="dp-chip dp-chip--lg dp-shift--frueh" role="img" aria-label="Früh" title="Früh"><span aria-hidden="true">F</span></span>
+        <div style="display: flex; flex-direction: column">
+          <span class="num-time">07:30–16:00</span>
+          <span class="body">Station 4B</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 12px 16px; border-top: 1px solid var(--rule)">
+        <div style="display: flex; align-items: baseline; justify-content: space-between">
+          <span class="body-strong num-time">Antwort bis 06:57</span>
+          <span class="num-small" style="color: var(--ink-muted)">noch 13 Min.</span>
+        </div>
+        <div style="height: 6px; background: var(--sheet-sunk); border-radius: 3px; overflow: hidden" role="img" aria-label="Noch 13 von 15 Minuten">
+          <div style="width: 87%; height: 6px; background: var(--ink)"></div>
+        </div>
+      </div>
+    </div>
+    <section style="display: flex; flex-direction: column; gap: 8px; padding: 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)" aria-labelledby="hrs8">
+      <h2 class="label" id="hrs8" style="color: var(--ink-muted)">Was das für Ihre Stunden heißt</h2>
+      <div style="display: flex; align-items: baseline; justify-content: space-between">
+        <span class="body">Oktober mit diesem Dienst</span>
+        <span class="num-time">160,5 von 168 Std.</span>
+      </div>
+      <div style="display: flex; height: 8px; background: var(--sheet-sunk); border-radius: 2px; overflow: hidden" role="img" aria-label="152 Stunden geleistet, 8,5 Stunden durch diesen Dienst, Vertrag 168 Stunden">
+        <div style="width: 90.5%; background: var(--ink-muted)"></div>
+        <div style="width: 5%; background: var(--shift-frueh)"></div>
+      </div>
+      <span class="body-strong">Keine Überstunden.</span>
+      <span class="caption" style="color: var(--ink-muted)">Ruhezeit seit Ihrem letzten Dienst: 34 Std. Vorgeschrieben sind 11 Std.</span>
+    </section>
+    <section class="dp-sugg dp-root" aria-label="Vorschlag" style="max-width: none; gap: 8px">
+      <span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg><span>Vorschlag der Vertretungssuche</span></span>
+      <p class="dp-sugg-body body">Sie haben von allen, die heute können, am längsten nicht vertreten.</p>
+      <div class="dp-sugg-actions">
+        <button class="dp-btn dp-btn--quiet label" type="button" aria-expanded="false" style="padding: 0 8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg><span>Warum?</span></button>
+      </div>
+    </section>
+  </main>
+  <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px 16px 16px 16px">
+    <span class="caption" style="color: var(--ink-muted); text-align: center">Ablehnen hat keine Folgen. Die Anfrage geht dann an die nächste Person.</span>
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px">
+      <button class="dp-btn dp-btn--secondary dp-btn--lg body-strong" type="button"><span>Ablehnen</span></button>
+      <button class="dp-btn dp-btn--primary dp-btn--lg body-strong" type="button"><span>Übernehmen</span></button>
+    </div>
+  </div>
+  <div style="height: 34px; flex: none" aria-hidden="true"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>M5 Request leave (EN)</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="dp-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div class="dp-root" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: var(--font-sans); overflow: hidden">
+  <div style="height: 47px; flex: none" aria-hidden="true"></div>
+  <div class="dp-env dp-env--bar caption" role="status">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"></path><path d="M6.453 15h11.094"></path><path d="M8.5 2h7"></path></svg>
+    <span>Demo environment, synthetic data</span>
+  </div>
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; padding: 12px 16px 0 16px; overflow: hidden">
+    <div style="display: flex; align-items: flex-start; gap: 8px">
+      <div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1">
+        <span class="caption" style="color: var(--ink-muted)">Request leave</span>
+        <h1 class="title">Leave 14–27 Jul 2027</h1>
+      </div>
+      <button class="dp-btn dp-btn--quiet label" type="button"><span>Cancel</span></button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <div class="dp-field">
+          <label class="dp-field-label label" for="from">From</label>
+          <input class="dp-input dp-tnum" id="from" type="text" value="Wed 14 Jul 2027" inputmode="numeric">
+        </div>
+        <div class="dp-field">
+          <label class="dp-field-label label" for="to">To</label>
+          <input class="dp-input dp-tnum" id="to" type="text" value="Tue 27 Jul 2027" inputmode="numeric">
+        </div>
+      </div>
+      <span class="caption" style="color: var(--ink-muted)">14 calendar days, 10 working days</span>
+      <span class="caption" style="display: flex; align-items: flex-start; gap: 4px; color: var(--pencil); font-style: italic">
+        <svg style="flex: none; margin-top: 1px" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>
+        <span>First estimate: two other colleagues have requested overlapping days.</span>
+      </span>
+    </div>
+    <section class="dp-sugg dp-root" aria-label="Suggestion" style="max-width: none">
+      <span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg><span>Suggestion</span></span>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <p class="dp-sugg-body body-strong">Coverable if you give up one weekend in June</p>
+        <p class="body" style="margin: 0">You would then work the early shift on the weekend of 12/13 Jun 2027.</p>
+      </div>
+      <div class="dp-sugg-actions">
+        <button class="dp-btn dp-btn--quiet label dp-sugg-why-btn" type="button" aria-expanded="true" aria-controls="why5" style="margin-left: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg><span>Hide reasoning</span></button>
+      </div>
+      <div class="dp-sugg-why" id="why5">
+        <ul class="body">
+          <li>From 19–23 Jul, three doctors would otherwise be away at once.</li>
+          <li>The early shift on Ward 4B needs at least three doctors. <cite class="caption">(Internal Medicine staffing rule)</cite></li>
+          <li>With the June weekend, your weekend balance stays at the average.</li>
+        </ul>
+        <span class="dp-sugg-note caption">The AI only proposes. Dr. Thomas Brandt decides on your request.</span>
+      </div>
+    </section>
+  </main>
+  <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px">
+    <button class="dp-btn dp-btn--secondary dp-btn--lg dp-btn--block body-strong" type="button"><span>Request without trade</span></button>
+    <button class="dp-btn dp-btn--primary dp-btn--lg dp-btn--block body-strong" type="button"><span>Request with trade</span></button>
+  </div>
+  <div style="height: 34px; flex: none" aria-hidden="true"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

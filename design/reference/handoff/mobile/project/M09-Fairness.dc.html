@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>M9 Fairness-Bilanz</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="dp-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div class="dp-root" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: var(--font-sans); overflow: hidden">
+  <div style="height: 47px; flex: none" aria-hidden="true"></div>
+  <div class="dp-env dp-env--bar caption" role="status">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"></path><path d="M6.453 15h11.094"></path><path d="M8.5 2h7"></path></svg>
+    <span>Demo-Umgebung, synthetische Daten</span>
+  </div>
+  <nav aria-label="Mehr" style="display: flex; gap: 20px; padding: 0 16px; border-bottom: 1px solid var(--rule)">
+    <a class="label" href="M09-Fairness.dc.html" aria-current="page" style="display: flex; align-items: center; height: 44px; text-decoration: none; color: var(--action); box-shadow: inset 0 -3px 0 var(--action)">Fairness-Bilanz</a>
+    <a class="label" href="M10-Stunden.dc.html" style="display: flex; align-items: center; height: 44px; text-decoration: none; color: var(--ink-muted)">Stunden</a>
+    <a class="label" href="M12-Einstellungen.dc.html" style="display: flex; align-items: center; height: 44px; text-decoration: none; color: var(--ink-muted)">Einstellungen</a>
+  </nav>
+  <main style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; padding: 16px 16px 0 16px; overflow: hidden">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <h1 class="title">Sie liegen bei Nachtdiensten 2 unter dem Durchschnitt</h1>
+      <span class="caption" style="color: var(--ink-muted)">2026 bis heute, verglichen mit den 28 Ärzt:innen der Klinik für Innere Medizin</span>
+    </div>
+    <div style="display: flex; flex-direction: column; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-control)">
+      <section style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-bottom: 1px solid var(--rule)" aria-label="Nachtdienste: Sie 22, Durchschnitt 24, Spanne 14 bis 31">
+        <div style="display: flex; align-items: baseline; justify-content: space-between">
+          <h2 class="body-strong">Nachtdienste</h2>
+          <span class="label">2 unter dem Durchschnitt</span>
+        </div>
+        <div style="position: relative; height: 52px" aria-hidden="true">
+          <span class="num-small" style="position: absolute; top: 0; left: 58.8%; transform: translateX(-50%); color: var(--ink-muted); white-space: nowrap">Ø 24</span>
+          <div style="position: absolute; top: 25px; left: 0; right: 0; height: 2px; background: var(--rule-strong)"></div>
+          <div style="position: absolute; top: 18px; left: 58.8%; width: 2px; height: 16px; margin-left: -1px; background: var(--ink-muted)"></div>
+          <div style="position: absolute; top: 20px; left: 47%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--ink)"></div>
+          <span class="num-small" style="position: absolute; top: 36px; left: 47%; transform: translateX(-50%); white-space: nowrap">Sie 22</span>
+          <span class="num-small" style="position: absolute; top: 36px; left: 0; color: var(--ink-muted)">14</span>
+          <span class="num-small" style="position: absolute; top: 36px; right: 0; color: var(--ink-muted)">31</span>
+        </div>
+      </section>
+      <section style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-bottom: 1px solid var(--rule)" aria-label="Wochenenddienste: Sie 9, Durchschnitt 9, Spanne 6 bis 13">
+        <div style="display: flex; align-items: baseline; justify-content: space-between">
+          <h2 class="body-strong">Wochenenddienste</h2>
+          <span class="label">genau im Durchschnitt</span>
+        </div>
+        <div style="position: relative; height: 52px" aria-hidden="true">
+          <span class="num-small" style="position: absolute; top: 0; left: 42.9%; transform: translateX(-50%); color: var(--ink-muted); white-space: nowrap">Ø 9</span>
+          <div style="position: absolute; top: 25px; left: 0; right: 0; height: 2px; background: var(--rule-strong)"></div>
+          <div style="position: absolute; top: 18px; left: 42.9%; width: 2px; height: 16px; margin-left: -1px; background: var(--ink-muted)"></div>
+          <div style="position: absolute; top: 20px; left: 42.9%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 2px var(--sheet)"></div>
+          <span class="num-small" style="position: absolute; top: 36px; left: 42.9%; transform: translateX(-50%); white-space: nowrap">Sie 9</span>
+          <span class="num-small" style="position: absolute; top: 36px; left: 0; color: var(--ink-muted)">6</span>
+          <span class="num-small" style="position: absolute; top: 36px; right: 0; color: var(--ink-muted)">13</span>
+        </div>
+      </section>
+      <section style="display: flex; flex-direction: column; gap: 10px; padding: 16px" aria-label="Feiertagsdienste: Sie 2, Durchschnitt 2,4, Spanne 0 bis 5">
+        <div style="display: flex; align-items: baseline; justify-content: space-between">
+          <h2 class="body-strong">Feiertagsdienste</h2>
+          <span class="label">0,4 unter dem Durchschnitt</span>
+        </div>
+        <div style="position: relative; height: 52px" aria-hidden="true">
+          <span class="num-small" style="position: absolute; top: 0; left: 48%; transform: translateX(-50%); color: var(--ink-muted); white-space: nowrap">Ø 2,4</span>
+          <div style="position: absolute; top: 25px; left: 0; right: 0; height: 2px; background: var(--rule-strong)"></div>
+          <div style="position: absolute; top: 18px; left: 48%; width: 2px; height: 16px; margin-left: -1px; background: var(--ink-muted)"></div>
+          <div style="position: absolute; top: 20px; left: 40%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--ink)"></div>
+          <span class="num-small" style="position: absolute; top: 36px; left: 40%; transform: translateX(-50%); white-space: nowrap">Sie 2</span>
+          <span class="num-small" style="position: absolute; top: 36px; left: 0; color: var(--ink-muted)">0</span>
+          <span class="num-small" style="position: absolute; top: 36px; right: 0; color: var(--ink-muted)">5</span>
+        </div>
+      </section>
+    </div>
+    <div class="caption" style="display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--ink-muted)">
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: var(--ink)" aria-hidden="true"></span>Sie</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 2px; height: 12px; background: var(--ink-muted)" aria-hidden="true"></span>Durchschnitt der Abteilung</span>
+      <span>Linie: geringster bis höchster Wert</span>
+    </div>
+    <p class="caption" style="color: var(--ink-muted)">Gezählt werden gearbeitete Dienste seit 01.01.2026. Ein getauschter Dienst zählt für die Person, die ihn gearbeitet hat.</p>
+  </main>
+  <nav aria-label="Hauptnavigation" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--sheet); border-top: 1px solid var(--rule)">
+    <a class="label" href="M02-Heute.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--ink-muted)">Heute</a>
+    <a class="label" href="M03-Dienstplan.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--ink-muted)">Dienstplan</a>
+    <a class="label" href="M11-Mitteilungen.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--ink-muted)">Mitteilungen</a>
+    <a class="label" href="M09-Fairness.dc.html" aria-current="page" style="display: flex; align-items: center; justify-content: center; height: 56px; text-decoration: none; color: var(--action); box-shadow: inset 0 3px 0 var(--action)">Mehr</a>
+  </nav>
+  <div style="height: 34px; flex: none; background: var(--sheet)" aria-hidden="true"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

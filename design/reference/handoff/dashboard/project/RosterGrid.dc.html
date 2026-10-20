@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Dienstplan-Raster Dezember 2026</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<section class="dp-sheet" lang="{{lang}}" aria-label="{{t.caption}}" style="display: block; max-width: 100%; overflow-x: auto; font-family: var(--font-sans); color: var(--ink)">
+<div style="width: max-content">
+
+<div style="display: flex">
+<div class="label" style="position: sticky; left: 0; z-index: 3; width: 184px; height: 40px; flex: none; box-sizing: border-box; padding: 0 12px; display: flex; align-items: center; background: var(--sheet-sunk); color: var(--ink-muted); border-right: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong)">{{t.physician}}</div>
+<sc-for list="{{days}}" as="x" hint-placeholder-count="31">
+<div style="width: 36px; height: 40px; flex: none; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; background: var(--sheet-sunk); border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule-strong); color: {{x.color}}">
+<span style="font-size: 12px; line-height: 13px; font-weight: 550">{{x.wd}}</span>
+<span class="num-small" style="font-weight: 750">{{x.d}}</span>
+</div>
+</sc-for>
+<div class="label" style="width: 56px; height: 40px; flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; background: var(--sheet-sunk); color: var(--ink-muted); border-left: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong)">{{t.hours}}</div>
+</div>
+
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="28">
+<div style="display: flex">
+<div style="position: sticky; left: 0; z-index: 2; width: 184px; height: 34px; flex: none; box-sizing: border-box; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; background: var(--sheet); border-right: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule)">
+<span class="grid-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.n}}</span>
+<span style="font-size: 12px; line-height: 14px; color: var(--ink-muted); white-space: nowrap">{{r.role}}</span>
+</div>
+<sc-for list="{{r.cells}}" as="c" hint-placeholder-count="31">
+<div style="width: 36px; height: 34px; flex: none; background: {{c.bg}}">
+<button type="button" class="dp-cell {{c.cls}}" aria-label="{{c.aria}}" style="padding: 0; margin: 0; font: inherit; cursor: grab; border-top: 0; border-left: 0">
+<sc-if value="{{c.letter}}" hint-placeholder-val="{{true}}"><span class="dp-letter grid-letter">{{c.letter}}</span></sc-if>
+<sc-if value="{{c.granted}}" hint-placeholder-val="{{false}}"><span class="dp-mark dp-mark--granted"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span></sc-if>
+<sc-if value="{{c.missed}}" hint-placeholder-val="{{false}}"><span class="dp-mark dp-mark--missed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M22 2 2 22"></path></svg></span></sc-if>
+<sc-if value="{{c.violation}}" hint-placeholder-val="{{false}}"><span class="dp-bang"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg></span></sc-if>
+</button>
+</div>
+</sc-for>
+<div class="num-small" style="width: 56px; height: 34px; flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; border-left: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule)">{{r.h}}</div>
+</div>
+</sc-for>
+
+<div style="display: flex; border-top: 2px solid var(--rule-strong)">
+<div class="label" style="position: sticky; left: 0; z-index: 2; width: 184px; height: 34px; flex: none; box-sizing: border-box; padding: 0 12px; display: flex; align-items: center; background: var(--sheet); color: var(--ink-muted); border-right: 1px solid var(--rule-strong)">{{t.coverage}}</div>
+<sc-for list="{{cov}}" as="k" hint-placeholder-count="31">
+<div style="width: 36px; height: 34px; flex: none; background: {{k.bg}}">
+<sc-if value="{{k.gap}}" hint-placeholder-val="{{false}}"><div class="dp-cell is-gap" role="img" aria-label="{{k.aria}}"><span class="dp-letter grid-letter">{{k.gap}}</span></div></sc-if>
+<sc-if value="{{k.ok}}" hint-placeholder-val="{{true}}"><div class="dp-cell dp-cov dp-cov-ok" role="img" aria-label="{{k.aria}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></div></sc-if>
+</div>
+</sc-for>
+<div style="width: 56px; height: 34px; flex: none; border-left: 1px solid var(--rule-strong)"></div>
+</div>
+
+</div>
+
+<div class="dp-legend caption">
+<span class="dp-legend-item"><span class="dp-cell has-shift dp-shift--frueh"><span class="dp-letter grid-letter">{{L.F}}</span></span>{{N.F}}</span>
+<span class="dp-legend-item"><span class="dp-cell has-shift dp-shift--spaet"><span class="dp-letter grid-letter">{{L.S}}</span></span>{{N.S}}</span>
+<span class="dp-legend-item"><span class="dp-cell has-shift dp-shift--nacht"><span class="dp-letter grid-letter">{{L.N}}</span></span>{{N.N}}</span>
+<span class="dp-legend-item"><span class="dp-cell has-shift dp-shift--bereitschaft"><span class="dp-letter grid-letter">{{L.B}}</span></span>{{N.B}}</span>
+<span class="dp-legend-item"><span class="dp-cell is-leave dp-shift--frei"><span class="dp-letter grid-letter">{{L.U}}</span></span>{{N.U}}</span>
+<span class="dp-legend-item"><span class="dp-cell"><span class="dp-mark dp-mark--granted"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span></span>{{t.granted}}</span>
+<span class="dp-legend-item"><span class="dp-cell"><span class="dp-mark dp-mark--missed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M22 2 2 22"></path></svg></span></span>{{t.missed}}</span>
+<span class="dp-legend-item"><span class="dp-cell has-shift dp-shift--frueh is-violation"><span class="dp-bang"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg></span><span class="dp-letter grid-letter">{{L.F}}</span></span>{{t.violation}}</span>
+<span class="dp-legend-item"><span class="dp-cell is-gap"><span class="dp-letter grid-letter">{{L.S}}</span></span>{{t.gap}}</span>
+<span class="dp-legend-item"><span class="dp-cell is-suggested"><span class="dp-letter grid-letter">{{L.S}}</span></span>{{t.suggested}}</span>
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"locale":{"editor":"enum","options":["de","en"],"default":"de"},"$preview":{"width":1360,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var de = (this.props.locale || 'de') !== 'en';
+    var L = de ? { F: 'F', S: 'S', N: 'N', B: 'B', U: 'U' } : { F: 'E', S: 'L', N: 'N', B: 'O', U: 'V' };
+    var N = de
+      ? { F: 'Früh', S: 'Spät', N: 'Nacht', B: 'Bereitschaft', U: 'Urlaub' }
+      : { F: 'Early', S: 'Late', N: 'Night', B: 'On-call', U: 'Leave' };
+    var CLS = {
+      F: 'has-shift dp-shift--frueh', S: 'has-shift dp-shift--spaet', N: 'has-shift dp-shift--nacht',
+      B: 'has-shift dp-shift--bereitschaft', U: 'is-leave dp-shift--frei'
+    };
+    var WD = de ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    var HOL = { 25: true, 26: true };
+    function wd(d) { return d % 7; }
+    function special(d) { return wd(d) === 5 || wd(d) === 6 || !!HOL[d]; }
+    function dstr(d) { return de ? (d < 10 ? '0' + d : d) + '.12.' : d + ' Dec'; }
+    var role = de ? {
+      cf: 'Chefärztin', oaM: 'Oberarzt', oaF: 'Oberärztin', oaX: 'Oberärzt:in', faM: 'Facharzt', faF: 'Fachärztin',
+      faX: 'Fachärzt:in', aaM: 'Assistenzarzt', aaF: 'Assistenzärztin', aaX: 'Assistenzärzt:in'
+    } : {
+      cf: 'Head of department', oaM: 'Senior physician', oaF: 'Senior physician', oaX: 'Senior physician',
+      faM: 'Specialist', faF: 'Specialist', faX: 'Specialist', aaM: 'Resident', aaF: 'Resident', aaX: 'Resident'
+    };
+    var syn = de ? 'Synth. Ärzt:in ' : 'Synth. physician ';
+    var P = [
+      ['hoffmann', 'Prof. Dr. C. Hoffmann', 'cf', 'lead'],
+      ['brandt', 'Dr. Thomas Brandt', 'oaM', 'oa'],
+      ['nowak', 'Dr. Marek Nowak', 'oaM', 'oa'],
+      ['schulz', 'Dr. Hannah Schulz', 'oaF', 'oa'],
+      ['s18', syn + '18', 'oaX', 'oa'],
+      ['lorenz', 'Dr. Lea Lorenz', 'faF', 'p'],
+      ['demir', 'Dr. Yusuf Demir', 'faM', 'p'],
+      ['becker', 'Dr. Ines Becker', 'faF', 'p'],
+      ['wagner', 'Dr. Felix Wagner', 'faM', 'p'],
+      ['s19', syn + '19', 'faX', 'p'], ['s20', syn + '20', 'faX', 'p'], ['s21', syn + '21', 'faX', 'p'],
+      ['kaya', 'Dr. Aylin Kaya', 'aaF', 'p'],
+      ['mehta', 'Dr. Rohan Mehta', 'aaM', 'p'],
+      ['weber', 'Dr. Jonas Weber', 'aaM', 'p'],
+      ['alvarez', 'Dr. Sofía Alvarez', 'aaF', 'p'],
+      ['okafor', 'Dr. Mira Okafor', 'aaF', 'p'],
+      ['richter', 'Dr. Paul Richter', 'aaM', 'p'],
+      ['lehmann', 'Dr. Anna Lehmann', 'aaF', 'p'],
+      ['klein', 'Dr. Tobias Klein', 'aaM', 'p'],
+      ['arslan', 'Dr. Elif Arslan', 'aaF', 'p'],
+      ['s22', syn + '22', 'aaX', 'p'], ['s23', syn + '23', 'aaX', 'p'], ['s24', syn + '24', 'aaX', 'p'],
+      ['s25', syn + '25', 'aaX', 'p'], ['s26', syn + '26', 'aaX', 'p'], ['s27', syn + '27', 'aaX', 'p'],
+      ['s28', syn + '28', 'aaX', 'p']
+    ];
+    var LEAVE = {
+      becker: [21, 31], nowak: [24, 31], s20: [28, 31], lehmann: [28, 31], hoffmann: [24, 31],
+      s18: [14, 18], s25: [7, 11], okafor: [1, 4], arslan: [21, 24], s21: [28, 31]
+    };
+    var NIGHT = [
+      ['richter', 1, 2], ['s24', 1, 2], ['wagner', 3, 4], ['s25', 3, 4], ['klein', 7, 9], ['s27', 7, 9],
+      ['okafor', 10, 11], ['s28', 10, 11], ['kaya', 14, 16], ['s21', 14, 16], ['demir', 17, 18], ['s22', 17, 18],
+      ['alvarez', 21, 23], ['s26', 21, 23], ['s27', 24, 24], ['lehmann', 24, 24], ['wagner', 28, 30],
+      ['klein', 28, 30], ['richter', 31, 31], ['s22', 31, 31]
+    ];
+    var BD = {
+      5: ['weber', 'brandt', 's26'], 6: ['becker', 'wagner', 'nowak'], 12: ['s21', 'schulz', 'mehta'],
+      13: ['weber', 's23', 'lehmann'], 19: ['weber', 's28', 's18'], 20: ['kaya', 's27', 'schulz'],
+      25: ['s24', 'richter', 'demir'], 26: ['alvarez', 's19', 'brandt'], 27: ['okafor', 's25', 's26']
+    };
+    var SG = [
+      [1, 4, ['kaya', 'demir', 's22', 's23', 'lehmann']],
+      [7, 11, ['weber', 'alvarez', 's19', 's26', 'arslan']],
+      [14, 18, ['lorenz', 'wagner', 's20', 'richter', 's24']],
+      [21, 24, ['mehta', 'klein', 's23', 's25', 'okafor']],
+      [28, 31, ['s19', 's28', 'kaya', 'arslan', 'demir']]
+    ];
+    var HRS = { F: 8, S: 8, N: 9.75, B: 24, U: 8 };
+
+    function letterFor(id, kind, d) {
+      var lv = LEAVE[id];
+      if (lv && d >= lv[0] && d <= lv[1]) return 'U';
+      var i;
+      for (i = 0; i < NIGHT.length; i++) { if (NIGHT[i][0] === id && d >= NIGHT[i][1] && d <= NIGHT[i][2]) return 'N'; }
+      if (BD[d] && BD[d].indexOf(id) >= 0) return 'B';
+      for (i = 0; i < NIGHT.length; i++) { if (NIGHT[i][0] === id && d === NIGHT[i][2] + 1) return ''; }
+      if (BD[d - 1] && BD[d - 1].indexOf(id) >= 0) return '';
+      if (special(d)) return '';
+      if (BD[d + 1] && BD[d + 1].indexOf(id) >= 0 && wd(d + 1) === 5) return '';
+      if (kind === 'lead' || kind === 'oa') return 'F';
+      for (i = 0; i < SG.length; i++) { if (d >= SG[i][0] && d <= SG[i][1] && SG[i][2].indexOf(id) >= 0) return 'S'; }
+      return 'F';
+    }
+
+    var days = [];
+    for (var d = 1; d <= 31; d++) {
+      days.push({ d: d, wd: WD[wd(d)], color: special(d) ? 'var(--ink)' : 'var(--ink-muted)' });
+    }
+
+    var rows = P.map(function (p, idx) {
+      var id = p[0], hours = 0;
+      var cells = [];
+      for (var d = 1; d <= 31; d++) {
+        var k = letterFor(id, p[3], d);
+        var suggested = false, violation = false, selected = false;
+        if (id === 'lorenz' && d === 15) { k = 'F'; violation = true; selected = true; }
+        if (id === 'mehta' && d === 23) { k = ''; suggested = true; }
+        if (k && !(k === 'U' && special(d))) hours += HRS[k];
+        var cls = suggested ? 'is-suggested' : (k ? CLS[k] : '');
+        if (violation) cls += ' is-violation';
+        if (selected) cls += ' is-selected';
+        var granted = !!k && !suggested && !violation && k !== 'U' && ((idx * 7 + d * 3) % 19 === 0);
+        var missed = !!k && !suggested && !violation && !granted && k !== 'U' && ((idx * 5 + d * 11) % 47 === 3);
+        var label = suggested ? (de ? 'leer, Vorschlag: Spät' : 'empty, suggestion: Late')
+          : (k ? N[k] : (de ? 'dienstfrei' : 'off'));
+        var aria = p[1] + ', ' + dstr(d) + ': ' + label;
+        if (granted) aria += de ? ', Wunsch erfüllt' : ', wish granted';
+        if (missed) aria += de ? ', Wunsch nicht erfüllt' : ', wish not granted';
+        if (violation) aria += de ? ', Regelverstoß: Ruhezeit 11 h, 14./15.12.' : ', rule violation: 11 h rest period, 14/15 Dec';
+        cells.push({
+          letter: suggested ? L.S : (k ? L[k] : ''),
+          cls: cls, aria: aria, granted: granted, missed: missed, violation: violation,
+          bg: special(d) ? 'var(--sheet-sunk)' : 'var(--sheet)'
+        });
+      }
+      var hs = hours % 1 === 0 ? String(hours) : hours.toFixed(2);
+      return { n: p[1], role: role[p[2]], h: de ? hs.replace('.', ',') : hs, cells: cells };
+    });
+
+    var cov = [];
+    for (var c = 1; c <= 31; c++) {
+      var gap = c === 23;
+      cov.push({
+        gap: gap ? L.S : '', ok: !gap,
+        bg: special(c) ? 'var(--sheet-sunk)' : 'var(--sheet)',
+        aria: gap
+          ? (de ? 'Lücke am 23.12., Spätdienst' : 'Gap on 23 Dec, late shift')
+          : (de ? dstr(c) + ': voll besetzt' : dstr(c) + ': fully staffed')
+      });
+    }
+
+    var t = de ? {
+      caption: 'Dienstplan Dezember 2026, Entwurf aus Variante A', physician: 'Ärzt:in', hours: 'Std.',
+      coverage: 'Besetzung', granted: 'Wunsch erfüllt', missed: 'Wunsch nicht erfüllt', violation: 'Regelverstoß',
+      gap: 'Lücke', suggested: 'Vorschlag der KI'
+    } : {
+      caption: 'Roster December 2026, draft from variant A', physician: 'Physician', hours: 'Hrs',
+      coverage: 'Coverage', granted: 'Wish granted', missed: 'Wish not granted', violation: 'Rule violation',
+      gap: 'Gap', suggested: 'AI suggestion'
+    };
+    return { lang: de ? 'de' : 'en', t: t, L: L, N: N, days: days, rows: rows, cov: cov };
+  }
+}
+</script>
+</body>
+</html>

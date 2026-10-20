@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>W2 Wunschphase</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="de" copilot="closed" person="Dr. Thomas Brandt" persona-role="Oberarzt · Planer" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="de" active="w2" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 32px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="display" style="margin: 0">21 von 28 haben geantwortet</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Wunschphase Dezember 2026 · geöffnet am 13.10. · schließt am 26.10. um 23:59, noch 6 Tage</p>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<button type="button" class="dp-btn dp-btn--secondary label">Wunschphase jetzt schließen</button>
+<button type="button" class="dp-btn dp-btn--primary label">Erinnerung senden</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div role="progressbar" aria-label="Rücklauf Wunschphase Dezember" aria-valuemin="0" aria-valuemax="28" aria-valuenow="21" style="height: 16px; background: var(--sheet-sunk); border: 1px solid var(--rule-strong); box-sizing: border-box">
+<div style="width: 75%; height: 100%; background: var(--ink)"></div>
+</div>
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+<span class="label" style="color: var(--ink-muted)">Die Erinnerung geht nur an die 7 Kolleg:innen ohne Antwort. Letzte Erinnerung: 18.10., 08:00</span>
+<span class="num-small" style="color: var(--ink-muted)">75 %</span>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start">
+
+<section style="background: var(--sheet); border: 1px solid var(--rule); display: flex; flex-direction: column">
+<div style="padding: 20px 24px 12px; display: flex; justify-content: space-between; align-items: baseline">
+<h2 class="heading" style="margin: 0">Noch keine Antwort</h2>
+<span class="num-small" style="color: var(--ink-muted)">7</span>
+</div>
+<div class="label" style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: 12px; padding: 8px 24px; background: var(--sheet-sunk); color: var(--ink-muted); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule-strong)">
+<span>Name</span><span>Rolle</span><span>Stand</span>
+</div>
+<sc-for list="{{missing}}" as="m" hint-placeholder-count="7">
+<div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: 12px; padding: 0 24px; min-height: 44px; align-items: center; border-bottom: 1px solid var(--rule)">
+<span class="body">{{m.n}}</span>
+<span class="label" style="color: var(--ink-muted)">{{m.r}}</span>
+<span class="label">{{m.s}}</span>
+</div>
+</sc-for>
+</section>
+
+<section style="background: var(--sheet); border: 1px solid var(--rule); display: flex; flex-direction: column">
+<div style="padding: 20px 24px 12px; display: flex; justify-content: space-between; align-items: baseline">
+<h2 class="heading" style="margin: 0">Geantwortet</h2>
+<span class="num-small" style="color: var(--ink-muted)">21</span>
+</div>
+<div class="label" style="display: grid; grid-template-columns: minmax(0, 1.6fr) 72px 64px 64px minmax(0, 1fr); gap: 12px; padding: 8px 24px; background: var(--sheet-sunk); color: var(--ink-muted); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule-strong)">
+<span>Name</span><span>Am</span><span style="text-align: right">Wünsche</span><span style="text-align: right">Wichtig</span><span>Urlaub</span>
+</div>
+<sc-for list="{{done}}" as="m" hint-placeholder-count="21">
+<div style="display: grid; grid-template-columns: minmax(0, 1.6fr) 72px 64px 64px minmax(0, 1fr); gap: 12px; padding: 0 24px; min-height: 40px; align-items: center; border-bottom: 1px solid var(--rule)">
+<span class="body">{{m.n}}</span>
+<span class="num-small" style="color: var(--ink-muted)">{{m.d}}</span>
+<span class="num-small" style="text-align: right">{{m.w}}</span>
+<span class="num-small" style="text-align: right">{{m.i}}</span>
+<span class="label" style="color: var(--ink-muted)">{{m.u}}</span>
+</div>
+</sc-for>
+</section>
+
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var missing = [
+      { n: 'Dr. Marek Nowak', r: 'Oberarzt', s: 'Urlaubsantrag eingereicht, Wünsche fehlen' },
+      { n: 'Synth. Ärzt:in 20', r: 'Fachärzt:in', s: 'Urlaubsantrag eingereicht, Wünsche fehlen' },
+      { n: 'Dr. Paul Richter', r: 'Assistenzarzt', s: 'App seit 18.10. nicht geöffnet' },
+      { n: 'Dr. Tobias Klein', r: 'Assistenzarzt', s: 'Entwurf begonnen, nicht abgegeben' },
+      { n: 'Synth. Ärzt:in 22', r: 'Assistenzärzt:in', s: 'Erinnerung am 18.10. erhalten' },
+      { n: 'Synth. Ärzt:in 24', r: 'Assistenzärzt:in', s: 'Erinnerung am 18.10. erhalten' },
+      { n: 'Synth. Ärzt:in 27', r: 'Assistenzärzt:in', s: 'Entwurf begonnen, nicht abgegeben' }
+    ];
+    var done = [
+      ['Dr. Aylin Kaya', '13.10.', 6, 2, '–'],
+      ['Dr. Rohan Mehta', '13.10.', 4, 1, '–'],
+      ['Dr. Lea Lorenz', '13.10.', 5, 2, '–'],
+      ['Dr. Thomas Brandt', '13.10.', 3, 0, '–'],
+      ['Dr. Sofía Alvarez', '14.10.', 7, 2, '–'],
+      ['Dr. Jonas Weber', '14.10.', 2, 0, '–'],
+      ['Dr. Ines Becker', '14.10.', 3, 1, '21.–31.12.'],
+      ['Prof. Dr. Claudia Hoffmann', '14.10.', 1, 0, '24.–31.12.'],
+      ['Dr. Hannah Schulz', '15.10.', 4, 1, '–'],
+      ['Dr. Yusuf Demir', '15.10.', 5, 2, '–'],
+      ['Dr. Felix Wagner', '15.10.', 3, 1, '–'],
+      ['Dr. Mira Okafor', '15.10.', 6, 2, '01.–04.12.'],
+      ['Dr. Anna Lehmann', '16.10.', 4, 1, '28.–31.12.'],
+      ['Dr. Elif Arslan', '16.10.', 5, 2, '21.–24.12.'],
+      ['Synth. Ärzt:in 18', '16.10.', 2, 0, '14.–18.12.'],
+      ['Synth. Ärzt:in 19', '17.10.', 4, 1, '–'],
+      ['Synth. Ärzt:in 21', '17.10.', 3, 1, '28.–31.12.'],
+      ['Synth. Ärzt:in 23', '18.10.', 5, 2, '–'],
+      ['Synth. Ärzt:in 25', '19.10.', 2, 1, '07.–11.12.'],
+      ['Synth. Ärzt:in 26', '19.10.', 4, 0, '–'],
+      ['Synth. Ärzt:in 28', '20.10.', 3, 1, '–']
+    ].map(function (r) { return { n: r[0], d: r[1], w: String(r[2]), i: String(r[3]), u: r[4] }; });
+    return { missing: missing, done: done };
+  }
+}
+</script>
+</body>
+</html>

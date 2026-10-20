@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>W1 Übersicht</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="de" copilot="closed" person="Dr. Thomas Brandt" persona-role="Oberarzt · Planer" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="de" active="w1" rail="no" hint-size="232px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 32px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="display" style="margin: 0">Heute braucht nichts Ihre Entscheidung</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Dienstag, 20.10.2026 · Veröffentlicht: November 2026 · In Planung: Dezember 2026</p>
+</div>
+<a class="dp-btn dp-btn--secondary label" href="W4-Dienstplan-Editor.dc.html">Dezember-Entwurf öffnen</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+
+<section style="background: var(--sheet); border: 1px solid var(--rule); padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
+<h2 class="heading" style="margin: 0">Wunschphase Dezember</h2>
+<span class="label" style="color: var(--ink-muted)">noch 6 Tage, bis 26.10.</span>
+</div>
+<p class="title" style="margin: 0">21 von 28 haben geantwortet</p>
+<div role="progressbar" aria-label="Rücklauf Wunschphase Dezember" aria-valuemin="0" aria-valuemax="28" aria-valuenow="21" style="height: 12px; background: var(--sheet-sunk); border: 1px solid var(--rule-strong); box-sizing: border-box">
+<div style="width: 75%; height: 100%; background: var(--ink)"></div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+<span class="label" style="color: var(--ink-muted)">7 Antworten fehlen, davon 2 mit offenem Urlaubsantrag</span>
+<a class="label" href="W2-Wunschphase.dc.html">Zur Wunschphase</a>
+</div>
+</section>
+
+<section style="background: var(--sheet); border: 1px solid var(--rule); padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
+<h2 class="heading" style="margin: 0">Offene Eskalationen</h2>
+<span class="num-small" style="color: var(--ink-muted)">0</span>
+</div>
+<div style="display: flex; gap: 12px; align-items: flex-start">
+<span style="color: var(--ink); display: flex; padding-top: 2px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<p class="body-strong" style="margin: 0">Keine Eskalation offen</p>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Die Lücke von heute früh ist geschlossen. Alle Tausche dieser Woche wurden automatisch bestätigt.</p>
+</div>
+</div>
+<div style="border-top: 1px solid var(--rule); padding-top: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+<span class="label">1 Urlaubsantrag wartet, nicht dringend: Dr. Aylin Kaya, 14.–27.07.2027</span>
+<a class="label" href="W6-Anfragen.dc.html">Zu den Anfragen</a>
+</div>
+</section>
+
+<section style="grid-column: 1 / -1; background: var(--sheet); border: 1px solid var(--rule); padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 class="heading" style="margin: 0">Besetzung, nächste 14 Tage</h2>
+<p class="label" style="margin: 0; color: var(--ink-muted)">Alle Dienste besetzt. Graue Bänder: erwartete Ausfälle pro Tag, Prognose mit 80-%-Intervall, nur auf Abteilungsebene.</p>
+</div>
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Prognose, kein Plan</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 120px repeat(14, minmax(0, 1fr)); column-gap: 0; border-top: 1px solid var(--rule)">
+<div style="display: flex; flex-direction: column; justify-content: space-between; padding: 12px 12px 0 0; height: 152px; box-sizing: border-box">
+<span class="caption" style="color: var(--ink-muted)">6 Ausfälle</span>
+<span class="caption" style="color: var(--ink-muted)">3</span>
+<span class="caption" style="color: var(--ink-muted)">0</span>
+</div>
+<sc-for list="{{days}}" as="x" hint-placeholder-count="14">
+<div style="display: flex; flex-direction: column; align-items: stretch; border-left: 1px solid var(--rule); background: {{x.bg}}">
+<div style="position: relative; height: 140px; margin-top: 12px">
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 60px; border-top: 1px dashed var(--rule)"></div>
+<div aria-hidden="true" style="position: absolute; left: 30%; right: 30%; bottom: {{x.lo}}; height: {{x.h}}; background: var(--pencil-wash); border: 1.5px dashed var(--pencil); box-sizing: border-box"></div>
+<div aria-hidden="true" style="position: absolute; left: 50%; margin-left: -5px; bottom: {{x.mid}}; width: 10px; height: 10px; margin-bottom: -5px; border-radius: 50%; background: var(--pencil)"></div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0; border-top: 1px solid var(--rule-strong)">
+<span class="caption" style="color: var(--ink-muted)">{{x.wd}}</span>
+<span class="num-small" style="color: {{x.fg}}">{{x.d}}</span>
+<span class="num-small" style="color: var(--pencil); font-style: italic">{{x.exp}}</span>
+<span class="caption" style="color: var(--ink)">{{x.state}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div class="dp-sugg" style="max-width: none">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Vorschlag</span>
+</div>
+<p class="dp-sugg-body body">Für Di 27.10. und Mo 02.11. eine Reserve im Frühdienst einplanen. An beiden Tagen reicht die Besetzung nur, wenn höchstens 4 Personen ausfallen.</p>
+<div class="dp-sugg-actions">
+<button type="button" class="dp-btn dp-btn--primary label">Reserve im Editor eintragen</button>
+<button type="button" class="dp-btn dp-btn--quiet label">Verwerfen</button>
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Warum?</button>
+</div>
+</div>
+</section>
+
+<section style="grid-column: 1 / -1; background: var(--sheet); border: 1px solid var(--rule); padding: 24px; display: flex; flex-direction: column; gap: 12px">
+<h2 class="heading" style="margin: 0">Zuletzt automatisch erledigt</h2>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<li style="display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--rule)">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>
+<span class="body" style="flex: 1 1 auto">Lücke geschlossen: Dr. Alvarez übernimmt heute den Frühdienst, 07:30–16:00, Station 4B</span>
+<span class="num-small" style="color: var(--ink-muted)">heute, 06:44</span>
+</li>
+<li style="display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--rule)">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>
+<span class="body" style="flex: 1 1 auto">Tausch bestätigt: Dr. Lorenz übernimmt den Nachtdienst von Dr. Mehta, Sa 24.10.</span>
+<span class="num-small" style="color: var(--ink-muted)">gestern, 18:12</span>
+</li>
+<li style="display: flex; gap: 12px; align-items: center; padding: 12px 0">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>
+<span class="body" style="flex: 1 1 auto">Tausch bestätigt: Dr. Nowak und Dr. Schulz tauschen den Spätdienst, Do 22.10.</span>
+<span class="num-small" style="color: var(--ink-muted)">18.10., 09:05</span>
+</li>
+</ul>
+<a class="label" href="W10-Protokoll.dc.html">Alles im Protokoll ansehen</a>
+</section>
+
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var raw = [
+      ['Di','20.10.',3.0,2,4,0],['Mi','21.10.',2.6,1,4,0],['Do','22.10.',2.4,1,4,0],['Fr','23.10.',2.8,1,5,0],
+      ['Sa','24.10.',1.4,0,3,1],['So','25.10.',1.2,0,3,1],['Mo','26.10.',3.1,2,5,0],['Di','27.10.',3.4,2,6,0],
+      ['Mi','28.10.',2.9,1,5,0],['Do','29.10.',2.7,1,5,0],['Fr','30.10.',3.0,1,5,0],['Sa','31.10.',1.5,0,3,1],
+      ['So','01.11.',1.3,0,3,1],['Mo','02.11.',3.6,2,6,0]
+    ];
+    var u = 20;
+    var days = raw.map(function (r, i) {
+      var tight = r[4] >= 6;
+      return {
+        wd: r[0], d: r[1],
+        exp: String(r[2].toFixed(1)).replace('.', ','),
+        lo: (r[3] * u) + 'px', h: ((r[4] - r[3]) * u) + 'px', mid: (r[2] * u) + 'px',
+        bg: r[5] ? 'var(--sheet-sunk)' : (i === 0 ? 'var(--action-wash)' : 'transparent'),
+        fg: i === 0 ? 'var(--action)' : 'var(--ink)',
+        state: i === 0 ? 'heute' : (tight ? 'knapp' : '')
+      };
+    });
+    return { days: days };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kopfzeile</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<header lang="{{lang}}" style="height: 56px; box-sizing: border-box; display: flex; align-items: center; gap: 16px; padding: 0 24px; background: var(--sheet); border-bottom: 1px solid var(--rule); font-family: var(--font-sans); color: var(--ink); flex-wrap: wrap">
+<span style="font: var(--type-title); font-weight: 700">DienstPilot</span>
+<span aria-hidden="true" style="width: 1px; height: 24px; background: var(--rule)"></span>
+<span class="label" style="color: var(--ink-muted)">Klinik für Innere Medizin, Klinikum Musterstadt</span>
+<span style="flex: 1 1 auto"></span>
+<span class="dp-env caption"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"></path><path d="M6.453 15h11.094"></path><path d="M8.5 2h7"></path></svg><span>{{t.env}}</span></span>
+<div class="dp-seg" style="padding: 2px">
+<button type="button" class="label" aria-pressed="{{dePressed}}" style="height: 32px; padding: 0 10px; border: 0; border-radius: 4px; font-family: var(--font-sans); cursor: pointer; background: {{deBg}}; color: {{deFg}}">DE</button>
+<button type="button" class="label" aria-pressed="{{enPressed}}" style="height: 32px; padding: 0 10px; border: 0; border-radius: 4px; font-family: var(--font-sans); cursor: pointer; background: {{enBg}}; color: {{enFg}}">EN</button>
+</div>
+<button type="button" class="dp-btn dp-btn--quiet" aria-label="{{t.copilot}}" aria-expanded="{{expanded}}" style="width: 40px; padding: 0; background: {{copilotBg}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button>
+<div style="display: flex; flex-direction: column; gap: 0; padding-left: 12px; border-left: 1px solid var(--rule)">
+<span class="label">{{person}}</span>
+<span class="caption" style="color: var(--ink-muted)">{{personaRole}}</span>
+</div>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"locale":{"editor":"enum","options":["de","en"],"default":"de"},"copilot":{"editor":"enum","options":["open","closed"],"default":"closed"},"person":{"editor":null,"default":"Dr. Thomas Brandt"},"personaRole":{"editor":null,"default":"Oberarzt · Planer"},"$preview":{"width":1440,"height":56}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var de = (this.props.locale || 'de') !== 'en';
+    var open = (this.props.copilot || 'closed') === 'open';
+    return {
+      lang: de ? 'de' : 'en',
+      t: de
+        ? { env: 'Demo-Umgebung, synthetische Daten', copilot: 'Copilot-Panel öffnen oder schließen' }
+        : { env: 'Demo environment, synthetic data', copilot: 'Open or close the copilot panel' },
+      dePressed: de ? 'true' : 'false', enPressed: de ? 'false' : 'true',
+      deBg: de ? 'var(--action)' : 'transparent', deFg: de ? 'var(--on-action)' : 'var(--ink)',
+      enBg: de ? 'transparent' : 'var(--action)', enFg: de ? 'var(--ink)' : 'var(--on-action)',
+      expanded: open ? 'true' : 'false',
+      copilotBg: open ? 'var(--sheet-sunk)' : 'transparent',
+      person: this.props.person || 'Dr. Thomas Brandt',
+      personaRole: this.props.personaRole || (de ? 'Oberarzt · Planer' : 'Senior physician · Planner')
+    };
+  }
+}
+</script>
+</body>
+</html>

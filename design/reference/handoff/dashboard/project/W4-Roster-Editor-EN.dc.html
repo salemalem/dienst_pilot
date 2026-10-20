@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>W4 Roster editor</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/dienstpilot/css/dienstpilot-tokens.css">
+<link rel="stylesheet" href="ds/dienstpilot/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:var(--action)}a:hover{color:var(--ink)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--font-sans); display: flex; flex-direction: column">
+<dc-import name="TopBar" locale="en" copilot="closed" person="Dr. Thomas Brandt" persona-role="Senior physician · Planner" hint-size="100%,56px"></dc-import>
+<div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+<dc-import name="Nav" locale="en" active="w4" rail="yes" hint-size="56px,760px"></dc-import>
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px 12px 40px; border-left: 1px solid var(--rule); display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 0 4px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="display" style="margin: 0">1 rule violation and 1 gap left before approval</h1>
+<p class="body" style="margin: 0; color: var(--ink-muted)">Roster December 2026 · draft from variant A · visible only to you · last changed 10:42</p>
+</div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px">
+<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+<button type="button" class="dp-btn dp-btn--quiet" aria-label="Previous month" style="width: 40px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></button>
+<span class="body-strong" style="min-width: 128px; text-align: center">December 2026</span>
+<button type="button" class="dp-btn dp-btn--quiet" aria-label="Next month" style="width: 40px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
+<span aria-hidden="true" style="width: 1px; height: 24px; background: var(--rule); margin: 0 4px"></span>
+<button type="button" class="dp-btn dp-btn--secondary label">Undo last change</button>
+<button type="button" class="dp-btn dp-btn--primary label" aria-disabled="true" aria-describedby="w4en-publish-hint">Approve and publish</button>
+</div>
+<span id="w4en-publish-hint" class="caption" style="color: var(--ink-muted)">You can approve once no rule is broken.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; padding: 0 4px">
+<div class="dp-rule" role="alert" style="flex: 1 1 560px; max-width: none">
+<span class="dp-rule-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg></span>
+<div class="dp-rule-text">
+<strong class="body-strong">11-hour rest period not met (Dr. Lorenz, 14/15 Dec)</strong>
+<span class="body">The late shift on 14 Dec ends at 22:00 and the early shift on 15 Dec starts at 07:30. Swap the early shift on 15 Dec or move the late shift.</span>
+<span class="caption" style="color: var(--ink-muted)">Rule minimum rest 11 hours · § 5 ArbZG · rule version 2026-1</span>
+</div>
+<div class="dp-rule-actions">
+<button type="button" class="dp-btn dp-btn--secondary label">See correction</button>
+</div>
+</div>
+
+<div class="dp-sugg" style="flex: 1 1 520px; max-width: none">
+<span class="dp-sugg-tag label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>Suggestion</span>
+<p class="dp-sugg-body body-strong">Gap on 23 Dec, late shift. Suggestion: Dr. Mehta</p>
+<div class="dp-sugg-actions">
+<button type="button" class="dp-btn dp-btn--primary label">Assign Dr. Mehta</button>
+<button type="button" class="dp-btn dp-btn--quiet label">Dismiss</button>
+<button type="button" class="dp-btn dp-btn--quiet label dp-sugg-why-btn" aria-expanded="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Why?</button>
+</div>
+<div class="dp-sugg-why">
+<ul class="label">
+<li>Qualified for the internal medicine late shift. <cite>Qualifications, master data</cite></li>
+<li>Rest period met: his late shift on 22 Dec ends at 22:00, the one on 23 Dec starts at 13:30. <cite>§ 5 ArbZG</cite></li>
+<li>Stays within his hours band: 192 instead of 184 hours of working time, contract 176 ± 10%.</li>
+</ul>
+<p class="dp-sugg-note caption" style="margin: 0">The AI only suggests. You decide.</p>
+</div>
+</div>
+</div>
+
+<dc-import name="RosterGrid" locale="en" hint-size="1356px,1180px"></dc-import>
+
+<p class="caption" style="margin: 0; padding: 0 4px; color: var(--ink-muted)">Drag a shift to another cell to move it. Every change is checked against all rules at once.</p>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1560}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
