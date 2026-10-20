@@ -1,0 +1,27 @@
+{
+  "app": {
+    "name": "DienstPilot",
+    "department": "Klinik für Innere Medizin, Klinikum Musterstadt",
+    "env": "Demo environment, synthetic data"
+  },
+  "locale": {
+    "label": "Language",
+    "de": "Deutsch",
+    "en": "English",
+    "current": "Current language: {language}"
+  },
+  "shell": {
+    "dashboardTitle": "Planner dashboard",
+    "mobileTitle": "Staff app",
+    "scaffold": "Scaffold. Screens follow in later phases.",
+    "shiftTypes": "Shift types"
+  },
+  "shift": {
+    "frueh": { "name": "Early shift", "short": "Early", "letter": "E" },
+    "spaet": { "name": "Late shift", "short": "Late", "letter": "L" },
+    "nacht": { "name": "Night shift", "short": "Night", "letter": "N" },
+    "bereitschaft": { "name": "On-call duty (in-house)", "short": "On-call", "letter": "O" },
+    "ruf": { "name": "On-call from home", "short": "From home", "letter": "H" },
+    "frei": { "name": "Leave", "short": "Leave", "letter": "V" }
+  }
+}

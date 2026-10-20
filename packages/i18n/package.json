@@ -1,0 +1,20 @@
+{
+  "name": "@dienstpilot/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The single DE/EN message catalog (ICU syntax) and locale formatting for both apps.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./de.json": "./de.json",
+    "./en.json": "./en.json"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "intl-messageformat": "^12.1.0",
+    "vitest": "^5.0.5"
+  }
+}
