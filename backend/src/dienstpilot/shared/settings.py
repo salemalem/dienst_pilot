@@ -10,7 +10,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    database_url: str = "postgresql+psycopg://dienstpilot:dienstpilot@localhost:5432/dienstpilot"
+    database_url: str = "postgresql+psycopg://dienstpilot:dienstpilot@localhost:5433/dienstpilot"
     redis_url: str = "redis://localhost:6379/0"
     llm_model_intake: str = "claude-haiku-5-5"
     llm_model_copilot: str = "claude-sonnet-5-5"
