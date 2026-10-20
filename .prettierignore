@@ -1,0 +1,13 @@
+pnpm-lock.yaml
+dist/
+.next/
+.expo/
+design/
+docs/
+packages/api-client/src/schema.ts
+*.md
+.import_linter_cache/
+.venv/
+backend/
+packages/design-tokens/src/generated/
+packages/api-client/openapi.json
