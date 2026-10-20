@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import "@dienstpilot/design-tokens/tokens.css";
+@import "@dienstpilot/design-tokens/tailwind.css";
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
