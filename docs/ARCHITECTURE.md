@@ -97,7 +97,7 @@ flowchart LR
 | Intelligence | feature pipelines, model serving (C3–C6) | `ForecastUpdated` |
 | Assistant | agents (C7, C8), workflows, RAG | `ProposalCreated` |
 
-Contexts never read each other's tables. Cross-context reads use public query services or read models built from events. Boundaries are enforced in CI with import-linter contracts, which is what makes later extraction into separate services cheap.
+Contexts never read each other's tables. Cross-context reads use public query services or read models built from events. Boundaries are enforced in CI with import-linter contracts, which is what makes later extraction into separate services cheap. The eight contexts from Identity to Audit live in `backend/src/dienstpilot/`; Intelligence lives in `ml/`, and Assistant in `agents/` and `mcp_servers/`.
 
 ## 8. Data architecture
 

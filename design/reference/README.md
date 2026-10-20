@@ -11,10 +11,9 @@ Exported 20 October 2026. Visual source of truth for apps/mobile and apps/dashbo
 ## Handoff links (from Claude Design)
 - Dashboard: https://claude.ai/code/artifact/a8cf0be9-493e-4ef8-92c2-84b4da547300
 - Staff app: https://claude.ai/code/artifact/aae3e938-97cf-4bc2-8b63-499c3d919d11
-- Design system: https://claude.ai/artifact/5crsuuin1rc3c7zFTMD3bd?sk=2TNs3EcmKYqJrD9cljvKfQ
 
 ## Rules
 - Token source of truth: design-system/ (downloaded from the Design system link). The copies under handoff/*/project/ds/ are older snapshots; don't use them for tokens.
-- Shift types and times: docs/UI_SPEC.md §1 is the source of truth.
+- Shift types and times: docs/UI_SPEC.md §5 is the source of truth. The mobile mockups predate Rufbereitschaft, so their shift times are outdated: Bereitschaftsdienst is 08:00–08:00 (+1 day); 16:00–07:30 is Rufbereitschaft.
 - Take tokens, layout and component styling from here; build in the stack from CLAUDE.md. Do not copy prototype code wholesale.
 - All numbers in the mockups (hours, fairness, overtime, costs) are illustrative. The coded apps must get every number from the backend.
