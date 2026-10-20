@@ -119,10 +119,11 @@ Tests pass; type checks clean; import-linter contracts hold; docs updated (statu
 
 ## Commands
 
-Fill these in as they are built: `make seed`, `make train`, `make eval`, `make screenshots`.
+Fill these in as they are built: `make train`, `make eval`, `make screenshots`.
 
 - `make dev`: installs dependencies, starts Postgres 16 + pgvector, Redis and the API in Docker (`infra/compose.dev.yml`, API on :8000), then the dashboard (:3000) and the Expo app on web (:8081). `make down` stops Docker.
-- `make test`: pytest, then vitest for the packages.
+- `make seed`: rebuilds the database from the synthetic seed. Generates `data/synthetic/v1/` if the seed or generator version changed (`SEED=20261020` by default), resets the schema with Alembic, then loads the Parquet. The Docker Postgres listens on host port 5433.
+- `make test`: pytest, then vitest for the packages. Database tests run when `TEST_DATABASE_URL` points to a Postgres the tests may wipe.
 - `make lint`: ruff, mypy `--strict`, import-linter, eslint, tsc, prettier.
 - `make format`: apply ruff and prettier formatting.
 - `make api-client`: regenerate `packages/api-client` from the backend's OpenAPI schema.
