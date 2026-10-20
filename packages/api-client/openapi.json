@@ -1,0 +1,115 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "DienstPilot API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Get Health",
+        "description": "Liveness: the API process is running.",
+        "operationId": "get_health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Get Readiness",
+        "description": "Readiness: Postgres (with pgvector) and Redis are reachable. 503 if any check fails.",
+        "operationId": "get_readiness_health_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Health": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status",
+            "default": "ok"
+          }
+        },
+        "type": "object",
+        "title": "Health",
+        "description": "Liveness response."
+      },
+      "Readiness": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "fail"
+            ],
+            "title": "Status"
+          },
+          "postgres": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "fail"
+            ],
+            "title": "Postgres"
+          },
+          "pgvector": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "fail"
+            ],
+            "title": "Pgvector"
+          },
+          "redis": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "fail"
+            ],
+            "title": "Redis"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "postgres",
+          "pgvector",
+          "redis"
+        ],
+        "title": "Readiness",
+        "description": "Readiness response: one entry per backing service."
+      }
+    }
+  }
+}
