@@ -11,7 +11,7 @@ minimumReleaseAge: 10080
 # TEMPORARY (added 2026-10-20): the exact versions below were already locked when the guard
 # went from 1 to 7 days and are younger than 7 days (react-native 0.88.0 is required by Expo
 # SDK 58). The newest was published on 2026-10-19, so all are 7 days old by 2026-10-26: remove this
-# list then (tracked in a GitHub issue). Only these exact versions are exempt.
+# list then (shadmanArko/dienst_pilot#2). Only these exact versions are exempt.
 minimumReleaseAgeExclude:
   - "2g@1.0.1"
   - "@expo/cli@58.1.12"
