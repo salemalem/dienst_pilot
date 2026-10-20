@@ -1,0 +1,16 @@
+<!-- @dsCard group="Status" height=130 subtitle="On every screen" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>EnvBadge — preview</title>
+<style>body{margin:0;padding:16px;background:var(--paper);color:var(--ink);font-family:var(--font-sans)} .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center} .stack{display:flex;flex-direction:column;gap:16px} .k{color:var(--ink-muted);min-width:7.5em}</style>
+</head>
+<body>
+<div class="stack" id="root"></div>
+<script>
+  var D = window.DienstPilot, r = document.getElementById("root");
+  var row = document.createElement("div"); row.className = "row";
+  row.append(D.EnvBadge({ lang: "de" }), D.EnvBadge({ lang: "en" }));
+  r.append(D.EnvBadge({ lang: "de", bar: true }), row);
+</script>
+</body>
+</html>

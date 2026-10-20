@@ -1,0 +1,22 @@
+<!-- @dsCard group="Roster" height=210 subtitle="Colour + letter, DE and EN" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>ShiftChip — preview</title>
+<style>body{margin:0;padding:16px;background:var(--paper);color:var(--ink);font-family:var(--font-sans)} .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center} .stack{display:flex;flex-direction:column;gap:16px} .k{color:var(--ink-muted);min-width:7.5em}</style>
+</head>
+<body>
+<div class="stack">
+  <div class="row"><span class="k caption">Deutsch</span><span class="row" id="de"></span></div>
+  <div class="row"><span class="k caption">English</span><span class="row" id="en"></span></div>
+  <div class="row"><span class="k caption">Mit Zeit</span><span class="row" id="lab" style="gap:24px"></span></div>
+</div>
+<script>
+  var D = window.DienstPilot, keys = ["frueh","spaet","nacht","bereitschaft","ruf","frei"];
+  keys.forEach(function (k) { document.getElementById("de").append(D.ShiftChip({ shift: k, lang: "de", size: "lg" })); });
+  keys.forEach(function (k) { document.getElementById("en").append(D.ShiftChip({ shift: k, lang: "en", size: "lg" })); });
+  [["frueh","07:30–16:00"],["spaet","14:30–23:00"],["nacht","22:00–08:00"],["bereitschaft","16:00–07:30"],["ruf","16:00–07:30"]].forEach(function (p) {
+    document.getElementById("lab").append(D.ShiftChip({ shift: p[0], lang: "de", label: true, time: p[1] }));
+  });
+</script>
+</body>
+</html>

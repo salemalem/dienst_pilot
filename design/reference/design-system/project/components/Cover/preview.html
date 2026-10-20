@@ -1,0 +1,53 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>DienstPilot — cover</title>
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--paper); font-family: var(--font-sans); width: 960px; height: 288px; position: relative; overflow: hidden; }
+  svg { position: absolute; left: 0; top: 0; }
+  .sheet { fill: var(--sheet); }
+  .frueh { fill: var(--shift-frueh); }
+  .spaet { fill: var(--shift-spaet); }
+  .nacht { fill: var(--shift-nacht-edge); }
+  .bereit { fill: var(--shift-bereitschaft); }
+  .frei-bg { fill: var(--shift-frei-wash); }
+  .hatch { stroke: var(--shift-frei); stroke-width: 2; }
+  .rule { stroke: var(--rule-strong); stroke-width: 1; }
+  .pen { fill: none; stroke: var(--alert); stroke-width: 2.5; }
+  .text { position: absolute; left: 40px; bottom: 40px; max-width: 440px; }
+  .name { margin: 0; font-size: 64px; line-height: 0.95; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .tag { margin: 12px 0 0; font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+</style>
+</head>
+<body>
+<!--
+  blocks: shift-nacht-edge 144×204 (4×6 cells), shift-frueh 180×102 (5×3), shift-spaet 180×102 (5×3), shift-bereitschaft 108×68 (3×2), hatched shift-frei-wash 72×68 (2×2); cell = cell-w 36 × cell-h 34, all radius-sheet (0).
+  arrangement: merged runs of roster cells on one sheet, the night slab bleeding off the top-right edge, like a column block on the pinned Dienstplan.
+  pattern: "editorial: a few hairline rules" — four rule-strong lines on the cell pitch, chosen because the brand IS a ruled paper grid; plus one small red-pen ring (alert, the only hand mark).
+  scales: pitch cell-w/cell-h (36/34), radius-sheet 0, rule 1px, text inset space-6+space-2 (40).
+-->
+<svg width="960" height="288" viewBox="0 0 960 288" aria-hidden="true">
+  <defs>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line class="hatch" x1="0" y1="0" x2="0" y2="6"/>
+    </pattern>
+  </defs>
+  <rect class="nacht"  x="816" y="0"   width="144" height="204"/>
+  <rect class="frueh"  x="552" y="34"  width="180" height="102"/>
+  <rect class="spaet"  x="624" y="170" width="180" height="102"/>
+  <rect class="bereit" x="516" y="170" width="108" height="68"/>
+  <rect class="frei-bg" x="732" y="68" width="72" height="68"/>
+  <rect x="732" y="68" width="72" height="68" fill="url(#hatch)"/>
+  <line class="rule" x1="480" y1="34.5"  x2="960" y2="34.5"/>
+  <line class="rule" x1="480" y1="136.5" x2="960" y2="136.5"/>
+  <line class="rule" x1="480" y1="170.5" x2="960" y2="170.5"/>
+  <line class="rule" x1="516.5" y1="0" x2="516.5" y2="288"/>
+  <ellipse class="pen" cx="882" cy="246" rx="25" ry="20" transform="rotate(-8 882 246)"/>
+</svg>
+<div class="text">
+  <h1 class="name">DienstPilot</h1>
+  <p class="tag">Dienstplanung für Kliniken. Die KI schlägt vor, Sie entscheiden.</p>
+</div>
+</body>
+</html>

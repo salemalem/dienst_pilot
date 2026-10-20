@@ -1,0 +1,29 @@
+<!-- @dsCard group="Roster" height=176 subtitle="Every state of a grid cell" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>RosterCell — preview</title>
+<style>body{margin:0;padding:16px;background:var(--paper);color:var(--ink);font-family:var(--font-sans)} .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center} .stack{display:flex;flex-direction:column;gap:16px} .k{color:var(--ink-muted);min-width:7.5em}</style>
+</head>
+<body>
+<style>.cells{display:grid;grid-template-columns:repeat(4,max-content);gap:12px 28px;align-items:center} .c{display:flex;align-items:center;gap:10px} .c .dp-cell{border:1px solid var(--rule);background-color:var(--sheet)} .c .dp-cell.has-shift{background-color:var(--wash)}</style>
+<div class="cells" id="root"></div>
+<script>
+  var D = window.DienstPilot, root = document.getElementById("root");
+  [[{ shift: "F" }, "Zugeteilt / Assigned"],
+   [{ shift: "S", wish: "granted" }, "Wunsch erfüllt / Wish granted"],
+   [{ shift: "N", wish: "missed" }, "Wunsch verfehlt / Wish missed"],
+   [{ shift: "F", violation: "Ruhezeit 11 h" }, "Regelverstoß / Rule violation"],
+   [{ gap: "S" }, "Lücke / Gap"],
+   [{ leave: true }, "Urlaub / Leave"],
+   [{ shift: "S", suggested: true }, "Vorschlag / Suggested"],
+   [{ shift: "R" }, "Rufbereitschaft / From home"],
+   [{ shift: "B", selected: true }, "Ausgewählt / Selected"]
+  ].forEach(function (p) {
+    var cell = D.RosterCell(Object.assign({ lang: "de", interactive: true }, p[0]));
+    var wrap = document.createElement("div"); wrap.className = "c dp-root";
+    var t = document.createElement("span"); t.className = "caption"; t.textContent = p[1];
+    wrap.append(cell, t); root.append(wrap);
+  });
+</script>
+</body>
+</html>

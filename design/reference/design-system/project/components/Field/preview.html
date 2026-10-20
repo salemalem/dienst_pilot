@@ -1,0 +1,20 @@
+<!-- @dsCard group="Forms" height=420 subtitle="Text, select, free text, error" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Field — preview</title>
+<style>body{margin:0;padding:16px;background:var(--paper);color:var(--ink);font-family:var(--font-sans)} .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center} .stack{display:flex;flex-direction:column;gap:16px} .k{color:var(--ink-muted);min-width:7.5em}</style>
+</head>
+<body>
+<div id="root" style="display:grid;grid-template-columns:repeat(2,minmax(0,280px));gap:16px 24px"></div>
+<script>
+  var D = window.DienstPilot, r = document.getElementById("root");
+  r.append(
+    D.Field({ label: "Zeitraum", value: "14.07.–27.07.2027", numeric: true, hint: "Zwei andere Kolleg:innen haben überlappende Tage beantragt." }),
+    D.Field({ label: "Station", options: ["Station 4B", "Station 5A", "Notaufnahme"], value: "Station 4B" }),
+    D.Field({ label: "Wünsche in eigenen Worten", multiline: true, placeholder: "Lieber Nächte als Wochenenden" }),
+    D.Field({ label: "Ablehnungsgrund", value: "", error: "Begründung fehlt.", fix: "Geben Sie einen Grund ein. Er wird Dr. Kaya angezeigt." }),
+    D.Field({ label: "Dienstbeginn", value: "25:00", numeric: true, error: "25:00 ist keine gültige Uhrzeit.", fix: "Geben Sie eine Zeit von 00:00 bis 23:59 ein, z. B. 07:30." }),
+    D.Field({ label: "Start time", value: "7.30", numeric: true, error: "Time format not recognised.", fix: "Use hours and minutes with a colon, e.g. 07:30." }));
+</script>
+</body>
+</html>

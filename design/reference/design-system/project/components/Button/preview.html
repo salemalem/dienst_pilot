@@ -1,0 +1,27 @@
+<!-- @dsCard group="Actions" height=210 subtitle="Ink for the decision, outline for the rest" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Button — preview</title>
+<style>body{margin:0;padding:16px;background:var(--paper);color:var(--ink);font-family:var(--font-sans)} .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center} .stack{display:flex;flex-direction:column;gap:16px} .k{color:var(--ink-muted);min-width:7.5em}</style>
+</head>
+<body>
+<div class="stack">
+  <div class="row" id="r1"></div>
+  <div class="row" id="r2"></div>
+  <div id="r3" style="max-width:360px"></div>
+</div>
+<script>
+  var D = window.DienstPilot;
+  document.getElementById("r1").append(
+    D.Button({ variant: "primary", label: "Freigeben und veröffentlichen" }),
+    D.Button({ variant: "secondary", label: "Erinnerung senden" }),
+    D.Button({ variant: "quiet", label: "Abbrechen" }),
+    D.Button({ variant: "link", label: "Protokoll öffnen" }));
+  document.getElementById("r2").append(
+    D.Button({ variant: "primary", label: "Approve and publish" }),
+    D.Button({ variant: "pencil", icon: "pencil-line", label: "Vorschlag erstellen" }),
+    D.Button({ variant: "secondary", label: "Genehmigen", disabled: true }));
+  document.getElementById("r3").append(D.Button({ variant: "primary", size: "lg", block: true, label: "Übernehmen" }));
+</script>
+</body>
+</html>

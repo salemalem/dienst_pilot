@@ -1,0 +1,27 @@
+<!-- @dsCard group="Roster" height=540 width=960 subtitle="The paper Dienstplan, alive: December 2026, Innere Medizin" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>RosterGrid — preview</title>
+<style>body{margin:0;padding:16px;background:var(--paper);color:var(--ink);font-family:var(--font-sans)} .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center} .stack{display:flex;flex-direction:column;gap:16px} .k{color:var(--ink-muted);min-width:7.5em}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  var D = window.DienstPilot;
+  var wd = ["Do","Fr","Sa","So","Mo","Di","Mi","Do","Fr","Sa","So","Mo","Di","Mi"];
+  var days = wd.map(function (w, i) { return { d: 10 + i, wd: w, weekend: w === "Sa" || w === "So" }; });
+  var rows = [
+    { name: "Dr. Thomas Brandt", role: "Oberarzt", hours: 86, cells: ["F","F","R","R","F","F","F",{shift:"B",wish:"granted"},null,"R",null,"F","F","F"] },
+    { name: "Dr. Lea Lorenz", role: "Fachärztin", hours: 92, cells: ["S","S",null,"B",{shift:"S",wish:"missed"},{shift:"F",violation:"Ruhezeit 11 h, 14./15.12."},"R","N","N",null,{shift:"R",wish:"granted"},"S","S",null] },
+    { name: "Dr. Aylin Kaya", role: "Assistenzärztin", hours: 88, cells: ["N","N","N",null,null,null,{shift:"F",wish:"granted"},"F","F",null,null,"F",null,"S"] },
+    { name: "Dr. Rohan Mehta", role: "Assistenzarzt", hours: 81, cells: [null,"F","F","F",null,"S","S",null,null,"N","N",null,null,{shift:"S",suggested:true}] },
+    { name: "Dr. Jonas Weber", role: "Assistenzarzt", hours: 90, cells: ["F",null,"S","S","S",null,"N","N",null,null,"F","F","F",null] },
+    { name: "Dr. Sofía Alvarez", role: "Assistenzärztin", hours: 84, cells: ["B",null,null,"N","N","N",null,null,"S","S",{shift:"F",wish:"granted"},null,"N","N"] },
+    { name: "Dr. Hannah Schulz", role: "Fachärztin", hours: 64, cells: ["S","B",null,null,"F","F","F","S",{shift:"S",wish:"missed"},null,null,{leave:true},{leave:true},{leave:true}] },
+    { name: "Dr. Marek Nowak", role: "Assistenzarzt", hours: 87, cells: [null,"N","B","F",null,null,"S","S","F","B","B",null,"S","F"] }
+  ];
+  var coverage = ["ok","ok","ok","ok","ok","ok","ok","ok","ok","ok","ok","ok","ok",{gap:"S"}];
+  document.getElementById("root").append(D.RosterGrid({ lang: "de", days: days, rows: rows, coverage: coverage, interactive: true, caption: "Dienstplan Dezember 2026, 10.–23.12." }));
+</script>
+</body>
+</html>
