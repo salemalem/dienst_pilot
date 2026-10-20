@@ -1,0 +1,27 @@
+{
+  "app": {
+    "name": "DienstPilot",
+    "department": "Klinik für Innere Medizin, Klinikum Musterstadt",
+    "env": "Demo-Umgebung, synthetische Daten"
+  },
+  "locale": {
+    "label": "Sprache",
+    "de": "Deutsch",
+    "en": "English",
+    "current": "Aktuelle Sprache: {language}"
+  },
+  "shell": {
+    "dashboardTitle": "Planer-Dashboard",
+    "mobileTitle": "Mitarbeiter-App",
+    "scaffold": "Grundgerüst. Die Ansichten folgen in späteren Phasen.",
+    "shiftTypes": "Dienstarten"
+  },
+  "shift": {
+    "frueh": { "name": "Frühdienst", "short": "Früh", "letter": "F" },
+    "spaet": { "name": "Spätdienst", "short": "Spät", "letter": "S" },
+    "nacht": { "name": "Nachtdienst", "short": "Nacht", "letter": "N" },
+    "bereitschaft": { "name": "Bereitschaftsdienst", "short": "Bereitschaft", "letter": "B" },
+    "ruf": { "name": "Rufbereitschaft", "short": "Ruf", "letter": "R" },
+    "frei": { "name": "Urlaub", "short": "Urlaub", "letter": "U" }
+  }
+}

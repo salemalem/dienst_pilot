@@ -1,0 +1,18 @@
+{
+  "name": "@dienstpilot/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript types generated from the backend's OpenAPI schema.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "uv run --project ../.. python -I ../../backend/scripts/export_openapi.py openapi.json && openapi-typescript openapi.json -o src/schema.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'api-client: generated types, checked by CI freshness check'"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.13.0"
+  }
+}

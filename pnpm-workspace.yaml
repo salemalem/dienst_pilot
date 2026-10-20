@@ -1,0 +1,14 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Expo/Metro needs a flat node_modules in a pnpm workspace.
+nodeLinker: hoisted
+
+# Supply-chain guard: only install releases that are at least one day old.
+minimumReleaseAge: 1440
+
+# No dependency install scripts run; both ship prebuilt binaries as optional dependencies.
+allowBuilds:
+  "@parcel/watcher": false
+  "@swc/core": false

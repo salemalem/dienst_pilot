@@ -1,0 +1,59 @@
+# Local development stack: Postgres 16 + pgvector, Redis 7, and the API with hot reload.
+# The dashboard and the Expo app run on the host (see `make dev`).
+name: dienstpilot
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: dienstpilot
+      POSTGRES_PASSWORD: dienstpilot
+      POSTGRES_DB: dienstpilot
+    ports: ["5432:5432"]
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dienstpilot -d dienstpilot"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@postgres:5432/dienstpilot
+      REDIS_URL: redis://redis:6379/0
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn dienstpilot.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/backend/src"
+    ports: ["8000:8000"]
+    volumes: ["../backend/src:/app/backend/src"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready')",
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+volumes:
+  postgres-data:
+  redis-data:

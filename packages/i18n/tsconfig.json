@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "noEmit": true,
+    "lib": ["ES2023", "DOM"]
+  },
+  "include": ["src", "tests", "*.json"]
+}

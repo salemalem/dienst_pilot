@@ -119,7 +119,15 @@ Tests pass; type checks clean; import-linter contracts hold; docs updated (statu
 
 ## Commands
 
-Fill these in as they are built: `make dev`, `make test`, `make lint`, `make seed`, `make train`, `make eval`, `make screenshots`.
+Fill these in as they are built: `make seed`, `make train`, `make eval`, `make screenshots`.
+
+- `make dev`: installs dependencies, starts Postgres 16 + pgvector, Redis and the API in Docker (`infra/compose.dev.yml`, API on :8000), then the dashboard (:3000) and the Expo app on web (:8081). `make down` stops Docker.
+- `make test`: pytest, then vitest for the packages.
+- `make lint`: ruff, mypy `--strict`, import-linter, eslint, tsc, prettier.
+- `make format`: apply ruff and prettier formatting.
+- `make api-client`: regenerate `packages/api-client` from the backend's OpenAPI schema.
+
+Toolchain: uv (Python 3.12) and pnpm (Node 24+). `packages/design-tokens` is built from `design/reference/design-system/project/tokens.json`; run `pnpm build:packages` after changing it.
 
 ## How to work in this repo
 

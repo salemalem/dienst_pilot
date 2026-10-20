@@ -28,7 +28,9 @@ Remaining staff up to about 28 come from the synthetic generator.
 
 **Subject.** The real artefact in this world is the printed Dienstplan pinned to the wall of the doctors' room: a dense grid of names and days with shift letters, marked up by hand. DienstPilot is that grid made alive and calm. The **roster grid** is the one memorable element; everything around it stays quiet and disciplined.
 
-**Starting palette** (a proposal for Claude Design to refine; avoid cream-and-terracotta, black-with-neon and generic SaaS card kits):
+**Starting palette** (a proposal for Claude Design to refine; avoid cream-and-terracotta, black-with-neon and generic SaaS card kits).
+
+> Superseded: the final tokens live in `design/reference/design-system/project/tokens.json`, built into `packages/design-tokens`. They add Rufbereitschaft as a sixth shift type (`shift-ruf`) and move Bereitschaft from teal `#2F8A7A` to green `#2A7F5B` for colour-blind separation from grey leave. The table below is kept as the starting point only.
 
 | Token | Hex | Use |
 |---|---|---|
@@ -42,7 +44,7 @@ Remaining staff up to about 28 come from the synthetic generator.
 | frei | `#9AA5B1` | leave / free (with hatching) |
 | alert | `#B3261E` | rule violations only |
 
-**Shift-type system.** Every shift is shown as a colour **and** a letter so it works without colour: F (Früh / Early, E in EN), S (Spät / Late, L), N (Nacht / Night, N), B (Bereitschaft / On-call, O), U (Urlaub / Leave, V for vacation). Letters switch with the language.
+**Shift-type system.** Every shift is shown as a colour **and** a letter so it works without colour: F (Früh / Early, E in EN), S (Spät / Late, L), N (Nacht / Night, N), B (Bereitschaft / On-call, O), R (Rufbereitschaft / On-call from home, H), U (Urlaub / Leave, V for vacation). Letters switch with the language.
 
 **Type.** One legible family. Atkinson Hyperlegible Next is a strong starting point because legibility for tired eyes at 03:00 is the point; use tabular figures for hours and times. Claude Design may propose an alternative with a stated reason.
 
