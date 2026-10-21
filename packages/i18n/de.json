@@ -103,11 +103,14 @@
   "recommendation": {
     "balanced": "Empfohlen: das ausgewogene Profil, mit Gewichten aus der Abstimmung auf Juli bis Dezember 2024."
   },
-  "leaveCheck": {
-    "coverable": "Abdeckbar.",
-    "coverable_with_trade_off": "Abdeckbar mit Tausch: {weekends, plural, one {# Wochenenddienst} other {# Wochenenddienste}} im {month} statt der üblichen Verteilung.",
-    "not_coverable": "Nicht abdeckbar, ohne eine Regel zu verletzen.",
-    "not_applicable": "Für diesen Zeitraum wird kein Tausch geprüft.",
+  "m5": {
+    "coverable": "{count, plural, =0 {Abdeckbar. Die Besetzung bleibt gesichert, ohne Überstunden.} one {Abdeckbar. Eine Kolleg:in hat überschneidende Tage beantragt; die Besetzung bleibt gesichert, ohne Überstunden.} =2 {Abdeckbar. Zwei Kolleg:innen haben überschneidende Tage beantragt; die Besetzung bleibt gesichert, ohne Überstunden.} other {Abdeckbar. # Kolleg:innen haben überschneidende Tage beantragt; die Besetzung bleibt gesichert, ohne Überstunden.}}",
+    "requestLeave": "Urlaub beantragen",
+    "tradeOff": "Abdeckbar, wenn Sie im {month} ein zusätzliches Wochenende übernehmen",
+    "requestWithTrade": "Mit Tausch beantragen",
+    "requestWithoutTrade": "Ohne Tausch beantragen",
+    "notCoverable": "Nicht abdeckbar, ohne eine Regel zu verletzen.",
+    "notApplicable": "Für diesen Zeitraum wird kein Tausch geprüft.",
     "reason": {
       "spans_months": "Der Urlaub reicht über zwei Monate.",
       "month_published": "Der Monat ist schon veröffentlicht; die Planung regelt die Vertretung.",
@@ -118,6 +121,11 @@
       "trade_off_invalid": "Der Plan mit Tausch hat die Prüfung durch den Validator nicht bestanden.",
       "baseline_unsolved": "Der Monat ließ sich ohne diesen Urlaub nicht vergleichen."
     }
+  },
+  "m6": {
+    "offerExchange": "Tausch anbieten",
+    "audience": "Angebot geht an {n} Kolleg:innen, die mit Ihnen tauschen dürfen",
+    "giveawayBelowHours": "Allein abgeben geht nicht: Sie lägen unter Ihren Vertragsstunden. Bieten Sie einen Tausch an."
   },
   "notification": {
     "roster_changed": "Ihr Dienstplan am {date} wurde geändert. Grund: {reason}"

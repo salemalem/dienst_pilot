@@ -4,7 +4,8 @@
     "allowImportingTsExtensions": true,
     "erasableSyntaxOnly": true,
     "noEmit": true,
-    "lib": ["ES2023", "DOM"]
+    "lib": ["ES2023", "DOM"],
+    "types": ["node"]
   },
   "include": ["src", "tests", "*.json"]
 }

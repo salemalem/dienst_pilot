@@ -103,11 +103,14 @@
   "recommendation": {
     "balanced": "Recommended: the balanced profile, with weights tuned on July to December 2024."
   },
-  "leaveCheck": {
-    "coverable": "Coverable.",
-    "coverable_with_trade_off": "Coverable with a trade: {weekends, plural, one {# weekend duty} other {# weekend duties}} in {month} instead of the usual spread.",
-    "not_coverable": "Not coverable without breaking a rule.",
-    "not_applicable": "No trade is checked for these dates.",
+  "m5": {
+    "coverable": "{count, plural, =0 {Coverable. Staffing stays covered without overtime.} one {Coverable. One colleague has requested overlapping days; staffing stays covered without overtime.} =2 {Coverable. Two colleagues have requested overlapping days; staffing stays covered without overtime.} other {Coverable. # colleagues have requested overlapping days; staffing stays covered without overtime.}}",
+    "requestLeave": "Request leave",
+    "tradeOff": "Coverable if you take one extra weekend in {month}",
+    "requestWithTrade": "Request with trade",
+    "requestWithoutTrade": "Request without trade",
+    "notCoverable": "Not coverable without breaking a rule.",
+    "notApplicable": "No trade is checked for these dates.",
     "reason": {
       "spans_months": "The leave spans two months.",
       "month_published": "The month is already published; the planner arranges cover.",
@@ -118,6 +121,11 @@
       "trade_off_invalid": "The roster with the trade did not pass the validator.",
       "baseline_unsolved": "The month could not be compared without this leave."
     }
+  },
+  "m6": {
+    "offerExchange": "Offer exchange",
+    "audience": "Offer goes to {n} colleagues who can exchange with you",
+    "giveawayBelowHours": "You can't give this shift away alone: you'd fall below your contract hours. Offer an exchange instead."
   },
   "notification": {
     "roster_changed": "Your roster on {date} was changed. Reason: {reason}"
