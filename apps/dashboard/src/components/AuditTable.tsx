@@ -9,6 +9,9 @@ import { ICON, Table } from "@/components/ui";
 import { AUDIT_ACTIONS } from "@/lib/audit";
 import { useFmt } from "@/lib/fmt";
 
+/** Catalog keys cannot contain dots, so `run.requested` is `run_requested`. */
+export const actionKey = (a: string): string => a.replace(".", "_");
+
 type Event = components["schemas"]["AuditEventOut"];
 
 /** Who did what, when; absences appear without a category for everyone but the Planner (the API decides). */
@@ -16,7 +19,9 @@ export function AuditTable({ events }: { events: Event[] }): ReactNode {
   const t = useTranslations("w10");
   const fmt = useFmt();
   const label = (a: string): string =>
-    (AUDIT_ACTIONS as readonly string[]).includes(a) ? t(`action.${a as "run.requested"}`) : a;
+    (AUDIT_ACTIONS as readonly string[]).includes(a)
+      ? t(`action.${actionKey(a) as "run_requested"}`)
+      : a;
   return (
     <Table label={t("tableLabel")}>
       <thead>

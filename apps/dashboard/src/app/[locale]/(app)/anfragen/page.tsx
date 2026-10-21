@@ -1,7 +1,7 @@
 "use client";
 
 import { ApiError, unwrap, type components } from "@dienstpilot/api-client";
-import { CircleAlert } from "lucide-react";
+import { CircleAlert, PencilLine } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 
@@ -15,8 +15,8 @@ import {
   Dialog,
   ErrorState,
   Field,
+  ICON,
   PageHeader,
-  Section,
   useToast,
 } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
@@ -25,6 +25,13 @@ import { useAction, useQuery } from "@/lib/hooks";
 import { useSession } from "@/lib/session";
 
 type Inbox = components["schemas"]["Inbox"];
+type Violation = components["schemas"]["ViolationOut"];
+
+type Item =
+  | { kind: "leave"; id: string; urgent: boolean; at: string; data: Inbox["leave"][number] }
+  | { kind: "swap"; id: string; urgent: boolean; at: string; data: Inbox["swaps"][number] }
+  | { kind: "cascade"; id: string; urgent: boolean; at: string; data: Inbox["cascades"][number] }
+  | { kind: "proposal"; id: string; urgent: boolean; at: string; data: Inbox["proposals"][number] };
 
 interface Target {
   kind: "leave" | "swap";
@@ -106,7 +113,7 @@ function DeclineDialog({
   );
 }
 
-/** W6: leave requests with their computed impact, escalated swaps and cover, copilot proposals. */
+/** W6: requests in a list, the selected one with its computed impact beside it. */
 export default function RequestsPage(): ReactNode {
   const t = useTranslations("w6");
   const te = useTranslations("escalation");
@@ -114,10 +121,9 @@ export default function RequestsPage(): ReactNode {
   const toast = useToast();
   const { api } = useSession();
   const q = useQuery((a) => unwrap(a.GET("/planner/requests")), []);
+  const [selected, setSelected] = useState<string | null>(null);
   const [declining, setDeclining] = useState<Target | null>(null);
-  const [blocked, setBlocked] = useState<Record<string, components["schemas"]["ViolationOut"][]>>(
-    {},
-  );
+  const [blocked, setBlocked] = useState<Record<string, Violation[]>>({});
 
   const approve = useAction(async (kind: "leave" | "swap", id: string) => {
     try {
@@ -137,6 +143,7 @@ export default function RequestsPage(): ReactNode {
           }),
         );
       toast.show(t("approved"));
+      setSelected(null);
       q.reload();
     } catch (e) {
       if (e instanceof ApiError && e.violations.length > 0)
@@ -152,6 +159,7 @@ export default function RequestsPage(): ReactNode {
       }),
     );
     toast.show(accept ? t("proposalAccepted") : t("proposalDismissed"));
+    setSelected(null);
     q.reload();
   });
 
@@ -159,172 +167,271 @@ export default function RequestsPage(): ReactNode {
     r && te.has(r as "overtime") ? te(r as "overtime") : r;
 
   const body = (d: Inbox): ReactNode => {
-    const total = d.leave.length + d.swaps.length + d.cascades.length + d.proposals.length;
+    const items: Item[] = [
+      ...d.cascades.map((c) => ({
+        kind: "cascade" as const,
+        id: c.id,
+        urgent: true,
+        at: c.date,
+        data: c,
+      })),
+      ...d.swaps.map((s) => ({
+        kind: "swap" as const,
+        id: s.id,
+        urgent: true,
+        at: s.date,
+        data: s,
+      })),
+      ...d.leave.map((l) => ({
+        kind: "leave" as const,
+        id: l.id,
+        urgent: false,
+        at: l.submitted_at,
+        data: l,
+      })),
+      ...d.proposals.map((p) => ({
+        kind: "proposal" as const,
+        id: p.id,
+        urgent: false,
+        at: p.created_at,
+        data: p,
+      })),
+    ].sort((a, b) => Number(b.urgent) - Number(a.urgent) || b.at.localeCompare(a.at));
+    const current = items.find((i) => i.id === selected) ?? items[0] ?? null;
+    const urgent = items.filter((i) => i.urgent).length;
+    const parts = [
+      d.leave.length ? t("partLeave", { count: d.leave.length }) : null,
+      d.swaps.length + d.cascades.length
+        ? t("partSwap", { count: d.swaps.length + d.cascades.length })
+        : null,
+      d.proposals.length ? t("partProposal", { count: d.proposals.length }) : null,
+    ].filter(Boolean);
+
+    const heading = (i: Item): string =>
+      i.kind === "leave"
+        ? i.data.display_name
+        : i.kind === "proposal"
+          ? i.data.title
+          : i.kind === "swap"
+            ? t("swapAt", { date: fmt.dayMonth(i.data.date) })
+            : t("coverAt", { date: fmt.dayMonth(i.data.date) });
+    const kindLabel = (i: Item): string => t(`kind.${i.kind}`);
+    const sub = (i: Item): ReactNode =>
+      i.kind === "leave" ? (
+        <span>
+          {fmt.range(i.data.start_date, i.data.end_date)} {i.data.end_date.slice(0, 4)}
+        </span>
+      ) : i.kind === "proposal" ? (
+        <span>{t("byCopilot")}</span>
+      ) : (
+        <ShiftLabel code={i.data.shift_type} />
+      );
+
     return (
       <>
         <PageHeader
-          title={t("title")}
-          status={total === 0 ? t("statusNone") : t("statusOpen", { count: total })}
+          title={
+            items.length === 0 ? t("statusNone") : t("headline", { count: items.length, urgent })
+          }
+          status={parts.join(" · ") || undefined}
         />
         {approve.error ? <ErrorState error={approve.error} /> : null}
-        <Section title={t("leaveTitle", { count: d.leave.length })}>
-          {d.leave.length === 0 ? <p className="body m-0">{t("leaveNone")}</p> : null}
-          <ul className="m-0 flex list-none flex-col gap-4 p-0">
-            {d.leave.map((l) => (
-              <li
-                key={l.id}
-                className="flex flex-col gap-2 border-b border-rule pb-4"
-                data-testid="leave-request"
-              >
-                <div className="flex flex-wrap items-baseline gap-3">
-                  <span className="heading">{l.display_name}</span>
-                  <span className="num-time">
-                    {fmt.range(l.start_date, l.end_date)} {l.end_date.slice(0, 4)}
-                  </span>
-                  <span className="caption text-ink-muted">
-                    {t("submitted", { date: fmt.date(l.submitted_at) })}
-                  </span>
-                </div>
-                <p className="body m-0" data-testid="leave-impact">
-                  {t(
-                    `hint.${l.impact.hint === "tight" || l.impact.hint === "not_coverable" ? l.impact.hint : "coverable"}`,
-                  )}{" "}
-                  {t("impact", { max: l.impact.max_on_leave_same_day, limit: l.impact.limit })}
-                </p>
-                <p className="body m-0 text-ink-muted">
-                  {t("leaveTaken", {
-                    days: l.impact.leave_days_taken_this_year,
-                    mean: fmt.number(l.impact.department_mean_leave_days, 1),
-                  })}{" "}
-                  <EngineBadge engine={l.impact.engine} />
-                </p>
-                {blocked[l.id]?.map((v) => (
-                  <RuleMessage key={`${v.rule}-${v.date}`} violation={v} live />
-                ))}
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant="primary"
-                    disabled={approve.pending}
-                    onClick={() => void approve.run("leave", l.id)}
-                    data-testid="approve-leave"
-                  >
-                    {t("approve")}
-                  </Button>
-                  <Button
-                    variant="secondary"
+        {items.length > 0 ? (
+          <div className="grid items-start gap-6 [grid-template-columns:minmax(260px,340px)_1fr]">
+            <ul className="m-0 flex list-none flex-col gap-2 p-0" aria-label={t("listLabel")}>
+              {items.map((i) => (
+                <li key={`${i.kind}-${i.id}`}>
+                  <button
+                    type="button"
+                    aria-current={current?.id === i.id ? "true" : undefined}
                     onClick={() => {
-                      setDeclining({ kind: "leave", id: l.id, label: l.display_name });
+                      setSelected(i.id);
                     }}
+                    data-testid={`${i.kind}-request`}
+                    className={`flex w-full cursor-pointer flex-col gap-1 border p-3 text-left ${
+                      current?.id === i.id
+                        ? "border-2 border-action bg-sheet"
+                        : "border-rule bg-sheet hover:bg-sheet-sunk"
+                    } ${i.kind === "proposal" ? "border-dashed bg-pencil-wash" : ""}`}
                   >
-                    {t("declineWithReason")}
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Section>
-        <Section title={t("swapsTitle", { count: d.swaps.length + d.cascades.length })}>
-          {d.swaps.length + d.cascades.length === 0 ? (
-            <p className="body m-0">{t("swapsNone")}</p>
-          ) : null}
-          <ul className="m-0 flex list-none flex-col gap-4 p-0">
-            {d.swaps.map((s) => (
-              <li
-                key={s.id}
-                className="flex flex-col gap-2 border-b border-rule pb-4"
-                data-testid="swap-request"
-              >
-                <div className="flex flex-wrap items-center gap-3">
-                  <CircleAlert size={20} strokeWidth={1.75} absoluteStrokeWidth aria-hidden />
-                  <span className="body-strong">{t("swap")}</span>
-                  <span className="num-time">{fmt.dayMonth(s.date)}</span>
-                  <ShiftLabel code={s.shift_type} />
-                  <span>
-                    {s.offered_by && s.taken_by
-                      ? t("swapBetween", { a: s.offered_by, b: s.taken_by })
-                      : (s.offered_by ?? s.taken_by)}
-                  </span>
-                </div>
-                {s.escalation_reason ? (
-                  <p className="body m-0">{reasonText(s.escalation_reason)}</p>
-                ) : null}
-                {blocked[s.id]?.map((v) => (
-                  <RuleMessage key={`${v.rule}-${v.date}`} violation={v} live />
-                ))}
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant="primary"
-                    disabled={approve.pending}
-                    onClick={() => void approve.run("swap", s.id)}
-                  >
-                    {t("approve")}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      setDeclining({ kind: "swap", id: s.id, label: fmt.dayMonth(s.date) });
-                    }}
-                  >
-                    {t("declineWithReason")}
-                  </Button>
-                </div>
-              </li>
-            ))}
-            {d.cascades.map((c) => (
-              <li
-                key={c.id}
-                className="flex flex-col gap-2 border-b border-rule pb-4"
-                data-testid="cascade-request"
-              >
-                <div className="flex flex-wrap items-center gap-3">
-                  <CircleAlert size={20} strokeWidth={1.75} absoluteStrokeWidth aria-hidden />
-                  <span className="body-strong">{t("cover")}</span>
-                  <span className="num-time">{fmt.dayMonth(c.date)}</span>
-                  <ShiftLabel code={c.shift_type} />
-                  {c.accepted_by ? <span>{c.accepted_by}</span> : null}
-                </div>
-                {c.escalation_reason ? (
-                  <p className="body m-0">{reasonText(c.escalation_reason)}</p>
-                ) : null}
-                <Link
-                  href={`/ausfaelle/${c.id}`}
-                  className="dp-btn dp-btn--primary label self-start no-underline"
-                >
-                  {t("decide")}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </Section>
-        <Section title={t("proposalsTitle", { count: d.proposals.length })}>
-          {d.proposals.length === 0 ? <p className="body m-0">{t("proposalsNone")}</p> : null}
-          <div className="flex flex-col gap-4">
-            {d.proposals.map((p) => (
-              <Suggestion
-                key={p.id}
-                text={
-                  <>
-                    <strong>{p.title}</strong> {p.body}
-                  </>
-                }
-                reasons={[
-                  { text: t("proposalWhy", { source: p.source, date: fmt.date(p.created_at) }) },
-                  { text: t("proposalChangesNothing") },
-                ]}
-                accept={t("proposalAccept")}
-                onAccept={() => void decideProposal.run(p.id, true)}
-                dismiss={t("proposalDismiss")}
-                onDismiss={() => void decideProposal.run(p.id, false)}
-              />
-            ))}
+                    <span className="caption flex items-center gap-1 text-ink-muted">
+                      {i.kind === "proposal" ? <PencilLine {...ICON} size={12} /> : null}
+                      {kindLabel(i)}
+                    </span>
+                    <span className="body-strong">{heading(i)}</span>
+                    <span className="label text-ink-muted">{sub(i)}</span>
+                    {i.urgent ? (
+                      <span className="label flex items-center gap-1 text-alert">
+                        <CircleAlert {...ICON} size={14} />
+                        {t("urgent")}
+                      </span>
+                    ) : null}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <section
+              aria-label={current ? heading(current) : undefined}
+              className="flex min-w-0 flex-col gap-4 border border-rule bg-sheet p-5"
+              data-testid="request-detail"
+            >
+              {current?.kind === "leave" ? (
+                <>
+                  <p className="caption m-0 text-ink-muted">
+                    {kindLabel(current)} ·{" "}
+                    {t("submitted", { date: fmt.date(current.data.submitted_at) })}
+                  </p>
+                  <h2 className="title m-0">
+                    {current.data.display_name},{" "}
+                    {fmt.range(current.data.start_date, current.data.end_date)}{" "}
+                    {current.data.end_date.slice(0, 4)}
+                  </h2>
+                  <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))]">
+                    <div className="border border-rule p-4">
+                      <h3 className="label m-0 text-ink-muted">{t("blockStaffing")}</h3>
+                      <p className="body m-0" data-testid="leave-impact">
+                        {t(
+                          `hint.${current.data.impact.hint === "tight" || current.data.impact.hint === "not_coverable" ? current.data.impact.hint : "coverable"}`,
+                        )}{" "}
+                        {t("impact", {
+                          max: current.data.impact.max_on_leave_same_day,
+                          limit: current.data.impact.limit,
+                        })}
+                      </p>
+                    </div>
+                    <div className="border border-rule p-4">
+                      <h3 className="label m-0 text-ink-muted">{t("blockLeave")}</h3>
+                      <p className="body m-0">
+                        {t("leaveTaken", {
+                          days: current.data.impact.leave_days_taken_this_year,
+                          mean: fmt.number(current.data.impact.department_mean_leave_days, 1),
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <EngineBadge engine={current.data.impact.engine} />
+                  {blocked[current.id]?.map((v) => (
+                    <RuleMessage key={`${v.rule}-${v.date}`} violation={v} live />
+                  ))}
+                  <div className="flex flex-wrap justify-end gap-2 border-t border-rule pt-4">
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setDeclining({
+                          kind: "leave",
+                          id: current.id,
+                          label: current.data.display_name,
+                        });
+                      }}
+                    >
+                      {t("declineWithReason")}
+                    </Button>
+                    <Button
+                      variant="primary"
+                      disabled={approve.pending}
+                      onClick={() => void approve.run("leave", current.id)}
+                      data-testid="approve-leave"
+                    >
+                      {t("approve")}
+                    </Button>
+                  </div>
+                </>
+              ) : current?.kind === "swap" ? (
+                <>
+                  <p className="caption m-0 text-ink-muted">{kindLabel(current)}</p>
+                  <h2 className="title m-0">{heading(current)}</h2>
+                  <p className="body m-0">
+                    {current.data.offered_by && current.data.taken_by
+                      ? t("swapBetween", { a: current.data.offered_by, b: current.data.taken_by })
+                      : (current.data.offered_by ?? current.data.taken_by)}
+                  </p>
+                  {current.data.escalation_reason ? (
+                    <p className="body-strong m-0 flex items-start gap-2 text-alert">
+                      <CircleAlert {...ICON} size={20} />
+                      {reasonText(current.data.escalation_reason)}
+                    </p>
+                  ) : null}
+                  {blocked[current.id]?.map((v) => (
+                    <RuleMessage key={`${v.rule}-${v.date}`} violation={v} live />
+                  ))}
+                  <div className="flex flex-wrap justify-end gap-2 border-t border-rule pt-4">
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setDeclining({
+                          kind: "swap",
+                          id: current.id,
+                          label: fmt.dayMonth(current.data.date),
+                        });
+                      }}
+                    >
+                      {t("declineWithReason")}
+                    </Button>
+                    <Button
+                      variant="primary"
+                      disabled={approve.pending}
+                      onClick={() => void approve.run("swap", current.id)}
+                    >
+                      {t("approve")}
+                    </Button>
+                  </div>
+                </>
+              ) : current?.kind === "cascade" ? (
+                <>
+                  <p className="caption m-0 text-ink-muted">{kindLabel(current)}</p>
+                  <h2 className="title m-0">{heading(current)}</h2>
+                  {current.data.accepted_by ? (
+                    <p className="body m-0">{current.data.accepted_by}</p>
+                  ) : null}
+                  {current.data.escalation_reason ? (
+                    <p className="body-strong m-0 flex items-start gap-2 text-alert">
+                      <CircleAlert {...ICON} size={20} />
+                      {reasonText(current.data.escalation_reason)}
+                    </p>
+                  ) : null}
+                  <div className="flex justify-end border-t border-rule pt-4">
+                    <Link
+                      href={`/ausfaelle/${current.id}`}
+                      className="dp-btn dp-btn--primary label no-underline"
+                    >
+                      {t("decide")}
+                    </Link>
+                  </div>
+                </>
+              ) : current?.kind === "proposal" ? (
+                <Suggestion
+                  text={
+                    <>
+                      <strong>{current.data.title}</strong> {current.data.body}
+                    </>
+                  }
+                  reasons={[
+                    {
+                      text: t("proposalWhy", {
+                        source: current.data.source,
+                        date: fmt.date(current.data.created_at),
+                      }),
+                    },
+                    { text: t("proposalChangesNothing") },
+                  ]}
+                  accept={t("proposalAccept")}
+                  onAccept={() => void decideProposal.run(current.id, true)}
+                  dismiss={t("proposalDismiss")}
+                  onDismiss={() => void decideProposal.run(current.id, false)}
+                />
+              ) : null}
+            </section>
           </div>
-        </Section>
+        ) : null}
         <DeclineDialog
           target={declining}
           onClose={() => {
             setDeclining(null);
           }}
-          onDone={q.reload}
+          onDone={() => {
+            setSelected(null);
+            q.reload();
+          }}
         />
       </>
     );

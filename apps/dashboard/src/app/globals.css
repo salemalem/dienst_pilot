@@ -42,3 +42,9 @@ td[role="gridcell"]:focus-visible {
 .dp-grid td[draggable="true"] {
   cursor: grab;
 }
+
+/* The suggestion's tag row spans the card so a badge can sit at its right edge. */
+.dp-sugg > .dp-sugg-tag {
+  display: flex;
+  width: 100%;
+}

@@ -240,6 +240,31 @@ export function ToastProvider({ children }: { children: ReactNode }): ReactNode 
   );
 }
 
+/** A progress bar in ballpoint blue; the numbers are always written next to it. */
+export function Progress({
+  value,
+  max,
+  label,
+}: {
+  value: number;
+  max: number;
+  label: string;
+}): ReactNode {
+  const pct = max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0;
+  return (
+    <div
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={max}
+      aria-valuenow={value}
+      className="h-3 w-full bg-sheet-sunk outline outline-1 outline-rule-strong"
+    >
+      <div className="h-full bg-ink" style={{ width: `${String(pct)}%` }} />
+    </div>
+  );
+}
+
 export function PageHeader({
   title,
   status,

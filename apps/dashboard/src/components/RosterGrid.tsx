@@ -205,6 +205,9 @@ export function RosterGrid({
                 </span>
               </th>
             ))}
+            <th scope="col" className="dp-total num-small">
+              {t("colShifts")}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -311,6 +314,9 @@ export function RosterGrid({
                   </td>
                 );
               })}
+              <td className="dp-total num-small" data-testid={`total-${row.staff_id}`}>
+                {Object.values(row.cells).reduce((n, c) => n + c.shifts.length, 0)}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -351,6 +357,7 @@ export function RosterGrid({
                 </td>
               );
             })}
+            <td className="dp-total" />
           </tr>
         </tfoot>
       </table>

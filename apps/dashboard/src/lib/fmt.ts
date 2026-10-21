@@ -98,7 +98,8 @@ export interface Fmt {
   weekday: (day: string) => string;
 }
 
-function build(locale: Locale): Fmt {
+/** The formatters for a locale (also used directly by tests). */
+export function buildFmt(locale: Locale): Fmt {
   const enMonth = (d: Date): string => MONTHS_EN[d.getUTCMonth()]?.slice(0, 3) ?? "";
   const toDate = (v: string | Date): Date =>
     typeof v === "string" ? new Date(v.length === 10 ? `${v}T12:00:00Z` : v) : v;
@@ -157,5 +158,5 @@ function build(locale: Locale): Fmt {
 /** Locale formatting for the current language (CLAUDE.md: dates, 24 h, "91 %", German decimals). */
 export function useFmt(): Fmt {
   const locale = useLocale() as Locale;
-  return useMemo(() => build(locale), [locale]);
+  return useMemo(() => buildFmt(locale), [locale]);
 }

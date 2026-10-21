@@ -5,7 +5,7 @@ import { Download, ListFilter } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 
-import { AuditTable, ChainIndicator } from "@/components/AuditTable";
+import { AuditTable, ChainIndicator, actionKey } from "@/components/AuditTable";
 import { Async, Button, Field, ICON, PageHeader, Section } from "@/components/ui";
 import { AUDIT_ACTIONS } from "@/lib/audit";
 import { useAction, useQuery } from "@/lib/hooks";
@@ -80,7 +80,7 @@ export default function AuditPage(): ReactNode {
                 <option value="">{t("all")}</option>
                 {AUDIT_ACTIONS.map((a) => (
                   <option key={a} value={a}>
-                    {t(`action.${a}`)}
+                    {t(`action.${actionKey(a) as "run_requested"}`)}
                   </option>
                 ))}
               </select>

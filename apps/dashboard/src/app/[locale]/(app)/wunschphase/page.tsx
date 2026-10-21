@@ -13,6 +13,7 @@ import {
   ICON,
   Loading,
   PageHeader,
+  Progress,
   Section,
   Table,
   useToast,
@@ -96,11 +97,10 @@ export default function WindowPage(): ReactNode {
               }
             />
             <Section title={t("progressTitle", { month: fmt.month(month) })}>
-              <progress
-                className="h-3 w-full accent-[var(--action)]"
+              <Progress
                 value={w.responded}
                 max={w.recipients}
-                aria-label={t("progress", { responded: w.responded, recipients: w.recipients })}
+                label={t("progress", { responded: w.responded, recipients: w.recipients })}
               />
               <div className="flex gap-3">
                 <Button

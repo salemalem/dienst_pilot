@@ -131,3 +131,142 @@ export function Bars({
     </svg>
   );
 }
+
+export interface CoverageDay {
+  date: string;
+  short: number;
+  expected: number;
+  low: number;
+  high: number;
+  weekday: string;
+  label: string;
+  weekend: boolean;
+  today: boolean;
+  expectedText: string;
+}
+
+/**
+ * Expected absences per day as a dotted band (the forecast's range) with a dot (its value):
+ * dashed means "estimate, not a plan". Always paired with a table of the same numbers.
+ */
+export function CoverageChart({
+  days,
+  label,
+  todayLabel,
+  axisLabel,
+}: {
+  days: CoverageDay[];
+  label: string;
+  todayLabel: string;
+  axisLabel: string;
+}): ReactNode {
+  const colW = 56;
+  const left = 92;
+  const top = 12;
+  const plot = 118;
+  const W = left + days.length * colW + 8;
+  const yMax = Math.max(6, Math.ceil(Math.max(0, ...days.map((d) => d.high))));
+  const y = (v: number): number => top + plot - (v / yMax) * plot;
+  const ticks = [0, Math.round(yMax / 2), yMax];
+  return (
+    <svg
+      viewBox={`0 0 ${String(W)} ${String(top + plot + 74)}`}
+      role="img"
+      aria-label={label}
+      className="h-auto w-full min-w-[760px]"
+    >
+      {days.map((d, i) => (
+        <g key={d.date} transform={`translate(${String(left + i * colW)} 0)`}>
+          <rect
+            width={colW}
+            height={plot + top + 62}
+            fill={d.today ? "var(--action-wash)" : d.weekend ? "var(--sheet-sunk)" : "transparent"}
+          />
+          <line x1={0} x2={0} y1={0} y2={plot + top + 62} stroke="var(--rule)" />
+          <rect
+            x={colW / 2 - 11}
+            y={y(d.high)}
+            width={22}
+            height={Math.max(4, y(d.low) - y(d.high))}
+            fill="var(--pencil-wash)"
+            stroke="var(--pencil)"
+            strokeDasharray="3 2"
+            strokeWidth={1.5}
+          />
+          <circle cx={colW / 2} cy={y(d.expected)} r={4} fill="var(--ink)" />
+          <text
+            x={colW / 2}
+            y={top + plot + 20}
+            textAnchor="middle"
+            fontSize={13}
+            fill={d.today ? "var(--action)" : "var(--ink-muted)"}
+          >
+            {d.weekday}
+          </text>
+          <text
+            x={colW / 2}
+            y={top + plot + 36}
+            textAnchor="middle"
+            fontSize={13}
+            fontWeight={650}
+            fill={d.today ? "var(--action)" : "var(--ink)"}
+            className="num-small"
+          >
+            {d.label}
+          </text>
+          <text
+            x={colW / 2}
+            y={top + plot + 52}
+            textAnchor="middle"
+            fontSize={12}
+            fontStyle="italic"
+            fill="var(--ink-muted)"
+            className="num-small"
+          >
+            {d.expectedText}
+          </text>
+          {d.today ? (
+            <text
+              x={colW / 2}
+              y={top + plot + 68}
+              textAnchor="middle"
+              fontSize={12}
+              fill="var(--ink)"
+            >
+              {todayLabel}
+            </text>
+          ) : null}
+        </g>
+      ))}
+      <line
+        x1={left}
+        x2={left + days.length * colW}
+        y1={top + plot}
+        y2={top + plot}
+        stroke="var(--rule-strong)"
+      />
+      {ticks.map((tick) => (
+        <g key={tick}>
+          <line
+            x1={left}
+            x2={left + days.length * colW}
+            y1={y(tick)}
+            y2={y(tick)}
+            stroke="var(--rule)"
+            strokeDasharray={tick === 0 ? undefined : "2 4"}
+          />
+          <text
+            x={left - 8}
+            y={y(tick) + 4}
+            textAnchor="end"
+            fontSize={12}
+            fill="var(--ink-muted)"
+            className="num-small"
+          >
+            {tick === yMax ? `${String(tick)} ${axisLabel}` : String(tick)}
+          </text>
+        </g>
+      ))}
+    </svg>
+  );
+}

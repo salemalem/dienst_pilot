@@ -16,6 +16,9 @@ export interface Reason {
  * Never a publish or approve action in here.
  */
 export function Suggestion({
+  title,
+  children,
+  actions,
   text,
   reasons,
   accept,
@@ -26,6 +29,10 @@ export function Suggestion({
   badge,
   busy,
 }: {
+  title?: ReactNode;
+  children?: ReactNode;
+  /** Extra actions before "Why?" (never publish or approve). */
+  actions?: ReactNode;
   text: ReactNode;
   reasons: Reason[];
   accept?: string | undefined;
@@ -46,8 +53,11 @@ export function Suggestion({
         {t("suggestion")}
         {badge}
       </span>
+      {title}
       <p className="dp-sugg-body body">{text}</p>
+      {children}
       <div className="dp-sugg-actions">
+        {actions}
         {accept && onAccept ? (
           <Button variant="primary" onClick={onAccept} disabled={busy}>
             {accept}

@@ -31,7 +31,14 @@ import { useSession } from "@/lib/session";
 type Edit = components["schemas"]["AssignmentEdit"];
 
 type Op =
-  | { kind: "move"; assignmentId: string; toStaffId: string; fromStaffId: string }
+  | {
+      kind: "move";
+      assignmentId: string;
+      toStaffId: string;
+      fromStaffId: string;
+      day: string;
+      shift: string;
+    }
   | { kind: "remove"; assignmentId: string; staffId: string; day: string; shift: string }
   | { kind: "add"; staffId: string; day: string; shift: string };
 
@@ -159,13 +166,23 @@ function Editor(): ReactNode {
   const undo = (): void => {
     if (!lastOp || !q.data) return;
     const grid = q.data.grid;
+    // A reassignment creates a new assignment, so the way back looks it up in the refreshed grid.
+    const idOf = (staffId: string, day: string, shift: string): string | undefined => {
+      const cell = grid.rows.find((r) => r.staff_id === staffId)?.cells[day];
+      const i = cell?.shifts.indexOf(shift) ?? -1;
+      return i >= 0 ? cell?.assignment_ids[i] : undefined;
+    };
     if (lastOp.kind === "move") {
-      edit({
-        kind: "move",
-        assignmentId: lastOp.assignmentId,
-        toStaffId: lastOp.fromStaffId,
-        fromStaffId: lastOp.toStaffId,
-      });
+      const id = idOf(lastOp.toStaffId, lastOp.day, lastOp.shift);
+      if (id)
+        edit({
+          kind: "move",
+          assignmentId: id,
+          toStaffId: lastOp.fromStaffId,
+          fromStaffId: lastOp.toStaffId,
+          day: lastOp.day,
+          shift: lastOp.shift,
+        });
     } else if (lastOp.kind === "remove") {
       edit({ kind: "add", staffId: lastOp.staffId, day: lastOp.day, shift: lastOp.shift });
     } else {
@@ -215,70 +232,189 @@ function Editor(): ReactNode {
   const selCell = sel && selected ? sel.cells[selected.day] : undefined;
   const staffByName = new Map(grid.rows.map((r) => [r.display_name, r.staff_id]));
 
+  const count = validation.violations.length;
+  const published_at = grid.published_at;
+  const draftLabel = drafts.find((d) => d.variant_id === variantId)?.label;
+  const headline =
+    grid.status === "not_planned"
+      ? t("statusNotPlanned", { month: fmt.month(month) })
+      : isPublished
+        ? count === 0
+          ? t("headlinePublishedOk", { month: fmt.month(month) })
+          : t("headlinePublishedBad", { month: fmt.month(month), count })
+        : count === 0
+          ? planning.windowOpen
+            ? t("headlineOkWindow")
+            : t("headlineReady")
+          : t("headlineLeft", { count });
+  const subline = [
+    t("sublineMonth", { month: fmt.month(month) }),
+    isPublished
+      ? published_at
+        ? t("sublinePublished", { date: fmt.date(published_at) })
+        : t("kind.published")
+      : grid.status === "draft"
+        ? t("sublineDraft", { label: draftLabel ?? "" })
+        : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const publishHint = planning.windowOpen ? t("hintWindowOpen") : count > 0 ? t("hintRules") : null;
+  const rulePanel = (
+    <Section
+      title={t("rulesTitle", { count })}
+      aside={<EngineBadge engine={validation.validator} />}
+    >
+      {count === 0 ? (
+        <p className="body m-0" data-testid="rules-ok">
+          {t("rulesOk")}
+        </p>
+      ) : (
+        <div className="flex flex-col gap-3" data-testid="violations">
+          {sorted.slice(0, 6).map((v) => (
+            <RuleMessage
+              key={`${v.rule}-${v.date}-${v.staff_id ?? ""}-${JSON.stringify(v.params)}`}
+              violation={v}
+              live={introducedKeys.has(`${v.rule}|${violationKey(v)}|${JSON.stringify(v.params)}`)}
+            />
+          ))}
+          {sorted.length > 6 ? (
+            <p className="caption m-0 text-ink-muted">{t("more", { count: sorted.length - 6 })}</p>
+          ) : null}
+        </div>
+      )}
+    </Section>
+  );
+
   return (
     <>
       <PageHeader
-        title={t("title")}
-        status={
-          grid.status === "not_planned"
-            ? t("statusNotPlanned", { month: fmt.month(month) })
-            : validation.valid
-              ? t("statusValid", { month: fmt.month(month), kind: t(`kind.${grid.status}`) })
-              : t("statusViolations", {
-                  count: validation.violations.length,
-                  month: fmt.month(month),
-                })
-        }
+        title={headline}
+        status={subline}
         actions={
-          <>
-            <MonthSwitch
-              month={month}
-              onChange={(m) => {
-                setQuery({ month: m });
-              }}
-            />
-            {!isPublished && drafts.length > 0 ? (
-              <label className="flex items-center gap-2">
-                <span className="label">{t("variantPicker")}</span>
-                <select
-                  className="dp-input label !w-auto"
-                  value={variantId ?? ""}
-                  onChange={(e) => {
-                    setQuery({ variant: e.target.value || null });
-                  }}
-                >
-                  {drafts.map((v) => (
-                    <option key={v.variant_id} value={v.variant_id}>
-                      {t("variantOption", { label: v.label, time: fmt.dateTime(v.runAt) })}
-                      {v.recommended ? ` · ${t("recommended")}` : ""}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
-            {grid.status === "draft" && variantId ? (
-              <Button
-                variant="primary"
-                disabled={planning.windowOpen || !validation.valid}
-                onClick={() => {
-                  setPublish(true);
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <MonthSwitch
+                month={month}
+                onChange={(m) => {
+                  setQuery({ month: m });
                 }}
-                data-testid="open-publish"
+              />
+              {!isPublished && drafts.length > 0 ? (
+                <label className="flex items-center gap-2">
+                  <span className="label">{t("variantPicker")}</span>
+                  <select
+                    className="dp-input label !w-auto"
+                    value={variantId ?? ""}
+                    onChange={(e) => {
+                      setQuery({ variant: e.target.value || null });
+                    }}
+                  >
+                    {drafts.map((v) => (
+                      <option key={v.variant_id} value={v.variant_id}>
+                        {t("variantOption", { label: v.label, time: fmt.dateTime(v.runAt) })}
+                        {v.recommended ? ` · ${t("recommended")}` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+              <Button
+                variant="secondary"
+                disabled={!lastOp || send.pending}
+                onClick={undo}
+                data-testid="undo"
               >
-                {t("publish")}
+                {t("undo")}
               </Button>
+              {grid.status === "draft" && variantId ? (
+                <Button
+                  variant="primary"
+                  disabled={planning.windowOpen || !validation.valid}
+                  onClick={() => {
+                    setPublish(true);
+                  }}
+                  data-testid="open-publish"
+                >
+                  {t("publish")}
+                </Button>
+              ) : null}
+            </div>
+            {grid.status === "draft" && publishHint ? (
+              <span className="caption text-ink-muted" data-testid="publish-hint">
+                {publishHint}
+              </span>
             ) : null}
-          </>
+          </div>
         }
       />
-      {grid.status === "draft" && planning.windowOpen ? (
-        <p className="caption m-0 text-ink-muted">{t("trialNote")}</p>
-      ) : null}
       {isPublished ? <p className="caption m-0 text-ink-muted">{t("publishedNote")}</p> : null}
       {grid.status === "not_planned" ? (
         <p className="body m-0">{t("notPlanned")}</p>
       ) : (
         <>
+          <div aria-live="polite" className="flex flex-col gap-3">
+            {send.error && selected === null && reasonFor === null ? (
+              <ErrorState error={send.error} />
+            ) : null}
+            {blocked.length > 0 ? (
+              <Section title={t("blockedTitle")}>
+                {blocked.map((v) => (
+                  <RuleMessage key={`${v.rule}-${v.date}-${v.staff_id ?? ""}`} violation={v} live />
+                ))}
+              </Section>
+            ) : null}
+            <div className="grid items-start gap-6 [grid-template-columns:repeat(auto-fit,minmax(380px,1fr))]">
+              {rulePanel}
+              {grid.gaps.length > 0 ? (
+                <Section title={t("gapsTitle")}>
+                  {grid.gaps.map((g) => {
+                    const name = g.candidates[0];
+                    const staffId = name ? staffByName.get(name) : undefined;
+                    return (
+                      <Suggestion
+                        key={`${g.date}-${g.shift_type}`}
+                        text={
+                          name
+                            ? t("gapSuggestion", {
+                                date: fmt.dayMonth(g.date),
+                                shift: names.name(g.shift_type),
+                                name,
+                              })
+                            : t("gapNone", {
+                                date: fmt.dayMonth(g.date),
+                                shift: names.name(g.shift_type),
+                              })
+                        }
+                        reasons={[
+                          { text: t("gapWhyChecked") },
+                          { text: t("gapWhyRanked") },
+                          ...(g.candidates.length > 1
+                            ? [
+                                {
+                                  text: t("gapAlternatives", {
+                                    names: g.candidates.slice(1).join(", "),
+                                  }),
+                                },
+                              ]
+                            : []),
+                        ]}
+                        badge={<EngineBadge engine={g.engine} />}
+                        accept={name ? t("gapAccept", { name }) : undefined}
+                        onAccept={
+                          staffId
+                            ? () => {
+                                edit({ kind: "add", staffId, day: g.date, shift: g.shift_type });
+                              }
+                            : undefined
+                        }
+                      />
+                    );
+                  })}
+                </Section>
+              ) : null}
+            </div>
+          </div>
           <p className="caption m-0 text-ink-muted">{t("howTo")}</p>
           <RosterGrid
             rows={grid.rows}
@@ -292,101 +428,19 @@ function Editor(): ReactNode {
               const from = grid.rows.find((r) =>
                 r.cells[day]?.assignment_ids.includes(assignmentId),
               );
-              if (from) edit({ kind: "move", assignmentId, toStaffId, fromStaffId: from.staff_id });
+              const cell = from?.cells[day];
+              const shift = cell?.shifts[cell.assignment_ids.indexOf(assignmentId)];
+              if (from && shift)
+                edit({
+                  kind: "move",
+                  assignmentId,
+                  toStaffId,
+                  fromStaffId: from.staff_id,
+                  day,
+                  shift,
+                });
             }}
           />
-          <div aria-live="polite" className="flex flex-col gap-3">
-            {blocked.length > 0 ? (
-              <Section title={t("blockedTitle")}>
-                {blocked.map((v) => (
-                  <RuleMessage key={`${v.rule}-${v.date}-${v.staff_id ?? ""}`} violation={v} live />
-                ))}
-              </Section>
-            ) : null}
-            <Section
-              title={t("rulesTitle", { count: validation.violations.length })}
-              aside={
-                <span className="flex items-center gap-2">
-                  {lastOp ? (
-                    <Button variant="secondary" onClick={undo} data-testid="undo">
-                      {t("undo")}
-                    </Button>
-                  ) : null}
-                  <EngineBadge engine={validation.validator} />
-                </span>
-              }
-            >
-              {validation.violations.length === 0 ? (
-                <p className="body m-0" data-testid="rules-ok">
-                  {t("rulesOk")}
-                </p>
-              ) : (
-                <div className="flex flex-col gap-3" data-testid="violations">
-                  {sorted.slice(0, 12).map((v) => (
-                    <RuleMessage
-                      key={`${v.rule}-${v.date}-${v.staff_id ?? ""}-${JSON.stringify(v.params)}`}
-                      violation={v}
-                      live={introducedKeys.has(
-                        `${v.rule}|${violationKey(v)}|${JSON.stringify(v.params)}`,
-                      )}
-                    />
-                  ))}
-                  {sorted.length > 12 ? (
-                    <p className="caption m-0 text-ink-muted">
-                      {t("more", { count: sorted.length - 12 })}
-                    </p>
-                  ) : null}
-                </div>
-              )}
-            </Section>
-            {grid.gaps.length > 0 ? (
-              <Section title={t("gapsTitle")}>
-                {grid.gaps.map((g) => {
-                  const name = g.candidates[0];
-                  const staffId = name ? staffByName.get(name) : undefined;
-                  return (
-                    <Suggestion
-                      key={`${g.date}-${g.shift_type}`}
-                      text={
-                        name
-                          ? t("gapSuggestion", {
-                              date: fmt.dayMonth(g.date),
-                              shift: names.name(g.shift_type),
-                              name,
-                            })
-                          : t("gapNone", {
-                              date: fmt.dayMonth(g.date),
-                              shift: names.name(g.shift_type),
-                            })
-                      }
-                      reasons={[
-                        { text: t("gapWhyChecked") },
-                        { text: t("gapWhyRanked") },
-                        ...(g.candidates.length > 1
-                          ? [
-                              {
-                                text: t("gapAlternatives", {
-                                  names: g.candidates.slice(1).join(", "),
-                                }),
-                              },
-                            ]
-                          : []),
-                      ]}
-                      badge={<EngineBadge engine={g.engine} />}
-                      accept={name ? t("gapAccept", { name }) : undefined}
-                      onAccept={
-                        staffId
-                          ? () => {
-                              edit({ kind: "add", staffId, day: g.date, shift: g.shift_type });
-                            }
-                          : undefined
-                      }
-                    />
-                  );
-                })}
-              </Section>
-            ) : null}
-          </div>
         </>
       )}
 
@@ -559,6 +613,8 @@ function CellActions({
                     assignmentId: id,
                     toStaffId: to,
                     fromStaffId: row.staff_id,
+                    day,
+                    shift: s,
                   });
                 }}
                 data-testid={`give-${s}`}

@@ -1,0 +1,73 @@
+import { expect, test } from "@playwright/test";
+
+import { asPersona } from "./helpers.ts";
+
+test("Oversight (Vogel): read-only W12, no planner screens, W8 without a single name", async ({
+  page,
+}) => {
+  await asPersona(page, "vogel");
+  await page.goto("/de/aufsicht");
+  await expect(page.getByTestId("read-only")).toContainText("Nur Lesezugriff");
+  await expect(page.getByTestId("cost-placeholder")).toBeVisible();
+  const nav = page.getByRole("navigation", { name: "Hauptnavigation" });
+  await expect(nav.getByRole("link", { name: "Aufsicht" })).toBeVisible();
+  await expect(nav.getByRole("link", { name: "Varianten" })).toHaveCount(0);
+  // Nothing on the page can change the roster.
+  await expect(page.getByRole("button", { name: /veröffentlichen|genehmigen/i })).toHaveCount(0);
+
+  await page.goto("/de/varianten");
+  await expect(
+    page.getByRole("heading", { name: "Für diese Rolle nicht verfügbar" }),
+  ).toBeVisible();
+
+  // W8: fairness only as anonymous statistics; no staff name anywhere in the content.
+  await page.goto("/de/fairness");
+  await expect(page.getByTestId("dist-nights")).toBeVisible();
+  await expect(page.getByTestId("compliance-summary")).toBeVisible();
+  const main = page.getByRole("main");
+  await expect(main).toContainText("Nur Statistik, keine Namen");
+  await expect(main).not.toContainText("Dr. ");
+  await expect(main).not.toContainText("Prof. ");
+  await expect(page.getByRole("table", { name: "Belastung je Person" })).toHaveCount(0);
+});
+
+test("Planner (Brandt): W8 names the people behind the distribution", async ({ page }) => {
+  await asPersona(page, "brandt");
+  await page.goto("/de/fairness");
+  await expect(page.getByRole("table", { name: "Belastung je Person" })).toContainText("Dr. ");
+});
+
+test("Administrator: rules, master data and the demo clock", async ({ page }) => {
+  await asPersona(page, "it-admin");
+  await page.goto("/de/regeln");
+  await expect(page.getByTestId("rule-sets")).toContainText("Regelversion 2026-1");
+  await expect(page.getByTestId("clock-now")).toBeVisible();
+  await page.getByLabel("Datum").fill("2026-10-27");
+  await page.getByLabel("Uhrzeit").fill("06:00");
+  await page.getByTestId("set-clock").click();
+  await expect(page.getByTestId("clock-now")).toContainText("27.10.2026, 06:00");
+  await page.getByRole("button", { name: "Auf Ausgangswert zurücksetzen" }).click();
+  await expect(page.getByTestId("clock-now")).toContainText("20.10.2026, 06:00");
+});
+
+test("W13: every component with its real status; none can change the roster", async ({ page }) => {
+  await asPersona(page, "brandt");
+  await page.goto("/de/ki-transparenz");
+  for (const c of ["C1", "C2"])
+    await expect(page.getByTestId(`component-${c}`)).toHaveAttribute(
+      "data-implementation",
+      "built",
+    );
+  for (const c of ["C3", "C4", "C5", "C6", "C7", "C8"]) {
+    await expect(page.getByTestId(`component-${c}`)).toHaveAttribute(
+      "data-implementation",
+      "stand-in",
+    );
+    await expect(
+      page.getByTestId(`component-${c}`).getByTestId("metric-placeholder"),
+    ).toBeVisible();
+  }
+  await expect(page.getByTestId("can-change").filter({ hasText: "Nein" })).toHaveCount(8);
+  await expect(page.getByTestId("c1-metrics")).toContainText("Wünsche erfüllt");
+  await expect(page.getByTestId("c2-metrics")).toContainText("71/71");
+});

@@ -3,19 +3,19 @@
 import { unwrap, type components } from "@dienstpilot/api-client";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { EngineBadge } from "@/components/EngineBadge";
-import { PublishDialog, type PublishTarget } from "@/components/PublishDialog";
+import { MonthSwitch } from "@/components/MonthSwitch";
 import { Suggestion } from "@/components/Suggestion";
 import { Button, ErrorState, Loading, PageHeader, Section } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { useFmt } from "@/lib/fmt";
 import { useAction, useQuery } from "@/lib/hooks";
 import { usePlanning } from "@/lib/planning";
-import { useKeyText } from "@/lib/violations";
-import { variantMetrics } from "@/lib/variants";
 import { useSession } from "@/lib/session";
+import { variantMetrics } from "@/lib/variants";
+import { useKeyText } from "@/lib/violations";
 
 type Run = components["schemas"]["RunOut"];
 type Variant = components["schemas"]["VariantOut"];
@@ -27,38 +27,27 @@ function VariantCard({
   run,
   variant,
   month,
-  windowOpen,
-  onPublish,
+  violations,
 }: {
   run: Run;
   variant: Variant;
   month: string;
-  windowOpen: boolean;
-  onPublish: (v: Variant) => void;
+  /** Rule violations C2 finds in this variant; null while the check runs. */
+  violations: number | null;
 }): ReactNode {
   const t = useTranslations("w3");
   const tp = useTranslations("profile");
   const fmt = useFmt();
   const text = useKeyText();
-  const hint = useId();
   const m = variantMetrics(variant.metrics);
   if (!m) return null;
   const profile = variant.profile ?? "";
   const weights = ((run.config?.profiles as Profile[] | undefined) ?? []).find(
     (p) => p.name === profile,
   );
-  const name =
-    profile && ["wishes_first", "zero_overtime", "balanced"].includes(profile)
-      ? tp(profile as "balanced")
-      : profile;
-  const summary = t("summary", {
-    label: variant.label,
-    rate: fmt.percent(m.wishRate),
-    granted: m.wishesGranted,
-    total: m.wishesTotal,
-    spread: m.burdenSpread,
-    overtime: fmt.number(m.overtimeHours, 1),
-  });
+  const name = ["wishes_first", "zero_overtime", "balanced"].includes(profile)
+    ? tp(profile as "balanced")
+    : profile;
   const reasons = [
     { text: t("why.profile", { profile: name }) },
     ...(weights
@@ -73,91 +62,82 @@ function VariantCard({
         ]
       : []),
     { text: t("why.important", { granted: m.importantGranted, total: m.importantTotal }) },
-    ...(variant.recommendation_key ? [{ text: text(variant.recommendation_key, {}) }] : []),
+    { text: t("why.checked", { validator: run.validator_version ?? "" }) },
   ];
-  const draft = variant.status === "draft";
   return (
     <article
       className="flex min-w-0 flex-col gap-3"
       aria-label={t("variant", { label: variant.label })}
       data-testid={`variant-${variant.label}`}
     >
-      <div className="flex items-baseline gap-3">
-        <h3 className="heading m-0">{t("variant", { label: variant.label })}</h3>
-        <span className="label text-ink-muted">{name}</span>
-        {variant.recommended ? (
-          <span className="label rounded-mark border border-ink px-2" data-testid="recommended">
-            {t("recommended")}
-          </span>
-        ) : null}
-        {run.trial ? (
-          <span className="label rounded-mark border border-dashed border-pencil px-2 text-pencil">
-            {t("trial")}
-          </span>
-        ) : null}
-      </div>
       <Suggestion
-        text={summary}
-        reasons={reasons}
         badge={
-          <EngineBadge
-            engine={{
-              component: "C1",
-              implementation: "built",
-              version: run.solver_version ?? "",
-              note: "",
-            }}
-          />
+          <span className="ml-auto flex items-center gap-2">
+            {run.trial ? (
+              <span className="label rounded-mark border border-dashed border-pencil px-2 text-pencil">
+                {t("trial")}
+              </span>
+            ) : null}
+            {variant.recommended ? (
+              <span
+                className="label rounded-mark border border-ink px-2 text-ink"
+                data-testid="recommended"
+              >
+                {t("recommended")}
+              </span>
+            ) : null}
+          </span>
         }
-      />
-      <dl className="body m-0 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1">
-        <dt>{t("m.wishes")}</dt>
-        <dd className="num-time m-0 text-right">
-          {t("m.wishesValue", {
-            rate: fmt.percent(m.wishRate),
-            granted: m.wishesGranted,
-            total: m.wishesTotal,
-          })}
-        </dd>
-        <dt>{t("m.important")}</dt>
-        <dd className="num-time m-0 text-right">
-          {m.importantGranted} / {m.importantTotal}
-        </dd>
-        <dt>{t("m.spread")}</dt>
-        <dd className="num-time m-0 text-right">
-          {m.burdenSpread} ({m.burdenMin}–{m.burdenMax})
-        </dd>
-        <dt>{t("m.overtime")}</dt>
-        <dd className="num-time m-0 text-right">{fmt.hours(m.overtimeHours)}</dd>
-        <dt>{t("m.isolated")}</dt>
-        <dd className="num-time m-0 text-right">{m.isolatedNights}</dd>
-      </dl>
+        title={
+          <div className="flex flex-col">
+            <h3 className="title m-0">{t("variant", { label: variant.label })}</h3>
+            <span className="label text-ink-muted">{t("weighting", { profile: name })}</span>
+          </div>
+        }
+        text={t("summary", {
+          label: variant.label,
+          rate: fmt.percent(m.wishRate),
+          granted: m.wishesGranted,
+          total: m.wishesTotal,
+          overtime: fmt.number(m.overtimeHours, 1),
+        })}
+        reasons={reasons}
+        actions={
+          <Link
+            href={`/dienstplan?month=${month}&variant=${variant.variant_id}`}
+            className={`dp-btn ${variant.recommended ? "dp-btn--primary" : "dp-btn--secondary"} label no-underline`}
+            data-testid={`open-${variant.label}`}
+          >
+            {t("openDraft")}
+          </Link>
+        }
+      >
+        <dl className="body m-0 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 border-y border-dashed border-pencil py-3">
+          <dt>{t("m.wishes")}</dt>
+          <dd className="num-time m-0 text-right">{fmt.percent(m.wishRate)}</dd>
+          <dt>{t("m.important")}</dt>
+          <dd className="num-time m-0 text-right">
+            {t("m.ofTotal", { granted: m.importantGranted, total: m.importantTotal })}
+          </dd>
+          <dt>{t("m.spread")}</dt>
+          <dd className="num-time m-0 text-right">{t("m.points", { count: m.burdenSpread })}</dd>
+          <dt>{t("m.overtime")}</dt>
+          <dd className="num-time m-0 text-right">{fmt.hours(m.overtimeHours)}</dd>
+          <dt>{t("m.isolated")}</dt>
+          <dd className="num-time m-0 text-right">{m.isolatedNights}</dd>
+          <dt>{t("m.violations")}</dt>
+          <dd className="num-time m-0 text-right" data-testid={`violations-${variant.label}`}>
+            {violations === null ? "…" : violations}
+          </dd>
+        </dl>
+      </Suggestion>
+      {variant.recommended && variant.recommendation_key ? (
+        <p className="body-strong m-0" data-testid="recommendation">
+          {text(variant.recommendation_key, {})}
+        </p>
+      ) : null}
       {variant.status !== "draft" ? (
         <p className="label m-0 text-ink-muted">{t(`status.${variant.status}`)}</p>
-      ) : null}
-      <div className="flex flex-wrap items-center gap-2">
-        <Link
-          href={`/dienstplan?month=${month}&variant=${variant.variant_id}`}
-          className="dp-btn dp-btn--secondary label no-underline"
-        >
-          {t("openEditor")}
-        </Link>
-        <Button
-          variant="primary"
-          disabled={!draft || windowOpen}
-          aria-describedby={windowOpen ? hint : undefined}
-          onClick={() => {
-            onPublish(variant);
-          }}
-          data-testid={`publish-${variant.label}`}
-        >
-          {t("publish")}
-        </Button>
-      </div>
-      {windowOpen ? (
-        <p id={hint} className="caption m-0 text-ink-muted">
-          {t("publishBlocked")}
-        </p>
       ) : null}
     </article>
   );
@@ -170,9 +150,9 @@ export default function VariantsPage(): ReactNode {
   const text = useKeyText();
   const { api } = useSession();
   const planning = usePlanning();
-  const month = planning.month;
+  const [picked, setPicked] = useState<string | null>(null);
+  const month = picked ?? planning.month;
   const [runId, setRunId] = useState<string | null>(null);
-  const [publish, setPublish] = useState<PublishTarget | null>(null);
 
   const runs = useQuery(
     (a) =>
@@ -211,41 +191,89 @@ export default function VariantsPage(): ReactNode {
     setRunId(r.run_id);
   });
 
+  const running = active.data !== null && !TERMINAL.includes(active.data.status);
+  const waiting = runId !== null && active.data?.run_id !== runId && active.error === null;
+  const pending = start.pending || running || waiting;
+  const finished = runs.data?.runs.filter((r) => TERMINAL.includes(r.status)) ?? [];
+  // While a new run is computing, the earlier run's variants are hidden so they are not mistaken for it.
+  const shown: Run | null = pending
+    ? null
+    : ((active.data && TERMINAL.includes(active.data.status) ? active.data : null) ??
+      finished[0] ??
+      null);
+
+  // Every variant is checked by the validator (C2) again, so the headline states what holds now.
+  const checks = useQuery(
+    async (a) => {
+      if (!shown || shown.status !== "done" || !month) return {} as Record<string, number>;
+      const entries = await Promise.all(
+        shown.variants.map(async (v) => {
+          const r = await unwrap(
+            a.POST("/planner/validate", {
+              body: { roster_month: month, variant_id: v.variant_id },
+            }),
+          );
+          return [v.variant_id, r.violations.length] as const;
+        }),
+      );
+      return Object.fromEntries(entries);
+    },
+    [shown?.run_id, month],
+  );
+
   if (planning.overview.error)
     return <ErrorState error={planning.overview.error} onRetry={planning.overview.reload} />;
   if (!planning.overview.data || !month) return <Loading />;
 
-  const running = active.data !== null && !TERMINAL.includes(active.data.status);
-  const finished = runs.data?.runs.filter((r) => TERMINAL.includes(r.status)) ?? [];
-  const shown: Run | null =
-    (active.data && TERMINAL.includes(active.data.status) ? active.data : null) ??
-    finished[0] ??
-    null;
-  const pending = start.pending || running;
+  const responded = planning.overview.data.window?.responded;
+  const valid = shown?.variants.filter((v) => checks.data?.[v.variant_id] === 0).length ?? 0;
+  const total = shown?.variants.length ?? 0;
+  const headline = pending
+    ? t("running")
+    : shown?.status === "done"
+      ? checks.data && valid < total
+        ? t("headlineSome", { valid, total })
+        : t("headlineAll", { count: total, month: fmt.monthShort(month) })
+      : shown
+        ? t("noRosterTitle")
+        : t("headlineNone", { month: fmt.monthShort(month) });
+  const subline = shown
+    ? [
+        shown.trial
+          ? t("sublineTrial", {
+              date: fmt.date(shown.created_at),
+              time: fmt.time(shown.created_at),
+              responded: responded ?? 0,
+            })
+          : t("sublineRun", { date: fmt.date(shown.created_at), time: fmt.time(shown.created_at) }),
+        shown.status === "done" && checks.data && valid === total
+          ? t("sublineChecked", { validator: shown.validator_version ?? "" })
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : t("empty");
 
   return (
     <>
       <PageHeader
-        title={t("title")}
-        status={
-          running
-            ? t("running")
-            : shown?.status === "done"
-              ? t("statusDone", { count: shown.variants.length, month: fmt.month(month) })
-              : t("statusNone", { month: fmt.month(month) })
-        }
+        title={headline}
+        status={subline}
         actions={
-          <Button
-            variant="primary"
-            onClick={() => void start.run()}
-            disabled={pending}
-            data-testid="start-run"
-          >
-            {pending ? t("starting") : t("start")}
-          </Button>
+          <>
+            <MonthSwitch month={month} onChange={setPicked} />
+            <Button
+              variant="primary"
+              onClick={() => void start.run()}
+              disabled={pending}
+              data-testid="start-run"
+            >
+              {pending ? t("starting") : t("start")}
+            </Button>
+          </>
         }
       />
-      {planning.windowOpen ? (
+      {planning.windowOpen && month === planning.month ? (
         <div className="dp-rule !bg-action-wash" role="note" data-testid="trial-banner">
           <span className="dp-rule-icon !text-action">
             <Info size={20} strokeWidth={1.75} absoluteStrokeWidth aria-hidden />
@@ -296,33 +324,33 @@ export default function VariantsPage(): ReactNode {
         </label>
       ) : null}
       {shown?.status === "done" ? (
-        <Section
-          title={t("comparison", { month: fmt.month(month) })}
-          aside={
-            <span className="caption text-ink-muted">
-              {t("versions", {
-                solver: shown.solver_version ?? "",
-                validator: shown.validator_version ?? "",
-                rules: shown.rule_set_version,
-              })}
-            </span>
-          }
-        >
-          <div className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
+        <>
+          <div className="grid items-start gap-6 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
             {shown.variants.map((v) => (
               <VariantCard
                 key={v.variant_id}
                 run={shown}
                 variant={v}
                 month={month}
-                windowOpen={planning.windowOpen}
-                onPublish={(variant) => {
-                  setPublish({ month, variantId: variant.variant_id, label: variant.label });
-                }}
+                violations={checks.data ? (checks.data[v.variant_id] ?? null) : null}
               />
             ))}
           </div>
-        </Section>
+          <p className="caption m-0 flex flex-wrap items-center gap-2 text-ink-muted">
+            <EngineBadge
+              engine={{
+                component: "C1",
+                implementation: "built",
+                version: shown.solver_version ?? "",
+                note: "",
+              }}
+            />
+            {t("versions", {
+              validator: shown.validator_version ?? "",
+              rules: shown.rule_set_version,
+            })}
+          </p>
+        </>
       ) : shown ? (
         <Section title={t("noRosterTitle")}>
           <p className="body m-0">{t("noRosterBody")}</p>
@@ -332,20 +360,7 @@ export default function VariantsPage(): ReactNode {
             ))}
           </ul>
         </Section>
-      ) : !running ? (
-        <p className="body m-0 text-ink-muted">{t("empty")}</p>
       ) : null}
-      <PublishDialog
-        target={publish}
-        onClose={() => {
-          setPublish(null);
-        }}
-        onPublished={() => {
-          reloadRuns();
-          active.reload();
-          planning.overview.reload();
-        }}
-      />
     </>
   );
 }
