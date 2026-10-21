@@ -132,6 +132,8 @@ Fill these in as they are built: `make train`, `make eval`, `make screenshots` (
 - `make eval`: validator eval (`eval/results/c2.json`), the full benchmark on 2025 (`benchmark.json`, `c1.json`, about 10 minutes) and the ARCHITECTURE §17.1 table. CI runs the one-month smoke benchmark and checks that its results hash matches the committed one.
 - `make tune`: re-tune the balanced profile on July to December 2024 (`eval/results/tuning.json`); copy the winner into `PROFILES` (a test checks they agree).
 
+Trying it by hand (devices, walkthrough of the three situations in both apps): `docs/TESTING.md`.
+
 API: see `docs/API.md` (screens → endpoints, roles, privacy). Demo sign-in with a persona; `DEMO_MODE=true` (dev stack) adds `PUT /demo/clock` for the Administrator.
 
 Toolchain: uv (Python 3.12) and pnpm (Node 24+). `packages/design-tokens` is built from `design/reference/design-system/project/tokens.json`; run `pnpm build:packages` after changing it.
