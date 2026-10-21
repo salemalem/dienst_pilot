@@ -22,8 +22,8 @@ def _get_paths(client: TestClient, cascade_id: str, assignment_id: str) -> list[
     """Every GET path of the OpenAPI schema, with path and required query parameters filled in."""
     paths = []
     for path, ops in client.app.openapi()["paths"].items():  # type: ignore[attr-defined]
-        if "get" not in ops:
-            continue
+        if "get" not in ops or path.startswith("/health"):
+            continue  # health checks carry no data (and /health/ready needs Redis)
         p = path.replace("{month}", "2026-12").replace("{cascade_id}", cascade_id)
         if p == "/me/swaps/audience":
             p += f"?assignment_id={assignment_id}"
