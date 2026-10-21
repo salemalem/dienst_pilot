@@ -1,5 +1,5 @@
 {
-  "extends": ["expo/tsconfig.base", "../../tsconfig.base.json"],
+  "extends": ["../../node_modules/expo/tsconfig.base", "../../tsconfig.base.json"],
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ES2023", "DOM"],
@@ -7,5 +7,5 @@
     "noEmit": true,
     "customConditions": ["react-native"]
   },
-  "include": ["index.ts", "src", "*.d.ts"]
+  "include": ["app", "src", "tests", "e2e", "*.d.ts", "*.ts", "*.mts"]
 }

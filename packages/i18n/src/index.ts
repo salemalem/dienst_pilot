@@ -14,3 +14,4 @@ export function isLocale(value: unknown): value is Locale {
 }
 
 export * from "./format.ts";
+export * from "./fmt.ts";

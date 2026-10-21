@@ -7,6 +7,7 @@ export default tseslint.config(
     ignores: [
       "**/node_modules/**",
       "**/dist/**",
+      "**/dist-e2e/**",
       "**/.next/**",
       "**/.expo/**",
       "**/next-env.d.ts",
@@ -28,7 +29,7 @@ export default tseslint.config(
   },
   {
     // Metro needs require() to bundle the font asset.
-    files: ["apps/mobile/src/App.tsx"],
+    files: ["apps/mobile/app/_layout.tsx"],
     rules: { "@typescript-eslint/no-require-imports": "off" },
   },
 );
