@@ -38,3 +38,6 @@ data/
 test-results/
 playwright-report/
 .claude/launch.json
+
+# Staff app e2e build
+apps/mobile/dist-e2e/

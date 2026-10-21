@@ -1,32 +1,9 @@
 import type { Page } from "@playwright/test";
 
+import { makeApi } from "../../../scripts/e2e/api.ts";
 import { API_URL } from "../playwright.config.ts";
 
-/** Scripted API calls play the other personas' parts (staff, admin); the checks run in the UI. */
-export async function login(persona: string): Promise<string> {
-  const r = await fetch(`${API_URL}/auth/demo-login`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ persona }),
-  });
-  if (!r.ok) throw new Error(`login ${persona}: ${String(r.status)}`);
-  return ((await r.json()) as { access_token: string }).access_token;
-}
-
-export async function api<T = unknown>(
-  token: string,
-  method: string,
-  path: string,
-  body?: unknown,
-): Promise<T> {
-  const r = await fetch(`${API_URL}${path}`, {
-    method,
-    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-  });
-  if (!r.ok) throw new Error(`${method} ${path}: ${String(r.status)} ${await r.text()}`);
-  return (await r.json()) as T;
-}
+export const { login, api } = makeApi(API_URL);
 
 /** Open the dashboard as a persona, in a theme, before any script runs. */
 export async function asPersona(

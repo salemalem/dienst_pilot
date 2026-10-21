@@ -133,7 +133,7 @@ jobs:
       - run: git diff --exit-code packages/api-client
 
   e2e:
-    name: Playwright e2e (planner dashboard on the demo clock)
+    name: Playwright e2e (dashboard and staff app on the demo clock)
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -172,5 +172,7 @@ jobs:
       - name: Install the browser
         working-directory: apps/dashboard
         run: pnpm exec playwright install --with-deps chromium
-      - name: Seed, start the API and the worker, build the dashboard, run the specs
+      - name: Planner dashboard (seed, API and worker, build, specs)
         run: pnpm --filter @dienstpilot/dashboard e2e
+      - name: Staff app on Expo web (export, then the specs in German and in English, each on a fresh seed)
+        run: pnpm --filter @dienstpilot/mobile e2e

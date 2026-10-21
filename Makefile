@@ -30,11 +30,12 @@ test: ## Python and TypeScript tests
 	uv run pytest
 	pnpm test
 
-e2e: ## Playwright e2e on the demo clock (own database dienstpilot_e2e; API on :8100, dashboard on :3100)
+e2e: ## Playwright e2e on the demo clock: dashboard (:3100) and staff app on Expo web (:8083), own database dienstpilot_e2e, API on :8100
 	$(COMPOSE) up -d --wait postgres redis
 	$(COMPOSE) exec -T postgres psql -U dienstpilot -c "CREATE DATABASE dienstpilot_e2e" 2>/dev/null || true
 	pnpm build:packages
 	pnpm --filter @dienstpilot/dashboard e2e
+	pnpm --filter @dienstpilot/mobile e2e
 
 lint: ## ruff, mypy, import-linter, eslint, tsc, prettier
 	uv run ruff check backend
