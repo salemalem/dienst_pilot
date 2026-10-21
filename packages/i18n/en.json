@@ -754,5 +754,11 @@
         "tagline": "Read and explain language. A sentence never becomes an assignment."
       }
     }
+  },
+  "qualification": {
+    "any": "no particular qualification",
+    "facharzt": "specialist",
+    "nachtdienstfaehig": "cleared for night duty",
+    "oberarzt": "senior physician"
   }
 }

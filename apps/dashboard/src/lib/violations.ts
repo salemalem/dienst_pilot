@@ -12,6 +12,7 @@ export function useKeyText(): (key: string, raw: Record<string, unknown>) => str
   const t = useTranslations();
   const shifts = useTranslations("shift");
   const rules = useTranslations("rules");
+  const quals = useTranslations("qualification");
   const fmt = useFmt();
   return (key, raw) => {
     const out: Record<string, string | number> = {};
@@ -20,10 +21,13 @@ export function useKeyText(): (key: string, raw: Record<string, unknown>) => str
       else if (k === "shift" && typeof v === "string") out[k] = shifts(`${v as "frueh"}.name`);
       else if (k === "rule" && typeof v === "string")
         out[k] = rules.has(v as "coverage") ? rules(v as "coverage") : v;
+      else if (k === "qualification" && typeof v === "string")
+        out[k] = quals.has(v as "any") ? quals(v as "any") : v;
       else if (typeof v === "number") out[k] = Number.isInteger(v) ? v : fmt.number(v);
       else if (typeof v === "string") out[k] = v;
     }
-    return t(key as "violation.coverage", out as never);
+    // A date written "01.12." before a sentence's full stop must not read "01.12..".
+    return t(key as "violation.coverage", out as never).replace(/(\d)\.\.(?!\.)/g, "$1.");
   };
 }
 

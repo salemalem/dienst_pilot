@@ -754,5 +754,11 @@
         "tagline": "Lesen und erklären Sprache. Ein Satz wird nie zu einer Dienstzuteilung."
       }
     }
+  },
+  "qualification": {
+    "any": "ohne besondere Qualifikation",
+    "facharzt": "Facharzt",
+    "nachtdienstfaehig": "nachtdienstfähig",
+    "oberarzt": "Oberarzt"
   }
 }

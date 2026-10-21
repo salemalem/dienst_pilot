@@ -33,7 +33,9 @@ test("W10: filterable event log, with the chain indicator that says what is not 
   await page.goto("/de/protokoll");
   await expect(page.getByTestId("audit-rows").getByRole("row").first()).toBeVisible();
   await expect(page.getByTestId("chain")).toContainText("Hash-Kette");
-  await page.getByLabel("Ereignis", { exact: true }).selectOption({ label: "Dienstplan veröffentlicht" });
+  await page
+    .getByLabel("Ereignis", { exact: true })
+    .selectOption({ label: "Dienstplan veröffentlicht" });
   const rows = page.getByTestId("audit-rows").getByRole("row");
   await expect(rows.first()).toHaveAttribute("data-action", "roster.published");
   const n = await rows.count();
