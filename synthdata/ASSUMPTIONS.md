@@ -231,9 +231,9 @@ The three situations of `docs/PROCESS.md` §4 are played live with the real engi
 
 **Situation A: Dr. Kaya asks for 14–27 July 2027.**
 - Seeded: two pending leave requests that overlap her dates. Dr. Carla Franke asks for 12–23 July 2027 (submitted 14 October 2026, 09:12). Dr. Niklas Stein asks for 19–30 July 2027 (submitted 16 October 2026, 18:47).
-- Live: Dr. Kaya runs the M5 check. With the definition of §18 and the production solver settings, the result is **coverable, no trade-off**; she submits without a trade and the Planner approves. PROCESS.md tells this situation with a trade-off (one weekend in June); on this data the engines do not produce one, so the M5 copy follows the computed result.
+- Live: Dr. Kaya runs the M5 check. With the definition of §18 and the production solver settings, the result is **coverable, no trade-off**; she submits without a trade and the Planner approves. PROCESS.md and the M5 copy in UI_SPEC tell it this way; the trade-off state appears only when the solver finds one.
 
-**Situation B: Dr. Mehta offers a weekend shift; Dr. Lorenz takes it in exchange.**
+**Situation B: Dr. Mehta offers his Saturday early shift as an exchange; Dr. Lorenz takes it.**
 - No data is edited. The seeded November 2026 roster has no Saturday night shift (weekend nights are covered by the 24-hour Bereitschaftsdienst), Dr. Mehta has no Saturday Bereitschaftsdienst in November, and December is not planned. Giving any of Dr. Mehta's November shifts away alone puts him below the contract-hours band, so the swap is an exchange.
 - Live: Dr. Mehta offers his **Frühdienst on Saturday 21 November 2026**. Dr. Lorenz takes it and gives him her **Frühdienst on Friday 27 November 2026** in return. C2 finds the exchange valid for both, the policy approves it, and the Planner sees it under recent changes (W1), not as a request. The only other exchange C2 accepts for that Saturday is her Spätdienst on Monday 30 November.
 

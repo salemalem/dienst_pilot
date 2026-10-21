@@ -92,15 +92,17 @@ These are the moments that decide whether the software is loved or ignored. They
 
 ### Situation A: A junior doctor wants two weeks off in July
 
-Dr. Kaya opens the app and selects 14–27 July. Before she even submits, the system shows her: two other colleagues have already requested overlapping days, and her request is coverable, but only if she gives up one weekend in June. She can accept that trade-off in the same screen or submit without it.
+Dr. Kaya opens the app and selects 14–27 July. Before she even submits, the system shows her: two other colleagues have already requested overlapping days, and her request is still coverable, without overtime and without raising the highest burden in the department.
 
 The planner sees the request with everything already calculated: the effect on staffing, who would cover, whether it creates overtime, and how much leave Dr. Kaya has taken relative to her colleagues this year. He approves with one tap. Total time spent by the senior physician: under a minute. Dr. Kaya has an answer the same day instead of waiting three weeks for the next planning round.
 
-### Situation B: Two doctors want to swap a shift
+Had covering her leave pushed colleagues into overtime or above that burden, the system would have offered her a trade-off within the rules, for example one extra weekend duty in June, which she could accept in the same screen or decline.
 
-Dr. Mehta cannot work Saturday night. He opens the shift in the app and offers it. The system does not broadcast it to everyone; it shows the offer only to colleagues who are qualified for that shift, legally able to take it, and not already overloaded, which is exactly the check that today has to be done in someone's head.
+### Situation B: Two doctors exchange a shift
 
-Dr. Lorenz accepts. The system re-verifies both rosters. Everything remains valid, so the swap is confirmed automatically, both rosters update, and the planner receives an information notice, not a request. If, however, the swap had pushed Dr. Lorenz over her hours, the system would have held it and sent it to the planner for a decision, with the reason stated.
+Dr. Mehta cannot work his early shift on Saturday, 21 November. Giving it away alone would leave him below his contracted hours, so he offers it as an exchange. The system does not broadcast it to everyone; it shows the offer only to colleagues who are qualified for that shift, legally able to take it, and able to give a shift back without breaking a rule, which is exactly the check that today has to be done in someone's head.
+
+Dr. Lorenz takes his Saturday shift and gives him her early shift on Friday, 27 November, in return. The system re-verifies both rosters. Everything remains valid, so the exchange is confirmed automatically, both rosters update, and the planner receives an information notice, not a request. If, however, the exchange had pushed Dr. Lorenz over her hours or broken a rest period, the system would have held it and sent it to the planner for a decision, with the reason stated.
 
 ### Situation C: A doctor calls in sick at 06:40
 
