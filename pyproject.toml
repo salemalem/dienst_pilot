@@ -45,6 +45,7 @@ python_version = "3.12"
 strict = true
 mypy_path = ["backend/src", "synthdata/src"]
 packages = ["dienstpilot", "synthdata"]
+plugins = ["pydantic.mypy"]
 
 [tool.pytest.ini_options]
 testpaths = ["backend/tests", "synthdata/tests"]
@@ -57,6 +58,7 @@ markers = [
 
 [tool.importlinter]
 root_packages = ["dienstpilot", "synthdata"]
+plugins = ["pydantic.mypy"]
 
 [[tool.importlinter.contracts]]
 name = "Bounded contexts are independent"
@@ -86,6 +88,9 @@ forbidden_modules = [
   "dienstpilot.notifications",
   "dienstpilot.audit",
   "dienstpilot.main",
+  "dienstpilot.app",
+  "dienstpilot.engines",
+  "dienstpilot.seeding",
 ]
 
 [[tool.importlinter.contracts]]
@@ -99,3 +104,33 @@ name = "The backend never imports the generator (the loader reads Parquet)"
 type = "forbidden"
 source_modules = ["dienstpilot"]
 forbidden_modules = ["synthdata"]
+
+[[tool.importlinter.contracts]]
+name = "The application layer uses contexts only through their public services"
+type = "forbidden"
+allow_indirect_imports = true
+source_modules = ["dienstpilot.app"]
+forbidden_modules = [
+  "dienstpilot.identity.models",
+  "dienstpilot.organization.models",
+  "dienstpilot.requests.models",
+  "dienstpilot.planning.models",
+  "dienstpilot.operations.models",
+  "dienstpilot.audit.models",
+]
+
+[[tool.importlinter.contracts]]
+name = "Engines depend only on the ports, never on a context"
+type = "forbidden"
+source_modules = ["dienstpilot.engines"]
+forbidden_modules = [
+  "dienstpilot.identity",
+  "dienstpilot.organization",
+  "dienstpilot.requests",
+  "dienstpilot.planning",
+  "dienstpilot.operations",
+  "dienstpilot.fairness",
+  "dienstpilot.notifications",
+  "dienstpilot.audit",
+  "dienstpilot.app",
+]

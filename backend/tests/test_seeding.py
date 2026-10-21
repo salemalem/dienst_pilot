@@ -58,7 +58,10 @@ def test_seed_loads_every_table_and_is_repeatable(seed_dir: Path, database_url: 
     expected = {
         rel.removesuffix(".parquet"): info["rows"] for rel, info in manifest["files"].items()
     }
-    assert first == second == expected
+    assert first == second
+    assert {k: v for k, v in first.items() if k in expected} == expected
+    assert first["identity/user"] == 11  # the demo personas
+    assert first["audit/event"] > 1000  # the history backfilled into the audit trail
 
 
 @pytest.mark.db

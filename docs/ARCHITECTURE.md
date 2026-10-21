@@ -10,6 +10,7 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | — | Process design (roles, approvals, monthly cycle) | Domain design | Done, with clinical input |
 | — | System architecture (this document) | Design | Done |
 | — | Synthetic data generator (`synthdata/`) | Simulation | Prototype |
+| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C3–C8) | Application | Prototype |
 | C1 | Roster Optimizer | Constraint optimization | Designed |
 | C2 | Rule and Compliance Validator | Deterministic | Designed |
 | C3 | Absence Forecaster | ML, time series | Designed |

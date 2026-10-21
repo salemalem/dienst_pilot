@@ -128,6 +128,8 @@ Fill these in as they are built: `make train`, `make eval`, `make screenshots`.
 - `make format`: apply ruff and prettier formatting.
 - `make api-client`: regenerate `packages/api-client` from the backend's OpenAPI schema.
 
+API: see `docs/API.md` (screens → endpoints, roles, privacy). Demo sign-in with a persona; `DEMO_MODE=true` (dev stack) adds `PUT /demo/clock` for the Administrator.
+
 Toolchain: uv (Python 3.12) and pnpm (Node 24+). `packages/design-tokens` is built from `design/reference/design-system/project/tokens.json`; run `pnpm build:packages` after changing it.
 
 ## How to work in this repo

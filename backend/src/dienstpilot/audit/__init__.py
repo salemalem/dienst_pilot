@@ -1,4 +1,4 @@
-"""Audit: append-only, hash-chained event log.
+"""Audit: an append-only log of who requested, proposed and decided what, and when.
 
-Empty in Phase 1. Talks to other contexts only through public services or domain events.
+Phase 3A stores events; the hash chain (ARCHITECTURE §8) comes in Phase 9.
 """

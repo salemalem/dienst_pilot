@@ -2,7 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "DienstPilot API",
-    "version": "0.1.0"
+    "description": "Demo environment, synthetic data. Fictional Klinik für Innere Medizin, Klinikum Musterstadt.",
+    "version": "0.2.0"
   },
   "paths": {
     "/health": {
@@ -48,10 +49,4231 @@
           }
         }
       }
+    },
+    "/auth/personas": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Personas",
+        "description": "List the demo personas (UI_SPEC §1).",
+        "operationId": "personas_auth_personas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Persona"
+                  },
+                  "type": "array",
+                  "title": "Response Personas Auth Personas Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/demo-login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Demo Login",
+        "description": "Sign in as a demo persona. Real single sign-on replaces this later.",
+        "operationId": "demo_login_auth_demo_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Me",
+        "description": "Return the signed-in user.",
+        "operationId": "me_me_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clock": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Clock Now",
+        "description": "Return the demo clock (the UI uses it for \"today\" and countdowns).",
+        "operationId": "clock_now_clock_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClockOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/today": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Today",
+        "description": "M2: the next shift with colleagues, the open request window, open cover requests.",
+        "operationId": "today_me_today_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Today"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/roster": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "My Roster",
+        "description": "M3: the physician's month with wish marks (granted, missed).",
+        "operationId": "my_roster_me_roster_get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyRoster"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/wishes": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "My Wishes",
+        "description": "M4: the open request window, the person's entries and preference suggestions.",
+        "operationId": "my_wishes_me_wishes_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyWishes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Save Wishes",
+        "description": "M4: replace the person's answer to the open window (no approval needed, PROCESS §2).",
+        "operationId": "save_wishes_me_wishes_put",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/WishEntry"
+                },
+                "title": "Entries"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyWishes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/wishes/parse": {
+      "post": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Parse Wishes",
+        "description": "M4: interpret free text (\"Wir haben verstanden: …\"). The text is not stored.",
+        "operationId": "parse_wishes_me_wishes_parse_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParsedOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/leave": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "My Leave",
+        "description": "M5: the person's leave requests.",
+        "operationId": "my_leave_me_leave_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LeaveOut"
+                  },
+                  "title": "Response My Leave Me Leave Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Request Leave",
+        "description": "M5: request leave without a trade (\"Ohne Tausch beantragen\"); the Planner decides.",
+        "operationId": "request_leave_me_leave_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeaveIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaveOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/leave/check": {
+      "post": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Check Leave",
+        "description": "M5: instant hint before submitting (C6 stand-in); the confirmed trade-off waits for C1.",
+        "operationId": "check_leave_me_leave_check_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeaveCheckIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaveCheck"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/swaps": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "My Swaps",
+        "description": "M6: swaps the person offered or took.",
+        "operationId": "my_swaps_me_swaps_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwapOut"
+                  },
+                  "title": "Response My Swaps Me Swaps Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Offer Swap",
+        "description": "M6: offer an own future shift to eligible colleagues.",
+        "operationId": "offer_swap_me_swaps_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwapOfferIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwapOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/swaps/audience": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Swap Audience",
+        "description": "M6: how many colleagues could take this shift (basic filter, not checked against rules).",
+        "operationId": "swap_audience_me_swaps_audience_get",
+        "parameters": [
+          {
+            "name": "assignment_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Assignment Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwapAudience"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/swap-offers": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Open Offers",
+        "description": "M6: open offers of colleagues the person could take (basic filter).",
+        "operationId": "open_offers_me_swap_offers_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OpenOffer"
+                  },
+                  "title": "Response Open Offers Me Swap Offers Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/swap-offers/{swap_id}/take": {
+      "post": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Take Offer",
+        "description": "M6: take a colleague's offer. Without the validator (C2) the Planner decides.",
+        "operationId": "take_offer_me_swap_offers__swap_id__take_post",
+        "parameters": [
+          {
+            "name": "swap_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Swap Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwapOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/sick": {
+      "post": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Report Sick",
+        "description": "M7: report sick (no approval, PROCESS §2); cover searches start for each affected shift.",
+        "operationId": "report_sick_me_sick_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SickIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SickOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/cover-requests": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Cover Requests",
+        "description": "M8: open cover requests with countdown and hours impact.",
+        "operationId": "cover_requests_me_cover_requests_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoverRequestOut"
+                  },
+                  "title": "Response Cover Requests Me Cover Requests Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/cover-requests/{offer_id}": {
+      "post": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Respond Cover",
+        "description": "M8: take the shift (\"Übernehmen\") or decline. Taking it waits for the Planner until C2.",
+        "operationId": "respond_cover_me_cover_requests__offer_id__post",
+        "parameters": [
+          {
+            "name": "offer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Offer Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RespondIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespondOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/fairness": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "My Fairness",
+        "description": "M9: own nights, weekends and holidays against the department (anonymous statistics).",
+        "operationId": "my_fairness_me_fairness_get",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyFairness"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/hours": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "My Hours",
+        "description": "M10: own hours for a month (default: the current month).",
+        "operationId": "my_hours_me_hours_get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoursOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/notifications": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Notifications",
+        "description": "M11: roster published, swap updates, leave decisions, cover requests.",
+        "operationId": "notifications_me_notifications_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Notification"
+                  },
+                  "title": "Response Notifications Me Notifications Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/settings": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Get Settings",
+        "description": "M12: personal settings (every signed-in user).",
+        "operationId": "get_settings_me_settings_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Put Settings",
+        "description": "M12: change personal settings. Oversight is read-only and cannot change anything.",
+        "operationId": "put_settings_me_settings_put",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/roster": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Roster",
+        "description": "W4 grid and the full roster for Staff+: shifts, absences, leave, coverage per shift.",
+        "operationId": "roster_roster_get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RosterGrid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/roster/assignments": {
+      "patch": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Change Assignment",
+        "description": "W4: change a published roster. Every change must pass the validator, so this waits for C2.",
+        "operationId": "change_assignment_planner_roster_assignments_patch",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/validate": {
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Validate",
+        "description": "W4: live validation (C2, Phase 7).",
+        "operationId": "validate_planner_validate_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/runs": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Runs",
+        "description": "W3: existing runs of a month (December 2026 has none until C1 exists).",
+        "operationId": "runs_planner_runs_get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Generate",
+        "description": "W3: generate variants with the optimizer (C1, Phase 7).",
+        "operationId": "generate_planner_runs_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/variants/{variant_id}/publish": {
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Publish",
+        "description": "W5: approve and publish. A variant must pass the validator first, so this waits for C2.",
+        "operationId": "publish_planner_variants__variant_id__publish_post",
+        "parameters": [
+          {
+            "name": "variant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Variant Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/overview": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Overview",
+        "description": "W1: window progress, escalations, coverage of the next 14 days with expected absences.",
+        "operationId": "overview_planner_overview_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Overview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/windows/{month}": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Window Detail",
+        "description": "W2: who has answered the window.",
+        "operationId": "window_detail_planner_windows__month__get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WindowDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/windows/{month}/reminders": {
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Remind",
+        "description": "W2: \"Erinnerung senden\" to everyone who has not answered (push comes later).",
+        "operationId": "remind_planner_windows__month__reminders_post",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReminderOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/windows/{month}/close": {
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Close Window",
+        "description": "W2: close the window.",
+        "operationId": "close_window_planner_windows__month__close_post",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WindowDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/requests": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Inbox",
+        "description": "W6: pending leave with computed impact, escalated swaps and cover, open proposals.",
+        "operationId": "inbox_planner_requests_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inbox"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/leave/{request_id}/decision": {
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Decide Leave",
+        "description": "W6: \"Genehmigen\" or \"Ablehnen mit Begründung\".",
+        "operationId": "decide_leave_planner_leave__request_id__decision_post",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Decision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Decided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/swaps/{swap_id}/decision": {
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Decide Swap",
+        "description": "W6: approve or decline a taken swap (escalated while C2 is not available).",
+        "operationId": "decide_swap_planner_swaps__swap_id__decision_post",
+        "parameters": [
+          {
+            "name": "swap_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Swap Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Decision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Decided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/proposals/{proposal_id}/decision": {
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Decide Proposal",
+        "description": "W6: mark a proposal accepted or dismissed. Acting on it is a separate, validated change.",
+        "operationId": "decide_proposal_planner_proposals__proposal_id__decision_post",
+        "parameters": [
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Proposal Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalDecision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Decided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/cascades": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Live Cascades",
+        "description": "W7: open and escalated cover searches, and those closed in the last 7 days.",
+        "operationId": "live_cascades_planner_cascades_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CascadeOut"
+                  },
+                  "title": "Response Live Cascades Planner Cascades Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/cascades/{cascade_id}": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Escalation",
+        "description": "W7b: options to close the gap, ranked, with hours and overtime consequences.",
+        "operationId": "escalation_planner_cascades__cascade_id__get",
+        "parameters": [
+          {
+            "name": "cascade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Cascade Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EscalationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/cascades/{cascade_id}/decision": {
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Decide Cascade",
+        "description": "W7b: close a cover search the way the Planner chose.",
+        "operationId": "decide_cascade_planner_cascades__cascade_id__decision_post",
+        "parameters": [
+          {
+            "name": "cascade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Cascade Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CascadeDecision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CascadeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fairness": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Fairness Report",
+        "description": "W8 (Planner) and W12 (Oversight, without names).",
+        "operationId": "fairness_report_fairness_get",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FairnessOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/compliance/hours": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Hours Report",
+        "description": "Per-person hours and overtime of a month (Planner and Oversight).",
+        "operationId": "hours_report_compliance_hours_get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoursReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/compliance/overtime-trend": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Overtime Trend",
+        "description": "W8: department overtime per month for the last published months.",
+        "operationId": "overtime_trend_compliance_overtime_trend_get",
+        "parameters": [
+          {
+            "name": "months",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 24,
+              "minimum": 1,
+              "default": 12,
+              "title": "Months"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OvertimeMonth"
+                  },
+                  "title": "Response Overtime Trend Compliance Overtime Trend Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/copilot/ask": {
+      "post": {
+        "tags": [
+          "insight"
+        ],
+        "summary": "Ask",
+        "description": "W9: ask the copilot (stand-in). It reads; it cannot publish or approve anything.",
+        "operationId": "ask_copilot_ask_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/copilot/proposals": {
+      "post": {
+        "tags": [
+          "insight"
+        ],
+        "summary": "Create Proposal",
+        "description": "W9: create a proposal. It changes nothing until the Planner acts on it.",
+        "operationId": "create_proposal_copilot_proposals_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalCreated"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/audit/events": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "summary": "Audit Events",
+        "description": "W10: the audit trail, filterable.\n\nSame privacy rules as everywhere: no absence category for anyone but the Planner.",
+        "operationId": "audit_events_audit_events_get",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Action"
+            }
+          },
+          {
+            "name": "staff_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Staff Id"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/master-data": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "summary": "Master Data",
+        "description": "W11: master data and versioned rules (Administrator and Planner).",
+        "operationId": "master_data_master_data_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MasterData"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/rule-sets": {
+      "post": {
+        "tags": [
+          "insight"
+        ],
+        "summary": "Add Rule Set",
+        "description": "W11: add a rule version (\"Neue Regelversion ab 01.01.2027\"). Old rosters keep theirs.",
+        "operationId": "add_rule_set_admin_rule_sets_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleSetIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleSetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oversight/summary": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "summary": "Oversight Summary",
+        "description": "W12: hours and overtime per person, fairness as anonymous statistics, audit export.",
+        "operationId": "oversight_summary_oversight_summary_get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OversightSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/audit/export": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "summary": "Audit Export",
+        "description": "W12: export of the audit trail (same privacy rules), up to 5 000 events.",
+        "operationId": "audit_export_audit_export_get",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transparency/components": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "summary": "Components",
+        "description": "W13: what each component is, how far it is built, and that none can change the roster.",
+        "operationId": "components_transparency_components_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ComponentOut"
+                  },
+                  "title": "Response Components Transparency Components Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/clock": {
+      "put": {
+        "tags": [
+          "demo"
+        ],
+        "summary": "Set Clock",
+        "description": "Move the demo clock (Administrator, DEMO_MODE only). Stored in Redis.",
+        "operationId": "set_clock_demo_clock_put",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClockIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClockOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AskIn": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Question"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "de",
+              "en"
+            ],
+            "title": "Language",
+            "default": "de"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "title": "AskIn",
+        "description": "A question for the copilot."
+      },
+      "AskOut": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer"
+          },
+          "figures": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Figures"
+          },
+          "citations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Citations"
+          },
+          "understood": {
+            "type": "boolean",
+            "title": "Understood"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "answer",
+          "figures",
+          "citations",
+          "understood",
+          "engine"
+        ],
+        "title": "AskOut",
+        "description": "The copilot's answer with figures and cited rules."
+      },
+      "AssignmentChange": {
+        "properties": {
+          "assignment_id": {
+            "type": "string",
+            "title": "Assignment Id"
+          },
+          "new_staff_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Staff Id"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assignment_id",
+          "reason"
+        ],
+        "title": "AssignmentChange",
+        "description": "A change to a published roster. Needs a reason (PROCESS §2)."
+      },
+      "AuditEventOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "actor": {
+            "type": "string",
+            "title": "Actor"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "subject_type": {
+            "type": "string",
+            "title": "Subject Type"
+          },
+          "subject_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject Id"
+          },
+          "staff_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Name"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "occurred_at",
+          "actor",
+          "action",
+          "subject_type",
+          "subject_id",
+          "staff_name",
+          "payload"
+        ],
+        "title": "AuditEventOut",
+        "description": "An audit event as the viewer may see it."
+      },
+      "AuditPage": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/AuditEventOut"
+            },
+            "type": "array",
+            "title": "Events"
+          },
+          "chain_verified": {
+            "type": "null",
+            "title": "Chain Verified",
+            "description": "The hash chain arrives in Phase 9"
+          },
+          "chain_available_from_phase": {
+            "type": "integer",
+            "title": "Chain Available From Phase",
+            "default": 9
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "events"
+        ],
+        "title": "AuditPage",
+        "description": "W10: a page of the audit trail."
+      },
+      "CascadeDecision": {
+        "properties": {
+          "option": {
+            "type": "string",
+            "enum": [
+              "confirm_cover",
+              "assign",
+              "locum",
+              "unfilled"
+            ],
+            "title": "Option"
+          },
+          "staff_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "option"
+        ],
+        "title": "CascadeDecision",
+        "description": "The Planner's choice for a gap."
+      },
+      "CascadeOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          },
+          "absent_staff": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Absent Staff"
+          },
+          "opened_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opened At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "covered_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Covered By"
+          },
+          "escalation_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalation Reason"
+          },
+          "remaining_candidates": {
+            "type": "integer",
+            "title": "Remaining Candidates"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/OfferStep"
+            },
+            "type": "array",
+            "title": "Timeline"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "date",
+          "shift_type",
+          "absent_staff",
+          "opened_at",
+          "status",
+          "outcome",
+          "covered_by",
+          "escalation_reason",
+          "remaining_candidates",
+          "timeline"
+        ],
+        "title": "CascadeOut",
+        "description": "W7: a cover search as a timeline."
+      },
+      "Cell": {
+        "properties": {
+          "shifts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Shifts"
+          },
+          "changed": {
+            "type": "boolean",
+            "title": "Changed"
+          },
+          "on_leave": {
+            "type": "boolean",
+            "title": "On Leave"
+          },
+          "absence": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Absence",
+            "description": "status 'absent'; the category only for the Planner"
+          },
+          "wish": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "granted",
+                  "missed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wish"
+          }
+        },
+        "type": "object",
+        "required": [
+          "shifts",
+          "changed",
+          "on_leave"
+        ],
+        "title": "Cell",
+        "description": "What a physician has on a day."
+      },
+      "ClockIn": {
+        "properties": {
+          "now": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Now"
+          },
+          "reset": {
+            "type": "boolean",
+            "title": "Reset",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "ClockIn",
+        "description": "A new demo time, or reset to the default demo moment."
+      },
+      "ClockOut": {
+        "properties": {
+          "now": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Now"
+          },
+          "demo_mode": {
+            "type": "boolean",
+            "title": "Demo Mode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "now",
+          "demo_mode"
+        ],
+        "title": "ClockOut",
+        "description": "The demo clock."
+      },
+      "Colleague": {
+        "properties": {
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_id",
+          "display_name"
+        ],
+        "title": "Colleague",
+        "description": "A colleague on the same shift (no other detail)."
+      },
+      "ComponentOut": {
+        "properties": {
+          "component": {
+            "type": "string",
+            "title": "Component"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "implementation": {
+            "type": "string",
+            "title": "Implementation"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          },
+          "planned_phase": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Phase"
+          },
+          "can_change_roster": {
+            "type": "boolean",
+            "title": "Can Change Roster",
+            "default": false
+          },
+          "eval_metric": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eval Metric",
+            "description": "From eval/results; None until evaluated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "component",
+          "kind",
+          "implementation",
+          "version",
+          "note",
+          "planned_phase"
+        ],
+        "title": "ComponentOut",
+        "description": "W13: one component card."
+      },
+      "ContractOut": {
+        "properties": {
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "title_de": {
+            "type": "string",
+            "title": "Title De"
+          },
+          "title_en": {
+            "type": "string",
+            "title": "Title En"
+          },
+          "weekly_hours": {
+            "type": "number",
+            "title": "Weekly Hours"
+          },
+          "qualifications": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Qualifications"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_id",
+          "display_name",
+          "role",
+          "title_de",
+          "title_en",
+          "weekly_hours",
+          "qualifications"
+        ],
+        "title": "ContractOut",
+        "description": "A physician's current contract."
+      },
+      "CoverRequestOut": {
+        "properties": {
+          "offer_id": {
+            "type": "string",
+            "title": "Offer Id"
+          },
+          "shift": {
+            "$ref": "#/components/schemas/ShiftOut"
+          },
+          "deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline At"
+          },
+          "seconds_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seconds Left"
+          },
+          "hours": {
+            "$ref": "#/components/schemas/HoursImpact"
+          },
+          "check": {
+            "type": "string",
+            "title": "Check",
+            "default": "unchecked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "offer_id",
+          "shift",
+          "deadline_at",
+          "seconds_left",
+          "hours"
+        ],
+        "title": "CoverRequestOut",
+        "description": "M8: an open cover request to the person."
+      },
+      "CoverTask": {
+        "properties": {
+          "offer_id": {
+            "type": "string",
+            "title": "Offer Id"
+          },
+          "shift": {
+            "$ref": "#/components/schemas/ShiftOut"
+          },
+          "deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "offer_id",
+          "shift",
+          "deadline_at"
+        ],
+        "title": "CoverTask",
+        "description": "An open cover request to the person."
+      },
+      "CoverageDay": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "short": {
+            "type": "integer",
+            "title": "Short",
+            "description": "Demand rows with fewer physicians than required"
+          },
+          "expected_absences": {
+            "type": "number",
+            "title": "Expected Absences"
+          },
+          "expected_low": {
+            "type": "number",
+            "title": "Expected Low"
+          },
+          "expected_high": {
+            "type": "number",
+            "title": "Expected High"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "short",
+          "expected_absences",
+          "expected_low",
+          "expected_high"
+        ],
+        "title": "CoverageDay",
+        "description": "Coverage and expected absences of one day."
+      },
+      "CoverageRow": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          },
+          "qualification": {
+            "type": "string",
+            "title": "Qualification"
+          },
+          "required": {
+            "type": "integer",
+            "title": "Required"
+          },
+          "assigned": {
+            "type": "integer",
+            "title": "Assigned"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "shift_type",
+          "qualification",
+          "required",
+          "assigned"
+        ],
+        "title": "CoverageRow",
+        "description": "Demand against assigned physicians for one day, shift and qualification."
+      },
+      "Decided": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "Decided",
+        "description": "The new state."
+      },
+      "Decision": {
+        "properties": {
+          "approve": {
+            "type": "boolean",
+            "title": "Approve"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "approve"
+        ],
+        "title": "Decision",
+        "description": "Approve or decline. A decline needs the Planner's reason (shown to the requester)."
+      },
+      "DemandOut": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "rows": {
+            "items": {
+              "prefixItems": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array",
+              "maxItems": 3,
+              "minItems": 3
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "rows"
+        ],
+        "title": "DemandOut",
+        "description": "The demand rows of one example day."
+      },
+      "DistributionOut": {
+        "properties": {
+          "metric": {
+            "type": "string",
+            "title": "Metric"
+          },
+          "people": {
+            "type": "integer",
+            "title": "People"
+          },
+          "mean": {
+            "type": "number",
+            "title": "Mean"
+          },
+          "median": {
+            "type": "number",
+            "title": "Median"
+          },
+          "minimum": {
+            "type": "integer",
+            "title": "Minimum"
+          },
+          "maximum": {
+            "type": "integer",
+            "title": "Maximum"
+          },
+          "values": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Values"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metric",
+          "people",
+          "mean",
+          "median",
+          "minimum",
+          "maximum",
+          "values"
+        ],
+        "title": "DistributionOut",
+        "description": "Anonymous department statistics of one metric (nights, weekends, holidays)."
+      },
+      "EngineLabel": {
+        "properties": {
+          "component": {
+            "type": "string",
+            "title": "Component"
+          },
+          "implementation": {
+            "type": "string",
+            "title": "Implementation"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "component",
+          "implementation",
+          "version",
+          "note"
+        ],
+        "title": "EngineLabel",
+        "description": "Which component produced a value, and whether it is a stand-in."
+      },
+      "EscalationOut": {
+        "properties": {
+          "cascade": {
+            "$ref": "#/components/schemas/CascadeOut"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/Option"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cascade",
+          "options",
+          "engine"
+        ],
+        "title": "EscalationOut",
+        "description": "W7b: a cover search with ranked options."
+      },
+      "FairnessCategory": {
+        "properties": {
+          "metric": {
+            "type": "string",
+            "title": "Metric"
+          },
+          "mine": {
+            "type": "integer",
+            "title": "Mine"
+          },
+          "department_mean": {
+            "type": "number",
+            "title": "Department Mean"
+          },
+          "department_median": {
+            "type": "number",
+            "title": "Department Median"
+          },
+          "department_min": {
+            "type": "integer",
+            "title": "Department Min"
+          },
+          "department_max": {
+            "type": "integer",
+            "title": "Department Max"
+          },
+          "distribution": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Distribution",
+            "description": "All values, sorted, without names"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metric",
+          "mine",
+          "department_mean",
+          "department_median",
+          "department_min",
+          "department_max",
+          "distribution"
+        ],
+        "title": "FairnessCategory",
+        "description": "The person's count against anonymous department statistics."
+      },
+      "FairnessOut": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date",
+            "title": "As Of"
+          },
+          "distributions": {
+            "items": {
+              "$ref": "#/components/schemas/DistributionOut"
+            },
+            "type": "array",
+            "title": "Distributions"
+          },
+          "people": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/PersonBurden"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "as_of",
+          "distributions",
+          "people"
+        ],
+        "title": "FairnessOut",
+        "description": "W8: burden distribution. Names only for the Planner; Oversight gets statistics only."
+      },
+      "GapSuggestion": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          },
+          "candidates": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Candidates"
+          },
+          "check": {
+            "type": "string",
+            "title": "Check",
+            "default": "unchecked"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "shift_type",
+          "candidates",
+          "engine"
+        ],
+        "title": "GapSuggestion",
+        "description": "Who could fill a gap (Planner only; unchecked until C2)."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
       "Health": {
         "properties": {
           "status": {
@@ -64,6 +4286,1477 @@
         "type": "object",
         "title": "Health",
         "description": "Liveness response."
+      },
+      "HoursImpact": {
+        "properties": {
+          "contract_hours": {
+            "type": "number",
+            "title": "Contract Hours"
+          },
+          "planned_hours_before": {
+            "type": "number",
+            "title": "Planned Hours Before"
+          },
+          "planned_hours_after": {
+            "type": "number",
+            "title": "Planned Hours After"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contract_hours",
+          "planned_hours_before",
+          "planned_hours_after"
+        ],
+        "title": "HoursImpact",
+        "description": "What taking the shift does to the person's month."
+      },
+      "HoursOut": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "contract_hours": {
+            "type": "number",
+            "title": "Contract Hours"
+          },
+          "leave_credit_hours": {
+            "type": "number",
+            "title": "Leave Credit Hours"
+          },
+          "planned_hours": {
+            "type": "number",
+            "title": "Planned Hours"
+          },
+          "worked_hours": {
+            "type": "number",
+            "title": "Worked Hours"
+          },
+          "overtime_hours": {
+            "type": "number",
+            "title": "Overtime Hours"
+          },
+          "rest_compliance": {
+            "type": "null",
+            "title": "Rest Compliance",
+            "description": "Needs the validator C2 (Phase 7)"
+          },
+          "rest_compliance_available_from_phase": {
+            "type": "integer",
+            "title": "Rest Compliance Available From Phase",
+            "default": 7
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "contract_hours",
+          "leave_credit_hours",
+          "planned_hours",
+          "worked_hours",
+          "overtime_hours"
+        ],
+        "title": "HoursOut",
+        "description": "M10: contract, planned, worked and overtime hours of a month."
+      },
+      "HoursReport": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/PersonHours"
+            },
+            "type": "array",
+            "title": "People"
+          },
+          "total_overtime_hours": {
+            "type": "number",
+            "title": "Total Overtime Hours"
+          },
+          "rest_compliance": {
+            "type": "null",
+            "title": "Rest Compliance",
+            "description": "Needs the validator C2 (Phase 7)"
+          },
+          "rest_compliance_available_from_phase": {
+            "type": "integer",
+            "title": "Rest Compliance Available From Phase",
+            "default": 7
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "people",
+          "total_overtime_hours"
+        ],
+        "title": "HoursReport",
+        "description": "W8/W12: hours, overtime and rest compliance per person for a month."
+      },
+      "Inbox": {
+        "properties": {
+          "leave": {
+            "items": {
+              "$ref": "#/components/schemas/PendingLeave"
+            },
+            "type": "array",
+            "title": "Leave"
+          },
+          "swaps": {
+            "items": {
+              "$ref": "#/components/schemas/PendingSwap"
+            },
+            "type": "array",
+            "title": "Swaps"
+          },
+          "cascades": {
+            "items": {
+              "$ref": "#/components/schemas/PendingCascade"
+            },
+            "type": "array",
+            "title": "Cascades"
+          },
+          "proposals": {
+            "items": {
+              "$ref": "#/components/schemas/ProposalOut"
+            },
+            "type": "array",
+            "title": "Proposals"
+          }
+        },
+        "type": "object",
+        "required": [
+          "leave",
+          "swaps",
+          "cascades",
+          "proposals"
+        ],
+        "title": "Inbox",
+        "description": "W6: everything waiting for the Planner."
+      },
+      "LeaveCheck": {
+        "properties": {
+          "outcome": {
+            "type": "string",
+            "title": "Outcome"
+          },
+          "overlapping_colleagues": {
+            "type": "integer",
+            "title": "Overlapping Colleagues"
+          },
+          "max_on_leave_same_day": {
+            "type": "integer",
+            "title": "Max On Leave Same Day"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "leave_days_taken_this_year": {
+            "type": "integer",
+            "title": "Leave Days Taken This Year"
+          },
+          "trade_off": {
+            "type": "null",
+            "title": "Trade Off",
+            "description": "Confirmed trade-off needs C1 (Phase 7)"
+          },
+          "trade_off_available_from_phase": {
+            "type": "integer",
+            "title": "Trade Off Available From Phase",
+            "default": 7
+          },
+          "engine": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "outcome",
+          "overlapping_colleagues",
+          "max_on_leave_same_day",
+          "limit",
+          "leave_days_taken_this_year",
+          "engine"
+        ],
+        "title": "LeaveCheck",
+        "description": "M5: instant hint (C6) and what is known about overlaps."
+      },
+      "LeaveCheckIn": {
+        "properties": {
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "title": "End Date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_date",
+          "end_date"
+        ],
+        "title": "LeaveCheckIn",
+        "description": "Dates to check before submitting."
+      },
+      "LeaveImpact": {
+        "properties": {
+          "hint": {
+            "type": "string",
+            "title": "Hint"
+          },
+          "max_on_leave_same_day": {
+            "type": "integer",
+            "title": "Max On Leave Same Day"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "leave_days_taken_this_year": {
+            "type": "integer",
+            "title": "Leave Days Taken This Year"
+          },
+          "department_mean_leave_days": {
+            "type": "number",
+            "title": "Department Mean Leave Days"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hint",
+          "max_on_leave_same_day",
+          "limit",
+          "leave_days_taken_this_year",
+          "department_mean_leave_days",
+          "engine"
+        ],
+        "title": "LeaveImpact",
+        "description": "What a leave request would mean."
+      },
+      "LeaveIn": {
+        "properties": {
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "title": "End Date"
+          },
+          "with_trade": {
+            "type": "boolean",
+            "title": "With Trade",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_date",
+          "end_date"
+        ],
+        "title": "LeaveIn",
+        "description": "A leave request. ``with_trade`` needs C1 and is refused until Phase 7."
+      },
+      "LeaveOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "title": "End Date"
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Submitted At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decision_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "start_date",
+          "end_date",
+          "submitted_at",
+          "status",
+          "decided_at",
+          "decision_reason"
+        ],
+        "title": "LeaveOut",
+        "description": "A leave request of the person. The Planner's reason is shown for a decline."
+      },
+      "LoginRequest": {
+        "properties": {
+          "persona": {
+            "type": "string",
+            "title": "Persona"
+          }
+        },
+        "type": "object",
+        "required": [
+          "persona"
+        ],
+        "title": "LoginRequest",
+        "description": "Which persona to sign in as."
+      },
+      "MasterData": {
+        "properties": {
+          "shift_types": {
+            "items": {
+              "$ref": "#/components/schemas/ShiftTypeOut"
+            },
+            "type": "array",
+            "title": "Shift Types"
+          },
+          "qualifications": {
+            "items": {
+              "prefixItems": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "type": "array",
+              "maxItems": 3,
+              "minItems": 3
+            },
+            "type": "array",
+            "title": "Qualifications"
+          },
+          "contracts": {
+            "items": {
+              "$ref": "#/components/schemas/ContractOut"
+            },
+            "type": "array",
+            "title": "Contracts"
+          },
+          "demand_examples": {
+            "items": {
+              "$ref": "#/components/schemas/DemandOut"
+            },
+            "type": "array",
+            "title": "Demand Examples"
+          },
+          "rule_sets": {
+            "items": {
+              "$ref": "#/components/schemas/RuleSetOut"
+            },
+            "type": "array",
+            "title": "Rule Sets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "shift_types",
+          "qualifications",
+          "contracts",
+          "demand_examples",
+          "rule_sets"
+        ],
+        "title": "MasterData",
+        "description": "W11: shift types, qualifications, contracts, demand templates, rule versions."
+      },
+      "Me": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "persona_key": {
+            "type": "string",
+            "title": "Persona Key"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "department_id": {
+            "type": "string",
+            "title": "Department Id"
+          },
+          "staff_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "persona_key",
+          "display_name",
+          "role",
+          "department_id",
+          "staff_id"
+        ],
+        "title": "Me",
+        "description": "The signed-in user."
+      },
+      "MyFairness": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date",
+            "title": "As Of"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/FairnessCategory"
+            },
+            "type": "array",
+            "title": "Categories"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "as_of",
+          "categories"
+        ],
+        "title": "MyFairness",
+        "description": "M9: nights, weekends and holidays this year."
+      },
+      "MyRoster": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "published_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published By"
+          },
+          "rule_set_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule Set Version"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/RosterDay"
+            },
+            "type": "array",
+            "title": "Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "published_at",
+          "published_by",
+          "rule_set_version",
+          "days"
+        ],
+        "title": "MyRoster",
+        "description": "M3: the month as published and changed since."
+      },
+      "MyWishes": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "closes_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Closes At"
+          },
+          "days_left": {
+            "type": "integer",
+            "title": "Days Left"
+          },
+          "answered_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answered At"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/WishEntry"
+            },
+            "type": "array",
+            "title": "Entries"
+          },
+          "max_important": {
+            "type": "integer",
+            "title": "Max Important"
+          },
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/Suggestion"
+            },
+            "type": "array",
+            "title": "Suggestions"
+          },
+          "suggestions_engine": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "closes_at",
+          "days_left",
+          "answered_at",
+          "entries",
+          "max_important",
+          "suggestions",
+          "suggestions_engine"
+        ],
+        "title": "MyWishes",
+        "description": "M4: the open window and the person's answer."
+      },
+      "NextShift": {
+        "properties": {
+          "shift": {
+            "$ref": "#/components/schemas/ShiftOut"
+          },
+          "colleagues": {
+            "items": {
+              "$ref": "#/components/schemas/Colleague"
+            },
+            "type": "array",
+            "title": "Colleagues"
+          }
+        },
+        "type": "object",
+        "required": [
+          "shift",
+          "colleagues"
+        ],
+        "title": "NextShift",
+        "description": "The next shift and who else works it."
+      },
+      "Notification": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "data": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "at",
+          "data"
+        ],
+        "title": "Notification",
+        "description": "One notification (the app renders the text from ``kind`` and ``data``)."
+      },
+      "OfferStep": {
+        "properties": {
+          "staff_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Name"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "asked_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Asked At"
+          },
+          "deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline At"
+          },
+          "responded_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Responded At"
+          },
+          "response": {
+            "type": "string",
+            "title": "Response"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_name",
+          "rank",
+          "asked_at",
+          "deadline_at",
+          "responded_at",
+          "response"
+        ],
+        "title": "OfferStep",
+        "description": "One step of a cascade's timeline."
+      },
+      "OpenOffer": {
+        "properties": {
+          "swap_id": {
+            "type": "string",
+            "title": "Swap Id"
+          },
+          "shift": {
+            "$ref": "#/components/schemas/ShiftOut"
+          },
+          "offered_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Offered At"
+          },
+          "check": {
+            "type": "string",
+            "title": "Check",
+            "default": "unchecked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "swap_id",
+          "shift",
+          "offered_at"
+        ],
+        "title": "OpenOffer",
+        "description": "An open offer the person could take."
+      },
+      "Option": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "confirm_cover",
+              "assign",
+              "locum",
+              "unfilled"
+            ],
+            "title": "Kind"
+          },
+          "staff_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Id"
+          },
+          "staff_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Name"
+          },
+          "hours_after": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hours After"
+          },
+          "contract_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contract Hours"
+          },
+          "overtime_after": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overtime After"
+          },
+          "check": {
+            "type": "string",
+            "title": "Check",
+            "default": "unchecked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "Option",
+        "description": "W7b: one way to close a gap, with its consequence."
+      },
+      "OversightSummary": {
+        "properties": {
+          "read_only": {
+            "type": "boolean",
+            "title": "Read Only",
+            "default": true
+          },
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "hours": {
+            "$ref": "#/components/schemas/HoursReport"
+          },
+          "fairness": {
+            "items": {
+              "$ref": "#/components/schemas/DistributionOut"
+            },
+            "type": "array",
+            "title": "Fairness"
+          },
+          "cost": {
+            "type": "null",
+            "title": "Cost",
+            "description": "Cost is not modelled in the synthetic data"
+          },
+          "audit_export": {
+            "type": "string",
+            "title": "Audit Export",
+            "default": "/audit/export"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "hours",
+          "fairness"
+        ],
+        "title": "OversightSummary",
+        "description": "W12: read-only view for Klinikleitung, HR and works council."
+      },
+      "OvertimeMonth": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "overtime_hours": {
+            "type": "number",
+            "title": "Overtime Hours"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "overtime_hours"
+        ],
+        "title": "OvertimeMonth",
+        "description": "Department overtime in one month."
+      },
+      "Overview": {
+        "properties": {
+          "now": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Now"
+          },
+          "published_month": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published Month"
+          },
+          "planning_month": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planning Month"
+          },
+          "window": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WindowProgress"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "escalations": {
+            "type": "integer",
+            "title": "Escalations"
+          },
+          "pending_leave": {
+            "type": "integer",
+            "title": "Pending Leave"
+          },
+          "open_proposals": {
+            "type": "integer",
+            "title": "Open Proposals"
+          },
+          "coverage": {
+            "items": {
+              "$ref": "#/components/schemas/CoverageDay"
+            },
+            "type": "array",
+            "title": "Coverage"
+          },
+          "forecast_engine": {
+            "$ref": "#/components/schemas/EngineLabel"
+          },
+          "recent": {
+            "items": {
+              "$ref": "#/components/schemas/RecentChange"
+            },
+            "type": "array",
+            "title": "Recent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "now",
+          "published_month",
+          "planning_month",
+          "window",
+          "escalations",
+          "pending_leave",
+          "open_proposals",
+          "coverage",
+          "forecast_engine",
+          "recent"
+        ],
+        "title": "Overview",
+        "description": "W1: what needs the Planner today."
+      },
+      "ParseRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Text"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "de",
+              "en"
+            ],
+            "title": "Language",
+            "default": "de"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "ParseRequest",
+        "description": "Free text to interpret (untrusted)."
+      },
+      "ParsedOut": {
+        "properties": {
+          "unavailable": {
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "type": "array",
+            "title": "Unavailable"
+          },
+          "prefer_shifts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Prefer Shifts"
+          },
+          "avoid_shifts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Avoid Shifts"
+          },
+          "avoid_weekends": {
+            "type": "boolean",
+            "title": "Avoid Weekends"
+          },
+          "clarifying_question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clarifying Question"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "unavailable",
+          "prefer_shifts",
+          "avoid_shifts",
+          "avoid_weekends",
+          "clarifying_question",
+          "engine"
+        ],
+        "title": "ParsedOut",
+        "description": "C7: what was understood. Nothing is saved until the person confirms."
+      },
+      "PendingCascade": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          },
+          "accepted_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted By"
+          },
+          "escalation_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalation Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "date",
+          "shift_type",
+          "accepted_by",
+          "escalation_reason"
+        ],
+        "title": "PendingCascade",
+        "description": "A cover search waiting for the Planner."
+      },
+      "PendingLeave": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "title": "End Date"
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Submitted At"
+          },
+          "impact": {
+            "$ref": "#/components/schemas/LeaveImpact"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "staff_id",
+          "display_name",
+          "start_date",
+          "end_date",
+          "submitted_at",
+          "impact"
+        ],
+        "title": "PendingLeave",
+        "description": "A leave request waiting for the Planner."
+      },
+      "PendingSwap": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          },
+          "offered_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offered By"
+          },
+          "taken_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Taken By"
+          },
+          "escalation_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalation Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "date",
+          "shift_type",
+          "offered_by",
+          "taken_by",
+          "escalation_reason"
+        ],
+        "title": "PendingSwap",
+        "description": "A taken swap waiting for the Planner."
+      },
+      "PersonBurden": {
+        "properties": {
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "nights": {
+            "type": "integer",
+            "title": "Nights"
+          },
+          "weekends": {
+            "type": "integer",
+            "title": "Weekends"
+          },
+          "holidays": {
+            "type": "integer",
+            "title": "Holidays"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_id",
+          "display_name",
+          "nights",
+          "weekends",
+          "holidays"
+        ],
+        "title": "PersonBurden",
+        "description": "One physician's burden (Planner only)."
+      },
+      "PersonHours": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "contract_hours": {
+            "type": "number",
+            "title": "Contract Hours"
+          },
+          "leave_credit_hours": {
+            "type": "number",
+            "title": "Leave Credit Hours"
+          },
+          "planned_hours": {
+            "type": "number",
+            "title": "Planned Hours"
+          },
+          "worked_hours": {
+            "type": "number",
+            "title": "Worked Hours"
+          },
+          "overtime_hours": {
+            "type": "number",
+            "title": "Overtime Hours"
+          },
+          "rest_compliance": {
+            "type": "null",
+            "title": "Rest Compliance",
+            "description": "Needs the validator C2 (Phase 7)"
+          },
+          "rest_compliance_available_from_phase": {
+            "type": "integer",
+            "title": "Rest Compliance Available From Phase",
+            "default": 7
+          },
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "contract_hours",
+          "leave_credit_hours",
+          "planned_hours",
+          "worked_hours",
+          "overtime_hours",
+          "staff_id",
+          "display_name"
+        ],
+        "title": "PersonHours",
+        "description": "A physician's hours in a month (Planner and Oversight: payroll, working-time records)."
+      },
+      "Persona": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "display_name",
+          "role"
+        ],
+        "title": "Persona",
+        "description": "A demo persona."
+      },
+      "ProposalCreated": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "ProposalCreated",
+        "description": "The created proposal."
+      },
+      "ProposalDecision": {
+        "properties": {
+          "accept": {
+            "type": "boolean",
+            "title": "Accept"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accept"
+        ],
+        "title": "ProposalDecision",
+        "description": "Accept (to act on it) or dismiss a proposal."
+      },
+      "ProposalIn": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 4000,
+            "title": "Body"
+          },
+          "roster_month": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roster Month"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "body"
+        ],
+        "title": "ProposalIn",
+        "description": "W9 \"Vorschlag erstellen\": a proposal for the Planner's inbox."
+      },
+      "ProposalOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "roster_month": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roster Month"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "title",
+          "body",
+          "created_at",
+          "roster_month",
+          "status"
+        ],
+        "title": "ProposalOut",
+        "description": "A proposal in the inbox."
       },
       "Readiness": {
         "properties": {
@@ -109,6 +5802,1231 @@
         ],
         "title": "Readiness",
         "description": "Readiness response: one entry per backing service."
+      },
+      "RecentChange": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "swap",
+              "cover"
+            ],
+            "title": "Kind"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          },
+          "staff_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Name"
+          },
+          "approval": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approval"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "at",
+          "date",
+          "shift_type",
+          "staff_name",
+          "approval"
+        ],
+        "title": "RecentChange",
+        "description": "A swap or cover settled recently."
+      },
+      "ReminderOut": {
+        "properties": {
+          "reminded": {
+            "type": "integer",
+            "title": "Reminded"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reminded"
+        ],
+        "title": "ReminderOut",
+        "description": "How many were reminded."
+      },
+      "RespondIn": {
+        "properties": {
+          "accept": {
+            "type": "boolean",
+            "title": "Accept"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accept"
+        ],
+        "title": "RespondIn",
+        "description": "Take the shift or decline."
+      },
+      "RespondOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "escalation_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalation Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "escalation_reason"
+        ],
+        "title": "RespondOut",
+        "description": "What happens next."
+      },
+      "Respondent": {
+        "properties": {
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "responded_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Responded At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_id",
+          "display_name",
+          "responded_at"
+        ],
+        "title": "Respondent",
+        "description": "Who received the window and whether they answered."
+      },
+      "RosterDay": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shifts": {
+            "items": {
+              "$ref": "#/components/schemas/ShiftOut"
+            },
+            "type": "array",
+            "title": "Shifts"
+          },
+          "wish": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "granted",
+                  "missed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wish"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "shifts",
+          "wish"
+        ],
+        "title": "RosterDay",
+        "description": "One day of the physician's month."
+      },
+      "RosterGrid": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "not_planned"
+            ],
+            "title": "Status"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "rule_set_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule Set Version"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/RosterRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "coverage": {
+            "items": {
+              "$ref": "#/components/schemas/CoverageRow"
+            },
+            "type": "array",
+            "title": "Coverage"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/GapSuggestion"
+            },
+            "type": "array",
+            "title": "Gaps"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "status",
+          "published_at",
+          "rule_set_version",
+          "rows",
+          "coverage",
+          "gaps"
+        ],
+        "title": "RosterGrid",
+        "description": "W4: the department's month."
+      },
+      "RosterRow": {
+        "properties": {
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "title_de": {
+            "type": "string",
+            "title": "Title De"
+          },
+          "title_en": {
+            "type": "string",
+            "title": "Title En"
+          },
+          "cells": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Cell"
+            },
+            "type": "object",
+            "title": "Cells"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_id",
+          "display_name",
+          "title_de",
+          "title_en",
+          "cells"
+        ],
+        "title": "RosterRow",
+        "description": "A physician's month."
+      },
+      "RuleSetIn": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d+$",
+            "title": "Version"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Effective From"
+          },
+          "rules": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Rules"
+          },
+          "change_note_de": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Change Note De"
+          },
+          "change_note_en": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Change Note En"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "effective_from",
+          "rules",
+          "change_note_de",
+          "change_note_en"
+        ],
+        "title": "RuleSetIn",
+        "description": "A new rule version: the full set of rules, effective from a future date."
+      },
+      "RuleSetOut": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Effective From"
+          },
+          "rules": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Rules"
+          },
+          "change_note_de": {
+            "type": "string",
+            "title": "Change Note De"
+          },
+          "change_note_en": {
+            "type": "string",
+            "title": "Change Note En"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "effective_from",
+          "rules",
+          "change_note_de",
+          "change_note_en"
+        ],
+        "title": "RuleSetOut",
+        "description": "A rule-set version."
+      },
+      "RunIn": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "title": "Roster Month"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month"
+        ],
+        "title": "RunIn",
+        "description": "Generate variants for a month."
+      },
+      "RunOut": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "variant_id": {
+            "type": "string",
+            "title": "Variant Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ],
+            "title": "Status"
+          },
+          "planner_kind": {
+            "type": "string",
+            "title": "Planner Kind"
+          },
+          "rule_set_version": {
+            "type": "string",
+            "title": "Rule Set Version"
+          },
+          "generator_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Generator Version"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "run_id",
+          "variant_id",
+          "label",
+          "status",
+          "planner_kind",
+          "rule_set_version",
+          "generator_version",
+          "published_at"
+        ],
+        "title": "RunOut",
+        "description": "A roster run of a month and the versions behind it."
+      },
+      "RunsOut": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/RunOut"
+            },
+            "type": "array",
+            "title": "Runs"
+          },
+          "optimizer": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "runs",
+          "optimizer"
+        ],
+        "title": "RunsOut",
+        "description": "W3: runs and variants of a month."
+      },
+      "SettingsIn": {
+        "properties": {
+          "language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "de",
+                  "en"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "theme": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "auto",
+                  "light",
+                  "dark"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Theme"
+          },
+          "notifications": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notifications"
+          },
+          "calendar_sync": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calendar Sync"
+          },
+          "preference_suggestions": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preference Suggestions"
+          }
+        },
+        "type": "object",
+        "title": "SettingsIn",
+        "description": "Changes to personal settings."
+      },
+      "SettingsOut": {
+        "properties": {
+          "language": {
+            "type": "string",
+            "enum": [
+              "de",
+              "en"
+            ],
+            "title": "Language"
+          },
+          "theme": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "light",
+              "dark"
+            ],
+            "title": "Theme"
+          },
+          "notifications": {
+            "type": "boolean",
+            "title": "Notifications"
+          },
+          "calendar_sync": {
+            "type": "boolean",
+            "title": "Calendar Sync"
+          },
+          "preference_suggestions": {
+            "type": "boolean",
+            "title": "Preference Suggestions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "language",
+          "theme",
+          "notifications",
+          "calendar_sync",
+          "preference_suggestions"
+        ],
+        "title": "SettingsOut",
+        "description": "M12: personal settings."
+      },
+      "ShiftOut": {
+        "properties": {
+          "assignment_id": {
+            "type": "string",
+            "title": "Assignment Id"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          },
+          "starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends At"
+          },
+          "changed": {
+            "type": "boolean",
+            "title": "Changed",
+            "description": "True if the shift came to this person by a swap or cover"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assignment_id",
+          "date",
+          "shift_type",
+          "starts_at",
+          "ends_at",
+          "changed"
+        ],
+        "title": "ShiftOut",
+        "description": "One shift of the signed-in physician."
+      },
+      "ShiftTypeOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "letter_de": {
+            "type": "string",
+            "title": "Letter De"
+          },
+          "letter_en": {
+            "type": "string",
+            "title": "Letter En"
+          },
+          "name_de": {
+            "type": "string",
+            "title": "Name De"
+          },
+          "name_en": {
+            "type": "string",
+            "title": "Name En"
+          },
+          "start_time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Time"
+          },
+          "end_time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Time"
+          },
+          "ends_next_day": {
+            "type": "boolean",
+            "title": "Ends Next Day"
+          },
+          "net_hours": {
+            "type": "number",
+            "title": "Net Hours"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "burden_weight": {
+            "type": "number",
+            "title": "Burden Weight"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "letter_de",
+          "letter_en",
+          "name_de",
+          "name_en",
+          "start_time",
+          "end_time",
+          "ends_next_day",
+          "net_hours",
+          "kind",
+          "burden_weight"
+        ],
+        "title": "ShiftTypeOut",
+        "description": "A shift type."
+      },
+      "SickIn": {
+        "properties": {
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          }
+        },
+        "type": "object",
+        "title": "SickIn",
+        "description": "Dates only. There is no field for a diagnosis or a reason."
+      },
+      "SickOut": {
+        "properties": {
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "title": "End Date"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "absent"
+          },
+          "affected_shifts": {
+            "items": {
+              "$ref": "#/components/schemas/ShiftOut"
+            },
+            "type": "array",
+            "title": "Affected Shifts"
+          },
+          "cover_searches_started": {
+            "type": "integer",
+            "title": "Cover Searches Started"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_date",
+          "end_date",
+          "affected_shifts",
+          "cover_searches_started"
+        ],
+        "title": "SickOut",
+        "description": "M7: the absence and the cover searches started."
+      },
+      "Suggestion": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "weekday": {
+            "type": "integer",
+            "title": "Weekday"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          },
+          "evidence": {
+            "type": "integer",
+            "title": "Evidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "weekday",
+          "shift_type",
+          "evidence"
+        ],
+        "title": "Suggestion",
+        "description": "A preference suggestion the person can confirm (C4)."
+      },
+      "SwapAudience": {
+        "properties": {
+          "assignment_id": {
+            "type": "string",
+            "title": "Assignment Id"
+          },
+          "eligible_colleagues": {
+            "type": "integer",
+            "title": "Eligible Colleagues"
+          },
+          "check": {
+            "type": "string",
+            "title": "Check",
+            "default": "unchecked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assignment_id",
+          "eligible_colleagues"
+        ],
+        "title": "SwapAudience",
+        "description": "M6: how many colleagues the offer reaches (a count, never names)."
+      },
+      "SwapOfferIn": {
+        "properties": {
+          "assignment_id": {
+            "type": "string",
+            "title": "Assignment Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assignment_id"
+        ],
+        "title": "SwapOfferIn",
+        "description": "Which own shift to offer."
+      },
+      "SwapOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "shift": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShiftOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "offered",
+              "taken"
+            ],
+            "title": "Role"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "escalation_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalation Reason"
+          },
+          "decision_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Reason"
+          },
+          "offered_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Offered At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "shift",
+          "role",
+          "status",
+          "escalation_reason",
+          "decision_reason",
+          "offered_at"
+        ],
+        "title": "SwapOut",
+        "description": "A swap the person offered or took."
+      },
+      "Today": {
+        "properties": {
+          "now": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Now"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "next_shift": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NextShift"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "open_window": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WindowTask"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cover_requests": {
+            "items": {
+              "$ref": "#/components/schemas/CoverTask"
+            },
+            "type": "array",
+            "title": "Cover Requests"
+          }
+        },
+        "type": "object",
+        "required": [
+          "now",
+          "display_name",
+          "next_shift",
+          "open_window",
+          "cover_requests"
+        ],
+        "title": "Today",
+        "description": "M2: next shift, open tasks."
+      },
+      "Token": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "user": {
+            "$ref": "#/components/schemas/Me"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "expires_at",
+          "user"
+        ],
+        "title": "Token",
+        "description": "A bearer token for the persona."
+      },
+      "ValidateIn": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "title": "Roster Month"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month"
+        ],
+        "title": "ValidateIn",
+        "description": "A month to validate."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WindowDetail": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "opens_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opens At"
+          },
+          "closes_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Closes At"
+          },
+          "responded": {
+            "type": "integer",
+            "title": "Responded"
+          },
+          "recipients": {
+            "type": "integer",
+            "title": "Recipients"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/Respondent"
+            },
+            "type": "array",
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "status",
+          "opens_at",
+          "closes_at",
+          "responded",
+          "recipients",
+          "people"
+        ],
+        "title": "WindowDetail",
+        "description": "W2: progress and the list of who has and hasn't answered."
+      },
+      "WindowProgress": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "responded": {
+            "type": "integer",
+            "title": "Responded"
+          },
+          "recipients": {
+            "type": "integer",
+            "title": "Recipients"
+          },
+          "closes_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Closes At"
+          },
+          "days_left": {
+            "type": "integer",
+            "title": "Days Left"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "responded",
+          "recipients",
+          "closes_at",
+          "days_left"
+        ],
+        "title": "WindowProgress",
+        "description": "Progress of the open request window."
+      },
+      "WindowTask": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "closes_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Closes At"
+          },
+          "days_left": {
+            "type": "integer",
+            "title": "Days Left"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "closes_at",
+          "days_left"
+        ],
+        "title": "WindowTask",
+        "description": "The open request window, if the person has not answered yet."
+      },
+      "WishEntry": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "unavailable",
+              "wish_work"
+            ],
+            "title": "Kind"
+          },
+          "shift_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "frueh",
+                  "spaet",
+                  "nacht",
+                  "bereitschaft",
+                  "ruf"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shift Type"
+          },
+          "important": {
+            "type": "boolean",
+            "title": "Important",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "kind"
+        ],
+        "title": "WishEntry",
+        "description": "A request-window entry."
       }
     }
   }

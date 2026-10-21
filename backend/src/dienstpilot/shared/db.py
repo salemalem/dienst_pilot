@@ -39,3 +39,15 @@ class OperationsBase(DeclarativeBase):
     """Base for the operations context."""
 
     metadata = context_metadata("operations")
+
+
+class IdentityBase(DeclarativeBase):
+    """Base for the identity context."""
+
+    metadata = context_metadata("identity")
+
+
+class AuditBase(DeclarativeBase):
+    """Base for the audit context."""
+
+    metadata = context_metadata("audit")

@@ -25,14 +25,26 @@ def _converter(table: Table) -> dict[str, Any]:
 def read_rows(path: Path, table: Table) -> list[dict[str, Any]]:
     """Read one Parquet file as rows for ``table``, converting UUID and JSON columns."""
     df = pl.read_parquet(path)
-    missing = {c.name for c in table.columns} ^ set(df.columns)
-    if missing:
-        raise ValueError(f"{path.name}: columns differ from {table.fullname}: {sorted(missing)}")
+    unknown = set(df.columns) - {c.name for c in table.columns}
+    if unknown:
+        raise ValueError(f"{path.name}: columns not in {table.fullname}: {sorted(unknown)}")
+    # Columns added after the seed format (expand migrations): NULL if nullable, else the
+    # server default applies; anything else is an error.
+    fill: dict[str, None] = {}
+    for col in table.columns:
+        if col.name in df.columns:
+            continue
+        if col.server_default is not None:
+            continue
+        if not col.nullable:
+            raise ValueError(f"{path.name}: required column {col.name} missing")
+        fill[col.name] = None
     conv = _converter(table)
-    rows = df.to_dicts()
+    rows = [{**r, **fill} for r in df.to_dicts()]
     for r in rows:
         for name, f in conv.items():
-            r[name] = f(r[name])
+            if name in r:
+                r[name] = f(r[name])
     return rows
 
 
@@ -62,6 +74,8 @@ def load_tables(conn: Connection, root: Path, tables: list[Table]) -> dict[str, 
     """Insert every table from ``root/<schema>/<table>.parquet``, in the given order."""
     counts: dict[str, int] = {}
     for table in tables:
+        if not (root / str(table.schema) / f"{table.name}.parquet").exists():
+            continue  # a table the seed does not fill (e.g. proposals): left empty
         rows = parents_first(
             read_rows(root / str(table.schema) / f"{table.name}.parquet", table), table
         )
