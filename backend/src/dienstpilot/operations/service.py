@@ -1,8 +1,9 @@
-"""Public interface of the operations context: absences, swaps and cover cascades.
+"""Public interface of the operations context: absences, swaps, cover cascades and the policy.
 
-Phase 3A: there is no validator (C2) yet, so a taken swap or an accepted cover waits for the
-Planner instead of being approved automatically (escalation reason "validator_unavailable").
-Cascades advance lazily: a request older than its 15-minute deadline moves on when read.
+A taken swap or an accepted cover is approved by the Planner's auto-approval policy when the
+application layer found it valid (C2) and the policy allows it; otherwise it waits for the
+Planner with an escalation reason. Cascades advance lazily: a request older than its 15-minute
+deadline moves on when read.
 """
 
 import uuid
@@ -15,8 +16,13 @@ from sqlalchemy.orm import Session
 from dienstpilot.operations import models as m
 
 ANSWER_WINDOW = timedelta(minutes=15)
-VALIDATOR_UNAVAILABLE = "validator_unavailable"
+VALIDATOR_UNAVAILABLE = "validator_unavailable"  # kept for rows written before Phase 7
 LIST_EXHAUSTED = "list_exhausted"
+# Why a swap or cover waits for the Planner (PROCESS §2).
+RULE_VIOLATION = "rule_violation"  # C2 found a new violation
+HOURS_BAND = "hours_band"  # only the offerer's month falls below the contract-hours band
+OVERTIME = "overtime"  # cover would put the colleague above the contract hours
+POLICY_OFF = "policy_off"  # the Planner switched auto-approval off
 
 
 @dataclass(frozen=True)
@@ -47,6 +53,7 @@ class Swap:
     decided_by: str | None
     decided_at: datetime | None
     decision_reason: str | None
+    counter_assignment_id: str | None = None  # an exchange: the taker's shift for the offerer
 
 
 @dataclass(frozen=True)
@@ -77,6 +84,7 @@ class Cascade:
     escalation_reason: str | None
     queue: tuple[str, ...]
     offers: tuple[CoverOffer, ...]
+    approval: str | None = None  # planner | policy (closed cascades)
 
 
 @dataclass(frozen=True)
@@ -147,6 +155,7 @@ def _swap(s: m.SwapOffer) -> Swap:
         _s(s.decided_by),
         s.decided_at,
         s.decision_reason,
+        _s(s.counter_assignment_id),
     )
 
 
@@ -189,15 +198,30 @@ def offer_swap(session: Session, assignment_id: str, offered_by: str, now: datet
     return _swap(s)
 
 
-def take_swap(session: Session, swap_id: str, taker: str, now: datetime) -> Swap:
-    """Record that a colleague takes an offer; without the validator it waits for the Planner."""
+def take_swap(
+    session: Session,
+    swap_id: str,
+    taker: str,
+    now: datetime,
+    escalation_reason: str | None,
+    counter_assignment_id: str | None = None,
+) -> Swap:
+    """Record that a colleague takes an offer, optionally giving one of their shifts in return.
+
+    ``escalation_reason`` None: approved by the policy; otherwise it waits for the Planner.
+    """
     s = session.get(m.SwapOffer, uuid.UUID(swap_id))
     if s is None:
         raise KeyError(swap_id)
     if s.status != "open":
         raise ValueError("offer is not open")
     s.accepted_by, s.accepted_at = uuid.UUID(taker), now
-    s.status, s.escalation_reason = "pending_approval", VALIDATOR_UNAVAILABLE
+    if counter_assignment_id is not None:
+        s.counter_assignment_id = uuid.UUID(counter_assignment_id)
+    if escalation_reason is None:
+        s.status, s.approval, s.decided_at = "approved", "policy", now
+    else:
+        s.status, s.escalation_reason = "pending_approval", escalation_reason
     session.flush()
     return _swap(s)
 
@@ -243,6 +267,7 @@ def _cascade(session: Session, c: m.CoverCascade) -> Cascade:
         c.escalation_reason,
         tuple(c.candidate_queue or ()),
         tuple(_offer(o) for o in offers),
+        c.approval,
     )
 
 
@@ -315,8 +340,19 @@ def advance(session: Session, now: datetime) -> list[tuple[str, str]]:
     return timed_out
 
 
-def respond(session: Session, offer_id: str, staff_id: str, accept: bool, now: datetime) -> Cascade:
-    """Record a colleague's answer to a cover request; acceptance waits for the Planner."""
+def respond(
+    session: Session,
+    offer_id: str,
+    staff_id: str,
+    accept: bool,
+    now: datetime,
+    escalation_reason: str | None = None,
+) -> Cascade:
+    """Record a colleague's answer to a cover request.
+
+    An acceptance closes the cascade under the policy when ``escalation_reason`` is None;
+    otherwise it waits for the Planner.
+    """
     o = session.get(m.CoverOffer, uuid.UUID(offer_id))
     if o is None or str(o.staff_id) != staff_id:
         raise KeyError(offer_id)
@@ -325,11 +361,14 @@ def respond(session: Session, offer_id: str, staff_id: str, accept: bool, now: d
     c = session.get(m.CoverCascade, o.cascade_id)
     assert c is not None
     o.response, o.responded_at = ("accepted" if accept else "declined"), now
-    if accept:
+    if accept and escalation_reason is None:
+        c.covered_by, c.status, c.outcome, c.closed_at = o.staff_id, "closed", "covered", now
+        c.approval = "policy"
+    elif accept:
         c.covered_by, c.status, c.escalation_reason = (
             o.staff_id,
             "pending_approval",
-            VALIDATOR_UNAVAILABLE,
+            escalation_reason,
         )
     else:
         _ask(session, c, now)
@@ -348,7 +387,7 @@ def decide_cascade(
         raise ValueError("cascade is not waiting for a decision")
     if outcome not in ("covered", "escalated_overtime", "locum", "unfilled"):
         raise ValueError(outcome)
-    c.outcome, c.status, c.closed_at = outcome, "closed", now
+    c.outcome, c.status, c.closed_at, c.approval = outcome, "closed", now, "planner"
     c.covered_by = (
         uuid.UUID(covered_by) if covered_by else (c.covered_by if outcome == "covered" else None)
     )
@@ -396,10 +435,19 @@ def holder_changes(session: Session, assignment_ids: list[str]) -> list[HolderCh
     """Return changes of holder for the given published assignments, in time order."""
     ids = [uuid.UUID(a) for a in assignment_ids]
     out: list[HolderChange] = []
-    for s in session.scalars(select(m.SwapOffer).where(m.SwapOffer.assignment_id.in_(ids))):
+    q = select(m.SwapOffer).where(
+        m.SwapOffer.assignment_id.in_(ids) | m.SwapOffer.counter_assignment_id.in_(ids)
+    )
+    wanted = set(assignment_ids)
+    for s in session.scalars(q):
         if s.status in ("accepted", "approved") and s.accepted_by is not None:
             at = s.decided_at or s.accepted_at or s.offered_at
-            out.append(HolderChange(at, str(s.assignment_id), str(s.accepted_by), "swap"))
+            if str(s.assignment_id) in wanted:
+                out.append(HolderChange(at, str(s.assignment_id), str(s.accepted_by), "swap"))
+            if s.counter_assignment_id is not None and str(s.counter_assignment_id) in wanted:
+                out.append(
+                    HolderChange(at, str(s.counter_assignment_id), str(s.offered_by), "swap")
+                )
     for c in session.scalars(select(m.CoverCascade).where(m.CoverCascade.assignment_id.in_(ids))):
         if c.status != "closed":
             out.append(HolderChange(c.opened_at, str(c.assignment_id), None, "open"))
@@ -410,3 +458,48 @@ def holder_changes(session: Session, assignment_ids: list[str]) -> list[HolderCh
                 HolderChange(c.opened_at, str(c.assignment_id), None, c.outcome or "unfilled")
             )
     return sorted(out, key=lambda h: (h.at, h.assignment_id))
+
+
+def offer(session: Session, offer_id: str) -> tuple[CoverOffer, str] | None:
+    """Return a cover offer and the assignment its cascade covers."""
+    o = session.get(m.CoverOffer, uuid.UUID(offer_id))
+    if o is None:
+        return None
+    c = session.get(m.CoverCascade, o.cascade_id)
+    assert c is not None
+    return _offer(o), str(c.assignment_id)
+
+
+# --- auto-approval policy (PROCESS §2) -------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class Policy:
+    """What the Planner lets the system approve on its own (always only C2-valid changes)."""
+
+    auto_approve_swaps: bool
+    auto_approve_cover: bool
+    updated_by: str | None
+    updated_at: datetime | None
+
+
+def policy(session: Session, department_id: str) -> Policy:
+    """Return the department's policy (both on by default)."""
+    p = session.get(m.Policy, uuid.UUID(department_id))
+    if p is None:
+        return Policy(True, True, None, None)
+    return Policy(p.auto_approve_swaps, p.auto_approve_cover, _s(p.updated_by), p.updated_at)
+
+
+def set_policy(
+    session: Session, department_id: str, swaps: bool, cover: bool, by: str, now: datetime
+) -> Policy:
+    """Change the policy."""
+    p = session.get(m.Policy, uuid.UUID(department_id))
+    if p is None:
+        p = m.Policy(department_id=uuid.UUID(department_id))
+        session.add(p)
+    p.auto_approve_swaps, p.auto_approve_cover = swaps, cover
+    p.updated_by, p.updated_at = uuid.UUID(by), now
+    session.flush()
+    return policy(session, department_id)

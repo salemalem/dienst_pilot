@@ -530,7 +530,7 @@
           "staff app"
         ],
         "summary": "Request Leave",
-        "description": "M5: request leave without a trade (\"Ohne Tausch beantragen\"); the Planner decides.",
+        "description": "M5: request leave (\"Ohne Tausch\" or \"Mit Tausch beantragen\"); the Planner decides.\n\nWith a trade, the check must have offered one for exactly these dates; the extra weekend\nbecomes a binding constraint when the earlier month is planned, once the Planner approves.",
         "operationId": "request_leave_me_leave_post",
         "parameters": [
           {
@@ -590,7 +590,7 @@
           "staff app"
         ],
         "summary": "Check Leave",
-        "description": "M5: instant hint before submitting (C6 stand-in); the confirmed trade-off waits for C1.",
+        "description": "M5: instant hint (C6 stand-in), and a background C1 check of coverability and trade-off.",
         "operationId": "check_leave_me_leave_check_post",
         "parameters": [
           {
@@ -627,6 +627,65 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LeaveCheck"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/leave/checks/{check_id}": {
+      "get": {
+        "tags": [
+          "staff app"
+        ],
+        "summary": "Leave Check",
+        "description": "M5: the background check: coverable, coverable with a trade-off, or not coverable.",
+        "operationId": "leave_check_me_leave_checks__check_id__get",
+        "parameters": [
+          {
+            "name": "check_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Check Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TradeOffCheck"
                 }
               }
             }
@@ -762,7 +821,7 @@
           "staff app"
         ],
         "summary": "Swap Audience",
-        "description": "M6: how many colleagues could take this shift (basic filter, not checked against rules).",
+        "description": "M6: how many colleagues could take this shift without breaking a rule (C2).",
         "operationId": "swap_audience_me_swaps_audience_get",
         "parameters": [
           {
@@ -821,7 +880,7 @@
           "staff app"
         ],
         "summary": "Open Offers",
-        "description": "M6: open offers of colleagues the person could take (basic filter).",
+        "description": "M6: open offers of colleagues the person could take without breaking a rule (C2).",
         "operationId": "open_offers_me_swap_offers_get",
         "parameters": [
           {
@@ -875,7 +934,7 @@
           "staff app"
         ],
         "summary": "Take Offer",
-        "description": "M6: take a colleague's offer. Without the validator (C2) the Planner decides.",
+        "description": "M6: take a colleague's offer, alone or in exchange for one of your own shifts.\n\nC2 checks both people with every change applied. A valid swap is approved by the Planner's\npolicy (logged as policy-approved); a swap with a new violation, or with the policy off,\ngoes to the Planner.",
         "operationId": "take_offer_me_swap_offers__swap_id__take_post",
         "parameters": [
           {
@@ -904,6 +963,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TakeIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1048,7 +1124,7 @@
           "staff app"
         ],
         "summary": "Respond Cover",
-        "description": "M8: take the shift (\"Übernehmen\") or decline. Taking it waits for the Planner until C2.",
+        "description": "M8: take the shift (\"Übernehmen\") or decline.\n\nA valid cover within the contract hours is approved by the policy; otherwise the Planner\ndecides (W7b).",
         "operationId": "respond_cover_me_cover_requests__offer_id__post",
         "parameters": [
           {
@@ -1250,7 +1326,7 @@
           "staff app"
         ],
         "summary": "Notifications",
-        "description": "M11: roster published, swap updates, leave decisions, cover requests.",
+        "description": "M11: roster published or changed, swap updates, leave decisions, cover requests.",
         "operationId": "notifications_me_notifications_get",
         "parameters": [
           {
@@ -1412,7 +1488,7 @@
           "planner dashboard"
         ],
         "summary": "Roster",
-        "description": "W4 grid and the full roster for Staff+: shifts, absences, leave, coverage per shift.",
+        "description": "W4 grid and the full roster for Staff+: shifts, absences, leave, coverage per shift.\n\nWith ``variant_id`` (Planner only) the grid shows a draft variant of a C1 run.",
         "operationId": "roster_roster_get",
         "parameters": [
           {
@@ -1423,6 +1499,22 @@
               "type": "string",
               "pattern": "^\\d{4}-\\d{2}$",
               "title": "Month"
+            }
+          },
+          {
+            "name": "variant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Variant Id"
             }
           },
           {
@@ -1472,7 +1564,7 @@
           "planner dashboard"
         ],
         "summary": "Change Assignment",
-        "description": "W4: change a published roster. Every change must pass the validator, so this waits for C2.",
+        "description": "W4: change a draft (live validation) or a published roster (reason, C2-valid, notify).",
         "operationId": "change_assignment_planner_roster_assignments_patch",
         "parameters": [
           {
@@ -1497,7 +1589,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AssignmentChange"
+                "$ref": "#/components/schemas/AssignmentEdit"
               }
             }
           }
@@ -1507,7 +1599,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EditOut"
+                }
               }
             }
           },
@@ -1530,7 +1624,7 @@
           "planner dashboard"
         ],
         "summary": "Validate",
-        "description": "W4: live validation (C2, Phase 7).",
+        "description": "W4: live validation with C2 (all rules, the whole month).",
         "operationId": "validate_planner_validate_post",
         "parameters": [
           {
@@ -1565,7 +1659,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationOut"
+                }
               }
             }
           },
@@ -1588,7 +1684,7 @@
           "planner dashboard"
         ],
         "summary": "Runs",
-        "description": "W3: existing runs of a month (December 2026 has none until C1 exists).",
+        "description": "W3: every run of a month (the seeded manual roster and C1 runs), newest first.",
         "operationId": "runs_planner_runs_get",
         "parameters": [
           {
@@ -1646,7 +1742,7 @@
           "planner dashboard"
         ],
         "summary": "Generate",
-        "description": "W3: generate variants with the optimizer (C1, Phase 7).",
+        "description": "W3: queue a C1 run for a month that is not published yet; the worker solves it.",
         "operationId": "generate_planner_runs_post",
         "parameters": [
           {
@@ -1677,11 +1773,72 @@
           }
         },
         "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunQueued"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/runs/{run_id}": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Run Detail",
+        "description": "W3: a run's progress, its variants with metrics, or why no valid roster exists.",
+        "operationId": "run_detail_planner_runs__run_id__get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RunOut"
+                }
               }
             }
           },
@@ -1704,7 +1861,7 @@
           "planner dashboard"
         ],
         "summary": "Publish",
-        "description": "W5: approve and publish. A variant must pass the validator first, so this waits for C2.",
+        "description": "W5: approve and publish a draft. It must pass the validator (C2) without a violation.",
         "operationId": "publish_planner_variants__variant_id__publish_post",
         "parameters": [
           {
@@ -1738,7 +1895,117 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Published"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/policy": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Get Policy",
+        "description": "W11: the auto-approval policy.",
+        "operationId": "get_policy_planner_policy_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Put Policy",
+        "description": "W11: change the auto-approval policy (audited).",
+        "operationId": "put_policy_planner_policy_put",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyOut"
+                }
               }
             }
           },
@@ -2107,7 +2374,7 @@
           "planner dashboard"
         ],
         "summary": "Decide Swap",
-        "description": "W6: approve or decline a taken swap (escalated while C2 is not available).",
+        "description": "W6: approve or decline an escalated swap. An approval must pass the validator (C2).",
         "operationId": "decide_swap_planner_swaps__swap_id__decision_post",
         "parameters": [
           {
@@ -2493,7 +2760,7 @@
           "planner dashboard"
         ],
         "summary": "Hours Report",
-        "description": "Per-person hours and overtime of a month (Planner and Oversight).",
+        "description": "Per-person hours, overtime and rest compliance (C2) of a month (Planner and Oversight).",
         "operationId": "hours_report_compliance_hours_get",
         "parameters": [
           {
@@ -2504,6 +2771,16 @@
               "type": "string",
               "pattern": "^\\d{4}-\\d{2}$",
               "title": "Month"
+            }
+          },
+          {
+            "name": "rest",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Rest"
             }
           },
           {
@@ -3250,6 +3527,31 @@
   },
   "components": {
     "schemas": {
+      "AddShift": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          },
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "shift_type",
+          "staff_id"
+        ],
+        "title": "AddShift",
+        "description": "A shift to add."
+      },
       "AskIn": {
         "properties": {
           "question": {
@@ -3311,10 +3613,29 @@
         "title": "AskOut",
         "description": "The copilot's answer with figures and cited rules."
       },
-      "AssignmentChange": {
+      "AssignmentEdit": {
         "properties": {
+          "variant_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variant Id",
+            "description": "A draft variant; omit for the published roster"
+          },
           "assignment_id": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Assignment Id"
           },
           "new_staff_id": {
@@ -3328,18 +3649,32 @@
             ],
             "title": "New Staff Id"
           },
+          "add": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AddShift"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "reason": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Reason"
           }
         },
         "type": "object",
-        "required": [
-          "assignment_id",
-          "reason"
-        ],
-        "title": "AssignmentChange",
-        "description": "A change to a published roster. Needs a reason (PROCESS §2)."
+        "title": "AssignmentEdit",
+        "description": "W4: one change. A draft changes directly; a published roster needs a reason.\n\n``assignment_id`` with ``new_staff_id`` reassigns (``null`` removes the shift); ``add``\nadds a shift. A change to a published roster must not break any rule (C2), and everyone\naffected is notified."
       },
       "AuditEventOut": {
         "properties": {
@@ -3575,6 +3910,14 @@
             "type": "array",
             "title": "Shifts"
           },
+          "assignment_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Assignment Ids",
+            "description": "Same order as shifts (W4 edits)"
+          },
           "changed": {
             "type": "boolean",
             "title": "Changed"
@@ -3617,6 +3960,7 @@
         "type": "object",
         "required": [
           "shifts",
+          "assignment_ids",
           "changed",
           "on_leave"
         ],
@@ -3735,7 +4079,7 @@
               }
             ],
             "title": "Eval Metric",
-            "description": "From eval/results; None until evaluated"
+            "description": "Written by an eval/ script (eval/results/c1.json …); None until then"
           }
         },
         "type": "object",
@@ -3835,7 +4179,7 @@
           "check": {
             "type": "string",
             "title": "Check",
-            "default": "unchecked"
+            "default": "validated"
           }
         },
         "type": "object",
@@ -4079,6 +4423,61 @@
         "title": "DistributionOut",
         "description": "Anonymous department statistics of one metric (nights, weekends, holidays)."
       },
+      "EditOut": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "change_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Id"
+          },
+          "notified": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notified"
+          },
+          "introduced": {
+            "items": {
+              "$ref": "#/components/schemas/ViolationOut"
+            },
+            "type": "array",
+            "title": "Introduced"
+          },
+          "violations": {
+            "items": {
+              "$ref": "#/components/schemas/ViolationOut"
+            },
+            "type": "array",
+            "title": "Violations"
+          },
+          "validator": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "change_id",
+          "notified",
+          "introduced",
+          "violations",
+          "validator"
+        ],
+        "title": "EditOut",
+        "description": "What the change did, and the violations of the changed people and days."
+      },
       "EngineLabel": {
         "properties": {
           "component": {
@@ -4245,7 +4644,7 @@
           "check": {
             "type": "string",
             "title": "Check",
-            "default": "unchecked"
+            "default": "validated"
           },
           "engine": {
             "$ref": "#/components/schemas/EngineLabel"
@@ -4259,7 +4658,7 @@
           "engine"
         ],
         "title": "GapSuggestion",
-        "description": "Who could fill a gap (Planner only; unchecked until C2)."
+        "description": "Who could fill a gap (Planner only; checked by C2, ranked by C5)."
       },
       "HTTPValidationError": {
         "properties": {
@@ -4339,14 +4738,15 @@
             "title": "Overtime Hours"
           },
           "rest_compliance": {
-            "type": "null",
-            "title": "Rest Compliance",
-            "description": "Needs the validator C2 (Phase 7)"
-          },
-          "rest_compliance_available_from_phase": {
-            "type": "integer",
-            "title": "Rest Compliance Available From Phase",
-            "default": 7
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RestCompliance"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rest periods in the month as it stands, checked by C2"
           }
         },
         "type": "object",
@@ -4379,22 +4779,18 @@
             "type": "number",
             "title": "Total Overtime Hours"
           },
-          "rest_compliance": {
-            "type": "null",
-            "title": "Rest Compliance",
-            "description": "Needs the validator C2 (Phase 7)"
-          },
-          "rest_compliance_available_from_phase": {
+          "rest_violations_total": {
             "type": "integer",
-            "title": "Rest Compliance Available From Phase",
-            "default": 7
+            "title": "Rest Violations Total",
+            "description": "Rest periods below the minimum (C2)"
           }
         },
         "type": "object",
         "required": [
           "roster_month",
           "people",
-          "total_overtime_hours"
+          "total_overtime_hours",
+          "rest_violations_total"
         ],
         "title": "HoursReport",
         "description": "W8/W12: hours, overtime and rest compliance per person for a month."
@@ -4462,15 +4858,10 @@
             "type": "integer",
             "title": "Leave Days Taken This Year"
           },
-          "trade_off": {
-            "type": "null",
-            "title": "Trade Off",
-            "description": "Confirmed trade-off needs C1 (Phase 7)"
-          },
-          "trade_off_available_from_phase": {
-            "type": "integer",
-            "title": "Trade Off Available From Phase",
-            "default": 7
+          "trade_off_check_id": {
+            "type": "string",
+            "title": "Trade Off Check Id",
+            "description": "Poll GET /me/leave/checks/{id}: C1 checks coverability and a trade-off"
           },
           "engine": {
             "$ref": "#/components/schemas/EngineLabel"
@@ -4483,6 +4874,7 @@
           "max_on_leave_same_day",
           "limit",
           "leave_days_taken_this_year",
+          "trade_off_check_id",
           "engine"
         ],
         "title": "LeaveCheck",
@@ -4563,6 +4955,17 @@
             "type": "boolean",
             "title": "With Trade",
             "default": false
+          },
+          "check_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check Id"
           }
         },
         "type": "object",
@@ -4571,7 +4974,7 @@
           "end_date"
         ],
         "title": "LeaveIn",
-        "description": "A leave request. ``with_trade`` needs C1 and is refused until Phase 7."
+        "description": "A leave request. ``with_trade`` needs a finished check that offered a trade-off."
       },
       "LeaveOut": {
         "properties": {
@@ -4620,6 +5023,19 @@
               }
             ],
             "title": "Decision Reason"
+          },
+          "trade_off": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trade Off",
+            "description": "The extra weekend duty committed to with 'Mit Tausch beantragen'"
           }
         },
         "type": "object",
@@ -5042,20 +5458,35 @@
             "format": "date-time",
             "title": "Offered At"
           },
+          "can_take_alone": {
+            "type": "boolean",
+            "title": "Can Take Alone",
+            "description": "Taking it breaks no rule for you (C2)"
+          },
+          "exchange_options": {
+            "items": {
+              "$ref": "#/components/schemas/ShiftOut"
+            },
+            "type": "array",
+            "title": "Exchange Options",
+            "description": "Own shifts you could give in return; valid for both of you (C2)"
+          },
           "check": {
             "type": "string",
             "title": "Check",
-            "default": "unchecked"
+            "default": "validated"
           }
         },
         "type": "object",
         "required": [
           "swap_id",
           "shift",
-          "offered_at"
+          "offered_at",
+          "can_take_alone",
+          "exchange_options"
         ],
         "title": "OpenOffer",
-        "description": "An open offer the person could take."
+        "description": "An open offer the person could take, alone or as an exchange."
       },
       "Option": {
         "properties": {
@@ -5127,7 +5558,7 @@
           "check": {
             "type": "string",
             "title": "Check",
-            "default": "unchecked"
+            "default": "validated"
           }
         },
         "type": "object",
@@ -5583,14 +6014,15 @@
             "title": "Overtime Hours"
           },
           "rest_compliance": {
-            "type": "null",
-            "title": "Rest Compliance",
-            "description": "Needs the validator C2 (Phase 7)"
-          },
-          "rest_compliance_available_from_phase": {
-            "type": "integer",
-            "title": "Rest Compliance Available From Phase",
-            "default": 7
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RestCompliance"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rest periods in the month as it stands, checked by C2"
           },
           "staff_id": {
             "type": "string",
@@ -5638,6 +6070,69 @@
         ],
         "title": "Persona",
         "description": "A demo persona."
+      },
+      "PolicyIn": {
+        "properties": {
+          "auto_approve_swaps": {
+            "type": "boolean",
+            "title": "Auto Approve Swaps"
+          },
+          "auto_approve_cover": {
+            "type": "boolean",
+            "title": "Auto Approve Cover"
+          }
+        },
+        "type": "object",
+        "required": [
+          "auto_approve_swaps",
+          "auto_approve_cover"
+        ],
+        "title": "PolicyIn",
+        "description": "Switch auto-approval on or off."
+      },
+      "PolicyOut": {
+        "properties": {
+          "auto_approve_swaps": {
+            "type": "boolean",
+            "title": "Auto Approve Swaps"
+          },
+          "auto_approve_cover": {
+            "type": "boolean",
+            "title": "Auto Approve Cover"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "auto_approve_swaps",
+          "auto_approve_cover",
+          "updated_by",
+          "updated_at"
+        ],
+        "title": "PolicyOut",
+        "description": "What the system approves on its own: only C2-valid swaps and cover inside the department.\n\nCover by a locum or from another department, and cover that means overtime, always go to\nthe Planner."
       },
       "ProposalCreated": {
         "properties": {
@@ -5757,6 +6252,41 @@
         ],
         "title": "ProposalOut",
         "description": "A proposal in the inbox."
+      },
+      "Published": {
+        "properties": {
+          "variant_id": {
+            "type": "string",
+            "title": "Variant Id"
+          },
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Published At"
+          },
+          "approved_by": {
+            "type": "string",
+            "title": "Approved By"
+          },
+          "validator": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "variant_id",
+          "roster_month",
+          "published_at",
+          "approved_by",
+          "validator"
+        ],
+        "title": "Published",
+        "description": "W5: the published variant and its approval."
       },
       "Readiness": {
         "properties": {
@@ -5948,6 +6478,43 @@
         "title": "Respondent",
         "description": "Who received the window and whether they answered."
       },
+      "RestCompliance": {
+        "properties": {
+          "violations": {
+            "type": "integer",
+            "title": "Violations"
+          },
+          "compliant": {
+            "type": "boolean",
+            "title": "Compliant"
+          },
+          "days": {
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "type": "array",
+            "title": "Days"
+          },
+          "min_rest_hours": {
+            "type": "number",
+            "title": "Min Rest Hours"
+          },
+          "validator": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "violations",
+          "compliant",
+          "days",
+          "min_rest_hours",
+          "validator"
+        ],
+        "title": "RestCompliance",
+        "description": "Rest periods below the minimum in the month (validator C2)."
+      },
       "RosterDay": {
         "properties": {
           "date": {
@@ -5998,6 +6565,7 @@
             "type": "string",
             "enum": [
               "published",
+              "draft",
               "not_planned"
             ],
             "title": "Status"
@@ -6176,6 +6744,7 @@
         "properties": {
           "roster_month": {
             "type": "string",
+            "pattern": "^\\d{4}-\\d{2}$",
             "title": "Roster Month"
           }
         },
@@ -6192,19 +6761,14 @@
             "type": "string",
             "title": "Run Id"
           },
-          "variant_id": {
-            "type": "string",
-            "title": "Variant Id"
-          },
-          "label": {
-            "type": "string",
-            "title": "Label"
-          },
           "status": {
             "type": "string",
             "enum": [
-              "published",
-              "draft"
+              "queued",
+              "running",
+              "done",
+              "infeasible",
+              "failed"
             ],
             "title": "Status"
           },
@@ -6227,7 +6791,34 @@
             ],
             "title": "Generator Version"
           },
-          "published_at": {
+          "solver_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Solver Version"
+          },
+          "validator_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validator Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "finished_at": {
             "anyOf": [
               {
                 "type": "string",
@@ -6237,22 +6828,84 @@
                 "type": "null"
               }
             ],
-            "title": "Published At"
+            "title": "Finished At"
+          },
+          "config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config"
+          },
+          "explanations": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Explanations"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/VariantOut"
+            },
+            "type": "array",
+            "title": "Variants"
           }
         },
         "type": "object",
         "required": [
           "run_id",
-          "variant_id",
-          "label",
           "status",
           "planner_kind",
           "rule_set_version",
           "generator_version",
-          "published_at"
+          "solver_version",
+          "validator_version",
+          "created_at",
+          "finished_at",
+          "config",
+          "explanations",
+          "error",
+          "variants"
         ],
         "title": "RunOut",
         "description": "A roster run of a month and the versions behind it."
+      },
+      "RunQueued": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "run_id",
+          "status"
+        ],
+        "title": "RunQueued",
+        "description": "The run is queued; poll ``GET /planner/runs/{run_id}``."
       },
       "RunsOut": {
         "properties": {
@@ -6639,16 +7292,31 @@
             "type": "integer",
             "title": "Eligible Colleagues"
           },
+          "needs_planner": {
+            "type": "boolean",
+            "title": "Needs Planner",
+            "description": "Giving the shift away breaks a rule for you (C2), so the Planner decides"
+          },
+          "own_rules": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Own Rules",
+            "description": "Which rules, e.g. contract_hours_band"
+          },
           "check": {
             "type": "string",
             "title": "Check",
-            "default": "unchecked"
+            "default": "validated"
           }
         },
         "type": "object",
         "required": [
           "assignment_id",
-          "eligible_colleagues"
+          "eligible_colleagues",
+          "needs_planner",
+          "own_rules"
         ],
         "title": "SwapAudience",
         "description": "M6: how many colleagues the offer reaches (a count, never names)."
@@ -6721,6 +7389,17 @@
             "type": "string",
             "format": "date-time",
             "title": "Offered At"
+          },
+          "exchange": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShiftOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "An exchange: the shift the taker gave the offerer in return"
           }
         },
         "type": "object",
@@ -6735,6 +7414,24 @@
         ],
         "title": "SwapOut",
         "description": "A swap the person offered or took."
+      },
+      "TakeIn": {
+        "properties": {
+          "give_assignment_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Give Assignment Id"
+          }
+        },
+        "type": "object",
+        "title": "TakeIn",
+        "description": "Take the shift, optionally giving one of your own shifts in return (an exchange)."
       },
       "Today": {
         "properties": {
@@ -6815,11 +7512,77 @@
         "title": "Token",
         "description": "A bearer token for the persona."
       },
+      "TradeOffCheck": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "title": "End Date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "done",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "start_date",
+          "end_date",
+          "status",
+          "result",
+          "engine"
+        ],
+        "title": "TradeOffCheck",
+        "description": "M5: the background check (C1).\n\n``result.outcome`` is one of coverable, coverable_with_trade_off, not_coverable,\nnot_applicable (synthdata ASSUMPTIONS §18)."
+      },
       "ValidateIn": {
         "properties": {
           "roster_month": {
             "type": "string",
+            "pattern": "^\\d{4}-\\d{2}$",
             "title": "Roster Month"
+          },
+          "variant_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variant Id"
           }
         },
         "type": "object",
@@ -6827,7 +7590,7 @@
           "roster_month"
         ],
         "title": "ValidateIn",
-        "description": "A month to validate."
+        "description": "A month to validate: the published roster as it stands, or a draft variant."
       },
       "ValidationError": {
         "properties": {
@@ -6868,6 +7631,208 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "ValidationOut": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "variant_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variant Id"
+          },
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "by_rule": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Rule"
+          },
+          "violations": {
+            "items": {
+              "$ref": "#/components/schemas/ViolationOut"
+            },
+            "type": "array",
+            "title": "Violations"
+          },
+          "validator": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "variant_id",
+          "valid",
+          "by_rule",
+          "violations",
+          "validator"
+        ],
+        "title": "ValidationOut",
+        "description": "W4: every violation of the month."
+      },
+      "VariantOut": {
+        "properties": {
+          "variant_id": {
+            "type": "string",
+            "title": "Variant Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft",
+              "discarded"
+            ],
+            "title": "Status"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile"
+          },
+          "recommended": {
+            "type": "boolean",
+            "title": "Recommended"
+          },
+          "recommendation_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation Key",
+            "description": "i18n key of the reason (deterministic: the balanced profile)"
+          },
+          "metrics": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metrics"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "variant_id",
+          "label",
+          "status",
+          "profile",
+          "recommended",
+          "metrics",
+          "published_at"
+        ],
+        "title": "VariantOut",
+        "description": "A variant and what it achieves (metrics from C1, checked by C2)."
+      },
+      "ViolationOut": {
+        "properties": {
+          "rule": {
+            "type": "string",
+            "title": "Rule"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "staff_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          },
+          "fix_key": {
+            "type": "string",
+            "title": "Fix Key"
+          },
+          "fix_params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Fix Params"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rule",
+          "key",
+          "staff_id",
+          "display_name",
+          "date",
+          "params",
+          "fix_key",
+          "fix_params"
+        ],
+        "title": "ViolationOut",
+        "description": "A broken rule, as i18n keys with parameters (packages/i18n: violation.*, fix.*)."
       },
       "WindowDetail": {
         "properties": {

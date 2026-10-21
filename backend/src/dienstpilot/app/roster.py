@@ -24,7 +24,7 @@ class Shift:
     shift_type: str
     holder: str | None
     planned_holder: str
-    note: str  # planned | swap | cover | open | locum | unfilled
+    note: str  # planned | swap | cover | open | locum | unfilled | change
 
 
 def month_start(d: date) -> date:
@@ -44,17 +44,41 @@ def parse_month(text: str) -> date:
 
 
 def effective(session: Session, start: date, end: date, now: datetime | None = None) -> list[Shift]:
-    """Return every published shift between start and end with its current holder."""
+    """Return every published shift between start and end with its current holder.
+
+    Swaps, cover and the Planner's changes (with reasons) apply on top of the published roster
+    in the order they happened. A shift the Planner added has the change's id.
+    """
     planned = planning.assignments(session, start, end)
+    base = {a.id: a for a in planned}
     holder: dict[str, tuple[str | None, str]] = {a.id: (a.staff_id, "planned") for a in planned}
-    for change in operations.holder_changes(session, list(holder)):
-        if now is not None and change.at > now:
+    events: list[tuple[datetime, int, str, str | None, str]] = [
+        (h.at, 0, h.assignment_id, h.holder, h.note)
+        for h in operations.holder_changes(session, list(holder))
+    ]
+    removed: set[str] = set()
+    for ch in planning.changes(session, start, end):
+        if ch.kind == "add":
+            base[ch.id] = planning.Assignment(
+                ch.id, ch.staff_after or "", ch.day, ch.shift_type, ch.roster_month
+            )
+            events.append((ch.changed_at, 1, ch.id, ch.staff_after, "change"))
+        elif ch.assignment_id is not None:
+            note = "removed" if ch.kind == "remove" else "change"
+            events.append((ch.changed_at, 1, ch.assignment_id, ch.staff_after, note))
+    for at, _, aid, who, note in sorted(events, key=lambda e: (e[0], e[1], e[2])):
+        if now is not None and at > now:
             continue
-        holder[change.assignment_id] = (change.holder, change.note)
+        if note == "removed":
+            removed.add(aid)
+        else:
+            removed.discard(aid)
+            holder[aid] = (who, note)
     return sorted(
         (
             Shift(a.id, a.day, a.shift_type, holder[a.id][0], a.staff_id, holder[a.id][1])
-            for a in planned
+            for a in base.values()
+            if a.id in holder and a.id not in removed
         ),
         key=lambda s: (s.day, s.shift_type, s.assignment_id),
     )

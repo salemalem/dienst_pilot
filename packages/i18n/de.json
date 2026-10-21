@@ -17,11 +17,117 @@
     "shiftTypes": "Dienstarten"
   },
   "shift": {
-    "frueh": { "name": "Frühdienst", "short": "Früh", "letter": "F" },
-    "spaet": { "name": "Spätdienst", "short": "Spät", "letter": "S" },
-    "nacht": { "name": "Nachtdienst", "short": "Nacht", "letter": "N" },
-    "bereitschaft": { "name": "Bereitschaftsdienst", "short": "Bereitschaft", "letter": "B" },
-    "ruf": { "name": "Rufbereitschaft", "short": "Ruf", "letter": "R" },
-    "frei": { "name": "Urlaub", "short": "Urlaub", "letter": "U" }
+    "frueh": {
+      "name": "Frühdienst",
+      "short": "Früh",
+      "letter": "F"
+    },
+    "spaet": {
+      "name": "Spätdienst",
+      "short": "Spät",
+      "letter": "S"
+    },
+    "nacht": {
+      "name": "Nachtdienst",
+      "short": "Nacht",
+      "letter": "N"
+    },
+    "bereitschaft": {
+      "name": "Bereitschaftsdienst",
+      "short": "Bereitschaft",
+      "letter": "B"
+    },
+    "ruf": {
+      "name": "Rufbereitschaft",
+      "short": "Ruf",
+      "letter": "R"
+    },
+    "frei": {
+      "name": "Urlaub",
+      "short": "Urlaub",
+      "letter": "U"
+    }
+  },
+  "violation": {
+    "coverage": "Unterbesetzt: {shift} am {date} braucht {required} ({qualification}), eingeteilt sind {assigned}.",
+    "one_shift_per_day": "Mehr als ein Dienst am {date}.",
+    "min_rest": "Ruhezeit von {required} Stunden nicht eingehalten: nur {hours} Stunden vor dem Dienst am {date}.",
+    "max_consecutive_nights": "{nights} Nachtdienste in Folge, erlaubt sind höchstens {max}.",
+    "max_weekends": "{weekends} Wochenenden mit Dienst in diesem Monat, erlaubt sind höchstens {max}.",
+    "max_on_call": "{count} Bereitschaftsdienste in diesem Monat, erlaubt sind höchstens {max}.",
+    "max_on_call_home": "{count} Rufbereitschaften in diesem Monat, erlaubt sind höchstens {max}.",
+    "free_day_after_on_call": "Dienst am {date}, obwohl nach einem Bereitschaftsdienst ein freier Tag folgt.",
+    "contract_hours_band": "{percent} % der Vertragsstunden geplant, erlaubt sind {low} bis {high} %.",
+    "qualification": "Für den Dienst am {date} fehlt die Qualifikation „{qualification}“.",
+    "role": "Diese Dienstart ist für die Rolle nicht vorgesehen ({date}).",
+    "unavailable": "Dienst am {date}, obwohl {reason, select, leave {Urlaub genehmigt ist} other {„kann nicht“ eingetragen ist}}.",
+    "not_rostered": "Dienst am {date}, obwohl die Person an diesem Tag nicht im Dienstplan der Abteilung ist."
+  },
+  "fix": {
+    "coverage": "Eine geeignete Person für den Dienst am {date} einteilen.",
+    "one_shift_per_day": "Einen der Dienste am {date} an eine andere Person geben.",
+    "min_rest": "Den Dienst am {date} tauschen oder den Dienst davor verlegen, damit {required} Stunden Ruhe bleiben.",
+    "max_consecutive_nights": "Den Nachtdienst am {date} an eine andere Person geben (höchstens {max} in Folge).",
+    "max_weekends": "Ein Wochenende an eine andere Person geben (höchstens {max}).",
+    "max_on_call": "Einen Bereitschaftsdienst an eine andere Person geben (höchstens {max}).",
+    "max_on_call_home": "Eine Rufbereitschaft an eine andere Person geben (höchstens {max}).",
+    "free_day_after_on_call": "Den Dienst am {date} an eine andere Person geben.",
+    "contract_hours_band": "Dienste so verteilen, dass die Stunden zwischen {low} und {high} % liegen.",
+    "qualification": "Eine Person mit der Qualifikation „{qualification}“ einteilen.",
+    "role": "Eine Person einteilen, deren Rolle diese Dienstart vorsieht.",
+    "unavailable": "Den Dienst am {date} an eine andere Person geben.",
+    "not_rostered": "Den Dienst am {date} an eine Person im Dienstplan geben."
+  },
+  "infeasible": {
+    "coverage": "Nicht abdeckbar: {date} braucht {required} für den Dienst ({qualification}), verfügbar sind nach genehmigtem Urlaub nur {available}.",
+    "person": "Für eine Person lassen sich die Regeln „{rule}“ in diesem Monat nicht einhalten.",
+    "unknown": "Kein gültiger Plan gefunden; die Ursache ließ sich nicht eingrenzen."
+  },
+  "escalation": {
+    "rule_violation": "Der Validator hat einen Regelverstoß gefunden; die Planung entscheidet.",
+    "hours_band": "Ohne diesen Dienst lägen die Stunden der abgebenden Person unter dem Band; die Planung entscheidet.",
+    "overtime": "Die Übernahme bedeutet Überstunden; die Planung entscheidet.",
+    "policy_off": "Die automatische Freigabe ist ausgeschaltet; die Planung entscheidet.",
+    "list_exhausted": "Niemand aus der Liste hat übernommen; die Planung entscheidet.",
+    "validator_unavailable": "Vor dem Validator eingegangen; die Planung entscheidet."
+  },
+  "approval": {
+    "planner": "Von der Planung freigegeben",
+    "policy": "Automatisch freigegeben (Regel der Planung, vom Validator geprüft)"
+  },
+  "profile": {
+    "wishes_first": "Wünsche zuerst",
+    "zero_overtime": "Keine Überstunden",
+    "balanced": "Ausgewogen"
+  },
+  "recommendation": {
+    "balanced": "Empfohlen: das ausgewogene Profil, mit Gewichten aus der Abstimmung auf Juli bis Dezember 2024."
+  },
+  "m5": {
+    "coverable": "{count, plural, =0 {Abdeckbar. Die Besetzung bleibt gesichert, ohne Überstunden.} one {Abdeckbar. Eine Kolleg:in hat überschneidende Tage beantragt; die Besetzung bleibt gesichert, ohne Überstunden.} =2 {Abdeckbar. Zwei Kolleg:innen haben überschneidende Tage beantragt; die Besetzung bleibt gesichert, ohne Überstunden.} other {Abdeckbar. # Kolleg:innen haben überschneidende Tage beantragt; die Besetzung bleibt gesichert, ohne Überstunden.}}",
+    "requestLeave": "Urlaub beantragen",
+    "tradeOff": "Abdeckbar, wenn Sie im {month} ein zusätzliches Wochenende übernehmen",
+    "requestWithTrade": "Mit Tausch beantragen",
+    "requestWithoutTrade": "Ohne Tausch beantragen",
+    "notCoverable": "Nicht abdeckbar, ohne eine Regel zu verletzen.",
+    "notApplicable": "Für diesen Zeitraum wird kein Tausch geprüft.",
+    "reason": {
+      "spans_months": "Der Urlaub reicht über zwei Monate.",
+      "month_published": "Der Monat ist schon veröffentlicht; die Planung regelt die Vertretung.",
+      "previous_month_planned": "Der Vormonat ist schon geplant; ein Tausch ist dort nicht mehr möglich.",
+      "previous_month_unsolved": "Für den Vormonat wurde kein gültiger Plan gefunden.",
+      "weekend_limit": "Ein zusätzliches Wochenende im Vormonat überschritte die Höchstzahl.",
+      "trade_off_infeasible": "Mit dem zusätzlichen Wochenende gibt es im Vormonat keinen gültigen Plan.",
+      "trade_off_invalid": "Der Plan mit Tausch hat die Prüfung durch den Validator nicht bestanden.",
+      "baseline_unsolved": "Der Monat ließ sich ohne diesen Urlaub nicht vergleichen."
+    }
+  },
+  "m6": {
+    "offerExchange": "Tausch anbieten",
+    "audience": "Angebot geht an {n} Kolleg:innen, die mit Ihnen tauschen dürfen",
+    "giveawayBelowHours": "Allein abgeben geht nicht: Sie lägen unter Ihren Vertragsstunden. Bieten Sie einen Tausch an."
+  },
+  "notification": {
+    "roster_changed": "Ihr Dienstplan am {date} wurde geändert. Grund: {reason}"
   }
 }

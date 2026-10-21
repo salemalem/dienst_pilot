@@ -1,0 +1,129 @@
+{
+  "description": "Manual-planner baseline vs C1 (recommended variant) on held-out months of the synthetic data.",
+  "dataset": {
+    "seed": 20261020,
+    "generator_version": "1.3.0"
+  },
+  "versions": {
+    "solver": "c1-1.0.1",
+    "validator": "c2-1.0.0"
+  },
+  "config": {
+    "deterministic_time_per_variant": 3.0,
+    "workers": 8,
+    "seed": 20261020,
+    "variants": 3,
+    "recommended_profile": "balanced",
+    "profiles": [
+      {
+        "name": "wishes_first",
+        "wishes": 12,
+        "spread": 3,
+        "overtime": 1,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      {
+        "name": "zero_overtime",
+        "wishes": 4,
+        "spread": 3,
+        "overtime": 12,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      {
+        "name": "balanced",
+        "wishes": 8,
+        "spread": 5,
+        "overtime": 3,
+        "isolated_nights": 2,
+        "stability": 1
+      }
+    ]
+  },
+  "held_out_months": [
+    "2025-03-01"
+  ],
+  "tuning_months": [
+    "2024-07-01",
+    "2024-08-01",
+    "2024-09-01",
+    "2024-10-01",
+    "2024-11-01",
+    "2024-12-01"
+  ],
+  "limitations": [
+    "Each month is compared independently from the same as-worked history (the manual roster and its in-month changes); C1's months are not chained into a year.",
+    "In-month violations exist only for the baseline and follow from a simulation parameter (manual_rule_check_rate, synthdata ASSUMPTIONS.md §13); they are not a finding about real planners.",
+    "Synthetic data of a fictional department; no real hospital."
+  ],
+  "summary": {
+    "baseline": {
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.4133,
+      "important_wishes_granted_rate": 0.4091,
+      "burden_spread_mean": 23,
+      "overtime_hours": 0.0,
+      "isolated_nights": 11,
+      "in_month_violations": 2
+    },
+    "c1": {
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.6933,
+      "important_wishes_granted_rate": 0.7273,
+      "burden_spread_mean": 14,
+      "overtime_hours": 0.0,
+      "isolated_nights": 2
+    }
+  },
+  "per_month": [
+    {
+      "month": "2025-03-01",
+      "baseline": {
+        "hard_violations": 0,
+        "violations_by_rule": {},
+        "wishes_total": 75,
+        "wishes_granted": 31,
+        "important_total": 22,
+        "important_granted": 9,
+        "burden_spread": 23,
+        "overtime_hours": 0.0,
+        "isolated_nights": 11
+      },
+      "baseline_in_month_violations": 2,
+      "c1": {
+        "hard_violations": 0,
+        "violations_by_rule": {},
+        "wishes_total": 75,
+        "wishes_granted": 52,
+        "important_total": 22,
+        "important_granted": 16,
+        "burden_spread": 14,
+        "overtime_hours": 0.0,
+        "isolated_nights": 2
+      },
+      "c1_variant": {
+        "label": "C",
+        "profile": "balanced",
+        "status": "OPTIMAL"
+      },
+      "c1_variants": 3
+    }
+  ],
+  "results_sha256": "cf65843724afc64725c8c2fc5dc7465a1abbec7fb87dcb2ec3126e8b12c7f052",
+  "timing": {
+    "note": "Wall-clock seconds per variant on the machine that ran the benchmark; not reproducible.",
+    "median_seconds_per_variant": 1.35,
+    "max_seconds_per_variant": 1.45,
+    "per_month": [
+      {
+        "month": "2025-03-01",
+        "wall_seconds": [
+          1.445,
+          1.308,
+          1.355
+        ]
+      }
+    ]
+  }
+}

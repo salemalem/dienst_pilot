@@ -1,20 +1,30 @@
 """Planner dashboard (W1–W8, W7b) and the department roster (Staff+ and Planner).
 
-Only the Planner decides. Until the validator (C2) exists, taken swaps and accepted cover wait
-here for a decision, candidate lists are unchecked, and roster edits and publishing answer 501.
+Only the Planner decides. The optimizer (C1) proposes variants in a background run; the
+validator (C2) checks every edit, every candidate list and every variant before it is published.
+Swaps and cover that C2 finds valid are approved by the Planner's policy; the rest waits here.
 """
 
 from datetime import date, datetime, timedelta
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from dienstpilot.app.common import EngineLabel, department, in_department, label, record
+from dienstpilot.app.common import (
+    Department,
+    EngineLabel,
+    department,
+    in_department,
+    label,
+    record,
+)
 from dienstpilot.app.context import CtxDep
-from dienstpilot.app.cover import CHECK, basic_candidates, ranked
+from dienstpilot.app.cover import CHECK, change_violations, ranked, valid_takers
 from dienstpilot.app.deps import Ctx, OversightReaderDep, PlannerDep, RosterReaderDep
+from dienstpilot.app.engine_inputs import Inputs
 from dienstpilot.app.privacy import absence_for
+from dienstpilot.app.queue import QueueDep
 from dienstpilot.app.roster import (
     Shift,
     approved_leave_days,
@@ -27,11 +37,12 @@ from dienstpilot.app.roster import (
 )
 from dienstpilot.app.routes.me import HoursOut, hours_table, year_burden
 from dienstpilot.fairness import service as fairness
+from dienstpilot.identity.service import UserView
 from dienstpilot.operations import service as operations
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.requests import service as requests
-from dienstpilot.shared.ports import EngineNotImplementedError
+from dienstpilot_validator import Assignment, Violation
 
 router = APIRouter(tags=["planner dashboard"])
 Month = Annotated[str, Query(pattern=r"^\d{4}-\d{2}$")]
@@ -44,6 +55,7 @@ class Cell(BaseModel):
     """What a physician has on a day."""
 
     shifts: list[str]
+    assignment_ids: list[str] = Field(description="Same order as shifts (W4 edits)")
     changed: bool
     on_leave: bool
     absence: dict[str, str] | None = Field(
@@ -73,7 +85,7 @@ class CoverageRow(BaseModel):
 
 
 class GapSuggestion(BaseModel):
-    """Who could fill a gap (Planner only; unchecked until C2)."""
+    """Who could fill a gap (Planner only; checked by C2, ranked by C5)."""
 
     date: date
     shift_type: str
@@ -86,7 +98,7 @@ class RosterGrid(BaseModel):
     """W4: the department's month."""
 
     roster_month: date
-    status: Literal["published", "not_planned"]
+    status: Literal["published", "draft", "not_planned"]
     published_at: datetime | None
     rule_set_version: str | None
     rows: list[RosterRow]
@@ -95,10 +107,32 @@ class RosterGrid(BaseModel):
 
 
 @router.get("/roster")
-def roster(c: CtxDep, user: RosterReaderDep, month: Month) -> RosterGrid:
-    """W4 grid and the full roster for Staff+: shifts, absences, leave, coverage per shift."""
+def roster(
+    c: CtxDep, user: RosterReaderDep, month: Month, variant_id: str | None = None
+) -> RosterGrid:
+    """W4 grid and the full roster for Staff+: shifts, absences, leave, coverage per shift.
+
+    With ``variant_id`` (Planner only) the grid shows a draft variant of a C1 run.
+    """
     m = parse_month(month)
     dep = department(c)
+    end = month_end(m)
+    if variant_id is not None:
+        if user.role != "planner":
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Drafts are for the Planner")
+        try:
+            info = planning.variant(c.session, variant_id)
+        except ValueError as e:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found") from e
+        if info is None or info[1] != m:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+        draft = [
+            Shift(a.id, a.day, a.shift_type, a.staff_id, a.staff_id, "planned")
+            for a in planning.variant_assignments(c.session, variant_id)
+        ]
+        return _grid(
+            c, user, dep, m, draft, "draft", None, organization.rules_for(c.session, m).version
+        )
     pub = planning.published(c.session, m)
     if pub is None or (
         pub.published_at and pub.published_at > c.clock.now() and user.role != "planner"
@@ -112,8 +146,29 @@ def roster(c: CtxDep, user: RosterReaderDep, month: Month) -> RosterGrid:
             coverage=[],
             gaps=[],
         )
+    return _grid(
+        c,
+        user,
+        dep,
+        m,
+        effective(c.session, m, end),
+        "published",
+        pub.published_at,
+        pub.rule_set_version,
+    )
+
+
+def _grid(
+    c: Ctx,
+    user: UserView,
+    dep: Department,
+    m: date,
+    shifts: list[Shift],
+    kind: Literal["published", "draft"],
+    published_at: datetime | None,
+    rule_set_version: str,
+) -> RosterGrid:
     end = month_end(m)
-    shifts = effective(c.session, m, end)
     ids = list(dep.staff)
     leave = approved_leave_days(c.session, ids, m, end)
     absences = operations.absences(c.session, ids, m, end)
@@ -143,6 +198,7 @@ def roster(c: CtxDep, user: RosterReaderDep, month: Month) -> RosterGrid:
             if mine or ab or d in leave.get(p.id, set()) or mark:
                 cells[d.isoformat()] = Cell(
                     shifts=[s.shift_type for s in mine],
+                    assignment_ids=[s.assignment_id for s in mine],
                     changed=any(s.note != "planned" for s in mine),
                     on_leave=d in leave.get(p.id, set()),
                     absence=None if ab is None else absence_for(user, ab.category),
@@ -159,6 +215,7 @@ def roster(c: CtxDep, user: RosterReaderDep, month: Month) -> RosterGrid:
             )
         )
     coverage, gaps = [], []
+    inputs = Inputs(c.session, dep, c.clock.now())
     for d, demand_rows in sorted(organization.demand(c.session, m, end).items()):
         for shift_type, qual, required in demand_rows:
             holders = [
@@ -178,9 +235,14 @@ def roster(c: CtxDep, user: RosterReaderDep, month: Month) -> RosterGrid:
                     assigned=have,
                 )
             )
-            if have < required and user.role == "planner" and d >= c.clock.today():
+            if (
+                have < required
+                and user.role == "planner"
+                and kind == "published"
+                and d > c.clock.today()
+            ):
                 probe = Shift("", d, shift_type, None, "", "open")
-                people = basic_candidates(c, dep, probe, exclude=set())
+                people = valid_takers(c, dep, probe, exclude=set(), inputs=inputs)
                 top = [dep.staff[x.staff_id].display_name for x in ranked(c, dep, people, d)[:3]]
                 gaps.append(
                     GapSuggestion(
@@ -192,55 +254,311 @@ def roster(c: CtxDep, user: RosterReaderDep, month: Month) -> RosterGrid:
                 )
     return RosterGrid(
         roster_month=m,
-        status="published",
-        published_at=pub.published_at,
-        rule_set_version=pub.rule_set_version,
+        status=kind,
+        published_at=published_at,
+        rule_set_version=rule_set_version,
         rows=rows,
         coverage=coverage,
         gaps=gaps,
     )
 
 
-class AssignmentChange(BaseModel):
-    """A change to a published roster. Needs a reason (PROCESS §2)."""
+class ViolationOut(BaseModel):
+    """A broken rule, as i18n keys with parameters (packages/i18n: violation.*, fix.*)."""
 
-    assignment_id: str
+    rule: str
+    key: str
+    staff_id: str | None
+    display_name: str | None
+    date: date
+    params: dict[str, Any]
+    fix_key: str
+    fix_params: dict[str, Any]
+
+
+def violations_out(dep: Department, vs: list[Violation]) -> list[ViolationOut]:
+    """Return violations for the API (names resolved here, in the UI layer)."""
+    return [
+        ViolationOut(
+            rule=v.rule,
+            key=v.key,
+            staff_id=v.staff_id,
+            display_name=dep.name(v.staff_id),
+            date=v.day,
+            params=v.params,
+            fix_key=v.fix_key,
+            fix_params=v.fix_params,
+        )
+        for v in sorted(vs, key=lambda v: (v.day, v.key, v.staff_id or ""))
+    ]
+
+
+def _unprocessable(dep: Department, message: str, vs: list[Violation]) -> HTTPException:
+    return HTTPException(
+        status.HTTP_422_UNPROCESSABLE_ENTITY,
+        {
+            "code": "rule_violation",
+            "message": message,
+            "violations": [v.model_dump(mode="json") for v in violations_out(dep, vs)],
+        },
+    )
+
+
+class AddShift(BaseModel):
+    """A shift to add."""
+
+    date: date
+    shift_type: str
+    staff_id: str
+
+
+class AssignmentEdit(BaseModel):
+    """W4: one change. A draft changes directly; a published roster needs a reason.
+
+    ``assignment_id`` with ``new_staff_id`` reassigns (``null`` removes the shift); ``add``
+    adds a shift. A change to a published roster must not break any rule (C2), and everyone
+    affected is notified.
+    """
+
+    variant_id: str | None = Field(
+        None, description="A draft variant; omit for the published roster"
+    )
+    assignment_id: str | None = None
     new_staff_id: str | None = None
-    reason: str
+    add: AddShift | None = None
+    reason: str | None = Field(None, max_length=500)
+
+
+class EditOut(BaseModel):
+    """What the change did, and the violations of the changed people and days."""
+
+    roster_month: date
+    change_id: str | None
+    notified: list[str]
+    introduced: list[ViolationOut]
+    violations: list[ViolationOut]
+    validator: EngineLabel
 
 
 @router.patch("/planner/roster/assignments")
-def change_assignment(c: CtxDep, _: PlannerDep, body: AssignmentChange) -> None:
-    """W4: change a published roster. Every change must pass the validator, so this waits for C2."""
-    raise EngineNotImplementedError(c.engines.validator.info)
+def change_assignment(c: CtxDep, _: PlannerDep, body: AssignmentEdit) -> EditOut:
+    """W4: change a draft (live validation) or a published roster (reason, C2-valid, notify)."""
+    dep = department(c)
+    if (body.assignment_id is None) == (body.add is None):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, "Give either assignment_id or add"
+        )
+    for sid in (body.new_staff_id, body.add.staff_id if body.add else None):
+        if sid is not None:
+            in_department(dep, sid)
+    inputs = Inputs(c.session, dep, c.clock.now())
+    if body.variant_id is not None:
+        return _edit_draft(c, dep, inputs, body)
+    if not (body.reason and body.reason.strip()):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, "A change to a published roster needs a reason"
+        )
+    remove: list[Assignment] = []
+    add: list[Assignment] = []
+    before: str | None
+    after: str | None
+    if body.add is not None:
+        day, shift_type, before, after = body.add.date, body.add.shift_type, None, body.add.staff_id
+        kind = "add"
+    else:
+        assert body.assignment_id is not None
+        a = planning.assignment(c.session, body.assignment_id)
+        current = (
+            None
+            if a is None
+            else next(
+                (x for x in effective(c.session, a.day, a.day) if x.assignment_id == a.id), None
+            )
+        )
+        if a is None or current is None or a.staff_id not in dep.staff:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+        day, shift_type, before, after = a.day, a.shift_type, current.holder, body.new_staff_id
+        kind = "remove" if after is None else "reassign"
+        if before == after:
+            raise HTTPException(status.HTTP_409_CONFLICT, "Nothing changes")
+    m = month_start(day)
+    if planning.published(c.session, m) is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "This month is not published")
+    if day <= c.clock.today():
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Only future days can change")
+    if before:
+        remove.append(Assignment(before, day, shift_type))
+    if after:
+        add.append(Assignment(after, day, shift_type))
+    people = {x for x in (before, after) if x}
+    introduced = change_violations(c, inputs, remove, add, people)
+    if introduced:
+        raise _unprocessable(dep, "The change breaks a rule", introduced)
+    assert c.user.staff_id is not None
+    ch = planning.record_change(
+        c.session,
+        month=m,
+        kind=kind,
+        assignment_id=body.assignment_id,
+        day=day,
+        shift_type=shift_type,
+        staff_before=before,
+        staff_after=after,
+        reason=body.reason.strip(),
+        changed_by=c.user.staff_id,
+        now=c.clock.now(),
+    )
+    notified = sorted(people)
+    for sid in notified:
+        record(
+            c,
+            "roster.changed",
+            "assignment_change",
+            ch.id,
+            sid,
+            {
+                "date": day.isoformat(),
+                "shift_type": shift_type,
+                "kind": kind,
+                "staff_before": before,
+                "staff_after": after,
+                "reason": ch.reason,
+            },
+        )
+    after_inp = Inputs(c.session, dep, c.clock.now()).month(m)
+    return EditOut(
+        roster_month=m,
+        change_id=ch.id,
+        notified=notified,
+        introduced=[],
+        violations=violations_out(
+            dep, [v for v in c.engines.validator.validate(after_inp) if v.staff_id in people]
+        ),
+        validator=label(c.engines.validator.info),
+    )
+
+
+def _edit_draft(c: Ctx, dep: Department, inputs: Inputs, body: AssignmentEdit) -> EditOut:
+    assert body.variant_id is not None
+    info = planning.variant(c.session, body.variant_id)
+    if info is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+    v, m = info
+    if v.status != "draft":
+        raise HTTPException(status.HTTP_409_CONFLICT, "Only a draft changes directly")
+    own = {a.id: a for a in planning.variant_assignments(c.session, body.variant_id)}
+    if body.add is not None:
+        if month_start(body.add.date) != m:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY, "The day is not in this month"
+            )
+        remove: list[Assignment] = []
+        add = [Assignment(body.add.staff_id, body.add.date, body.add.shift_type)]
+    else:
+        a = own.get(body.assignment_id or "")
+        if a is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+        remove = [Assignment(a.staff_id, a.day, a.shift_type)]
+        add = [Assignment(body.new_staff_id, a.day, a.shift_type)] if body.new_staff_id else []
+    inp = inputs.variant(body.variant_id)
+    after, introduced = c.engines.validator.validate_change(inp, remove, add)
+    planning.edit_draft(
+        c.session,
+        body.variant_id,
+        [(x.staff_id, x.day, x.shift_type) for x in remove],
+        [(x.staff_id, x.day, x.shift_type) for x in add],
+    )
+    return EditOut(
+        roster_month=m,
+        change_id=None,
+        notified=[],
+        introduced=violations_out(dep, introduced),
+        violations=violations_out(dep, after),
+        validator=label(c.engines.validator.info),
+    )
 
 
 class ValidateIn(BaseModel):
-    """A month to validate."""
+    """A month to validate: the published roster as it stands, or a draft variant."""
 
-    roster_month: str
+    roster_month: str = Field(pattern=r"^\d{4}-\d{2}$")
+    variant_id: str | None = None
+
+
+class ValidationOut(BaseModel):
+    """W4: every violation of the month."""
+
+    roster_month: date
+    variant_id: str | None
+    valid: bool
+    by_rule: dict[str, int]
+    violations: list[ViolationOut]
+    validator: EngineLabel
 
 
 @router.post("/planner/validate")
-def validate(c: CtxDep, _: PlannerDep, body: ValidateIn) -> None:
-    """W4: live validation (C2, Phase 7)."""
-    c.engines.validator.validate(parse_month(body.roster_month), [])
+def validate(c: CtxDep, _: PlannerDep, body: ValidateIn) -> ValidationOut:
+    """W4: live validation with C2 (all rules, the whole month)."""
+    dep = department(c)
+    m = parse_month(body.roster_month)
+    inputs = Inputs(c.session, dep, c.clock.now())
+    if body.variant_id is not None:
+        info = planning.variant(c.session, body.variant_id)
+        if info is None or info[1] != m:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+        inp = inputs.variant(body.variant_id)
+    elif planning.published(c.session, m) is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "This month has no roster yet")
+    else:
+        inp = inputs.month(m)
+    vs = c.engines.validator.validate(inp)
+    by_rule: dict[str, int] = {}
+    for v in vs:
+        by_rule[v.rule] = by_rule.get(v.rule, 0) + 1
+    return ValidationOut(
+        roster_month=m,
+        variant_id=body.variant_id,
+        valid=not vs,
+        by_rule=by_rule,
+        violations=violations_out(dep, vs),
+        validator=label(c.engines.validator.info),
+    )
 
 
 # --- W3 Varianten, W5 Freigabe ----------------------------------------------------------------
+
+
+class VariantOut(BaseModel):
+    """A variant and what it achieves (metrics from C1, checked by C2)."""
+
+    variant_id: str
+    label: str
+    status: Literal["published", "draft", "discarded"]
+    profile: str | None
+    recommended: bool
+    recommendation_key: str | None = Field(
+        None, description="i18n key of the reason (deterministic: the balanced profile)"
+    )
+    metrics: dict[str, Any] | None
+    published_at: datetime | None
 
 
 class RunOut(BaseModel):
     """A roster run of a month and the versions behind it."""
 
     run_id: str
-    variant_id: str
-    label: str
-    status: Literal["published", "draft"]
+    status: Literal["queued", "running", "done", "infeasible", "failed"]
     planner_kind: str
     rule_set_version: str
     generator_version: str | None
-    published_at: datetime | None
+    solver_version: str | None
+    validator_version: str | None
+    created_at: datetime
+    finished_at: datetime | None
+    config: dict[str, Any] | None
+    explanations: list[dict[str, Any]]
+    error: str | None
+    variants: list[VariantOut]
 
 
 class RunsOut(BaseModel):
@@ -251,45 +569,200 @@ class RunsOut(BaseModel):
     optimizer: EngineLabel
 
 
+def _run_out(r: planning.Run, kind: str, generator: str | None) -> RunOut:
+    return RunOut(
+        run_id=r.id,
+        status=r.status,
+        planner_kind=kind,
+        rule_set_version=r.rule_set_version,
+        generator_version=generator,
+        solver_version=r.solver_version,
+        validator_version=r.validator_version,
+        created_at=r.created_at,
+        finished_at=r.finished_at,
+        config=r.config,
+        explanations=r.explanations or [],
+        error=r.error,
+        variants=[
+            VariantOut(
+                variant_id=v.id,
+                label=v.label,
+                status=v.status,
+                profile=v.profile,
+                recommended=v.recommended,
+                recommendation_key="recommendation.balanced" if v.recommended else None,
+                metrics=v.metrics,
+                published_at=v.published_at,
+            )
+            for v in r.variants
+        ],
+    )
+
+
 @router.get("/planner/runs")
 def runs(c: CtxDep, _: PlannerDep, month: Month) -> RunsOut:
-    """W3: existing runs of a month (December 2026 has none until C1 exists)."""
+    """W3: every run of a month (the seeded manual roster and C1 runs), newest first."""
     m = parse_month(month)
+    kinds = {r.run_id: (r.planner_kind, r.generator_version) for r in planning.runs(c.session, m)}
     return RunsOut(
         roster_month=m,
         optimizer=label(c.engines.optimizer.info),
-        runs=[
-            RunOut(
-                run_id=r.run_id,
-                variant_id=r.variant_id,
-                label=r.variant_label,
-                status="published" if r.published_at else "draft",
-                planner_kind=r.planner_kind,
-                rule_set_version=r.rule_set_version,
-                generator_version=r.generator_version,
-                published_at=r.published_at,
-            )
-            for r in planning.runs(c.session, m)
-        ],
+        runs=[_run_out(r, *kinds.get(r.id, ("c1", None))) for r in planning.runs_of(c.session, m)],
     )
 
 
 class RunIn(BaseModel):
     """Generate variants for a month."""
 
-    roster_month: str
+    roster_month: str = Field(pattern=r"^\d{4}-\d{2}$")
 
 
-@router.post("/planner/runs")
-def generate(c: CtxDep, _: PlannerDep, body: RunIn) -> None:
-    """W3: generate variants with the optimizer (C1, Phase 7)."""
-    c.engines.optimizer.generate(parse_month(body.roster_month), c.user.department_id)
+class RunQueued(BaseModel):
+    """The run is queued; poll ``GET /planner/runs/{run_id}``."""
+
+    run_id: str
+    status: str
+
+
+@router.post("/planner/runs", status_code=status.HTTP_202_ACCEPTED)
+def generate(c: CtxDep, _: PlannerDep, queue: QueueDep, body: RunIn) -> RunQueued:
+    """W3: queue a C1 run for a month that is not published yet; the worker solves it."""
+    m = parse_month(body.roster_month)
+    if m <= month_start(c.clock.today()):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Plan a future month")
+    if planning.published(c.session, m) is not None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "This month is already published")
+    if any(r.status in ("queued", "running") for r in planning.runs_of(c.session, m)):
+        raise HTTPException(status.HTTP_409_CONFLICT, "A run for this month is in progress")
+    assert c.user.staff_id is not None
+    rule_set = organization.rules_for(c.session, m)
+    run_id = planning.create_run(c.session, m, rule_set.version, c.user.staff_id, c.clock.now())
+    record(c, "run.requested", "roster_run", run_id, None, {"roster_month": m.isoformat()})
+    c.session.commit()
+    queue.enqueue("run_roster", run_id=run_id, department_id=c.user.department_id)
+    return RunQueued(run_id=run_id, status="queued")
+
+
+@router.get("/planner/runs/{run_id}")
+def run_detail(c: CtxDep, _: PlannerDep, run_id: str) -> RunOut:
+    """W3: a run's progress, its variants with metrics, or why no valid roster exists."""
+    try:
+        r = planning.run(c.session, run_id)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found") from e
+    if r is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+    kinds = {
+        x.run_id: (x.planner_kind, x.generator_version)
+        for x in planning.runs(c.session, r.roster_month)
+    }
+    return _run_out(r, *kinds.get(r.id, ("c1", None)))
+
+
+class Published(BaseModel):
+    """W5: the published variant and its approval."""
+
+    variant_id: str
+    roster_month: date
+    published_at: datetime
+    approved_by: str
+    validator: EngineLabel
 
 
 @router.post("/planner/variants/{variant_id}/publish")
-def publish(c: CtxDep, _: PlannerDep, variant_id: str) -> None:
-    """W5: approve and publish. A variant must pass the validator first, so this waits for C2."""
-    raise EngineNotImplementedError(c.engines.validator.info)
+def publish(c: CtxDep, _: PlannerDep, variant_id: str) -> Published:
+    """W5: approve and publish a draft. It must pass the validator (C2) without a violation."""
+    dep = department(c)
+    try:
+        info = planning.variant(c.session, variant_id)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found") from e
+    if info is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+    v, m = info
+    if planning.published(c.session, m) is not None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "This month is already published")
+    if v.status != "draft":
+        raise HTTPException(status.HTTP_409_CONFLICT, "Only a draft can be published")
+    vs = c.engines.validator.validate(Inputs(c.session, dep, c.clock.now()).variant(variant_id))
+    if vs:
+        raise _unprocessable(dep, "The variant breaks a rule", vs)
+    assert c.user.staff_id is not None
+    now = c.clock.now()
+    planning.publish_variant(c.session, variant_id, c.user.staff_id, now)
+    record(
+        c,
+        "roster.published",
+        "roster_variant",
+        variant_id,
+        None,
+        {
+            "roster_month": m.isoformat(),
+            "label": v.label,
+            "profile": v.profile,
+            "validator_version": c.engines.validator.info.version,
+        },
+    )
+    return Published(
+        variant_id=variant_id,
+        roster_month=m,
+        published_at=now,
+        approved_by=c.user.display_name,
+        validator=label(c.engines.validator.info),
+    )
+
+
+class PolicyOut(BaseModel):
+    """What the system approves on its own: only C2-valid swaps and cover inside the department.
+
+    Cover by a locum or from another department, and cover that means overtime, always go to
+    the Planner.
+    """
+
+    auto_approve_swaps: bool
+    auto_approve_cover: bool
+    updated_by: str | None
+    updated_at: datetime | None
+
+
+class PolicyIn(BaseModel):
+    """Switch auto-approval on or off."""
+
+    auto_approve_swaps: bool
+    auto_approve_cover: bool
+
+
+def _policy_out(dep: Department, p: operations.Policy) -> PolicyOut:
+    return PolicyOut(
+        auto_approve_swaps=p.auto_approve_swaps,
+        auto_approve_cover=p.auto_approve_cover,
+        updated_by=dep.name(p.updated_by),
+        updated_at=p.updated_at,
+    )
+
+
+@router.get("/planner/policy")
+def get_policy(c: CtxDep, _: PlannerDep) -> PolicyOut:
+    """W11: the auto-approval policy."""
+    dep = department(c)
+    return _policy_out(dep, operations.policy(c.session, dep.id))
+
+
+@router.put("/planner/policy")
+def put_policy(c: CtxDep, _: PlannerDep, body: PolicyIn) -> PolicyOut:
+    """W11: change the auto-approval policy (audited)."""
+    dep = department(c)
+    assert c.user.staff_id is not None
+    p = operations.set_policy(
+        c.session,
+        dep.id,
+        body.auto_approve_swaps,
+        body.auto_approve_cover,
+        c.user.staff_id,
+        c.clock.now(),
+    )
+    record(c, "policy.changed", "policy", dep.id, None, body.model_dump())
+    return _policy_out(dep, p)
 
 
 # --- W1 Übersicht -----------------------------------------------------------------------------
@@ -426,7 +899,7 @@ def overview(c: CtxDep, _: PlannerDep) -> Overview:
                     date=a.day,
                     shift_type=a.shift_type,
                     staff_name=dep.name(cas.covered_by),
-                    approval="planner",
+                    approval=cas.approval or "planner",
                 )
             )
     months = planning.published_months(c.session)
@@ -731,13 +1204,34 @@ def decide_leave(c: CtxDep, _: PlannerDep, request_id: str, body: Decision) -> D
 
 @router.post("/planner/swaps/{swap_id}/decision")
 def decide_swap(c: CtxDep, _: PlannerDep, swap_id: str, body: Decision) -> Decided:
-    """W6: approve or decline a taken swap (escalated while C2 is not available)."""
+    """W6: approve or decline an escalated swap. An approval must pass the validator (C2)."""
     dep = department(c)
     s = operations.swap(c.session, swap_id)
     if s is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
     in_department(dep, s.offered_by)
     assert c.user.staff_id is not None
+    a = planning.assignment(c.session, s.assignment_id)
+    if body.approve and a is not None and s.accepted_by:
+        remove = [Assignment(s.offered_by, a.day, a.shift_type)]
+        add = [Assignment(s.accepted_by, a.day, a.shift_type)]
+        counter = (
+            None
+            if s.counter_assignment_id is None
+            else planning.assignment(c.session, s.counter_assignment_id)
+        )
+        if counter is not None:
+            remove.append(Assignment(s.accepted_by, counter.day, counter.shift_type))
+            add.append(Assignment(s.offered_by, counter.day, counter.shift_type))
+        introduced = change_violations(
+            c,
+            Inputs(c.session, dep, c.clock.now()),
+            remove,
+            add,
+            {s.offered_by, s.accepted_by},
+        )
+        if introduced:
+            raise _unprocessable(dep, "The swap breaks a rule", introduced)
     try:
         s = operations.decide_swap(
             c.session, swap_id, body.approve, c.user.staff_id, body.reason, c.clock.now()
@@ -910,9 +1404,7 @@ def escalation(c: CtxDep, _: PlannerDep, cascade_id: str) -> EscalationOut:
         shifts = effective(c.session, m, month_end(m))
         probe = Shift(a.id, a.day, a.shift_type, None, a.staff_id, "open")
         asked = {o.staff_id for o in cas.offers}
-        people = [
-            p for p in basic_candidates(c, dep, probe, exclude={a.staff_id}) if p.id not in asked
-        ]
+        people = [p for p in valid_takers(c, dep, probe, exclude={a.staff_id}) if p.id not in asked]
         rules = organization.rules_for(c.session, m).rules
         holidays = set(organization.holidays(c.session, m, month_end(m)))
         leave = approved_leave_days(c.session, [p.id for p in people], m, month_end(m))
@@ -969,6 +1461,19 @@ def decide_cascade(c: CtxDep, _: PlannerDep, cascade_id: str, body: CascadeDecis
     }
     if body.option == "confirm_cover" and not cas.covered_by:
         raise HTTPException(status.HTTP_409_CONFLICT, "Nobody has accepted")
+    taker = body.staff_id if body.option == "assign" else cas.covered_by
+    if body.option in ("confirm_cover", "assign") and taker:
+        a = planning.assignment(c.session, cas.assignment_id)
+        assert a is not None
+        introduced = change_violations(
+            c,
+            Inputs(c.session, dep, c.clock.now()),
+            [],
+            [Assignment(taker, a.day, a.shift_type)],
+            {taker},
+        )
+        if introduced:
+            raise _unprocessable(dep, "This cover breaks a rule", introduced)
     try:
         closed = operations.decide_cascade(
             c.session,
@@ -1069,13 +1574,12 @@ class HoursReport(BaseModel):
     roster_month: date
     people: list[PersonHours]
     total_overtime_hours: float
-    rest_compliance: None = Field(None, description="Needs the validator C2 (Phase 7)")
-    rest_compliance_available_from_phase: int = 7
+    rest_violations_total: int = Field(description="Rest periods below the minimum (C2)")
 
 
 @router.get("/compliance/hours")
-def hours_report(c: CtxDep, _: OversightReaderDep, month: Month) -> HoursReport:
-    """Per-person hours and overtime of a month (Planner and Oversight)."""
+def hours_report(c: CtxDep, _: OversightReaderDep, month: Month, rest: bool = True) -> HoursReport:
+    """Per-person hours, overtime and rest compliance (C2) of a month (Planner and Oversight)."""
     m = parse_month(month)
     dep = department(c)
     banded = ("facharzt", "assistenzarzt", "oberarzt")
@@ -1087,7 +1591,7 @@ def hours_report(c: CtxDep, _: OversightReaderDep, month: Month) -> HoursReport:
         ),
         key=lambda s: s.display_name,
     )
-    table = hours_table(c, m, [p.id for p in people])
+    table = hours_table(c, m, [p.id for p in people], rest=rest)
     out = [
         PersonHours(staff_id=p.id, display_name=p.display_name, **table[p.id].model_dump())
         for p in people
@@ -1096,6 +1600,9 @@ def hours_report(c: CtxDep, _: OversightReaderDep, month: Month) -> HoursReport:
         roster_month=m,
         people=out,
         total_overtime_hours=round(sum(p.overtime_hours for p in out), 2),
+        rest_violations_total=sum(
+            p.rest_compliance.violations for p in out if p.rest_compliance is not None
+        ),
     )
 
 
@@ -1117,7 +1624,7 @@ def overtime_trend(
     return [
         OvertimeMonth(
             roster_month=m,
-            overtime_hours=hours_report(c, _, m.strftime("%Y-%m")).total_overtime_hours,
+            overtime_hours=hours_report(c, _, m.strftime("%Y-%m"), rest=False).total_overtime_hours,
         )
         for m in published
     ]

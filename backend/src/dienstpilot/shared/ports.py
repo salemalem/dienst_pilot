@@ -1,15 +1,22 @@
 """Interfaces for everything outside the domain: the clock and the eight intelligence components.
 
-Domain and application code depend on these protocols, never on an implementation. Phase 3A
-provides deterministic stand-ins for C3–C8 and "not implemented" adapters for C1 and C2.
+Domain and application code depend on these protocols, never on an implementation. C1 and C2
+are built (Phase 7); C3–C8 are deterministic stand-ins until their phases.
 """
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
-Implementation = Literal["stand-in", "not_implemented", "built"]
+if TYPE_CHECKING:
+    from dienstpilot_solver.model import Config as SolverConfig
+    from dienstpilot_solver.model import Problem
+    from dienstpilot_solver.model import Result as SolverResult
+    from dienstpilot_validator import Assignment as RosterAssignment
+    from dienstpilot_validator import MonthInput, Violation
+
+Implementation = Literal["stand-in", "built"]
 
 
 class Clock(ABC):
@@ -35,17 +42,6 @@ class EngineInfo:
     planned_phase: int | None = None
 
 
-class EngineNotImplementedError(Exception):
-    """An engine port without an implementation yet (C1 and C2 until Phase 7)."""
-
-    def __init__(self, info: EngineInfo) -> None:
-        """Remember which component is missing."""
-        super().__init__(
-            f"{info.component} is not implemented yet (planned for phase {info.planned_phase})"
-        )
-        self.info = info
-
-
 class Engine(ABC):
     """Common base: every engine describes itself."""
 
@@ -53,22 +49,30 @@ class Engine(ABC):
 
 
 # --- C1, C2: optimisation and validation -----------------------------------------------------
+# The engines are this repository's own packages (engine/solver, engine/validator); their typed
+# inputs are part of the port. The vendor SDK (OR-Tools) stays inside the solver package.
 
 
 class RosterOptimizer(Engine):
     """C1: proposes complete roster variants for a month."""
 
     @abstractmethod
-    def generate(self, month: date, department_id: str) -> list[dict[str, Any]]:
-        """Return variants with metrics."""
+    def solve(self, problem: "Problem", config: "SolverConfig") -> "SolverResult":
+        """Return variants with metrics, or why no valid roster exists."""
 
 
 class Validator(Engine):
     """C2: checks a roster or a change against the active rule set."""
 
     @abstractmethod
-    def validate(self, month: date, assignments: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Return the violations."""
+    def validate(self, month: "MonthInput") -> list["Violation"]:
+        """Return every violation of the month."""
+
+    @abstractmethod
+    def validate_change(
+        self, month: "MonthInput", remove: list["RosterAssignment"], add: list["RosterAssignment"]
+    ) -> tuple[list["Violation"], list["Violation"]]:
+        """Return (violations after the change, violations the change introduces)."""
 
 
 # --- C3–C6: estimates ------------------------------------------------------------------------

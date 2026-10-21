@@ -1,0 +1,13 @@
+[project]
+name = "dienstpilot-eval"
+version = "1.0.0"
+description = "Evaluation: inputs from the synthetic data, benchmark, validator eval. May read _truth/."
+requires-python = ">=3.12,<3.13"
+dependencies = ["polars>=1.30.0", "dienstpilot-validator", "dienstpilot-solver"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dienstpilot_eval"]

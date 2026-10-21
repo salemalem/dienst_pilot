@@ -130,6 +130,9 @@ importers:
 
   packages/i18n:
     devDependencies:
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.19.2
       intl-messageformat:
         specifier: ^12.1.0
         version: 12.1.3

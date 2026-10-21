@@ -2,7 +2,7 @@ COMPOSE := docker compose -f infra/compose.dev.yml
 SEED ?= 20261020
 SEED_DIR := data/synthetic/v1
 
-.PHONY: install dev down logs seed test lint format api-client
+.PHONY: install dev down logs seed test lint format api-client eval tune
 
 install: ## Install Python and Node dependencies
 	uv sync
@@ -41,6 +41,14 @@ format: ## Apply ruff and prettier formatting
 	uv run ruff format backend
 	uv run ruff check --fix backend
 	pnpm format
+
+eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.1 table
+	uv run python eval/run_validator_eval.py --data $(SEED_DIR)
+	uv run python eval/run_benchmark.py --data $(SEED_DIR)
+	uv run python eval/render_tables.py
+
+tune: ## Re-tune the balanced profile on July-December 2024 (eval/results/tuning.json)
+	uv run python eval/tune_profiles.py --data $(SEED_DIR)
 
 api-client: ## Regenerate packages/api-client from the backend's OpenAPI schema
 	pnpm --filter @dienstpilot/api-client generate

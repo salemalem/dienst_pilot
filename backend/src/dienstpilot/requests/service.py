@@ -3,6 +3,7 @@
 import uuid
 from dataclasses import dataclass
 from datetime import date, datetime
+from typing import Any
 
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
@@ -48,6 +49,7 @@ class LeaveRequest:
     decision_reason_code: str | None
     decision_reason: str | None
     previous_request_id: str | None
+    trade_off: dict[str, Any] | None = None  # the extra weekend duty committed to (C1-checked)
 
 
 def _window(w: m.RequestWindow) -> Window:
@@ -144,6 +146,7 @@ def _leave(r: m.LeaveRequest) -> LeaveRequest:
         r.decision_reason_code,
         r.decision_reason,
         None if r.previous_request_id is None else str(r.previous_request_id),
+        r.trade_off,
     )
 
 
@@ -172,9 +175,14 @@ def leave_request(session: Session, request_id: str) -> LeaveRequest | None:
 
 
 def create_leave(
-    session: Session, staff_id: str, start: date, end: date, now: datetime
+    session: Session,
+    staff_id: str,
+    start: date,
+    end: date,
+    now: datetime,
+    trade_off: dict[str, Any] | None = None,
 ) -> LeaveRequest:
-    """File a leave request (pending until the Planner decides)."""
+    """File a leave request (pending until the Planner decides), optionally with a trade-off."""
     r = m.LeaveRequest(
         id=uuid.uuid5(uuid.UUID(staff_id), f"leave/{start}/{end}/{now.isoformat()}"),
         staff_id=uuid.UUID(staff_id),
@@ -182,6 +190,7 @@ def create_leave(
         end_date=end,
         submitted_at=now,
         status="pending",
+        trade_off=trade_off,
     )
     session.add(r)
     session.flush()
@@ -209,3 +218,75 @@ def decide_leave(
     r.decision_reason = None if approve else reason
     session.flush()
     return _leave(r)
+
+
+def trade_off_commitments(session: Session, month: date) -> list[tuple[str, int]]:
+    """Return (staff id, weekends) promised for a month by approved leave with a trade-off."""
+    out = []
+    for r in session.scalars(
+        select(m.LeaveRequest).where(
+            m.LeaveRequest.status == "approved", m.LeaveRequest.trade_off.is_not(None)
+        )
+    ):
+        t = r.trade_off or {}
+        if t.get("month") == month.isoformat():
+            out.append((str(r.staff_id), int(t["weekends"])))
+    return out
+
+
+# --- M5 leave checks (computed in the background with C1) ------------------------------------
+
+
+@dataclass(frozen=True)
+class LeaveCheckInfo:
+    """A coverability check of a leave and its result."""
+
+    id: str
+    staff_id: str
+    start_date: date
+    end_date: date
+    created_at: datetime
+    status: str
+    result: dict[str, Any] | None
+
+
+def _check(c: m.LeaveCheck) -> LeaveCheckInfo:
+    return LeaveCheckInfo(
+        str(c.id), str(c.staff_id), c.start_date, c.end_date, c.created_at, c.status, c.result
+    )
+
+
+def create_check(
+    session: Session, staff_id: str, start: date, end: date, now: datetime
+) -> LeaveCheckInfo:
+    """Queue a coverability check."""
+    c = m.LeaveCheck(
+        id=uuid.uuid4(),  # random: the same dates may be checked twice at one demo instant
+        staff_id=uuid.UUID(staff_id),
+        start_date=start,
+        end_date=end,
+        created_at=now,
+        status="queued",
+    )
+    session.add(c)
+    session.flush()
+    return _check(c)
+
+
+def set_check(
+    session: Session, check_id: str, status: str, result: dict[str, Any] | None = None
+) -> None:
+    """Record a check's progress and result."""
+    c = session.get(m.LeaveCheck, uuid.UUID(check_id))
+    if c is None:
+        raise KeyError(check_id)
+    c.status = status
+    if result is not None:
+        c.result = result
+    session.flush()
+
+
+def check(session: Session, check_id: str) -> LeaveCheckInfo | None:
+    """Return a check."""
+    c = session.get(m.LeaveCheck, uuid.UUID(check_id))
+    return None if c is None else _check(c)

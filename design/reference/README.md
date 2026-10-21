@@ -16,4 +16,5 @@ Exported 20 October 2026. Visual source of truth for apps/mobile and apps/dashbo
 - Token source of truth: design-system/ (downloaded from the Design system link). The copies under handoff/*/project/ds/ are older snapshots; don't use them for tokens.
 - Shift types and times: docs/UI_SPEC.md §5 is the source of truth. The mobile mockups predate Rufbereitschaft, so their shift times are outdated: Bereitschaftsdienst is 08:00–08:00 (+1 day); 16:00–07:30 is Rufbereitschaft.
 - Take tokens, layout and component styling from here; build in the stack from CLAUDE.md. Do not copy prototype code wholesale.
+- Where the M5 (Urlaub beantragen) and M6 (Dienst tauschen) mockups differ from docs/UI_SPEC.md §3, UI_SPEC wins: M5 shows "coverable" by default and the trade-off only when the solver finds one; M6 is an exchange offer.
 - All numbers in the mockups (hours, fairness, overtime, costs) are illustrative. The coded apps must get every number from the backend.

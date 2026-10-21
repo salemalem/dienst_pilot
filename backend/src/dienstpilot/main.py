@@ -5,7 +5,6 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, Response, status
 
 from dienstpilot import health
-from dienstpilot.app import errors
 from dienstpilot.app.routes import auth, insight, me, planner
 from dienstpilot.shared.settings import Settings, get_settings
 
@@ -21,7 +20,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             " Fictional Klinik für Innere Medizin, Klinikum Musterstadt."
         ),
     )
-    errors.install(app)
 
     @app.get("/health", tags=["health"])
     async def get_health() -> health.Health:

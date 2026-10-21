@@ -42,7 +42,7 @@ async def check_postgres(settings: Settings) -> tuple[CheckStatus, CheckStatus]:
 
 async def check_redis(settings: Settings) -> CheckStatus:
     """Return whether Redis answers a PING."""
-    client = aioredis.from_url(settings.redis_url)
+    client = aioredis.from_url(settings.redis_url)  # type: ignore[no-untyped-call]  # redis-py 5 stubs
     try:
         await client.ping()
         return "ok"

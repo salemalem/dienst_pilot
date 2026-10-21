@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 
 from dienstpilot.shared.settings import DEMO_NOW
 
-from .helpers import future_shift
+from .helpers import coverable_shift
 
 pytestmark = pytest.mark.db
 
@@ -23,7 +23,7 @@ def _actions(client: TestClient, login: Any, prefix: str) -> list[str]:
 
 def _report_sick(client: TestClient, login: Any) -> tuple[dict[str, Any], dict[str, Any]]:
     weber = login("weber")
-    shift = future_shift(client, weber)
+    shift = coverable_shift(client, weber)
     r = client.post(
         "/me/sick", json={"start_date": shift["date"], "end_date": shift["date"]}, headers=weber
     )
@@ -42,7 +42,7 @@ def _staff_ids(client: TestClient, login: Any, month: str) -> dict[str, str]:
     return {r["display_name"]: r["staff_id"] for r in rows}
 
 
-def test_situation_c_cover_accepted_then_confirmed(
+def test_situation_c_cover_is_policy_approved_or_escalated_with_a_reason(
     client: TestClient, login: Any, as_staff: Any, clock: Any
 ) -> None:
     shift, cascade = _report_sick(client, login)
@@ -53,7 +53,7 @@ def test_situation_c_cover_accepted_then_confirmed(
     steps = detail["cascade"]["timeline"]
     assert steps[0]["response"] == "no_response"
     if detail["cascade"]["status"] != "open":
-        pytest.skip("only one candidate passed the basic filter")
+        pytest.skip("only one colleague could take this shift under the rules")
     asked = steps[-1]
     assert asked["response"] == "pending" and asked["rank"] == 2
     h = as_staff(_staff_ids(client, login, shift["date"][:7])[asked["staff_name"]])
@@ -62,28 +62,58 @@ def test_situation_c_cover_accepted_then_confirmed(
         for o in client.get("/me/cover-requests", headers=h).json()
         if o["shift"]["date"] == shift["date"]
     )
-    assert offer["check"] == "unchecked" and 0 < offer["seconds_left"] <= 15 * 60
-    assert offer["hours"]["planned_hours_after"] > offer["hours"]["planned_hours_before"]
+    assert offer["check"] == "validated" and 0 < offer["seconds_left"] <= 15 * 60
     resp = client.post(
         f"/me/cover-requests/{offer['offer_id']}", json={"accept": True}, headers=h
     ).json()
-    assert resp == {"status": "pending_approval", "escalation_reason": "validator_unavailable"}
-    inbox = client.get("/planner/requests", headers=login("brandt")).json()
-    assert any(c["id"] == cascade["id"] for c in inbox["cascades"])
-    closed = client.post(
-        f"/planner/cascades/{cascade['id']}/decision",
-        json={"option": "confirm_cover"},
-        headers=login("brandt"),
-    ).json()
-    assert (
-        closed["status"] == "closed"
-        and closed["outcome"] == "covered"
-        and closed["covered_by"] == asked["staff_name"]
-    )
+    if resp["status"] == "closed":
+        # C2-valid, no overtime, policy on: approved by the policy, logged as such.
+        assert resp["escalation_reason"] is None
+        events = client.get(
+            "/audit/events?action=cover.decided&since=2026-10-20T00:00:00%2B02:00",
+            headers=login("brandt"),
+        ).json()["events"]
+        assert any(e["payload"] == {"approval": "policy"} for e in events)
+    else:
+        assert resp == {"status": "pending_approval", "escalation_reason": "overtime"}
+        closed = client.post(
+            f"/planner/cascades/{cascade['id']}/decision",
+            json={"option": "confirm_cover"},
+            headers=login("brandt"),
+        ).json()
+        assert closed["outcome"] == "covered" and closed["covered_by"] == asked["staff_name"]
+    roster = client.get(f"/roster?month={shift['date'][:7]}", headers=login("brandt")).json()
+    row = next(r for r in roster["rows"] if r["display_name"] == asked["staff_name"])
+    assert shift["shift_type"] in row["cells"][shift["date"]]["shifts"]
     actions = _actions(client, login, "")
     assert {"absence.reported", "cover.search_started", "cover.accepted", "cover.decided"} <= set(
         actions
     )
+
+
+def test_cover_waits_for_the_planner_when_the_policy_is_off(
+    client: TestClient, login: Any, as_staff: Any
+) -> None:
+    put = client.put(
+        "/planner/policy",
+        json={"auto_approve_swaps": True, "auto_approve_cover": False},
+        headers=login("brandt"),
+    )
+    assert put.status_code == 200 and put.json()["auto_approve_cover"] is False
+    shift, cascade = _report_sick(client, login)
+    asked = cascade["timeline"][0]
+    h = as_staff(_staff_ids(client, login, shift["date"][:7])[asked["staff_name"]])
+    offer = next(
+        o
+        for o in client.get("/me/cover-requests", headers=h).json()
+        if o["shift"]["date"] == shift["date"]
+    )
+    resp = client.post(
+        f"/me/cover-requests/{offer['offer_id']}", json={"accept": True}, headers=h
+    ).json()
+    assert resp["status"] == "pending_approval"
+    assert resp["escalation_reason"] in ("policy_off", "overtime")
+    assert "policy.changed" in _actions(client, login, "policy")
 
 
 def test_situation_c_exhausted_list_escalates_with_ranked_options(
@@ -104,37 +134,47 @@ def test_situation_c_exhausted_list_escalates_with_ranked_options(
     assert closed["outcome"] == "locum"
 
 
-def test_situation_b_swap_waits_for_the_planner(client: TestClient, login: Any) -> None:
-    mehta = login("mehta")
-    shift = future_shift(client, mehta)
-    audience = client.get(
-        f"/me/swaps/audience?assignment_id={shift['assignment_id']}", headers=mehta
-    ).json()
-    assert audience["check"] == "unchecked" and audience["eligible_colleagues"] >= 0
-    offered = client.post(
-        "/me/swaps", json={"assignment_id": shift["assignment_id"]}, headers=mehta
-    )
-    assert offered.status_code == 201 and offered.json()["status"] == "open"
-    taker = None
-    for persona in ("lorenz", "alvarez", "kaya", "nowak", "weber", "schulz"):
-        offers = client.get("/me/swap-offers", headers=login(persona)).json()
-        match = next((o for o in offers if o["swap_id"] == offered.json()["id"]), None)
-        if match:
-            taker = persona
+def _offer_and_find_taker(
+    client: TestClient, login: Any, offerer: str = "nowak", needs_planner: bool = False
+) -> tuple[dict[str, Any], str, str]:
+    """Offer a shift whose swap does (not) break a rule for the offerer, and find a taker."""
+    h = login(offerer)
+    days = client.get("/me/roster?month=2026-11", headers=h).json()["days"]
+    shift = None
+    for d in days:
+        for s in d["shifts"]:
+            if s["shift_type"] == "ruf" or s["date"] <= DEMO_NOW.date().isoformat():
+                continue
+            a = client.get(f"/me/swaps/audience?assignment_id={s['assignment_id']}", headers=h)
+            audience = a.json()
+            assert audience["check"] == "validated"
+            if audience["eligible_colleagues"] and audience["needs_planner"] == needs_planner:
+                shift = s
+                break
+        if shift:
             break
-    if taker is None:
-        pytest.skip("no demo persona is eligible for this shift")
-    taken = client.post(f"/me/swap-offers/{offered.json()['id']}/take", headers=login(taker)).json()
-    assert (
-        taken["status"] == "pending_approval"
-        and taken["escalation_reason"] == "validator_unavailable"
-    )
-    d = client.post(
-        f"/planner/swaps/{offered.json()['id']}/decision",
-        json={"approve": True},
+    if shift is None:
+        pytest.skip(f"no shift of {offerer} with needs_planner={needs_planner}")
+    offered = client.post("/me/swaps", json={"assignment_id": shift["assignment_id"]}, headers=h)
+    assert offered.status_code == 201 and offered.json()["status"] == "open"
+    for persona in ("lorenz", "alvarez", "kaya", "mehta", "nowak", "weber", "schulz"):
+        if persona == offerer:
+            continue
+        offers = client.get("/me/swap-offers", headers=login(persona)).json()
+        if any(o["swap_id"] == offered.json()["id"] for o in offers):
+            return shift, offered.json()["id"], persona
+    pytest.skip("no demo persona may take this shift under the rules")
+
+
+def test_situation_b_valid_swap_is_approved_by_the_policy(client: TestClient, login: Any) -> None:
+    shift, swap_id, taker = _offer_and_find_taker(client, login)
+    taken = client.post(f"/me/swap-offers/{swap_id}/take", headers=login(taker)).json()
+    assert taken["status"] == "approved" and taken["escalation_reason"] is None
+    events = client.get(
+        "/audit/events?action=swap.approved&since=2026-10-20T00:00:00%2B02:00",
         headers=login("brandt"),
-    )
-    assert d.json()["status"] == "approved"
+    ).json()["events"]
+    assert any(e["payload"] == {"approval": "policy"} for e in events)
     roster = client.get(f"/me/roster?month={shift['date'][:7]}", headers=login(taker)).json()
     assert any(
         s["assignment_id"] == shift["assignment_id"] and s["changed"]
@@ -143,20 +183,76 @@ def test_situation_b_swap_waits_for_the_planner(client: TestClient, login: Any) 
     )
 
 
+def test_situation_b_swap_waits_for_the_planner_when_the_policy_is_off(
+    client: TestClient, login: Any
+) -> None:
+    client.put(
+        "/planner/policy",
+        json={"auto_approve_swaps": False, "auto_approve_cover": True},
+        headers=login("brandt"),
+    )
+    _, swap_id, taker = _offer_and_find_taker(client, login)
+    taken = client.post(f"/me/swap-offers/{swap_id}/take", headers=login(taker)).json()
+    assert taken["status"] == "pending_approval" and taken["escalation_reason"] == "policy_off"
+    inbox = client.get("/planner/requests", headers=login("brandt")).json()
+    assert any(s["id"] == swap_id for s in inbox["swaps"])
+    d = client.post(
+        f"/planner/swaps/{swap_id}/decision", json={"approve": True}, headers=login("brandt")
+    )
+    assert d.json()["status"] == "approved"
+
+
+def test_a_swap_below_the_offerers_hours_band_goes_to_the_planner(
+    client: TestClient, login: Any
+) -> None:
+    _, swap_id, taker = _offer_and_find_taker(client, login, "mehta", needs_planner=True)
+    taken = client.post(f"/me/swap-offers/{swap_id}/take", headers=login(taker)).json()
+    assert taken["status"] == "pending_approval" and taken["escalation_reason"] == "hours_band"
+
+
+def test_an_invalid_taker_is_refused(client: TestClient, login: Any) -> None:
+    """Someone who already works that day cannot take the offer (C2: one shift per day)."""
+    shift, swap_id, _ = _offer_and_find_taker(client, login)
+    for persona in ("lorenz", "alvarez", "kaya", "mehta", "weber", "schulz"):
+        h = login(persona)
+        mine = client.get(f"/me/roster?month={shift['date'][:7]}", headers=h).json()["days"]
+        busy = any(
+            x["shift_type"] in ("frueh", "spaet", "nacht", "bereitschaft")
+            for d in mine
+            if d["date"] == shift["date"]
+            for x in d["shifts"]
+        )
+        if busy:
+            r = client.post(f"/me/swap-offers/{swap_id}/take", headers=h)
+            assert r.status_code == 403
+            return
+    pytest.skip("no demo persona works that day")
+
+
 def test_situation_a_leave_without_trade_and_planner_decline(
     client: TestClient, login: Any
 ) -> None:
     kaya = login("kaya")
     check = client.post(
-        "/me/leave/check", json={"start_date": "2027-07-14", "end_date": "2027-07-27"}, headers=kaya
+        "/me/leave/check", json={"start_date": "2027-07-26", "end_date": "2027-08-06"}, headers=kaya
     ).json()
-    assert check["engine"]["implementation"] == "stand-in" and check["trade_off"] is None
+    assert check["engine"]["implementation"] == "stand-in" and check["trade_off_check_id"]
+    # The leave spans two months: the C1 check offers no trade-off.
+    result = client.get(f"/me/leave/checks/{check['trade_off_check_id']}", headers=kaya).json()
+    assert result["status"] == "done" and result["engine"]["component"] == "C1"
+    assert result["result"]["outcome"] == "not_applicable"
+    assert result["result"]["reason"] == "spans_months"
     with_trade = client.post(
         "/me/leave",
-        json={"start_date": "2027-07-14", "end_date": "2027-07-27", "with_trade": True},
+        json={
+            "start_date": "2027-07-26",
+            "end_date": "2027-08-06",
+            "with_trade": True,
+            "check_id": check["trade_off_check_id"],
+        },
         headers=kaya,
     )
-    assert with_trade.status_code == 501 and with_trade.json()["detail"]["component"] == "C1"
+    assert with_trade.status_code == 409
     created = client.post(
         "/me/leave", json={"start_date": "2027-07-14", "end_date": "2027-07-27"}, headers=kaya
     )
@@ -208,20 +304,84 @@ def test_wishes_limit_important_and_count_as_answered(client: TestClient, login:
     assert parsed["unavailable"] == ["2026-12-14"] and parsed["engine"]["component"] == "C7"
 
 
-def test_c1_and_c2_answer_501(client: TestClient, login: Any) -> None:
+def test_w3_to_w5_run_validate_edit_and_publish(client: TestClient, login: Any) -> None:
     h = login("brandt")
-    for method, path, body, component in [
-        ("post", "/planner/runs", {"roster_month": "2026-12"}, "C1"),
-        ("post", "/planner/validate", {"roster_month": "2026-11"}, "C2"),
-        ("patch", "/planner/roster/assignments", {"assignment_id": "x", "reason": "y"}, "C2"),
-        ("post", "/planner/variants/x/publish", None, "C2"),
-    ]:
-        r = getattr(client, method)(path, json=body, headers=h)
-        assert r.status_code == 501, (path, r.text)
-        assert (
-            r.json()["detail"]["component"] == component
-            and r.json()["detail"]["planned_phase"] == 7
-        )
+    assert (
+        client.post("/planner/runs", json={"roster_month": "2026-11"}, headers=h).status_code == 409
+    )
+    queued = client.post("/planner/runs", json={"roster_month": "2026-12"}, headers=h)
+    assert queued.status_code == 202 and queued.json()["status"] == "queued"
+    run = client.get(f"/planner/runs/{queued.json()['run_id']}", headers=h).json()
+    assert run["status"] == "done", run
+    assert run["solver_version"].startswith("c1-") and run["validator_version"].startswith("c2-")
+    variants = run["variants"]
+    assert [v["label"] for v in variants] == ["A", "B", "C"]
+    assert sum(v["recommended"] for v in variants) == 1
+    assert all(0 <= v["metrics"]["wish_rate"] <= 1 for v in variants)
+    best = next(v for v in variants if v["recommended"])
+    # A second run at the same demo instant is a new run (the demo clock can stand still).
+    second_run = client.post("/planner/runs", json={"roster_month": "2026-12"}, headers=h).json()
+    assert second_run["run_id"] != run["run_id"]
+    listed = client.get("/planner/runs?month=2026-12", headers=h).json()["runs"]
+    assert {r["run_id"] for r in listed} >= {run["run_id"], second_run["run_id"]}
+
+    grid = client.get(f"/roster?month=2026-12&variant_id={best['variant_id']}", headers=h).json()
+    assert grid["status"] == "draft" and grid["rows"]
+    assert (
+        client.get(
+            f"/roster?month=2026-12&variant_id={best['variant_id']}", headers=login("lorenz")
+        ).status_code
+        == 403
+    )
+    valid = client.post(
+        "/planner/validate",
+        json={"roster_month": "2026-12", "variant_id": best["variant_id"]},
+        headers=h,
+    ).json()
+    assert valid["valid"] and valid["validator"]["component"] == "C2"
+
+    # Remove a night from the draft: C2 reports the gap with an i18n key and a fix.
+    staff_id, day, assignment_id = next(
+        (row["staff_id"], day, cell["assignment_ids"][cell["shifts"].index("nacht")])
+        for row in grid["rows"]
+        for day, cell in row["cells"].items()
+        if "nacht" in cell["shifts"]
+    )
+    edit = client.patch(
+        "/planner/roster/assignments",
+        json={"variant_id": best["variant_id"], "assignment_id": assignment_id},
+        headers=h,
+    ).json()
+    gap = next(v for v in edit["introduced"] if v["rule"] == "coverage")
+    assert gap["key"] == "violation.coverage" and gap["fix_key"] == "fix.coverage"
+    assert gap["params"]["shift"] == "nacht" and gap["date"] == day
+    pub = client.post(f"/planner/variants/{best['variant_id']}/publish", headers=h)
+    assert pub.status_code == 422 and pub.json()["detail"]["code"] == "rule_violation"
+    # Put it back: valid again, and the Planner publishes it.
+    back = client.patch(
+        "/planner/roster/assignments",
+        json={
+            "variant_id": best["variant_id"],
+            "add": {"date": day, "shift_type": "nacht", "staff_id": staff_id},
+        },
+        headers=h,
+    ).json()
+    assert back["introduced"] == [] and back["violations"] == []
+    pub = client.post(f"/planner/variants/{best['variant_id']}/publish", headers=h)
+    assert pub.status_code == 200, pub.text
+    assert pub.json()["approved_by"] == "Dr. Thomas Brandt"
+    again = client.post(f"/planner/variants/{best['variant_id']}/publish", headers=h)
+    assert again.status_code == 409
+    statuses = {
+        v["variant_id"]: v["status"]
+        for v in client.get(f"/planner/runs/{run['run_id']}", headers=h).json()["variants"]
+    }
+    assert sorted(statuses.values()) == ["discarded", "discarded", "published"]
+    second = client.get(f"/planner/runs/{second_run['run_id']}", headers=h).json()["variants"]
+    assert {v["status"] for v in second} == {"discarded"}
+    published = client.get("/roster?month=2026-12", headers=h).json()
+    assert published["status"] == "published"
+    assert "roster.published" in _actions(client, login, "roster")
 
 
 def test_copilot_answers_with_rule_citation_and_creates_only_proposals(
@@ -258,10 +418,7 @@ def test_transparency_lists_eight_components_none_can_change_the_roster(
 ) -> None:
     comps = client.get("/transparency/components", headers=login("kaya")).json()
     assert [c["component"] for c in comps] == [f"C{i}" for i in range(1, 9)]
-    assert {c["component"] for c in comps if c["implementation"] == "not_implemented"} == {
-        "C1",
-        "C2",
-    }
+    assert {c["component"] for c in comps if c["implementation"] == "built"} == {"C1", "C2"}
     assert {c["component"] for c in comps if c["implementation"] == "stand-in"} == {
         f"C{i}" for i in range(3, 9)
     }

@@ -5,12 +5,15 @@ description = "DienstPilot backend: modular monolith with enforced bounded conte
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "alembic>=1.20.0",
+  "arq>=0.26",
+  "dienstpilot-solver",
+  "dienstpilot-validator",
   "fastapi>=0.153.0",
   "polars>=1.30.0",
   "psycopg[binary]>=3.3.6",
   "pydantic>=2.14.1",
   "pydantic-settings>=2.16.1",
-  "redis>=8.1.0",
+  "redis>=5.2,<6",  # arq (background jobs) supports redis-py below 6
   "sqlalchemy[asyncio]>=2.1.5",
   "uvicorn[standard]>=0.54.0",
 ]

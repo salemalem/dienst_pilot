@@ -7,7 +7,12 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 COPY backend/pyproject.toml backend/pyproject.toml
 COPY backend/src backend/src
+COPY engine engine
+COPY synthdata/pyproject.toml synthdata/pyproject.toml
+COPY eval/pyproject.toml eval/pyproject.toml
 RUN uv sync --frozen --no-dev --package dienstpilot
+# The transparency screen (W13) shows the eval summaries written by eval/ scripts.
+COPY eval/results eval/results
 
 COPY backend backend
 WORKDIR /app/backend

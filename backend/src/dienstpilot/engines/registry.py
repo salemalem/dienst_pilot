@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from dienstpilot.engines.not_implemented import OptimizerNotImplemented, ValidatorNotImplemented
+from dienstpilot.engines.built import CpSatOptimizer, RuleValidator
 from dienstpilot.engines.standins import (
     CopilotStandIn,
     CoverRankStandIn,
@@ -55,10 +55,10 @@ class Engines:
 
 
 def default_engines() -> Engines:
-    """Return the Phase 3A set: stand-ins for C3–C8, not implemented for C1 and C2."""
+    """Return the current set: C1 and C2 built, stand-ins for C3–C8."""
     return Engines(
-        OptimizerNotImplemented(),
-        ValidatorNotImplemented(),
+        CpSatOptimizer(),
+        RuleValidator(),
         ForecastStandIn(),
         PreferenceStandIn(),
         CoverRankStandIn(),
