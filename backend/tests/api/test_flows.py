@@ -166,6 +166,21 @@ def _offer_and_find_taker(
     pytest.skip("no demo persona may take this shift under the rules")
 
 
+def test_the_policy_can_be_switched_several_times_at_the_same_demo_instant(
+    client: TestClient, login: Any
+) -> None:
+    """The demo clock stands still, so each switch is its own audit event (no id collision)."""
+    h = login("brandt")
+    for swaps in (False, True, False, True):
+        r = client.put(
+            "/planner/policy",
+            json={"auto_approve_swaps": swaps, "auto_approve_cover": True},
+            headers=h,
+        )
+        assert r.status_code == 200, r.text
+    assert _actions(client, login, "policy").count("policy.changed") >= 4
+
+
 def test_situation_b_valid_swap_is_approved_by_the_policy(client: TestClient, login: Any) -> None:
     shift, swap_id, taker = _offer_and_find_taker(client, login)
     taken = client.post(f"/me/swap-offers/{swap_id}/take", headers=login(taker)).json()

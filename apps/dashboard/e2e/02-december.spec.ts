@@ -31,6 +31,8 @@ test.describe.serial("December: trial run, closing the window, a rule break, pub
     await expect(
       page.getByTestId("window-progress").or(page.getByText(/haben geantwortet/).first()),
     ).toBeVisible();
+    await page.getByRole("button", { name: "Erinnerung senden" }).click();
+    await expect(page.getByTestId("toast")).toContainText("Erinnerung an");
     await page.getByRole("button", { name: "Wunschphase schließen" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Wunschphase schließen" }).click();
     await expect(page.getByTestId("toast")).toContainText(

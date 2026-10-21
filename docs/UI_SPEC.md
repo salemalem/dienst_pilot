@@ -95,6 +95,15 @@ Persona: Dr. Thomas Brandt. Layout: left navigation, main canvas, collapsible co
 | W13 | KI-Transparenz / AI transparency | One card per component C1–C8: what it does, kind (optimization / ML / LLM), version, last trained, key eval metric from `eval/results`, link to model card, and "Kann den Dienstplan ändern: Nein" / "Can change the roster: No" | This screen is the portfolio's "how it works" shot |
 
 
+### 4.1 How the coded dashboard resolves the open points
+
+- **Navigation.** Groups are "Planung Dezember 2026" (the month comes from the API), "Laufender Betrieb", "Auswertung" and "System" (W11). W7 is called "Ausfälle live / Absences live", as in the design reference.
+- **W3 and W5.** A variant card never carries a publish action (the design system forbids one on an AI surface). Each card opens the draft in W4; the Planner's approval (W5) is the dialog behind "Freigeben und veröffentlichen" in W4. It needs the request window closed: a run while the window is open is a **trial run**, labelled on the cards and in the banner.
+- **W4.** A drag moves a shift to a colleague on the same day (reassignment; keyboard: Space picks up, arrows choose the person, Space drops, Enter opens the cell). Gap suggestions come from the API for published months only; a draft shows its gaps in the coverage row and as rule messages.
+- **W8 and W12 for Oversight.** Fairness is only anonymous statistics (no names on W8). Hours per person (payroll, working-time records) are on W12.
+- **W10.** The chain indicator says that the hash chain arrives in Phase 9 until `chain_verified` is true; it never shows a tick it cannot back.
+- **W13.** Cards are grouped by kind. Metrics come from `eval/results` through the API (C1, C2); the other components show a marked placeholder, and no model card exists yet.
+
 ## 5. Shift types (use these exact times)
 
 | Dienstart | Shift type | DE | EN | Start | End | Break | Net working time |
