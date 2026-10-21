@@ -44,10 +44,1474 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/personas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Personas
+         * @description List the demo personas (UI_SPEC §1).
+         */
+        get: operations["personas_auth_personas_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/demo-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Demo Login
+         * @description Sign in as a demo persona. Real single sign-on replaces this later.
+         */
+        post: operations["demo_login_auth_demo_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Me
+         * @description Return the signed-in user.
+         */
+        get: operations["me_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Clock Now
+         * @description Return the demo clock (the UI uses it for "today" and countdowns).
+         */
+        get: operations["clock_now_clock_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Today
+         * @description M2: the next shift with colleagues, the open request window, open cover requests.
+         */
+        get: operations["today_me_today_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/roster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Roster
+         * @description M3: the physician's month with wish marks (granted, missed).
+         */
+        get: operations["my_roster_me_roster_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/wishes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Wishes
+         * @description M4: the open request window, the person's entries and preference suggestions.
+         */
+        get: operations["my_wishes_me_wishes_get"];
+        /**
+         * Save Wishes
+         * @description M4: replace the person's answer to the open window (no approval needed, PROCESS §2).
+         */
+        put: operations["save_wishes_me_wishes_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/wishes/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Parse Wishes
+         * @description M4: interpret free text ("Wir haben verstanden: …"). The text is not stored.
+         */
+        post: operations["parse_wishes_me_wishes_parse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Leave
+         * @description M5: the person's leave requests.
+         */
+        get: operations["my_leave_me_leave_get"];
+        put?: never;
+        /**
+         * Request Leave
+         * @description M5: request leave without a trade ("Ohne Tausch beantragen"); the Planner decides.
+         */
+        post: operations["request_leave_me_leave_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/leave/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check Leave
+         * @description M5: instant hint before submitting (C6 stand-in); the confirmed trade-off waits for C1.
+         */
+        post: operations["check_leave_me_leave_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/swaps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Swaps
+         * @description M6: swaps the person offered or took.
+         */
+        get: operations["my_swaps_me_swaps_get"];
+        put?: never;
+        /**
+         * Offer Swap
+         * @description M6: offer an own future shift to eligible colleagues.
+         */
+        post: operations["offer_swap_me_swaps_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/swaps/audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Swap Audience
+         * @description M6: how many colleagues could take this shift (basic filter, not checked against rules).
+         */
+        get: operations["swap_audience_me_swaps_audience_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/swap-offers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Open Offers
+         * @description M6: open offers of colleagues the person could take (basic filter).
+         */
+        get: operations["open_offers_me_swap_offers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/swap-offers/{swap_id}/take": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Take Offer
+         * @description M6: take a colleague's offer. Without the validator (C2) the Planner decides.
+         */
+        post: operations["take_offer_me_swap_offers__swap_id__take_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/sick": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report Sick
+         * @description M7: report sick (no approval, PROCESS §2); cover searches start for each affected shift.
+         */
+        post: operations["report_sick_me_sick_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/cover-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cover Requests
+         * @description M8: open cover requests with countdown and hours impact.
+         */
+        get: operations["cover_requests_me_cover_requests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/cover-requests/{offer_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Respond Cover
+         * @description M8: take the shift ("Übernehmen") or decline. Taking it waits for the Planner until C2.
+         */
+        post: operations["respond_cover_me_cover_requests__offer_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/fairness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Fairness
+         * @description M9: own nights, weekends and holidays against the department (anonymous statistics).
+         */
+        get: operations["my_fairness_me_fairness_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Hours
+         * @description M10: own hours for a month (default: the current month).
+         */
+        get: operations["my_hours_me_hours_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Notifications
+         * @description M11: roster published, swap updates, leave decisions, cover requests.
+         */
+        get: operations["notifications_me_notifications_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Settings
+         * @description M12: personal settings (every signed-in user).
+         */
+        get: operations["get_settings_me_settings_get"];
+        /**
+         * Put Settings
+         * @description M12: change personal settings. Oversight is read-only and cannot change anything.
+         */
+        put: operations["put_settings_me_settings_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/roster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Roster
+         * @description W4 grid and the full roster for Staff+: shifts, absences, leave, coverage per shift.
+         */
+        get: operations["roster_roster_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/roster/assignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change Assignment
+         * @description W4: change a published roster. Every change must pass the validator, so this waits for C2.
+         */
+        patch: operations["change_assignment_planner_roster_assignments_patch"];
+        trace?: never;
+    };
+    "/planner/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Validate
+         * @description W4: live validation (C2, Phase 7).
+         */
+        post: operations["validate_planner_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Runs
+         * @description W3: existing runs of a month (December 2026 has none until C1 exists).
+         */
+        get: operations["runs_planner_runs_get"];
+        put?: never;
+        /**
+         * Generate
+         * @description W3: generate variants with the optimizer (C1, Phase 7).
+         */
+        post: operations["generate_planner_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/variants/{variant_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish
+         * @description W5: approve and publish. A variant must pass the validator first, so this waits for C2.
+         */
+        post: operations["publish_planner_variants__variant_id__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Overview
+         * @description W1: window progress, escalations, coverage of the next 14 days with expected absences.
+         */
+        get: operations["overview_planner_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/windows/{month}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Window Detail
+         * @description W2: who has answered the window.
+         */
+        get: operations["window_detail_planner_windows__month__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/windows/{month}/reminders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Remind
+         * @description W2: "Erinnerung senden" to everyone who has not answered (push comes later).
+         */
+        post: operations["remind_planner_windows__month__reminders_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/windows/{month}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Close Window
+         * @description W2: close the window.
+         */
+        post: operations["close_window_planner_windows__month__close_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Inbox
+         * @description W6: pending leave with computed impact, escalated swaps and cover, open proposals.
+         */
+        get: operations["inbox_planner_requests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/leave/{request_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decide Leave
+         * @description W6: "Genehmigen" or "Ablehnen mit Begründung".
+         */
+        post: operations["decide_leave_planner_leave__request_id__decision_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/swaps/{swap_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decide Swap
+         * @description W6: approve or decline a taken swap (escalated while C2 is not available).
+         */
+        post: operations["decide_swap_planner_swaps__swap_id__decision_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/proposals/{proposal_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decide Proposal
+         * @description W6: mark a proposal accepted or dismissed. Acting on it is a separate, validated change.
+         */
+        post: operations["decide_proposal_planner_proposals__proposal_id__decision_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/cascades": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Live Cascades
+         * @description W7: open and escalated cover searches, and those closed in the last 7 days.
+         */
+        get: operations["live_cascades_planner_cascades_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/cascades/{cascade_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Escalation
+         * @description W7b: options to close the gap, ranked, with hours and overtime consequences.
+         */
+        get: operations["escalation_planner_cascades__cascade_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/cascades/{cascade_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decide Cascade
+         * @description W7b: close a cover search the way the Planner chose.
+         */
+        post: operations["decide_cascade_planner_cascades__cascade_id__decision_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fairness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fairness Report
+         * @description W8 (Planner) and W12 (Oversight, without names).
+         */
+        get: operations["fairness_report_fairness_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Hours Report
+         * @description Per-person hours and overtime of a month (Planner and Oversight).
+         */
+        get: operations["hours_report_compliance_hours_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/overtime-trend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Overtime Trend
+         * @description W8: department overtime per month for the last published months.
+         */
+        get: operations["overtime_trend_compliance_overtime_trend_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/copilot/ask": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask
+         * @description W9: ask the copilot (stand-in). It reads; it cannot publish or approve anything.
+         */
+        post: operations["ask_copilot_ask_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/copilot/proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Proposal
+         * @description W9: create a proposal. It changes nothing until the Planner acts on it.
+         */
+        post: operations["create_proposal_copilot_proposals_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/audit/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Audit Events
+         * @description W10: the audit trail, filterable.
+         *
+         *     Same privacy rules as everywhere: no absence category for anyone but the Planner.
+         */
+        get: operations["audit_events_audit_events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/master-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Master Data
+         * @description W11: master data and versioned rules (Administrator and Planner).
+         */
+        get: operations["master_data_master_data_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/rule-sets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Rule Set
+         * @description W11: add a rule version ("Neue Regelversion ab 01.01.2027"). Old rosters keep theirs.
+         */
+        post: operations["add_rule_set_admin_rule_sets_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/oversight/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Oversight Summary
+         * @description W12: hours and overtime per person, fairness as anonymous statistics, audit export.
+         */
+        get: operations["oversight_summary_oversight_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/audit/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Audit Export
+         * @description W12: export of the audit trail (same privacy rules), up to 5 000 events.
+         */
+        get: operations["audit_export_audit_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/transparency/components": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Components
+         * @description W13: what each component is, how far it is built, and that none can change the roster.
+         */
+        get: operations["components_transparency_components_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/demo/clock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Clock
+         * @description Move the demo clock (Administrator, DEMO_MODE only). Stored in Redis.
+         */
+        put: operations["set_clock_demo_clock_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AskIn
+         * @description A question for the copilot.
+         */
+        AskIn: {
+            /** Question */
+            question: string;
+            /**
+             * Language
+             * @default de
+             * @enum {string}
+             */
+            language: "de" | "en";
+        };
+        /**
+         * AskOut
+         * @description The copilot's answer with figures and cited rules.
+         */
+        AskOut: {
+            /** Answer */
+            answer: string;
+            /** Figures */
+            figures: {
+                [key: string]: unknown;
+            };
+            /** Citations */
+            citations: string[];
+            /** Understood */
+            understood: boolean;
+            engine: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * AssignmentChange
+         * @description A change to a published roster. Needs a reason (PROCESS §2).
+         */
+        AssignmentChange: {
+            /** Assignment Id */
+            assignment_id: string;
+            /** New Staff Id */
+            new_staff_id?: string | null;
+            /** Reason */
+            reason: string;
+        };
+        /**
+         * AuditEventOut
+         * @description An audit event as the viewer may see it.
+         */
+        AuditEventOut: {
+            /** Id */
+            id: string;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Actor */
+            actor: string;
+            /** Action */
+            action: string;
+            /** Subject Type */
+            subject_type: string;
+            /** Subject Id */
+            subject_id: string | null;
+            /** Staff Name */
+            staff_name: string | null;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * AuditPage
+         * @description W10: a page of the audit trail.
+         */
+        AuditPage: {
+            /** Total */
+            total: number;
+            /** Events */
+            events: components["schemas"]["AuditEventOut"][];
+            /**
+             * Chain Verified
+             * @description The hash chain arrives in Phase 9
+             */
+            chain_verified?: null;
+            /**
+             * Chain Available From Phase
+             * @default 9
+             */
+            chain_available_from_phase: number;
+        };
+        /**
+         * CascadeDecision
+         * @description The Planner's choice for a gap.
+         */
+        CascadeDecision: {
+            /**
+             * Option
+             * @enum {string}
+             */
+            option: "confirm_cover" | "assign" | "locum" | "unfilled";
+            /** Staff Id */
+            staff_id?: string | null;
+        };
+        /**
+         * CascadeOut
+         * @description W7: a cover search as a timeline.
+         */
+        CascadeOut: {
+            /** Id */
+            id: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
+            /** Absent Staff */
+            absent_staff: string | null;
+            /**
+             * Opened At
+             * Format: date-time
+             */
+            opened_at: string;
+            /** Status */
+            status: string;
+            /** Outcome */
+            outcome: string | null;
+            /** Covered By */
+            covered_by: string | null;
+            /** Escalation Reason */
+            escalation_reason: string | null;
+            /** Remaining Candidates */
+            remaining_candidates: number;
+            /** Timeline */
+            timeline: components["schemas"]["OfferStep"][];
+        };
+        /**
+         * Cell
+         * @description What a physician has on a day.
+         */
+        Cell: {
+            /** Shifts */
+            shifts: string[];
+            /** Changed */
+            changed: boolean;
+            /** On Leave */
+            on_leave: boolean;
+            /**
+             * Absence
+             * @description status 'absent'; the category only for the Planner
+             */
+            absence?: {
+                [key: string]: string;
+            } | null;
+            /** Wish */
+            wish?: ("granted" | "missed") | null;
+        };
+        /**
+         * ClockIn
+         * @description A new demo time, or reset to the default demo moment.
+         */
+        ClockIn: {
+            /** Now */
+            now?: string | null;
+            /**
+             * Reset
+             * @default false
+             */
+            reset: boolean;
+        };
+        /**
+         * ClockOut
+         * @description The demo clock.
+         */
+        ClockOut: {
+            /**
+             * Now
+             * Format: date-time
+             */
+            now: string;
+            /** Demo Mode */
+            demo_mode: boolean;
+        };
+        /**
+         * Colleague
+         * @description A colleague on the same shift (no other detail).
+         */
+        Colleague: {
+            /** Staff Id */
+            staff_id: string;
+            /** Display Name */
+            display_name: string;
+        };
+        /**
+         * ComponentOut
+         * @description W13: one component card.
+         */
+        ComponentOut: {
+            /** Component */
+            component: string;
+            /** Kind */
+            kind: string;
+            /** Implementation */
+            implementation: string;
+            /** Version */
+            version: string;
+            /** Note */
+            note: string;
+            /** Planned Phase */
+            planned_phase: number | null;
+            /**
+             * Can Change Roster
+             * @default false
+             */
+            can_change_roster: boolean;
+            /**
+             * Eval Metric
+             * @description From eval/results; None until evaluated
+             */
+            eval_metric?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /**
+         * ContractOut
+         * @description A physician's current contract.
+         */
+        ContractOut: {
+            /** Staff Id */
+            staff_id: string;
+            /** Display Name */
+            display_name: string;
+            /** Role */
+            role: string;
+            /** Title De */
+            title_de: string;
+            /** Title En */
+            title_en: string;
+            /** Weekly Hours */
+            weekly_hours: number;
+            /** Qualifications */
+            qualifications: string[];
+        };
+        /**
+         * CoverRequestOut
+         * @description M8: an open cover request to the person.
+         */
+        CoverRequestOut: {
+            /** Offer Id */
+            offer_id: string;
+            shift: components["schemas"]["ShiftOut"];
+            /** Deadline At */
+            deadline_at: string | null;
+            /** Seconds Left */
+            seconds_left: number | null;
+            hours: components["schemas"]["HoursImpact"];
+            /**
+             * Check
+             * @default unchecked
+             */
+            check: string;
+        };
+        /**
+         * CoverTask
+         * @description An open cover request to the person.
+         */
+        CoverTask: {
+            /** Offer Id */
+            offer_id: string;
+            shift: components["schemas"]["ShiftOut"];
+            /** Deadline At */
+            deadline_at: string | null;
+        };
+        /**
+         * CoverageDay
+         * @description Coverage and expected absences of one day.
+         */
+        CoverageDay: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /**
+             * Short
+             * @description Demand rows with fewer physicians than required
+             */
+            short: number;
+            /** Expected Absences */
+            expected_absences: number;
+            /** Expected Low */
+            expected_low: number;
+            /** Expected High */
+            expected_high: number;
+        };
+        /**
+         * CoverageRow
+         * @description Demand against assigned physicians for one day, shift and qualification.
+         */
+        CoverageRow: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
+            /** Qualification */
+            qualification: string;
+            /** Required */
+            required: number;
+            /** Assigned */
+            assigned: number;
+        };
+        /**
+         * Decided
+         * @description The new state.
+         */
+        Decided: {
+            /** Id */
+            id: string;
+            /** Status */
+            status: string;
+        };
+        /**
+         * Decision
+         * @description Approve or decline. A decline needs the Planner's reason (shown to the requester).
+         */
+        Decision: {
+            /** Approve */
+            approve: boolean;
+            /** Reason */
+            reason?: string | null;
+        };
+        /**
+         * DemandOut
+         * @description The demand rows of one example day.
+         */
+        DemandOut: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Rows */
+            rows: [
+                string,
+                string,
+                number
+            ][];
+        };
+        /**
+         * DistributionOut
+         * @description Anonymous department statistics of one metric (nights, weekends, holidays).
+         */
+        DistributionOut: {
+            /** Metric */
+            metric: string;
+            /** People */
+            people: number;
+            /** Mean */
+            mean: number;
+            /** Median */
+            median: number;
+            /** Minimum */
+            minimum: number;
+            /** Maximum */
+            maximum: number;
+            /** Values */
+            values: number[];
+        };
+        /**
+         * EngineLabel
+         * @description Which component produced a value, and whether it is a stand-in.
+         */
+        EngineLabel: {
+            /** Component */
+            component: string;
+            /** Implementation */
+            implementation: string;
+            /** Version */
+            version: string;
+            /** Note */
+            note: string;
+        };
+        /**
+         * EscalationOut
+         * @description W7b: a cover search with ranked options.
+         */
+        EscalationOut: {
+            cascade: components["schemas"]["CascadeOut"];
+            /** Options */
+            options: components["schemas"]["Option"][];
+            engine: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * FairnessCategory
+         * @description The person's count against anonymous department statistics.
+         */
+        FairnessCategory: {
+            /** Metric */
+            metric: string;
+            /** Mine */
+            mine: number;
+            /** Department Mean */
+            department_mean: number;
+            /** Department Median */
+            department_median: number;
+            /** Department Min */
+            department_min: number;
+            /** Department Max */
+            department_max: number;
+            /**
+             * Distribution
+             * @description All values, sorted, without names
+             */
+            distribution: number[];
+        };
+        /**
+         * FairnessOut
+         * @description W8: burden distribution. Names only for the Planner; Oversight gets statistics only.
+         */
+        FairnessOut: {
+            /** Year */
+            year: number;
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Distributions */
+            distributions: components["schemas"]["DistributionOut"][];
+            /** People */
+            people: components["schemas"]["PersonBurden"][] | null;
+        };
+        /**
+         * GapSuggestion
+         * @description Who could fill a gap (Planner only; unchecked until C2).
+         */
+        GapSuggestion: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
+            /** Candidates */
+            candidates: string[];
+            /**
+             * Check
+             * @default unchecked
+             */
+            check: string;
+            engine: components["schemas"]["EngineLabel"];
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
         /**
          * Health
          * @description Liveness response.
@@ -59,6 +1523,681 @@ export interface components {
              * @constant
              */
             status: "ok";
+        };
+        /**
+         * HoursImpact
+         * @description What taking the shift does to the person's month.
+         */
+        HoursImpact: {
+            /** Contract Hours */
+            contract_hours: number;
+            /** Planned Hours Before */
+            planned_hours_before: number;
+            /** Planned Hours After */
+            planned_hours_after: number;
+        };
+        /**
+         * HoursOut
+         * @description M10: contract, planned, worked and overtime hours of a month.
+         */
+        HoursOut: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Contract Hours */
+            contract_hours: number;
+            /** Leave Credit Hours */
+            leave_credit_hours: number;
+            /** Planned Hours */
+            planned_hours: number;
+            /** Worked Hours */
+            worked_hours: number;
+            /** Overtime Hours */
+            overtime_hours: number;
+            /**
+             * Rest Compliance
+             * @description Needs the validator C2 (Phase 7)
+             */
+            rest_compliance?: null;
+            /**
+             * Rest Compliance Available From Phase
+             * @default 7
+             */
+            rest_compliance_available_from_phase: number;
+        };
+        /**
+         * HoursReport
+         * @description W8/W12: hours, overtime and rest compliance per person for a month.
+         */
+        HoursReport: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** People */
+            people: components["schemas"]["PersonHours"][];
+            /** Total Overtime Hours */
+            total_overtime_hours: number;
+            /**
+             * Rest Compliance
+             * @description Needs the validator C2 (Phase 7)
+             */
+            rest_compliance?: null;
+            /**
+             * Rest Compliance Available From Phase
+             * @default 7
+             */
+            rest_compliance_available_from_phase: number;
+        };
+        /**
+         * Inbox
+         * @description W6: everything waiting for the Planner.
+         */
+        Inbox: {
+            /** Leave */
+            leave: components["schemas"]["PendingLeave"][];
+            /** Swaps */
+            swaps: components["schemas"]["PendingSwap"][];
+            /** Cascades */
+            cascades: components["schemas"]["PendingCascade"][];
+            /** Proposals */
+            proposals: components["schemas"]["ProposalOut"][];
+        };
+        /**
+         * LeaveCheck
+         * @description M5: instant hint (C6) and what is known about overlaps.
+         */
+        LeaveCheck: {
+            /** Outcome */
+            outcome: string;
+            /** Overlapping Colleagues */
+            overlapping_colleagues: number;
+            /** Max On Leave Same Day */
+            max_on_leave_same_day: number;
+            /** Limit */
+            limit: number;
+            /** Leave Days Taken This Year */
+            leave_days_taken_this_year: number;
+            /**
+             * Trade Off
+             * @description Confirmed trade-off needs C1 (Phase 7)
+             */
+            trade_off?: null;
+            /**
+             * Trade Off Available From Phase
+             * @default 7
+             */
+            trade_off_available_from_phase: number;
+            engine: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * LeaveCheckIn
+         * @description Dates to check before submitting.
+         */
+        LeaveCheckIn: {
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+        };
+        /**
+         * LeaveImpact
+         * @description What a leave request would mean.
+         */
+        LeaveImpact: {
+            /** Hint */
+            hint: string;
+            /** Max On Leave Same Day */
+            max_on_leave_same_day: number;
+            /** Limit */
+            limit: number;
+            /** Leave Days Taken This Year */
+            leave_days_taken_this_year: number;
+            /** Department Mean Leave Days */
+            department_mean_leave_days: number;
+            engine: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * LeaveIn
+         * @description A leave request. ``with_trade`` needs C1 and is refused until Phase 7.
+         */
+        LeaveIn: {
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /**
+             * With Trade
+             * @default false
+             */
+            with_trade: boolean;
+        };
+        /**
+         * LeaveOut
+         * @description A leave request of the person. The Planner's reason is shown for a decline.
+         */
+        LeaveOut: {
+            /** Id */
+            id: string;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+            /** Status */
+            status: string;
+            /** Decided At */
+            decided_at: string | null;
+            /** Decision Reason */
+            decision_reason: string | null;
+        };
+        /**
+         * LoginRequest
+         * @description Which persona to sign in as.
+         */
+        LoginRequest: {
+            /** Persona */
+            persona: string;
+        };
+        /**
+         * MasterData
+         * @description W11: shift types, qualifications, contracts, demand templates, rule versions.
+         */
+        MasterData: {
+            /** Shift Types */
+            shift_types: components["schemas"]["ShiftTypeOut"][];
+            /** Qualifications */
+            qualifications: [
+                string,
+                string,
+                string
+            ][];
+            /** Contracts */
+            contracts: components["schemas"]["ContractOut"][];
+            /** Demand Examples */
+            demand_examples: components["schemas"]["DemandOut"][];
+            /** Rule Sets */
+            rule_sets: components["schemas"]["RuleSetOut"][];
+        };
+        /**
+         * Me
+         * @description The signed-in user.
+         */
+        Me: {
+            /** Id */
+            id: string;
+            /** Persona Key */
+            persona_key: string;
+            /** Display Name */
+            display_name: string;
+            /** Role */
+            role: string;
+            /** Department Id */
+            department_id: string;
+            /** Staff Id */
+            staff_id: string | null;
+        };
+        /**
+         * MyFairness
+         * @description M9: nights, weekends and holidays this year.
+         */
+        MyFairness: {
+            /** Year */
+            year: number;
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Categories */
+            categories: components["schemas"]["FairnessCategory"][];
+        };
+        /**
+         * MyRoster
+         * @description M3: the month as published and changed since.
+         */
+        MyRoster: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Published At */
+            published_at: string | null;
+            /** Published By */
+            published_by: string | null;
+            /** Rule Set Version */
+            rule_set_version: string | null;
+            /** Days */
+            days: components["schemas"]["RosterDay"][];
+        };
+        /**
+         * MyWishes
+         * @description M4: the open window and the person's answer.
+         */
+        MyWishes: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /** Days Left */
+            days_left: number;
+            /** Answered At */
+            answered_at: string | null;
+            /** Entries */
+            entries: components["schemas"]["WishEntry"][];
+            /** Max Important */
+            max_important: number;
+            /** Suggestions */
+            suggestions: components["schemas"]["Suggestion"][];
+            suggestions_engine: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * NextShift
+         * @description The next shift and who else works it.
+         */
+        NextShift: {
+            shift: components["schemas"]["ShiftOut"];
+            /** Colleagues */
+            colleagues: components["schemas"]["Colleague"][];
+        };
+        /**
+         * Notification
+         * @description One notification (the app renders the text from ``kind`` and ``data``).
+         */
+        Notification: {
+            /** Kind */
+            kind: string;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Data */
+            data: {
+                [key: string]: string | null;
+            };
+        };
+        /**
+         * OfferStep
+         * @description One step of a cascade's timeline.
+         */
+        OfferStep: {
+            /** Staff Name */
+            staff_name: string | null;
+            /** Rank */
+            rank: number;
+            /**
+             * Asked At
+             * Format: date-time
+             */
+            asked_at: string;
+            /** Deadline At */
+            deadline_at: string | null;
+            /** Responded At */
+            responded_at: string | null;
+            /** Response */
+            response: string;
+        };
+        /**
+         * OpenOffer
+         * @description An open offer the person could take.
+         */
+        OpenOffer: {
+            /** Swap Id */
+            swap_id: string;
+            shift: components["schemas"]["ShiftOut"];
+            /**
+             * Offered At
+             * Format: date-time
+             */
+            offered_at: string;
+            /**
+             * Check
+             * @default unchecked
+             */
+            check: string;
+        };
+        /**
+         * Option
+         * @description W7b: one way to close a gap, with its consequence.
+         */
+        Option: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "confirm_cover" | "assign" | "locum" | "unfilled";
+            /** Staff Id */
+            staff_id?: string | null;
+            /** Staff Name */
+            staff_name?: string | null;
+            /** Hours After */
+            hours_after?: number | null;
+            /** Contract Hours */
+            contract_hours?: number | null;
+            /** Overtime After */
+            overtime_after?: number | null;
+            /**
+             * Check
+             * @default unchecked
+             */
+            check: string;
+        };
+        /**
+         * OversightSummary
+         * @description W12: read-only view for Klinikleitung, HR and works council.
+         */
+        OversightSummary: {
+            /**
+             * Read Only
+             * @default true
+             */
+            read_only: boolean;
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            hours: components["schemas"]["HoursReport"];
+            /** Fairness */
+            fairness: components["schemas"]["DistributionOut"][];
+            /**
+             * Cost
+             * @description Cost is not modelled in the synthetic data
+             */
+            cost?: null;
+            /**
+             * Audit Export
+             * @default /audit/export
+             */
+            audit_export: string;
+        };
+        /**
+         * OvertimeMonth
+         * @description Department overtime in one month.
+         */
+        OvertimeMonth: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Overtime Hours */
+            overtime_hours: number;
+        };
+        /**
+         * Overview
+         * @description W1: what needs the Planner today.
+         */
+        Overview: {
+            /**
+             * Now
+             * Format: date-time
+             */
+            now: string;
+            /** Published Month */
+            published_month: string | null;
+            /** Planning Month */
+            planning_month: string | null;
+            window: components["schemas"]["WindowProgress"] | null;
+            /** Escalations */
+            escalations: number;
+            /** Pending Leave */
+            pending_leave: number;
+            /** Open Proposals */
+            open_proposals: number;
+            /** Coverage */
+            coverage: components["schemas"]["CoverageDay"][];
+            forecast_engine: components["schemas"]["EngineLabel"];
+            /** Recent */
+            recent: components["schemas"]["RecentChange"][];
+        };
+        /**
+         * ParseRequest
+         * @description Free text to interpret (untrusted).
+         */
+        ParseRequest: {
+            /** Text */
+            text: string;
+            /**
+             * Language
+             * @default de
+             * @enum {string}
+             */
+            language: "de" | "en";
+        };
+        /**
+         * ParsedOut
+         * @description C7: what was understood. Nothing is saved until the person confirms.
+         */
+        ParsedOut: {
+            /** Unavailable */
+            unavailable: string[];
+            /** Prefer Shifts */
+            prefer_shifts: string[];
+            /** Avoid Shifts */
+            avoid_shifts: string[];
+            /** Avoid Weekends */
+            avoid_weekends: boolean;
+            /** Clarifying Question */
+            clarifying_question: string | null;
+            engine: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * PendingCascade
+         * @description A cover search waiting for the Planner.
+         */
+        PendingCascade: {
+            /** Id */
+            id: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
+            /** Accepted By */
+            accepted_by: string | null;
+            /** Escalation Reason */
+            escalation_reason: string | null;
+        };
+        /**
+         * PendingLeave
+         * @description A leave request waiting for the Planner.
+         */
+        PendingLeave: {
+            /** Id */
+            id: string;
+            /** Staff Id */
+            staff_id: string;
+            /** Display Name */
+            display_name: string;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+            impact: components["schemas"]["LeaveImpact"];
+        };
+        /**
+         * PendingSwap
+         * @description A taken swap waiting for the Planner.
+         */
+        PendingSwap: {
+            /** Id */
+            id: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
+            /** Offered By */
+            offered_by: string | null;
+            /** Taken By */
+            taken_by: string | null;
+            /** Escalation Reason */
+            escalation_reason: string | null;
+        };
+        /**
+         * PersonBurden
+         * @description One physician's burden (Planner only).
+         */
+        PersonBurden: {
+            /** Staff Id */
+            staff_id: string;
+            /** Display Name */
+            display_name: string;
+            /** Nights */
+            nights: number;
+            /** Weekends */
+            weekends: number;
+            /** Holidays */
+            holidays: number;
+        };
+        /**
+         * PersonHours
+         * @description A physician's hours in a month (Planner and Oversight: payroll, working-time records).
+         */
+        PersonHours: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Contract Hours */
+            contract_hours: number;
+            /** Leave Credit Hours */
+            leave_credit_hours: number;
+            /** Planned Hours */
+            planned_hours: number;
+            /** Worked Hours */
+            worked_hours: number;
+            /** Overtime Hours */
+            overtime_hours: number;
+            /**
+             * Rest Compliance
+             * @description Needs the validator C2 (Phase 7)
+             */
+            rest_compliance?: null;
+            /**
+             * Rest Compliance Available From Phase
+             * @default 7
+             */
+            rest_compliance_available_from_phase: number;
+            /** Staff Id */
+            staff_id: string;
+            /** Display Name */
+            display_name: string;
+        };
+        /**
+         * Persona
+         * @description A demo persona.
+         */
+        Persona: {
+            /** Key */
+            key: string;
+            /** Display Name */
+            display_name: string;
+            /** Role */
+            role: string;
+        };
+        /**
+         * ProposalCreated
+         * @description The created proposal.
+         */
+        ProposalCreated: {
+            /** Id */
+            id: string;
+            /** Status */
+            status: string;
+        };
+        /**
+         * ProposalDecision
+         * @description Accept (to act on it) or dismiss a proposal.
+         */
+        ProposalDecision: {
+            /** Accept */
+            accept: boolean;
+        };
+        /**
+         * ProposalIn
+         * @description W9 "Vorschlag erstellen": a proposal for the Planner's inbox.
+         */
+        ProposalIn: {
+            /** Title */
+            title: string;
+            /** Body */
+            body: string;
+            /** Roster Month */
+            roster_month?: string | null;
+        };
+        /**
+         * ProposalOut
+         * @description A proposal in the inbox.
+         */
+        ProposalOut: {
+            /** Id */
+            id: string;
+            /** Source */
+            source: string;
+            /** Title */
+            title: string;
+            /** Body */
+            body: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Roster Month */
+            roster_month: string | null;
+            /** Status */
+            status: string;
         };
         /**
          * Readiness
@@ -85,6 +2224,555 @@ export interface components {
              * @enum {string}
              */
             redis: "ok" | "fail";
+        };
+        /**
+         * RecentChange
+         * @description A swap or cover settled recently.
+         */
+        RecentChange: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "swap" | "cover";
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
+            /** Staff Name */
+            staff_name: string | null;
+            /** Approval */
+            approval: string | null;
+        };
+        /**
+         * ReminderOut
+         * @description How many were reminded.
+         */
+        ReminderOut: {
+            /** Reminded */
+            reminded: number;
+        };
+        /**
+         * RespondIn
+         * @description Take the shift or decline.
+         */
+        RespondIn: {
+            /** Accept */
+            accept: boolean;
+        };
+        /**
+         * RespondOut
+         * @description What happens next.
+         */
+        RespondOut: {
+            /** Status */
+            status: string;
+            /** Escalation Reason */
+            escalation_reason: string | null;
+        };
+        /**
+         * Respondent
+         * @description Who received the window and whether they answered.
+         */
+        Respondent: {
+            /** Staff Id */
+            staff_id: string;
+            /** Display Name */
+            display_name: string;
+            /** Responded At */
+            responded_at: string | null;
+        };
+        /**
+         * RosterDay
+         * @description One day of the physician's month.
+         */
+        RosterDay: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shifts */
+            shifts: components["schemas"]["ShiftOut"][];
+            /** Wish */
+            wish: ("granted" | "missed") | null;
+        };
+        /**
+         * RosterGrid
+         * @description W4: the department's month.
+         */
+        RosterGrid: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "published" | "not_planned";
+            /** Published At */
+            published_at: string | null;
+            /** Rule Set Version */
+            rule_set_version: string | null;
+            /** Rows */
+            rows: components["schemas"]["RosterRow"][];
+            /** Coverage */
+            coverage: components["schemas"]["CoverageRow"][];
+            /** Gaps */
+            gaps: components["schemas"]["GapSuggestion"][];
+        };
+        /**
+         * RosterRow
+         * @description A physician's month.
+         */
+        RosterRow: {
+            /** Staff Id */
+            staff_id: string;
+            /** Display Name */
+            display_name: string;
+            /** Title De */
+            title_de: string;
+            /** Title En */
+            title_en: string;
+            /** Cells */
+            cells: {
+                [key: string]: components["schemas"]["Cell"];
+            };
+        };
+        /**
+         * RuleSetIn
+         * @description A new rule version: the full set of rules, effective from a future date.
+         */
+        RuleSetIn: {
+            /** Version */
+            version: string;
+            /**
+             * Effective From
+             * Format: date
+             */
+            effective_from: string;
+            /** Rules */
+            rules: {
+                [key: string]: unknown;
+            };
+            /** Change Note De */
+            change_note_de: string;
+            /** Change Note En */
+            change_note_en: string;
+        };
+        /**
+         * RuleSetOut
+         * @description A rule-set version.
+         */
+        RuleSetOut: {
+            /** Version */
+            version: string;
+            /**
+             * Effective From
+             * Format: date
+             */
+            effective_from: string;
+            /** Rules */
+            rules: {
+                [key: string]: unknown;
+            };
+            /** Change Note De */
+            change_note_de: string;
+            /** Change Note En */
+            change_note_en: string;
+        };
+        /**
+         * RunIn
+         * @description Generate variants for a month.
+         */
+        RunIn: {
+            /** Roster Month */
+            roster_month: string;
+        };
+        /**
+         * RunOut
+         * @description A roster run of a month and the versions behind it.
+         */
+        RunOut: {
+            /** Run Id */
+            run_id: string;
+            /** Variant Id */
+            variant_id: string;
+            /** Label */
+            label: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "published" | "draft";
+            /** Planner Kind */
+            planner_kind: string;
+            /** Rule Set Version */
+            rule_set_version: string;
+            /** Generator Version */
+            generator_version: string | null;
+            /** Published At */
+            published_at: string | null;
+        };
+        /**
+         * RunsOut
+         * @description W3: runs and variants of a month.
+         */
+        RunsOut: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Runs */
+            runs: components["schemas"]["RunOut"][];
+            optimizer: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * SettingsIn
+         * @description Changes to personal settings.
+         */
+        SettingsIn: {
+            /** Language */
+            language?: ("de" | "en") | null;
+            /** Theme */
+            theme?: ("auto" | "light" | "dark") | null;
+            /** Notifications */
+            notifications?: boolean | null;
+            /** Calendar Sync */
+            calendar_sync?: boolean | null;
+            /** Preference Suggestions */
+            preference_suggestions?: boolean | null;
+        };
+        /**
+         * SettingsOut
+         * @description M12: personal settings.
+         */
+        SettingsOut: {
+            /**
+             * Language
+             * @enum {string}
+             */
+            language: "de" | "en";
+            /**
+             * Theme
+             * @enum {string}
+             */
+            theme: "auto" | "light" | "dark";
+            /** Notifications */
+            notifications: boolean;
+            /** Calendar Sync */
+            calendar_sync: boolean;
+            /** Preference Suggestions */
+            preference_suggestions: boolean;
+        };
+        /**
+         * ShiftOut
+         * @description One shift of the signed-in physician.
+         */
+        ShiftOut: {
+            /** Assignment Id */
+            assignment_id: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
+            /** Starts At */
+            starts_at: string | null;
+            /** Ends At */
+            ends_at: string | null;
+            /**
+             * Changed
+             * @description True if the shift came to this person by a swap or cover
+             */
+            changed: boolean;
+        };
+        /**
+         * ShiftTypeOut
+         * @description A shift type.
+         */
+        ShiftTypeOut: {
+            /** Code */
+            code: string;
+            /** Letter De */
+            letter_de: string;
+            /** Letter En */
+            letter_en: string;
+            /** Name De */
+            name_de: string;
+            /** Name En */
+            name_en: string;
+            /** Start Time */
+            start_time: string | null;
+            /** End Time */
+            end_time: string | null;
+            /** Ends Next Day */
+            ends_next_day: boolean;
+            /** Net Hours */
+            net_hours: number;
+            /** Kind */
+            kind: string;
+            /** Burden Weight */
+            burden_weight: number;
+        };
+        /**
+         * SickIn
+         * @description Dates only. There is no field for a diagnosis or a reason.
+         */
+        SickIn: {
+            /** Start Date */
+            start_date?: string | null;
+            /** End Date */
+            end_date?: string | null;
+        };
+        /**
+         * SickOut
+         * @description M7: the absence and the cover searches started.
+         */
+        SickOut: {
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /**
+             * Status
+             * @default absent
+             */
+            status: string;
+            /** Affected Shifts */
+            affected_shifts: components["schemas"]["ShiftOut"][];
+            /** Cover Searches Started */
+            cover_searches_started: number;
+        };
+        /**
+         * Suggestion
+         * @description A preference suggestion the person can confirm (C4).
+         */
+        Suggestion: {
+            /** Kind */
+            kind: string;
+            /** Weekday */
+            weekday: number;
+            /** Shift Type */
+            shift_type: string;
+            /** Evidence */
+            evidence: number;
+        };
+        /**
+         * SwapAudience
+         * @description M6: how many colleagues the offer reaches (a count, never names).
+         */
+        SwapAudience: {
+            /** Assignment Id */
+            assignment_id: string;
+            /** Eligible Colleagues */
+            eligible_colleagues: number;
+            /**
+             * Check
+             * @default unchecked
+             */
+            check: string;
+        };
+        /**
+         * SwapOfferIn
+         * @description Which own shift to offer.
+         */
+        SwapOfferIn: {
+            /** Assignment Id */
+            assignment_id: string;
+        };
+        /**
+         * SwapOut
+         * @description A swap the person offered or took.
+         */
+        SwapOut: {
+            /** Id */
+            id: string;
+            shift: components["schemas"]["ShiftOut"] | null;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "offered" | "taken";
+            /** Status */
+            status: string;
+            /** Escalation Reason */
+            escalation_reason: string | null;
+            /** Decision Reason */
+            decision_reason: string | null;
+            /**
+             * Offered At
+             * Format: date-time
+             */
+            offered_at: string;
+        };
+        /**
+         * Today
+         * @description M2: next shift, open tasks.
+         */
+        Today: {
+            /**
+             * Now
+             * Format: date-time
+             */
+            now: string;
+            /** Display Name */
+            display_name: string;
+            next_shift: components["schemas"]["NextShift"] | null;
+            open_window: components["schemas"]["WindowTask"] | null;
+            /** Cover Requests */
+            cover_requests: components["schemas"]["CoverTask"][];
+        };
+        /**
+         * Token
+         * @description A bearer token for the persona.
+         */
+        Token: {
+            /** Access Token */
+            access_token: string;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            user: components["schemas"]["Me"];
+        };
+        /**
+         * ValidateIn
+         * @description A month to validate.
+         */
+        ValidateIn: {
+            /** Roster Month */
+            roster_month: string;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
+        };
+        /**
+         * WindowDetail
+         * @description W2: progress and the list of who has and hasn't answered.
+         */
+        WindowDetail: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Status */
+            status: string;
+            /**
+             * Opens At
+             * Format: date-time
+             */
+            opens_at: string;
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /** Responded */
+            responded: number;
+            /** Recipients */
+            recipients: number;
+            /** People */
+            people: components["schemas"]["Respondent"][];
+        };
+        /**
+         * WindowProgress
+         * @description Progress of the open request window.
+         */
+        WindowProgress: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Responded */
+            responded: number;
+            /** Recipients */
+            recipients: number;
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /** Days Left */
+            days_left: number;
+        };
+        /**
+         * WindowTask
+         * @description The open request window, if the person has not answered yet.
+         */
+        WindowTask: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /** Days Left */
+            days_left: number;
+        };
+        /**
+         * WishEntry
+         * @description A request-window entry.
+         */
+        WishEntry: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "unavailable" | "wish_work";
+            /** Shift Type */
+            shift_type?: ("frueh" | "spaet" | "nacht" | "bereitschaft" | "ruf") | null;
+            /**
+             * Important
+             * @default false
+             */
+            important: boolean;
         };
     };
     responses: never;
@@ -131,6 +2819,1788 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Readiness"];
+                };
+            };
+        };
+    };
+    personas_auth_personas_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Persona"][];
+                };
+            };
+        };
+    };
+    demo_login_auth_demo_login_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Token"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    me_me_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clock_now_clock_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClockOut"];
+                };
+            };
+        };
+    };
+    today_me_today_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Today"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_roster_me_roster_get: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyRoster"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_wishes_me_wishes_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyWishes"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_wishes_me_wishes_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WishEntry"][];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyWishes"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    parse_wishes_me_wishes_parse_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParseRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParsedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_leave_me_leave_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaveOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    request_leave_me_leave_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeaveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaveOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_leave_me_leave_check_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeaveCheckIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaveCheck"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_swaps_me_swaps_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwapOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    offer_swap_me_swaps_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SwapOfferIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwapOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    swap_audience_me_swaps_audience_get: {
+        parameters: {
+            query: {
+                assignment_id: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwapAudience"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_offers_me_swap_offers_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpenOffer"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    take_offer_me_swap_offers__swap_id__take_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                swap_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwapOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    report_sick_me_sick_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SickIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SickOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cover_requests_me_cover_requests_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoverRequestOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    respond_cover_me_cover_requests__offer_id__post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                offer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RespondIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RespondOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_fairness_me_fairness_get: {
+        parameters: {
+            query?: {
+                year?: number | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyFairness"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_hours_me_hours_get: {
+        parameters: {
+            query?: {
+                month?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HoursOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    notifications_me_notifications_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notification"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_settings_me_settings_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_settings_me_settings_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    roster_roster_get: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RosterGrid"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_assignment_planner_roster_assignments_patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignmentChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_planner_validate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ValidateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    runs_planner_runs_get: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_planner_runs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_planner_variants__variant_id__publish_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                variant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overview_planner_overview_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Overview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    window_detail_planner_windows__month__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WindowDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remind_planner_windows__month__reminders_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_window_planner_windows__month__close_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WindowDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inbox_planner_requests_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Inbox"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_leave_planner_leave__request_id__decision_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Decision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decided"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_swap_planner_swaps__swap_id__decision_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                swap_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Decision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decided"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_proposal_planner_proposals__proposal_id__decision_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                proposal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProposalDecision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decided"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    live_cascades_planner_cascades_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CascadeOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    escalation_planner_cascades__cascade_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                cascade_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EscalationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_cascade_planner_cascades__cascade_id__decision_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                cascade_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CascadeDecision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CascadeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    fairness_report_fairness_get: {
+        parameters: {
+            query?: {
+                year?: number | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FairnessOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    hours_report_compliance_hours_get: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HoursReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overtime_trend_compliance_overtime_trend_get: {
+        parameters: {
+            query?: {
+                months?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeMonth"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ask_copilot_ask_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AskIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AskOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_proposal_copilot_proposals_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProposalIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProposalCreated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    audit_events_audit_events_get: {
+        parameters: {
+            query?: {
+                action?: string | null;
+                staff_id?: string | null;
+                since?: string | null;
+                until?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    master_data_master_data_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MasterData"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_rule_set_admin_rule_sets_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RuleSetIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RuleSetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    oversight_summary_oversight_summary_get: {
+        parameters: {
+            query?: {
+                month?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OversightSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    audit_export_audit_export_get: {
+        parameters: {
+            query?: {
+                since?: string | null;
+                until?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    components_transparency_components_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComponentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_clock_demo_clock_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
