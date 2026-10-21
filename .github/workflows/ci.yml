@@ -59,6 +59,18 @@ jobs:
       - name: Database tests (load twice, demo state, models match migrations)
         run: uv run pytest -m db backend/tests
 
+  seeds:
+    name: Generator across nine seeds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0 (no floating major tag)
+        with:
+          version: "0.11.26"
+      - run: uv sync --frozen
+      - name: Every published month of every seed breaks only coverage
+        run: uv run pytest -m seeds synthdata/tests
+
   node:
     name: TypeScript (tokens, eslint, tsc, vitest)
     runs-on: ubuntu-latest

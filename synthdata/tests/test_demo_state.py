@@ -6,7 +6,7 @@ from pathlib import Path
 
 import polars as pl
 
-from hard_rules import check_month
+from hard_rules import Dataset, check_all, check_month
 from synthdata.config import DEMO_NOW
 from tests_support import read
 
@@ -40,7 +40,7 @@ def _published_at(dataset: Path, month: date) -> datetime:
 
 
 def test_november_2026_roster_passes_every_hard_rule(dataset: Path) -> None:
-    problems = check_month(dataset, NOVEMBER, _published_at(dataset, NOVEMBER))
+    problems = check_month(Dataset(dataset), NOVEMBER)
     assert problems == []
 
 
@@ -133,3 +133,14 @@ def test_published_rosters_break_only_coverage(dataset: Path) -> None:
     v = read(dataset, "_truth/published_violations")
     assert set(v["rule"].to_list()) <= {"coverage"}
     assert v.filter(pl.col("roster_month") == NOVEMBER).is_empty()
+
+
+def test_every_published_month_breaks_only_coverage_and_matches_the_record(dataset: Path) -> None:
+    problems = check_all(dataset)
+    assert len(problems) == 71  # January 2021 to November 2026
+    other = [p for ps in problems.values() for p in ps if p.rule != "coverage"]
+    assert other == []
+    found = {(p.day, p.detail) for ps in problems.values() for p in ps}
+    truth = read(dataset, "_truth/published_violations")
+    recorded = {(r["date"], r["detail"].split(":")[0]) for r in truth.iter_rows(named=True)}
+    assert found == recorded

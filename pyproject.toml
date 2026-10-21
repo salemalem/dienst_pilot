@@ -49,8 +49,11 @@ packages = ["dienstpilot", "synthdata"]
 [tool.pytest.ini_options]
 testpaths = ["backend/tests", "synthdata/tests"]
 pythonpath = ["synthdata/tests"]
-addopts = "-q"
-markers = ["db: needs TEST_DATABASE_URL (a Postgres the tests may wipe)"]
+addopts = "-q -m 'not seeds'"
+markers = [
+  "db: needs TEST_DATABASE_URL (a Postgres the tests may wipe)",
+  "seeds: generates and checks nine seeds (slow; own CI job)",
+]
 
 [tool.importlinter]
 root_packages = ["dienstpilot", "synthdata"]

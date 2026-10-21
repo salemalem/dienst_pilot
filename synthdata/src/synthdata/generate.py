@@ -24,8 +24,8 @@ from synthdata.config import (
 )
 from synthdata.demand import template_for
 from synthdata.ids import uid
-from synthdata.leave import LeaveRequest, generate_leave
-from synthdata.operations import OpsContext, OpsLog, cover_shift, simulate_sickness, simulate_swaps
+from synthdata.leave import LeaveRequest, calibrated_leave
+from synthdata.operations import OpsContext, OpsLog, run_before_month, simulate_sickness
 from synthdata.planner import PlanInput, plan_month
 from synthdata.rng import Streams
 from synthdata.roster import Schedule
@@ -42,12 +42,17 @@ class DemoRosterInvalidError(RuntimeError):
     """The November 2026 demo roster breaks a hard rule; the generator refuses to output it."""
 
 
+class PublishedRosterInvalidError(RuntimeError):
+    """A published month breaks a hard rule other than an unfillable coverage gap."""
+
+
 @dataclass
 class Dataset:
     """All visible tables (by context) and the ground truth."""
 
     tables: dict[str, Rows] = field(default_factory=dict)
     truth: dict[str, Rows] = field(default_factory=dict)
+    calibration: dict[str, float] = field(default_factory=dict)
 
 
 def generate(seed: int) -> Dataset:
@@ -63,7 +68,8 @@ def generate(seed: int) -> Dataset:
     template = {
         d: template_for(d, holidays) for d in days(HISTORY_START - timedelta(days=7), last_day)
     }
-    leave_reqs, leave = generate_leave(streams, people, latents, years)
+    leave_outcome = calibrated_leave(streams, people, latents, years)
+    leave_reqs, leave = leave_outcome.requests, leave_outcome.approved
     waves = {y: sickness_wave(streams.get("wave", y)) for y in range(2020, 2027)}
 
     ds = Dataset()
@@ -113,6 +119,8 @@ def generate(seed: int) -> Dataset:
         if is_demo and (result.gaps or result.person_violations):
             problems = [*result.gaps, *result.person_violations][:10]
             raise DemoRosterInvalidError(f"November 2026 roster breaks hard rules: {problems}")
+        if result.person_violations:
+            raise PublishedRosterInvalidError(f"{month}: {result.person_violations[:10]}")
         for v in [*result.gaps, *result.person_violations]:
             published_v.append(
                 {
@@ -177,13 +185,7 @@ def generate(seed: int) -> Dataset:
         ctx = OpsContext(
             month, rules, pmap, latents, holidays, leave, sick, effective, ids, published, waves
         )
-        simulate_swaps(ctx, ops, streams.get("swaps", month.isoformat()))
-        cover_rng = streams.get("cover-carry", month.isoformat())
-        for k, a, b, reported, absence_id in absences_open:
-            for sd in days(max(a, month), min(b, month_end(month))):
-                if reported > published:
-                    for shift in sorted(effective.get(k, {}).get(sd, set())):
-                        cover_shift(ctx, ops, cover_rng, k, sd, shift, reported, absence_id)
+        run_before_month(ctx, ops, streams.get("before-month", month.isoformat()), absences_open)
 
         new_absences: list[tuple[str, date, date, datetime, object]] = []
 
@@ -217,6 +219,10 @@ def generate(seed: int) -> Dataset:
             "operations/cover_offer": ops.offers,
         }
     )
+    ds.calibration = {
+        "leave_affinity_scale": leave_outcome.affinity_scale,
+        "first_request_decline_rate_achieved": round(leave_outcome.first_request_decline_rate, 4),
+    }
     ds.truth = {
         "staff_latent": _latent_rows(people, latents),
         "sickness_wave": [
@@ -424,6 +430,7 @@ def _requests(
             "decided_by": None if r.decided_at is None else pmap[PLANNER_KEY].id,
             "decision_reason_code": r.decision_reason_code,
             "decision_reason": r.decision_reason,
+            "previous_request_id": r.previous_id,
         }
         for r in leave_reqs
     ]

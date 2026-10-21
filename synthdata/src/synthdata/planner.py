@@ -144,6 +144,7 @@ def _attempt(inp: PlanInput, rng: np.random.Generator) -> PlanResult:
                 continue  # a gap; counted by the coverage check below
             _assign(sched, state, best_key, slot, rules)
 
+    _fill_gaps(inp, sched, state, active)
     _repair_low_hours(inp, sched, state, active)
     _top_up(inp, sched, state, active)
     month_sched = {k: {d: c for d, c in sp.items() if d >= month} for k, sp in sched.items()}
@@ -351,6 +352,131 @@ def _top_up(inp: PlanInput, sched: Schedule, state: dict[str, PState], active: l
                     sched[k] = trial
                     st.hours += credit(extra, rules)
                     break
+
+
+BASE_NEEDS = {
+    "nacht": {"nachtdienstfaehig"},
+    "bereitschaft": {"nachtdienstfaehig"},
+    "ruf": {"oberarzt"},
+}
+
+
+def _fill_gaps(
+    inp: PlanInput, sched: Schedule, state: dict[str, PState], active: list[str]
+) -> None:
+    """Close coverage gaps the greedy pass left, the way a planner reshuffles a day.
+
+    First a free colleague takes the gap directly; otherwise a colleague moves from another
+    shift that day into the gap and a free colleague takes the shift they left. A change is
+    kept only if nobody involved breaks a rule and the day's coverage gets better.
+    """
+    month = inp.month
+    for d in days(month, month_end(month)):
+        for _ in range(6):
+            gaps = _day_gaps(inp, sched, d)
+            if not gaps or not _close_one(inp, sched, state, active, d, gaps):
+                break
+
+
+def _day_gaps(inp: PlanInput, sched: Schedule, d: date) -> list[tuple[str, str]]:
+    """Return the (shift, qualification) rows of d's demand that are short."""
+    holders: dict[str, list[set[str]]] = {}
+    for k, sp in sched.items():
+        for c in sp.get(d, ()):
+            holders.setdefault(c, []).append(inp.people[k].qualifications_on(d))
+    short = []
+    for shift, qual, count in inp.template[d]:
+        qs = holders.get(shift, [])
+        have = len(qs) if qual == "any" else sum(qual in q for q in qs)
+        if have < count:
+            short.append((shift, qual))
+    return short
+
+
+def _ok(
+    inp: PlanInput,
+    sched: Schedule,
+    state: dict[str, PState],
+    k: str,
+    trial: dict[date, set[str]],
+    delta: float,
+) -> bool:
+    p = inp.people[k]
+    full = {**{x: set(v) for x, v in inp.history.get(k, {}).items()}, **trial}
+    if check_person(
+        p,
+        full,
+        inp.month,
+        inp.rules,
+        inp.holidays,
+        inp.blocked.get(k, set()),
+        inp.leave.get(k, set()),
+        band=False,
+    ):
+        return False
+    st = state[k]
+    return st.target <= 0 or (st.hours + st.leave_credit + delta) / st.target <= st.ratio_cap + 1e-9
+
+
+def _close_one(
+    inp: PlanInput,
+    sched: Schedule,
+    state: dict[str, PState],
+    active: list[str],
+    d: date,
+    gaps: list[tuple[str, str]],
+) -> bool:
+    rules = inp.rules
+    before = len(gaps)
+    for shift, qual in gaps:
+        needs = set(BASE_NEEDS.get(shift, set())) | ({qual} if qual != "any" else set())
+        # Direct: a free colleague with the right qualifications.
+        for k in active:
+            if sched[k].get(d) or not needs <= inp.people[k].qualifications_on(d):
+                continue
+            trial = {x: set(v) for x, v in sched[k].items()}
+            trial[d] = {shift}
+            if _ok(inp, sched, state, k, trial, credit(shift, rules)):
+                sched[k] = trial
+                state[k].hours += credit(shift, rules)
+                if len(_day_gaps(inp, sched, d)) < before:
+                    return True
+                sched[k][d].discard(shift)
+                if not sched[k][d]:
+                    del sched[k][d]
+                state[k].hours -= credit(shift, rules)
+        # Chain: p moves from another shift into the gap, q takes p's old shift.
+        for p_key in active:
+            old = {c for c in sched[p_key].get(d, set()) if c in WORKING and c != shift}
+            if len(old) != 1 or not needs <= inp.people[p_key].qualifications_on(d):
+                continue
+            (left,) = old
+            trial_p = {x: set(v) for x, v in sched[p_key].items()}
+            trial_p[d] = (trial_p[d] - {left}) | {shift}
+            if not _ok(
+                inp, sched, state, p_key, trial_p, credit(shift, rules) - credit(left, rules)
+            ):
+                continue
+            left_needs = _needs_of(inp.people[p_key], d, left)
+            for q in active:
+                if (
+                    q == p_key
+                    or sched[q].get(d)
+                    or not left_needs <= inp.people[q].qualifications_on(d)
+                ):
+                    continue
+                trial_q = {x: set(v) for x, v in sched[q].items()}
+                trial_q[d] = {left}
+                if not _ok(inp, sched, state, q, trial_q, credit(left, rules)):
+                    continue
+                saved_p, saved_q = sched[p_key], sched[q]
+                sched[p_key], sched[q] = trial_p, trial_q
+                if len(_day_gaps(inp, sched, d)) < before:
+                    state[p_key].hours += credit(shift, rules) - credit(left, rules)
+                    state[q].hours += credit(left, rules)
+                    return True
+                sched[p_key], sched[q] = saved_p, saved_q
+    return False
 
 
 def _needs_of(p: Person, d: date, shift: str) -> set[str]:

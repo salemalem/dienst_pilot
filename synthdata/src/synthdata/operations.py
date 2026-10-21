@@ -152,9 +152,26 @@ def _apply_and_record(
             )
 
 
-def simulate_swaps(ctx: OpsContext, log: OpsLog, rng: np.random.Generator) -> None:
-    """Each person offers at most one disliked shift per month; a colleague may take it over."""
+@dataclass(frozen=True)
+class PendingSwap:
+    """A swap offer, drawn when the month is published and settled at ``settle_at``."""
+
+    offered_by: str
+    day: date
+    shift: str
+    offered_at: datetime
+    settle_at: datetime
+
+
+def draw_swap_offers(ctx: OpsContext, rng: np.random.Generator) -> list[PendingSwap]:
+    """Each person offers at most one disliked shift of the month.
+
+    Offers are made and settled between publication and the start of the month, so every swap
+    precedes the month's own sick reports (a simplification, see ASSUMPTIONS.md §13).
+    """
     last = month_end(ctx.month)
+    month_start = datetime.combine(ctx.month, time(0, 0), tzinfo=TZ)
+    out: list[PendingSwap] = []
     for k in sorted(ctx.people):
         lat = ctx.latents[k]
         mine = [
@@ -169,49 +186,81 @@ def simulate_swaps(ctx: OpsContext, log: OpsLog, rng: np.random.Generator) -> No
         mine.sort(key=lambda t: (lat.shift_affinity(t[0], t[1]), t[0], t[1]))
         d, shift = mine[0]
         earliest = ctx.publish_at + timedelta(days=1)
-        latest = datetime.combine(d - timedelta(days=2), time(20, 0), tzinfo=TZ)
+        latest = month_start - timedelta(days=2)
         if latest <= earliest:
             continue
-        offered_at = earliest + (latest - earliest) * float(rng.random())
-        offered_at = offered_at.replace(second=0, microsecond=0)
-        swap_id = uid("swap", k, d, shift)
-        assignment_id = ctx.assignment_ids.get((k, d, shift))
-        if assignment_id is None:
-            continue  # the shift is itself the result of an earlier change
-        needs = _relevant_needs(ctx.people[k], d, shift)
-        cands = _free_candidates(ctx, d, shift, k, needs)
-        order = [cands[i] for i in rng.permutation(len(cands))] if cands else []
-        accepted_by: str | None = None
-        accepted_at: datetime | None = None
-        status = "expired"
-        for c in order[:8]:
-            p_acc = _sigmoid(ctx.latents[c].shift_affinity(d, shift) - 0.6)
-            if rng.random() < p_acc:
-                checked = rng.random() < PARAMS.manual_rule_check_rate
-                if checked and _violations_if(ctx, c, d, shift):
-                    status = "rejected"  # the planner refuses this taker; the offer stays open
-                    continue
-                accepted_by = c
-                accepted_at = offered_at + timedelta(hours=float(rng.uniform(0.5, 48)))
-                status = "accepted"
-                break
-        resolved = accepted_at or offered_at + timedelta(days=3)
-        if resolved > DEMO_NOW:
-            continue  # not settled by the demo date: leave it out
-        log.swaps.append(
-            {
-                "id": swap_id,
-                "assignment_id": assignment_id,
-                "offered_by": ctx.people[k].id,
-                "offered_at": offered_at,
-                "accepted_by": None if accepted_by is None else ctx.people[accepted_by].id,
-                "accepted_at": accepted_at,
-                "status": status,
-                "approval": "planner",
-            }
+        offered_at = (earliest + (latest - earliest) * float(rng.random())).replace(
+            second=0, microsecond=0
         )
-        if accepted_by is not None:
-            _apply_and_record(log, ctx, k, accepted_by, d, shift, "swap", swap_id)
+        settle_at = min(
+            offered_at + timedelta(hours=float(rng.uniform(0.5, 48))),
+            month_start - timedelta(minutes=1),
+        )
+        out.append(PendingSwap(k, d, shift, offered_at, settle_at.replace(second=0, microsecond=0)))
+    return out
+
+
+def settle_swap(ctx: OpsContext, log: OpsLog, rng: np.random.Generator, swap: PendingSwap) -> None:
+    """Ask colleagues in random order; the first who accepts and passes the planner takes it."""
+    k, d, shift = swap.offered_by, swap.day, swap.shift
+    if swap.settle_at > DEMO_NOW:
+        return  # not settled by the demo date: leave it out
+    assignment_id = ctx.assignment_ids.get((k, d, shift))
+    if assignment_id is None:
+        return  # no longer theirs (covered away after a sick report)
+    swap_id = uid("swap", k, d, shift)
+    needs = _relevant_needs(ctx.people[k], d, shift)
+    cands = _free_candidates(ctx, d, shift, k, needs)
+    order = [cands[i] for i in rng.permutation(len(cands))] if cands else []
+    accepted_by: str | None = None
+    status = "expired"
+    for c in order[:8]:
+        p_acc = _sigmoid(ctx.latents[c].shift_affinity(d, shift) - 0.6)
+        if rng.random() < p_acc:
+            checked = rng.random() < PARAMS.manual_rule_check_rate
+            if checked and _violations_if(ctx, c, d, shift):
+                status = "rejected"  # the planner refuses this taker; the offer stays open
+                continue
+            accepted_by = c
+            status = "accepted"
+            break
+    log.swaps.append(
+        {
+            "id": swap_id,
+            "assignment_id": assignment_id,
+            "offered_by": ctx.people[k].id,
+            "offered_at": swap.offered_at,
+            "accepted_by": None if accepted_by is None else ctx.people[accepted_by].id,
+            "accepted_at": swap.settle_at if accepted_by is not None else None,
+            "status": status,
+            "approval": "planner",
+        }
+    )
+    if accepted_by is not None:
+        _apply_and_record(log, ctx, k, accepted_by, d, shift, "swap", swap_id)
+
+
+Carried = tuple[str, date, date, datetime, object]  # person, start, end, reported, absence id
+
+
+def run_before_month(
+    ctx: OpsContext, log: OpsLog, rng: np.random.Generator, carried: list[Carried]
+) -> None:
+    """Process everything between publication and the month, in the order it happens.
+
+    That is swaps, and cover for sickness reported after publication that reaches into the month.
+    """
+    swaps = [(sw.settle_at, 1, sw) for sw in draw_swap_offers(ctx, rng)]
+    covers = [(c[3], 0, c) for c in carried if c[3] > ctx.publish_at]
+    events: list[tuple[datetime, int, PendingSwap | Carried]] = [*swaps, *covers]
+    for _, _, ev in sorted(events, key=lambda e: (e[0], e[1])):
+        if isinstance(ev, PendingSwap):
+            settle_swap(ctx, log, rng, ev)
+            continue
+        k, a, b, reported, absence_id = ev
+        for sd in days(max(a, ctx.month), min(b, month_end(ctx.month))):
+            for shift in sorted(ctx.effective.get(k, {}).get(sd, set())):
+                cover_shift(ctx, log, rng, k, sd, shift, reported, absence_id)
 
 
 def simulate_sickness(
@@ -221,10 +270,15 @@ def simulate_sickness(
     last_day: date,
     on_new_absence: Callable[[str, date, date, datetime, object], None],
 ) -> None:
-    """Sickness episodes day by day, then a cover cascade for every affected shift."""
+    """Draw each day's sick reports, then run the cover cascades in report-time order.
+
+    All of a day's reports are drawn first, so nobody who reports sick that day is asked to
+    cover, and every cascade starts after the report that caused it.
+    """
     for d in days(ctx.month, min(month_end(ctx.month), last_day)):
         seasonal = seasonal_factor(d, ctx.waves)
         expected = 0.0
+        reports: list[tuple[datetime, str, date, object]] = []
         for k in sorted(ctx.people):
             p = ctx.people[k]
             if (
@@ -262,9 +316,11 @@ def simulate_sickness(
                 }
             )
             on_new_absence(k, d, end, reported, absence_id)
-            for sd in days(d, end):
-                for shift in sorted(ctx.effective.get(k, {}).get(sd, set())):
-                    cover_shift(ctx, log, rng, k, sd, shift, reported, absence_id)
+            reports.append((reported, k, end, absence_id))
+        for at, who, until, aid in sorted(reports, key=lambda r: (r[0], r[1])):
+            for sd in days(d, until):
+                for shift in sorted(ctx.effective.get(who, {}).get(sd, set())):
+                    cover_shift(ctx, log, rng, who, sd, shift, at, aid)
         log.hazard.append(
             {"date": d, "expected_new_episodes": expected, "seasonal_factor": seasonal}
         )
