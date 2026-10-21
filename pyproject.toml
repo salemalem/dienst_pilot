@@ -7,14 +7,16 @@ requires-python = ">=3.12,<3.13"
 package = false
 
 [tool.uv.workspace]
-members = ["backend"]
+members = ["backend", "synthdata"]
 
 [tool.uv.sources]
 dienstpilot = { workspace = true }
+synthdata = { workspace = true }
 
 [dependency-groups]
 dev = [
   "dienstpilot",
+  "synthdata[plots]",
   "httpx>=0.28.1",
   "import-linter>=2.15",
   "mypy>=2.4.0",
@@ -25,28 +27,36 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["backend/src", "backend/tests"]
+src = ["backend/src", "backend/tests", "synthdata/src", "synthdata/tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF", "D"]
-ignore = ["D100", "D104", "D203", "D213"]
+# RUF001-003: German copy and date ranges use the en dash and ×.
+ignore = ["D100", "D104", "D203", "D213", "RUF001", "RUF002", "RUF003"]
 
 [tool.ruff.lint.per-file-ignores]
 "backend/tests/**" = ["D"]
+"synthdata/tests/**" = ["D"]
+"synthdata/scripts/**" = ["D"]
 "backend/migrations/**" = ["D"]
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
-mypy_path = "backend/src"
-packages = ["dienstpilot"]
+mypy_path = ["backend/src", "synthdata/src"]
+packages = ["dienstpilot", "synthdata"]
 
 [tool.pytest.ini_options]
-testpaths = ["backend/tests"]
-addopts = "-q"
+testpaths = ["backend/tests", "synthdata/tests"]
+pythonpath = ["synthdata/tests"]
+addopts = "-q -m 'not seeds'"
+markers = [
+  "db: needs TEST_DATABASE_URL (a Postgres the tests may wipe)",
+  "seeds: generates and checks nine seeds (slow; own CI job)",
+]
 
 [tool.importlinter]
-root_package = "dienstpilot"
+root_packages = ["dienstpilot", "synthdata"]
 
 [[tool.importlinter.contracts]]
 name = "Bounded contexts are independent"
@@ -77,3 +87,15 @@ forbidden_modules = [
   "dienstpilot.audit",
   "dienstpilot.main",
 ]
+
+[[tool.importlinter.contracts]]
+name = "The generator never imports the backend"
+type = "forbidden"
+source_modules = ["synthdata"]
+forbidden_modules = ["dienstpilot"]
+
+[[tool.importlinter.contracts]]
+name = "The backend never imports the generator (the loader reads Parquet)"
+type = "forbidden"
+source_modules = ["dienstpilot"]
+forbidden_modules = ["synthdata"]

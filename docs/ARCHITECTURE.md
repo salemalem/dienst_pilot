@@ -9,6 +9,7 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 |---|---|---|---|
 | — | Process design (roles, approvals, monthly cycle) | Domain design | Done, with clinical input |
 | — | System architecture (this document) | Design | Done |
+| — | Synthetic data generator (`synthdata/`) | Simulation | Prototype |
 | C1 | Roster Optimizer | Constraint optimization | Designed |
 | C2 | Rule and Compliance Validator | Deterministic | Designed |
 | C3 | Absence Forecaster | ML, time series | Designed |
@@ -116,15 +117,17 @@ Contexts never read each other's tables. Cross-context reads use public query se
 Because the prototype uses no real data, the generator in `synthdata/` is a first-class component.
 
 - **Department:** Klinik für Innere Medizin, Klinikum Musterstadt (fictional). About 28 physicians: 1 Chefärztin, 4 Oberärzt:innen, 7 Fachärzt:innen, 16 Assistenzärzt:innen, with rotations, arrivals and departures over time.
-- **Period:** January 2021 to December 2025, daily granularity.
-- **Shift types:** Frühdienst, Spätdienst, Nachtdienst, Bereitschaftsdienst (weekend and holiday), plus Rufbereitschaft for Oberärzt:innen.
+- **Period:** January 2021 to December 2025, daily granularity, for training and evaluation. 2026 is a separate demo period (marked in `manifest.json`, not for training): January to October simulated the same way, November 2026 published, the December 2026 request window open on the demo date.
+- **Shift types:** Frühdienst, Spätdienst, Nachtdienst, Bereitschaftsdienst (weekend and holiday), plus Rufbereitschaft for Oberärzt:innen and the Chefärztin.
 - **Demand:** weekday and weekend templates, holiday adjustments, qualification mix per shift.
 - **Absences:** seasonal respiratory waves (winter peaks), school-holiday leave peaks, post-night-shift effects at department level, random noise.
 - **Behaviour:** each synthetic physician has latent preferences (weekday × shift type), a latent cover willingness that decays with recent load, and swap habits.
 - **Historical rosters:** produced by a simulated "manual planner" heuristic (greedy, with realistic imperfections such as uneven weekend distribution) so the optimizer has a baseline to be compared against.
 - **Ground truth:** the latent parameters are written to a separate `_truth/` folder that training code is forbidden to read. Evaluation code uses it to check whether models recover the structure they were meant to learn.
 
-All generator assumptions are documented in `synthdata/ASSUMPTIONS.md`, and the dataset is reproducible from a seed.
+- **Rules:** two rule-set versions (`2021-1`, and `2026-1` from 1 January 2026), so roster runs show which version they were planned under.
+
+All generator assumptions are documented in `synthdata/ASSUMPTIONS.md`, and the dataset is reproducible from a seed. The output is Parquet in `data/synthetic/v1/` with a manifest (seed, generator version, row counts, hashes); `make seed` loads it into Postgres through each context's models (ADR-007).
 
 ---
 
@@ -365,11 +368,12 @@ These are planning estimates; `eval/cost_model.py` recomputes them from measured
 
 ### 17.1 Benchmark on synthetic data
 
-`eval/run_benchmark.py` compares the manual-planner baseline with C1 on held-out months and writes `eval/results/benchmark.json`. The table below is rendered from that file.
+`eval/run_benchmark.py` compares the manual-planner baseline with C1 on held-out months and writes `eval/results/benchmark.json`. The table below is rendered from that file. Violations in published rosters and in in-month changes are counted separately: the manual baseline's in-month rate follows from a simulation parameter (`synthdata/ASSUMPTIONS.md` §13), so it is not a finding about real planners.
 
 | Metric | Manual baseline | DienstPilot |
 |---|---|---|
-| Hard-rule violations | *pending eval* | *pending eval* |
+| Hard-rule violations, published rosters | *pending eval* | *pending eval* |
+| Hard-rule violations, in-month changes | *pending eval* | *pending eval* |
 | Wishes granted | *pending eval* | *pending eval* |
 | Weighted-burden spread (max − min) | *pending eval* | *pending eval* |
 | Overtime hours | *pending eval* | *pending eval* |

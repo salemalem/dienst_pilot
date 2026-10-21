@@ -9,7 +9,8 @@ services:
       POSTGRES_USER: dienstpilot
       POSTGRES_PASSWORD: dienstpilot
       POSTGRES_DB: dienstpilot
-    ports: ["5432:5432"]
+    # Host port 5433, so a Postgres already running on the host (5432) does not collide.
+    ports: ["5433:5432"]
     volumes: [postgres-data:/var/lib/postgresql/data]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dienstpilot -d dienstpilot"]

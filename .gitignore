@@ -30,3 +30,6 @@ web-build/
 
 # Tool caches
 .import_linter_cache/
+
+# Generated synthetic data (reproducible from the seed; see synthdata/)
+data/

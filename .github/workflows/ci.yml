@@ -25,6 +25,52 @@ jobs:
       - run: uv run lint-imports
       - run: uv run pytest
 
+  seed:
+    name: Seed loads into Postgres
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: dienstpilot
+          POSTGRES_PASSWORD: dienstpilot
+          POSTGRES_DB: dienstpilot
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U dienstpilot -d dienstpilot"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@localhost:5432/dienstpilot
+      TEST_DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@localhost:5432/dienstpilot
+      DIENSTPILOT_SEED_DIR: data/synthetic/v1
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0 (no floating major tag)
+        with:
+          version: "0.11.26"
+      - run: uv sync --frozen
+      - name: Generate the dataset from the seed
+        run: uv run python -m synthdata generate --out data/synthetic/v1
+      - name: Migrate a fresh database
+        working-directory: backend
+        run: uv run alembic upgrade head
+      - name: Load the seed
+        run: uv run python -m dienstpilot.seeding data/synthetic/v1
+      - name: Database tests (load twice, demo state, models match migrations)
+        run: uv run pytest -m db backend/tests
+
+  seeds:
+    name: Generator across nine seeds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0 (no floating major tag)
+        with:
+          version: "0.11.26"
+      - run: uv sync --frozen
+      - name: Every published month of every seed breaks only coverage
+        run: uv run pytest -m seeds synthdata/tests
+
   node:
     name: TypeScript (tokens, eslint, tsc, vitest)
     runs-on: ubuntu-latest

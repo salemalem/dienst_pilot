@@ -1,6 +1,8 @@
 COMPOSE := docker compose -f infra/compose.dev.yml
+SEED ?= 20261020
+SEED_DIR := data/synthetic/v1
 
-.PHONY: install dev down logs test lint format api-client
+.PHONY: install dev down logs seed test lint format api-client
 
 install: ## Install Python and Node dependencies
 	uv sync
@@ -16,6 +18,12 @@ down: ## Stop the Docker services
 
 logs: ## Follow the API, Postgres and Redis logs
 	$(COMPOSE) logs -f
+
+seed: ## Rebuild the database from the seed: generate (if changed), reset the schema, load
+	$(COMPOSE) up -d --wait postgres
+	uv run python -m synthdata generate --seed $(SEED) --out $(SEED_DIR) --if-changed
+	cd backend && uv run alembic downgrade base && uv run alembic upgrade head
+	uv run python -m dienstpilot.seeding $(SEED_DIR)
 
 test: ## Python and TypeScript tests
 	uv run pytest
