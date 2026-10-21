@@ -35,6 +35,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@postgres:5432/dienstpilot
       REDIS_URL: redis://redis:6379/0
+      DEMO_MODE: "true"
     command: >
       sh -c "alembic upgrade head &&
              uvicorn dienstpilot.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/backend/src"
