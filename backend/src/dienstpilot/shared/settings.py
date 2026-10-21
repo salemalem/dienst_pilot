@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     demo_now: datetime = DEMO_NOW
     # Registers the demo endpoints (PUT /demo/clock). On in the dev stack, off otherwise.
     demo_mode: bool = False
+    # Browser origins that may call the API, comma separated. Used only when DEMO_MODE is on
+    # (Expo web in development and in the e2e run); without DEMO_MODE the API sends no CORS headers.
+    cors_origins: str = "http://localhost:8081,http://localhost:8083"
     # Signs demo-login tokens. The default is for local development only.
     token_secret: str = "dev-only-not-a-secret"
     token_ttl_hours: int = 12

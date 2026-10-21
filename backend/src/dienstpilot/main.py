@@ -3,6 +3,7 @@
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Response, status
+from fastapi.middleware.cors import CORSMiddleware
 
 from dienstpilot import health
 from dienstpilot.app.routes import auth, insight, me, planner
@@ -44,6 +45,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.include_router(router)
     if settings.demo_mode:
         app.include_router(auth.demo_router)
+        # Dev origins only, bearer tokens (no cookies), explicit methods and headers (ADR-011).
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=[o.strip() for o in settings.cors_origins.split(",") if o.strip()],
+            allow_methods=["GET", "POST", "PUT", "PATCH", "OPTIONS"],
+            allow_headers=["authorization", "content-type"],
+            allow_credentials=False,
+        )
     return app
 
 
