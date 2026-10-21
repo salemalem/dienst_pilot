@@ -93,6 +93,11 @@ def upgrade() -> None:
         schema="operations",
     )
     op.add_column(
+        "swap_offer",
+        sa.Column("counter_assignment_id", sa.Uuid(), nullable=True),
+        schema="operations",
+    )
+    op.add_column(
         "roster_run",
         sa.Column("status", sa.String(length=12), server_default="done", nullable=False),
         schema="planning",
@@ -186,6 +191,7 @@ def downgrade() -> None:
     op.drop_column("roster_run", "finished_at", schema="planning")
     op.drop_column("roster_run", "requested_by", schema="planning")
     op.drop_column("roster_run", "status", schema="planning")
+    op.drop_column("swap_offer", "counter_assignment_id", schema="operations")
     op.drop_column("cover_cascade", "approval", schema="operations")
     op.drop_table("policy", schema="operations")
     op.drop_index(

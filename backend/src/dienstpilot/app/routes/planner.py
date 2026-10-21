@@ -899,7 +899,7 @@ def overview(c: CtxDep, _: PlannerDep) -> Overview:
                     date=a.day,
                     shift_type=a.shift_type,
                     staff_name=dep.name(cas.covered_by),
-                    approval="planner",
+                    approval=cas.approval or "planner",
                 )
             )
     months = planning.published_months(c.session)
@@ -1213,11 +1213,21 @@ def decide_swap(c: CtxDep, _: PlannerDep, swap_id: str, body: Decision) -> Decid
     assert c.user.staff_id is not None
     a = planning.assignment(c.session, s.assignment_id)
     if body.approve and a is not None and s.accepted_by:
+        remove = [Assignment(s.offered_by, a.day, a.shift_type)]
+        add = [Assignment(s.accepted_by, a.day, a.shift_type)]
+        counter = (
+            None
+            if s.counter_assignment_id is None
+            else planning.assignment(c.session, s.counter_assignment_id)
+        )
+        if counter is not None:
+            remove.append(Assignment(s.accepted_by, counter.day, counter.shift_type))
+            add.append(Assignment(s.offered_by, counter.day, counter.shift_type))
         introduced = change_violations(
             c,
             Inputs(c.session, dep, c.clock.now()),
-            [Assignment(s.offered_by, a.day, a.shift_type)],
-            [Assignment(s.accepted_by, a.day, a.shift_type)],
+            remove,
+            add,
             {s.offered_by, s.accepted_by},
         )
         if introduced:

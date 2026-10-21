@@ -13,7 +13,7 @@ A solver run takes seconds to minutes, too long for an HTTP request. Once C2 exi
 1. **Jobs in an arq worker.** `POST /planner/runs` stores a queued run, commits, and enqueues `run_roster`; the client polls `GET /planner/runs/{id}`. The M5 check (`POST /me/leave/check`) enqueues `check_leave` the same way. The worker (`dienstpilot.worker`, compose service `worker`) runs the same job functions the tests run inline (`dienstpilot.app.jobs`). Jobs are idempotent: a re-delivered job for a run that is no longer queued does nothing.
 2. **Every variant is checked by C2 before it is stored.** A variant C2 rejects is dropped (the property test says it cannot happen). Publishing (`POST /planner/variants/{id}/publish`) checks the whole month again, records an `Approval` by the Planner and an audit event, and sets the other drafts of the month aside.
 3. **Auto-approval policy** (`GET/PUT /planner/policy`, both on by default):
-   - a taken swap is approved by the policy when C2 finds no new violation for **either** person; if the only new violation is the offerer falling below the contract-hours band, the reason is `hours_band`, otherwise `rule_violation`;
+   - a swap is a give-away or an **exchange** (the taker gives one of their own shifts in return, `swap_offer.counter_assignment_id`); it is approved by the policy when C2, with every change applied, finds no new violation for **either** person; if the only new violation is the offerer falling below the contract-hours band, the reason is `hours_band`, otherwise `rule_violation`;
    - an accepted cover is approved by the policy when the colleague belongs to the department, C2 finds no new violation, and the shift keeps them within their contract hours (otherwise `overtime`);
    - cover by an external locum or from another department is always the Planner's decision (W7b);
    - with the policy off, everything goes to the Planner (`policy_off`). Policy approvals are logged with `{"approval": "policy"}`.
@@ -23,7 +23,7 @@ A solver run takes seconds to minutes, too long for an HTTP request. Once C2 exi
 ## Consequences
 
 - The API process never runs the solver; the dev stack needs the worker service, tests need no Redis except the one arq round-trip test.
-- Because swaps also check the offerer, giving a shift away while already near the lower edge of the hours band goes to the Planner. The staff app shows this before the offer (`needs_planner`).
+- Because swaps also check the offerer, giving a shift away while already near the lower edge of the hours band goes to the Planner. The staff app shows this before the offer (`needs_planner`); an exchange keeps both people's hours and is the usual way out (PROCESS.md Situation B).
 - Swap and cover rows written before Phase 7 keep their old escalation reason `validator_unavailable`.
 - Run, leave-check and change ids are random (the demo clock can stand still, and arq de-duplicates jobs by id).
 - If the worker is down, a run stays `queued` and blocks a new run for that month; recovering stuck runs comes with the durable workflows (Phase 9).

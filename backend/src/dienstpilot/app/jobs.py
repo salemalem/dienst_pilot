@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from dienstpilot.app.common import Department
 from dienstpilot.app.engine_inputs import Inputs
-from dienstpilot.app.roster import month_start
+from dienstpilot.app.roster import month_end, month_start
 from dienstpilot.engines.registry import Engines
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
@@ -178,10 +178,25 @@ def _coverability(
         return {**base, "outcome": "not_applicable", "reason": "spans_months"}
     if planning.published(session, leave_month) is not None:
         return {**base, "outcome": "not_applicable", "reason": "month_published"}
-    inputs = Inputs(session, _department(session, department_id), clock.now())
+    dep = _department(session, department_id)
+    inputs = Inputs(session, dep, clock.now())
     me = chk.staff_id
-    without = engines.optimizer.solve(inputs.problem(leave_month), CHECK_CONFIG)
-    extra = {me: _days(chk.start_date, chk.end_date)}
+    # Colleagues' pending requests in the month count as leave too (the cautious reading).
+    pending: dict[str, set[date]] = {}
+    last = month_end(leave_month)
+    others = [s for s in dep.staff if s != me]
+    asked = requests.leave_requests(
+        session, others, status="pending", overlapping=(leave_month, last)
+    )
+    for r in asked:
+        pending.setdefault(r.staff_id, set()).update(
+            _days(max(r.start_date, leave_month), min(r.end_date, last))
+        )
+    base["pending_colleague_requests_counted"] = len(asked)
+    without = engines.optimizer.solve(
+        inputs.problem(leave_month, extra_leave=pending), CHECK_CONFIG
+    )
+    extra = {**pending, me: _days(chk.start_date, chk.end_date)}
     with_leave = engines.optimizer.solve(
         inputs.problem(leave_month, extra_leave=extra), CHECK_CONFIG
     )

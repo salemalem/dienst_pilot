@@ -1,7 +1,7 @@
 {
   "component": "C1",
   "source": "eval/results/benchmark.json",
-  "results_sha256": "7d0797f5077b7e9e6da098b87abb69d9e7de0a7f18f25128beba5a3df083c350",
+  "results_sha256": "a57e62760915b25c12ed5401150d824831adee75db6282a3d6a16589f430931c",
   "solver_version": "c1-1.0.1",
   "held_out_months": "2025-01-01..2025-12-01",
   "summary": {
@@ -23,7 +23,7 @@
       "isolated_nights": 26
     }
   },
-  "median_seconds_per_variant": 1.61,
+  "median_seconds_per_variant": 1.41,
   "limitations": [
     "Each month is compared independently from the same as-worked history (the manual roster and its in-month changes); C1's months are not chained into a year.",
     "In-month violations exist only for the baseline and follow from a simulation parameter (manual_rule_check_rate, synthdata ASSUMPTIONS.md §13); they are not a finding about real planners.",

@@ -62,6 +62,7 @@ addopts = "-q -m 'not seeds'"
 markers = [
   "db: needs TEST_DATABASE_URL (a Postgres the tests may wipe)",
   "seeds: generates and checks nine seeds (slow; own CI job)",
+  "production_solver: run C1 with the production settings (the scripted demo scenarios)",
 ]
 
 [tool.importlinter]

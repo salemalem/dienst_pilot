@@ -350,10 +350,11 @@ export interface paths {
         put?: never;
         /**
          * Take Offer
-         * @description M6: take a colleague's offer.
+         * @description M6: take a colleague's offer, alone or in exchange for one of your own shifts.
          *
-         *     C2 checks both people. A valid swap is approved by the Planner's policy (logged as
-         *     policy-approved); a swap with a new violation, or with the policy off, goes to the Planner.
+         *     C2 checks both people with every change applied. A valid swap is approved by the Planner's
+         *     policy (logged as policy-approved); a swap with a new violation, or with the policy off,
+         *     goes to the Planner.
          */
         post: operations["take_offer_me_swap_offers__swap_id__take_post"];
         delete?: never;
@@ -1988,7 +1989,7 @@ export interface components {
         };
         /**
          * OpenOffer
-         * @description An open offer the person could take.
+         * @description An open offer the person could take, alone or as an exchange.
          */
         OpenOffer: {
             /** Swap Id */
@@ -1999,6 +2000,16 @@ export interface components {
              * Format: date-time
              */
             offered_at: string;
+            /**
+             * Can Take Alone
+             * @description Taking it breaks no rule for you (C2)
+             */
+            can_take_alone: boolean;
+            /**
+             * Exchange Options
+             * @description Own shifts you could give in return; valid for both of you (C2)
+             */
+            exchange_options: components["schemas"]["ShiftOut"][];
             /**
              * Check
              * @default validated
@@ -2832,6 +2843,16 @@ export interface components {
              * Format: date-time
              */
             offered_at: string;
+            /** @description An exchange: the shift the taker gave the offerer in return */
+            exchange?: components["schemas"]["ShiftOut"] | null;
+        };
+        /**
+         * TakeIn
+         * @description Take the shift, optionally giving one of your own shifts in return (an exchange).
+         */
+        TakeIn: {
+            /** Give Assignment Id */
+            give_assignment_id?: string | null;
         };
         /**
          * Today
@@ -3689,7 +3710,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["TakeIn"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

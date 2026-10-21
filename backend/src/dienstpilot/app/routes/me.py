@@ -17,6 +17,8 @@ from dienstpilot.app.cover import (
     CHECK,
     basic_candidates,
     change_violations,
+    exchange_changes,
+    exchange_options,
     offerer_violations,
     open_cascades_for,
     swap_escalation,
@@ -581,6 +583,9 @@ class SwapOut(BaseModel):
     escalation_reason: str | None
     decision_reason: str | None
     offered_at: datetime
+    exchange: ShiftOut | None = Field(
+        None, description="An exchange: the shift the taker gave the offerer in return"
+    )
 
 
 class SwapAudience(BaseModel):
@@ -602,12 +607,22 @@ class SwapOfferIn(BaseModel):
 
 
 class OpenOffer(BaseModel):
-    """An open offer the person could take."""
+    """An open offer the person could take, alone or as an exchange."""
 
     swap_id: str
     shift: ShiftOut
     offered_at: datetime
+    can_take_alone: bool = Field(description="Taking it breaks no rule for you (C2)")
+    exchange_options: list[ShiftOut] = Field(
+        description="Own shifts you could give in return; valid for both of you (C2)"
+    )
     check: str = CHECK
+
+
+class TakeIn(BaseModel):
+    """Take the shift, optionally giving one of your own shifts in return (an exchange)."""
+
+    give_assignment_id: str | None = None
 
 
 def _my_future_shift(c: Ctx, assignment_id: str) -> Shift:
@@ -626,14 +641,17 @@ def _my_future_shift(c: Ctx, assignment_id: str) -> Shift:
     return s
 
 
+def _plain(c: Ctx, assignment_id: str | None) -> ShiftOut | None:
+    a = None if assignment_id is None else planning.assignment(c.session, assignment_id)
+    if a is None:
+        return None
+    return _shift_out(c, Shift(a.id, a.day, a.shift_type, None, a.staff_id, "planned"))
+
+
 def _swap_out(c: Ctx, s: operations.Swap, me: str) -> SwapOut:
-    a = planning.assignment(c.session, s.assignment_id)
-    shift = (
-        None
-        if a is None
-        else _shift_out(c, Shift(a.id, a.day, a.shift_type, None, a.staff_id, "planned"))
-    )
+    shift = _plain(c, s.assignment_id)
     return SwapOut(
+        exchange=_plain(c, s.counter_assignment_id),
         id=s.id,
         shift=shift,
         role="offered" if s.offered_by == me else "taken",
@@ -701,8 +719,20 @@ def open_offers(c: CtxDep, _: Physician) -> list[OpenOffer]:
         if a is None or a.day <= c.clock.today():
             continue
         s = Shift(a.id, a.day, a.shift_type, sw.offered_by, a.staff_id, "planned")
-        if me in dep.staff and _can_take(c, dep, inputs, s, me):
-            out.append(OpenOffer(swap_id=sw.id, shift=_shift_out(c, s), offered_at=sw.offered_at))
+        if me not in dep.staff:
+            continue
+        alone = _can_take(c, dep, inputs, s, me)
+        options = exchange_options(c, dep, inputs, s, sw.offered_by, me)
+        if alone or options:
+            out.append(
+                OpenOffer(
+                    swap_id=sw.id,
+                    shift=_shift_out(c, s),
+                    offered_at=sw.offered_at,
+                    can_take_alone=alone,
+                    exchange_options=[_shift_out(c, h) for h in options],
+                )
+            )
     return out
 
 
@@ -712,12 +742,14 @@ def _can_take(c: Ctx, dep: Department, inputs: Inputs, s: Shift, me: str) -> boo
 
 
 @router.post("/swap-offers/{swap_id}/take")
-def take_offer(c: CtxDep, _: Physician, swap_id: str) -> SwapOut:
-    """M6: take a colleague's offer.
+def take_offer(c: CtxDep, _: Physician, swap_id: str, body: TakeIn | None = None) -> SwapOut:
+    """M6: take a colleague's offer, alone or in exchange for one of your own shifts.
 
-    C2 checks both people. A valid swap is approved by the Planner's policy (logged as
-    policy-approved); a swap with a new violation, or with the policy off, goes to the Planner.
+    C2 checks both people with every change applied. A valid swap is approved by the Planner's
+    policy (logged as policy-approved); a swap with a new violation, or with the policy off,
+    goes to the Planner.
     """
+    give = None if body is None else body.give_assignment_id
     me, dep = _staff_id(c), department(c)
     try:
         sw = operations.swap(c.session, swap_id)
@@ -735,18 +767,19 @@ def take_offer(c: CtxDep, _: Physician, swap_id: str) -> SwapOut:
         or not any(p.id == me for p in basic_candidates(c, dep, s, exclude={sw.offered_by}))
     ):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "You cannot take this shift")
-    introduced = change_violations(
-        c,
-        inputs,
-        [Assignment(sw.offered_by, a.day, a.shift_type)],
-        [Assignment(me, a.day, a.shift_type)],
-        {sw.offered_by, me},
-    )
+    remove = [Assignment(sw.offered_by, a.day, a.shift_type)]
+    add = [Assignment(me, a.day, a.shift_type)]
+    if give is not None:
+        counter = _my_future_shift(c, give)
+        if counter.day == a.day:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Give a shift on another day")
+        remove, add = exchange_changes(s, sw.offered_by, counter, me)
+    introduced = change_violations(c, inputs, remove, add, {sw.offered_by, me})
     reason = swap_escalation(introduced, sw.offered_by)
     if reason is None and not operations.policy(c.session, dep.id).auto_approve_swaps:
         reason = operations.POLICY_OFF
     try:
-        taken = operations.take_swap(c.session, swap_id, me, c.clock.now(), reason)
+        taken = operations.take_swap(c.session, swap_id, me, c.clock.now(), reason, give)
     except ValueError as e:
         raise HTTPException(status.HTTP_409_CONFLICT, str(e)) from e
     record(
@@ -758,6 +791,7 @@ def take_offer(c: CtxDep, _: Physician, swap_id: str) -> SwapOut:
         {
             "escalation_reason": taken.escalation_reason,
             "rules": sorted({v.rule for v in introduced}),
+            "exchange_assignment_id": give,
         },
     )
     if reason is None:

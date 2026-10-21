@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 
-from synthdata import GENERATOR_VERSION
+from synthdata import GENERATOR_VERSION, scenarios
 from synthdata.behaviour import Latent, draw_latents, sickness_wave
 from synthdata.calendar import (
     Holiday,
@@ -14,6 +14,7 @@ from synthdata.calendar import (
     school_holiday_periods,
 )
 from synthdata.config import (
+    DEFAULT_SEED,
     DEMO_NOW,
     DEPARTMENT_NAME,
     DEPARTMENT_SHORT,
@@ -220,6 +221,8 @@ def generate(seed: int) -> Dataset:
             "operations/cover_offer": ops.offers,
         }
     )
+    if seed == DEFAULT_SEED:
+        scenarios.apply(ds.tables)  # ASSUMPTIONS §19: scripted demo scenarios
     ds.calibration = {
         "leave_affinity_scale": leave_outcome.affinity_scale,
         "first_request_decline_rate_achieved": round(leave_outcome.first_request_decline_rate, 4),

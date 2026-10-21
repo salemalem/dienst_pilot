@@ -37,7 +37,7 @@ Every query is limited to the signed-in user's department.
 | Situation | Behaviour |
 |---|---|
 | Candidate lists (swap audience, open offers, cover cascade, gap suggestions, W7b options) | A quick filter, then C2 checks the change for each colleague (rest periods, nights in a row, weekends, on-call limits, the free day after Bereitschaftsdienst, hours band, qualification mix). Every list says `check: "validated"` |
-| A colleague takes a swap offer | C2 checks both people. No new violation and the policy on: approved by the policy (`status: approved`, audit payload `{"approval": "policy"}`). Otherwise it waits for the Planner with `escalation_reason`: `hours_band` (only the offerer falls below the band), `rule_violation` or `policy_off`. The audience endpoint says beforehand whether giving the shift away needs the Planner (`needs_planner`, `own_rules`) |
+| A colleague takes a swap offer | Alone, or as an **exchange**: `POST /me/swap-offers/{id}/take` with `give_assignment_id` (one of the taker's own future shifts on another day); `GET /me/swap-offers` lists, per offer, `can_take_alone` and the `exchange_options` C2 accepts for both. C2 checks both people with every change applied. No new violation and the policy on: approved by the policy (`status: approved`, audit payload `{"approval": "policy"}`). Otherwise it waits for the Planner with `escalation_reason`: `hours_band` (only the offerer falls below the band), `rule_violation` or `policy_off`. The audience endpoint says beforehand whether giving the shift away needs the Planner (`needs_planner`, `own_rules`) |
 | A colleague accepts a cover request | Approved by the policy when C2 finds nothing new and the shift keeps them within their contract hours; otherwise `overtime`, `rule_violation` or `policy_off`. A locum or someone from another department is always the Planner's decision (W7b) |
 | The Planner decides an escalated swap or cover | The approval must still pass C2 (422 otherwise) |
 | Draft edits (W4) | Direct, with live validation: the response lists the violations the change introduced and those of the changed people and days |
@@ -47,9 +47,11 @@ Every query is limited to the signed-in user's department.
 
 Cover cascades give each colleague 15 minutes on the demo clock. When a request times out, the next colleague is asked the next time the cascade is read. Durable timers come with the workflows in Phase 9.
 
+The three situations of PROCESS.md §4 run against this API as scripted demo scenarios (`backend/tests/api/test_demo_scenarios.py`, synthdata ASSUMPTIONS §19).
+
 ### M5 trade-off ("Mit Tausch beantragen")
 
-`POST /me/leave/check` returns the instant C6 hint and a `trade_off_check_id`. Poll `GET /me/leave/checks/{id}` until `status: done`; `result.outcome` is `coverable`, `coverable_with_trade_off` (with `trade_off: {month, weekends}`), `not_coverable` (with C1's explanations) or `not_applicable` (with a `reason`). The definition and thresholds are in `synthdata/ASSUMPTIONS.md` §18. `POST /me/leave` with `with_trade: true` needs that `check_id` for the same dates and an offered trade-off; once the Planner approves the leave, the weekends become a binding constraint when that earlier month is planned.
+`POST /me/leave/check` returns the instant C6 hint and a `trade_off_check_id`. Poll `GET /me/leave/checks/{id}` until `status: done`; `result.outcome` is `coverable`, `coverable_with_trade_off` (with `trade_off: {month, weekends}`), `not_coverable` (with C1's explanations) or `not_applicable` (with a `reason`). The definition and thresholds are in `synthdata/ASSUMPTIONS.md` §18; colleagues' pending requests in the month count as leave. `POST /me/leave` with `with_trade: true` needs that `check_id` for the same dates and an offered trade-off; once the Planner approves the leave, the weekends become a binding constraint when that earlier month is planned.
 
 ## Writes and the audit trail
 
@@ -84,7 +86,7 @@ Every write records an audit event (`GET /audit/events`). The seed loader also t
 | M3 Mein Dienstplan / My roster | `GET /me/roster?month=YYYY-MM` (shifts, wish marks granted/missed, published by and when), `GET /me/fairness` (the one-line balance), `GET /me/settings` (calendar sync) |
 | M4 Wünsche / Wishes | `GET /me/wishes` (open window, entries, C4 suggestions), `PUT /me/wishes`, `POST /me/wishes/parse` (C7 preview, not saved) |
 | M5 Urlaub beantragen / Request leave | `POST /me/leave/check` (C6 hint and a C1 check id), `GET /me/leave/checks/{id}` (coverable, with trade-off, not coverable), `POST /me/leave` ("Ohne Tausch" or "Mit Tausch beantragen" with `check_id`), `GET /me/leave` |
-| M6 Dienst tauschen / Swap | `GET /me/swaps/audience?assignment_id=` (count only, and whether the Planner must decide), `POST /me/swaps`, `GET /me/swaps`, `GET /me/swap-offers`, `POST /me/swap-offers/{swap_id}/take` |
+| M6 Dienst tauschen / Swap | `GET /me/swaps/audience?assignment_id=` (count only, and whether the Planner must decide), `GET /me/swap-offers` (alone or as an exchange), `POST /me/swaps`, `GET /me/swaps`, `GET /me/swap-offers`, `POST /me/swap-offers/{swap_id}/take` |
 | M7 Krank melden / Report sick | `POST /me/sick` (dates only) |
 | M8 Vertretungsanfrage / Cover request | `GET /me/cover-requests` (countdown, hours impact), `POST /me/cover-requests/{offer_id}` (`Übernehmen` / `Ablehnen`) |
 | M9 Fairness-Bilanz | `GET /me/fairness?year=` (own counts against anonymous department statistics) |

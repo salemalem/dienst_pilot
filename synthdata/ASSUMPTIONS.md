@@ -13,7 +13,7 @@ This document lists inputs only. Results computed from the data (rates, counts, 
 - The demo moment is Tuesday, 20 October 2026, 06:00 Europe/Berlin (UI_SPEC §1). No timestamp in the dataset is later than that.
 - November 2026 is the last planned month. It was published on Monday 19 October 2026 at 14:00, approved by Dr. Thomas Brandt. It has no in-month changes yet.
 - The December 2026 request window is open: 28 recipients, 21 answers. Dr. Aylin Kaya has not answered (her open task on M2).
-- **Assumption.** Sickness episodes in the demo period start no later than 18 October 2026, so every cover search is settled before the demo moment. The scripted demo events (the 06:40 sick call, the swap offer, Dr. Kaya's July leave request) are not part of the seed; later phases create them live.
+- **Assumption.** Sickness episodes in the demo period start no later than 18 October 2026, so every cover search is settled before the demo moment. The scripted demo events (the 06:40 sick call, the swap offer, Dr. Kaya's July leave request) are not part of the seed; they are played live (§19). The seed only carries the data they need.
 
 ## 2. Calendar
 
@@ -201,7 +201,7 @@ Training and application code must not read it. A test fails if anything in `bac
 - **Christmas leave:** leave blocks are only placed in school-holiday periods of at least ten days, so the Christmas holidays get no holiday-period leave.
 - **User accounts:** there are no user accounts or app roles (identity context), and HR staff (Katrin Vogel) are not in the dataset yet.
 - **December 2026:** there is no roster for it, and no burden ledger.
-- **2027:** only demand exists (§17); there are no staff changes, request windows, leave or absences in 2027.
+- **2027:** only demand (§17) and the two scripted leave requests of §19 exist; there are no staff changes, request windows, other leave or absences in 2027.
 
 ## 17. Demand through 2027 (generator 1.2.0)
 
@@ -221,4 +221,28 @@ The staff app checks a leave request in the background with the optimizer (C1). 
 - **Not coverable.** No valid roster exists for the leave month with the leave; the explanation comes from C1's infeasibility analysis.
 - **Not applicable.** The leave spans two months, or the leave month is already published (the Planner arranges cover).
 - An approved leave with a trade-off is a binding commitment: when the Planner runs C1 for that earlier month, the requester gets at least that many weekends with duty in every variant.
-- **What the tests show.** In the API test of a two-week January 2027 leave (real solver), the leave is coverable without crossing either threshold, so no trade-off is offered. How often the trade-off applies has not been measured; the tests drive that branch with a test-only wrapper around the real solver.
+- **Colleagues' pending requests** in the leave month count as leave in both solves (the cautious reading: they may still be approved).
+- **What the tests show.** In the scripted Situation A (§19: 14–27 July 2027, two colleagues' pending requests overlapping, real solver with production settings) and in a two-week January 2027 leave, the leave is coverable without crossing either threshold, so **no trade-off is offered**. How often the trade-off applies has not been measured; one API test drives that branch with a test-only wrapper around the real solver.
+
+
+## 19. Scripted demo scenarios (generator 1.3.0)
+
+The three situations of `docs/PROCESS.md` §4 are played live with the real engines (C1, C2 and the C5 stand-in) on the demo clock; `backend/tests/api/test_demo_scenarios.py` runs each one end to end. The simulation is unchanged; for the default seed only, `synthdata/src/synthdata/scenarios.py` applies the edits below to its finished output, each with a precondition check. Nothing else in the dataset differs from 1.2.0 apart from the `generator_version` column (checked row by row when the version was bumped).
+
+**Situation A: Dr. Kaya asks for 14–27 July 2027.**
+- Seeded: two pending leave requests that overlap her dates. Dr. Carla Franke asks for 12–23 July 2027 (submitted 14 October 2026, 09:12). Dr. Niklas Stein asks for 19–30 July 2027 (submitted 16 October 2026, 18:47).
+- Live: Dr. Kaya runs the M5 check. With the definition of §18 and the production solver settings, the result is **coverable, no trade-off**; she submits without a trade and the Planner approves. PROCESS.md tells this situation with a trade-off (one weekend in June); on this data the engines do not produce one, so the M5 copy follows the computed result.
+
+**Situation B: Dr. Mehta offers a weekend shift; Dr. Lorenz takes it in exchange.**
+- No data is edited. The seeded November 2026 roster has no Saturday night shift (weekend nights are covered by the 24-hour Bereitschaftsdienst), Dr. Mehta has no Saturday Bereitschaftsdienst in November, and December is not planned. Giving any of Dr. Mehta's November shifts away alone puts him below the contract-hours band, so the swap is an exchange.
+- Live: Dr. Mehta offers his **Frühdienst on Saturday 21 November 2026**. Dr. Lorenz takes it and gives him her **Frühdienst on Friday 27 November 2026** in return. C2 finds the exchange valid for both, the policy approves it, and the Planner sees it under recent changes (W1), not as a request. The only other exchange C2 accepts for that Saturday is her Spätdienst on Monday 30 November.
+
+**Situation C: Dr. Weber reports sick at 06:40 on Tuesday 20 October 2026.**
+- Edited in the published October 2026 roster:
+  - Dr. Jonas Weber's approved autumn leave ends on Monday 19 October instead of Friday 23 October.
+  - He works the Frühdienst from Tuesday 20 to Friday 23 October, on top of the minimum demand (within the Früh cap), so his hours stay as they were and nobody else loses a shift.
+  - Dr. Nadia Kaiser works her Frühdienst of Thursday 22 October on Tuesday 20 October instead (Thursday stays covered through Dr. Weber).
+  - Dr. Felix Wagner and Dr. Mira Okafor exchange Spätdienste: Wagner works 20 October, Okafor 27 October.
+- Why: without the last two edits, C5 ranks Dr. Kaiser and Dr. Wagner above Dr. Alvarez, because their hours are further below their contracts. With them, Dr. Alvarez is first in the C5 order (fewest covers in the last 90 days, then hours against contract) among the colleagues C2 allows to cover the shift.
+- C2 finds no new violation in October or November after these edits. None of the edited assignments is referenced by a swap or a cover search.
+- Live: at 06:40 (Frühdienst starts at 07:30) Dr. Weber reports sick. The cover search asks Dr. Alvarez first with a 15-minute deadline. She accepts at 06:43 within her contract hours, the policy approves it, and the Planner sees the closed gap under recent changes (W1).

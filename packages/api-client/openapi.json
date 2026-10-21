@@ -934,7 +934,7 @@
           "staff app"
         ],
         "summary": "Take Offer",
-        "description": "M6: take a colleague's offer.\n\nC2 checks both people. A valid swap is approved by the Planner's policy (logged as\npolicy-approved); a swap with a new violation, or with the policy off, goes to the Planner.",
+        "description": "M6: take a colleague's offer, alone or in exchange for one of your own shifts.\n\nC2 checks both people with every change applied. A valid swap is approved by the Planner's\npolicy (logged as policy-approved); a swap with a new violation, or with the policy off,\ngoes to the Planner.",
         "operationId": "take_offer_me_swap_offers__swap_id__take_post",
         "parameters": [
           {
@@ -963,6 +963,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TakeIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -5441,6 +5458,19 @@
             "format": "date-time",
             "title": "Offered At"
           },
+          "can_take_alone": {
+            "type": "boolean",
+            "title": "Can Take Alone",
+            "description": "Taking it breaks no rule for you (C2)"
+          },
+          "exchange_options": {
+            "items": {
+              "$ref": "#/components/schemas/ShiftOut"
+            },
+            "type": "array",
+            "title": "Exchange Options",
+            "description": "Own shifts you could give in return; valid for both of you (C2)"
+          },
           "check": {
             "type": "string",
             "title": "Check",
@@ -5451,10 +5481,12 @@
         "required": [
           "swap_id",
           "shift",
-          "offered_at"
+          "offered_at",
+          "can_take_alone",
+          "exchange_options"
         ],
         "title": "OpenOffer",
-        "description": "An open offer the person could take."
+        "description": "An open offer the person could take, alone or as an exchange."
       },
       "Option": {
         "properties": {
@@ -7357,6 +7389,17 @@
             "type": "string",
             "format": "date-time",
             "title": "Offered At"
+          },
+          "exchange": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShiftOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "An exchange: the shift the taker gave the offerer in return"
           }
         },
         "type": "object",
@@ -7371,6 +7414,24 @@
         ],
         "title": "SwapOut",
         "description": "A swap the person offered or took."
+      },
+      "TakeIn": {
+        "properties": {
+          "give_assignment_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Give Assignment Id"
+          }
+        },
+        "type": "object",
+        "title": "TakeIn",
+        "description": "Take the shift, optionally giving one of your own shifts in return (an exchange)."
       },
       "Today": {
         "properties": {

@@ -3,4 +3,4 @@
 Standalone: imports nothing from the backend. The backend's seed loader reads the Parquet output.
 """
 
-GENERATOR_VERSION = "1.2.0"
+GENERATOR_VERSION = "1.3.0"

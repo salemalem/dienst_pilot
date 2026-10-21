@@ -48,6 +48,8 @@ class SwapOffer(Base):
     accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     status: Mapped[str] = mapped_column(String(20))
     approval: Mapped[str | None] = mapped_column(String(10))
+    # An exchange: the shift the taker gives the offerer in return (None: the taker just takes it).
+    counter_assignment_id: Mapped[uuid.UUID | None]
     # Why a taken swap waits for the Planner (e.g. the validator C2 is not available yet).
     escalation_reason: Mapped[str | None] = mapped_column(String(40))
     decided_by: Mapped[uuid.UUID | None]

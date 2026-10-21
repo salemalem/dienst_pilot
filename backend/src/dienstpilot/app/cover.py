@@ -137,6 +137,43 @@ def offerer_violations(ctx: Ctx, inputs: Inputs, shift: Shift) -> list[Violation
     ]
 
 
+def exchange_changes(
+    offered: Shift, offerer: str, counter: Shift, taker: str
+) -> tuple[list[Assignment], list[Assignment]]:
+    """Return (remove, add) for an exchange: the taker takes ``offered``, gives ``counter``."""
+    remove = [
+        Assignment(offerer, offered.day, offered.shift_type),
+        Assignment(taker, counter.day, counter.shift_type),
+    ]
+    add = [
+        Assignment(taker, offered.day, offered.shift_type),
+        Assignment(offerer, counter.day, counter.shift_type),
+    ]
+    return remove, add
+
+
+def exchange_options(
+    ctx: Ctx, dep: Department, inputs: Inputs, offered: Shift, offerer: str, taker: str
+) -> list[Shift]:
+    """Return the taker's future shifts that make a valid exchange for both people (C2).
+
+    The taker must pass the quick filter for the offered shift; the counter-shift is on
+    another day, in the offered shift's month or the next.
+    """
+    if not any(p.id == taker for p in basic_candidates(ctx, dep, offered, exclude={offerer})):
+        return []
+    start = ctx.clock.today() + timedelta(days=1)
+    end = month_end(month_end(offered.day) + timedelta(days=1))
+    out = []
+    for h in effective(ctx.session, start, end):
+        if h.holder != taker or h.day == offered.day:
+            continue
+        remove, add = exchange_changes(offered, offerer, h, taker)
+        if not change_violations(ctx, inputs, remove, add, {offerer, taker}):
+            out.append(h)
+    return out
+
+
 def swap_escalation(introduced: list[Violation], offerer: str) -> str | None:
     """Return why a swap needs the Planner (None: C2 found nothing new)."""
     if not introduced:

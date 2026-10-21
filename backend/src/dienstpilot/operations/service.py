@@ -53,6 +53,7 @@ class Swap:
     decided_by: str | None
     decided_at: datetime | None
     decision_reason: str | None
+    counter_assignment_id: str | None = None  # an exchange: the taker's shift for the offerer
 
 
 @dataclass(frozen=True)
@@ -154,6 +155,7 @@ def _swap(s: m.SwapOffer) -> Swap:
         _s(s.decided_by),
         s.decided_at,
         s.decision_reason,
+        _s(s.counter_assignment_id),
     )
 
 
@@ -197,9 +199,14 @@ def offer_swap(session: Session, assignment_id: str, offered_by: str, now: datet
 
 
 def take_swap(
-    session: Session, swap_id: str, taker: str, now: datetime, escalation_reason: str | None
+    session: Session,
+    swap_id: str,
+    taker: str,
+    now: datetime,
+    escalation_reason: str | None,
+    counter_assignment_id: str | None = None,
 ) -> Swap:
-    """Record that a colleague takes an offer.
+    """Record that a colleague takes an offer, optionally giving one of their shifts in return.
 
     ``escalation_reason`` None: approved by the policy; otherwise it waits for the Planner.
     """
@@ -209,6 +216,8 @@ def take_swap(
     if s.status != "open":
         raise ValueError("offer is not open")
     s.accepted_by, s.accepted_at = uuid.UUID(taker), now
+    if counter_assignment_id is not None:
+        s.counter_assignment_id = uuid.UUID(counter_assignment_id)
     if escalation_reason is None:
         s.status, s.approval, s.decided_at = "approved", "policy", now
     else:
@@ -426,10 +435,19 @@ def holder_changes(session: Session, assignment_ids: list[str]) -> list[HolderCh
     """Return changes of holder for the given published assignments, in time order."""
     ids = [uuid.UUID(a) for a in assignment_ids]
     out: list[HolderChange] = []
-    for s in session.scalars(select(m.SwapOffer).where(m.SwapOffer.assignment_id.in_(ids))):
+    q = select(m.SwapOffer).where(
+        m.SwapOffer.assignment_id.in_(ids) | m.SwapOffer.counter_assignment_id.in_(ids)
+    )
+    wanted = set(assignment_ids)
+    for s in session.scalars(q):
         if s.status in ("accepted", "approved") and s.accepted_by is not None:
             at = s.decided_at or s.accepted_at or s.offered_at
-            out.append(HolderChange(at, str(s.assignment_id), str(s.accepted_by), "swap"))
+            if str(s.assignment_id) in wanted:
+                out.append(HolderChange(at, str(s.assignment_id), str(s.accepted_by), "swap"))
+            if s.counter_assignment_id is not None and str(s.counter_assignment_id) in wanted:
+                out.append(
+                    HolderChange(at, str(s.counter_assignment_id), str(s.offered_by), "swap")
+                )
     for c in session.scalars(select(m.CoverCascade).where(m.CoverCascade.assignment_id.in_(ids))):
         if c.status != "closed":
             out.append(HolderChange(c.opened_at, str(c.assignment_id), None, "open"))

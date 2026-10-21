@@ -56,10 +56,12 @@ class InlineQueue:
 
 
 @pytest.fixture(autouse=True)
-def fast_solver(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Shorter solver runs in tests (the property tests in eval/tests use the full settings)."""
+def fast_solver(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Shorter solver runs in tests, except those marked ``production_solver``."""
     from dataclasses import replace
 
+    if request.node.get_closest_marker("production_solver"):
+        return
     monkeypatch.setattr(jobs, "RUN_CONFIG", replace(jobs.RUN_CONFIG, deterministic_time=4.0))
     monkeypatch.setattr(jobs, "CHECK_CONFIG", replace(jobs.CHECK_CONFIG, deterministic_time=3.0))
 
