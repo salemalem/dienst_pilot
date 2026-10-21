@@ -8,7 +8,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from dienstpilot.app.deps import get_clock
+from dienstpilot.app import jobs
+from dienstpilot.app.deps import get_clock, get_engines
+from dienstpilot.app.queue import get_queue
 from dienstpilot.main import create_app
 from dienstpilot.seeding import load
 from dienstpilot.shared.database import get_session
@@ -37,6 +39,31 @@ def clock() -> MovableClock:
     return MovableClock(DEMO_NOW)
 
 
+class InlineQueue:
+    """Runs a job right away inside the test transaction (the arq path has its own test)."""
+
+    def __init__(self, conn: Any, clock: Clock) -> None:
+        self.conn, self.clock, self.jobs = conn, clock, []
+        self.engines: Any = None  # a test may swap in other engines for the jobs
+
+    def enqueue(self, job: str, **kwargs: str) -> None:
+        self.jobs.append((job, kwargs))
+        with Session(
+            bind=self.conn, join_transaction_mode="create_savepoint", expire_on_commit=False
+        ) as s:
+            jobs.JOBS[job](s, self.engines or get_engines(), self.clock, **kwargs)
+            s.commit()
+
+
+@pytest.fixture(autouse=True)
+def fast_solver(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Shorter solver runs in tests (the property tests in eval/tests use the full settings)."""
+    from dataclasses import replace
+
+    monkeypatch.setattr(jobs, "RUN_CONFIG", replace(jobs.RUN_CONFIG, deterministic_time=4.0))
+    monkeypatch.setattr(jobs, "CHECK_CONFIG", replace(jobs.CHECK_CONFIG, deterministic_time=3.0))
+
+
 @pytest.fixture
 def app_factory(seeded: str, clock: MovableClock) -> Iterator[Any]:
     """Build apps whose requests share one connection; everything rolls back after the test."""
@@ -55,9 +82,12 @@ def app_factory(seeded: str, clock: MovableClock) -> Iterator[Any]:
         app = create_app(settings or Settings(database_url=seeded))
         app.dependency_overrides[get_session] = session_override
         app.dependency_overrides[get_clock] = lambda: clock
+        app.dependency_overrides[get_queue] = lambda: queue
         return TestClient(app)
 
+    queue = InlineQueue(conn, clock)
     make.conn = conn  # type: ignore[attr-defined]
+    make.queue = queue  # type: ignore[attr-defined]
     yield make
     outer.rollback()
     conn.close()

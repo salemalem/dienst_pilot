@@ -1,0 +1,43 @@
+{
+  "description": "C2 against the independent Phase 2 checker on the synthetic data.",
+  "component": "C2",
+  "validator_version": "c2-1.0.0",
+  "dataset": {
+    "seed": 20261020,
+    "generator_version": "1.2.0"
+  },
+  "published_months": {
+    "compared": 71,
+    "agreeing": 71,
+    "disagreeing": [],
+    "violations_found": 13,
+    "violations_by_rule": {
+      "coverage": 13
+    },
+    "note": "Violations in published months are the simulated manual planner's in-month changes (a simulation parameter, synthdata ASSUMPTIONS §13)."
+  },
+  "random_changes": {
+    "months": [
+      "2024-03-01",
+      "2025-07-01",
+      "2025-12-01",
+      "2026-10-01",
+      "2026-11-01"
+    ],
+    "changes": 300,
+    "agreeing": 300,
+    "violations_found": 1996,
+    "seed": 20261020
+  },
+  "summary": {
+    "agreement_published_months": "71/71",
+    "agreement_random_changes": "300/300"
+  },
+  "results_sha256": "671eac13ca1e9794f799f5fb393c701efcc7d6a30399d25fb1f1d64f425afcc6",
+  "timing": {
+    "note": "Wall-clock milliseconds for validating a whole month on the machine that ran this; not reproducible.",
+    "runs": 355,
+    "p50_ms": 2.46,
+    "p95_ms": 4.91
+  }
+}

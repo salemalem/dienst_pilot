@@ -6,8 +6,10 @@ foreign keys across contexts.
 
 import uuid
 from datetime import date, datetime
+from typing import Any
 
 from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, String, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from dienstpilot.shared.db import RequestsBase as Base
@@ -71,3 +73,21 @@ class LeaveRequest(Base):
     decision_reason: Mapped[str | None] = mapped_column(Text)
     # A follow-up after a decline points at the declined request.
     previous_request_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("leave_request.id"))
+    # "Mit Tausch beantragen": the extra weekend duty the requester commits to (C1-checked).
+    trade_off: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+
+
+class LeaveCheck(Base):
+    """M5: a background check whether a leave is coverable, and the trade-off C1 found."""
+
+    __tablename__ = "leave_check"
+    __table_args__ = (
+        CheckConstraint("status IN ('queued','running','done','failed')", name="status"),
+    )
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    staff_id: Mapped[uuid.UUID] = mapped_column(index=True)
+    start_date: Mapped[date] = mapped_column(Date)
+    end_date: Mapped[date] = mapped_column(Date)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    status: Mapped[str] = mapped_column(String(10))
+    result: Mapped[dict[str, Any] | None] = mapped_column(JSONB)

@@ -17,11 +17,109 @@
     "shiftTypes": "Shift types"
   },
   "shift": {
-    "frueh": { "name": "Early shift", "short": "Early", "letter": "E" },
-    "spaet": { "name": "Late shift", "short": "Late", "letter": "L" },
-    "nacht": { "name": "Night shift", "short": "Night", "letter": "N" },
-    "bereitschaft": { "name": "On-call duty (in-house)", "short": "On-call", "letter": "O" },
-    "ruf": { "name": "On-call from home", "short": "From home", "letter": "H" },
-    "frei": { "name": "Leave", "short": "Leave", "letter": "V" }
+    "frueh": {
+      "name": "Early shift",
+      "short": "Early",
+      "letter": "E"
+    },
+    "spaet": {
+      "name": "Late shift",
+      "short": "Late",
+      "letter": "L"
+    },
+    "nacht": {
+      "name": "Night shift",
+      "short": "Night",
+      "letter": "N"
+    },
+    "bereitschaft": {
+      "name": "On-call duty (in-house)",
+      "short": "On-call",
+      "letter": "O"
+    },
+    "ruf": {
+      "name": "On-call from home",
+      "short": "From home",
+      "letter": "H"
+    },
+    "frei": {
+      "name": "Leave",
+      "short": "Leave",
+      "letter": "V"
+    }
+  },
+  "violation": {
+    "coverage": "Understaffed: the shift on {date} needs {required} ({qualification}), {assigned} assigned.",
+    "one_shift_per_day": "More than one shift on {date}.",
+    "min_rest": "{required}-hour rest period not met: only {hours} hours before the shift on {date}.",
+    "max_consecutive_nights": "{nights} night shifts in a row, at most {max} allowed.",
+    "max_weekends": "Duty on {weekends} weekends this month, at most {max} allowed.",
+    "max_on_call": "{count} on-call duties this month, at most {max} allowed.",
+    "max_on_call_home": "{count} on-call-from-home duties this month, at most {max} allowed.",
+    "free_day_after_on_call": "Duty on {date}, although a free day follows an on-call duty.",
+    "contract_hours_band": "{percent}% of contract hours planned, {low} to {high}% allowed.",
+    "qualification": "The shift on {date} needs the qualification “{qualification}”.",
+    "role": "This shift type is not planned for this role ({date}).",
+    "unavailable": "Duty on {date}, although {reason, select, leave {leave is approved} other {“can't” was entered}}.",
+    "not_rostered": "Duty on {date}, although the person is not on the department's roster that day."
+  },
+  "fix": {
+    "coverage": "Assign a suitable person to the shift on {date}.",
+    "one_shift_per_day": "Give one of the shifts on {date} to someone else.",
+    "min_rest": "Swap the shift on {date} or move the shift before it, so {required} hours of rest remain.",
+    "max_consecutive_nights": "Give the night shift on {date} to someone else (at most {max} in a row).",
+    "max_weekends": "Give one weekend to someone else (at most {max}).",
+    "max_on_call": "Give one on-call duty to someone else (at most {max}).",
+    "max_on_call_home": "Give one on-call-from-home duty to someone else (at most {max}).",
+    "free_day_after_on_call": "Give the shift on {date} to someone else.",
+    "contract_hours_band": "Spread the shifts so the hours stay between {low} and {high}%.",
+    "qualification": "Assign someone with the qualification “{qualification}”.",
+    "role": "Assign someone whose role includes this shift type.",
+    "unavailable": "Give the shift on {date} to someone else.",
+    "not_rostered": "Give the shift on {date} to someone on the roster."
+  },
+  "infeasible": {
+    "coverage": "Not coverable: {date} needs {required} for the shift ({qualification}), only {available} available after approved leave.",
+    "person": "For one person, the rule “{rule}” cannot be kept this month.",
+    "unknown": "No valid roster found; the cause could not be narrowed down."
+  },
+  "escalation": {
+    "rule_violation": "The validator found a rule violation; the planner decides.",
+    "hours_band": "Without this shift, the hours of the person giving it away would fall below the band; the planner decides.",
+    "overtime": "Taking the shift means overtime; the planner decides.",
+    "policy_off": "Automatic approval is switched off; the planner decides.",
+    "list_exhausted": "Nobody on the list took the shift; the planner decides.",
+    "validator_unavailable": "Received before the validator existed; the planner decides."
+  },
+  "approval": {
+    "planner": "Approved by the planner",
+    "policy": "Approved automatically (planner's policy, checked by the validator)"
+  },
+  "profile": {
+    "wishes_first": "Wishes first",
+    "zero_overtime": "No overtime",
+    "balanced": "Balanced"
+  },
+  "recommendation": {
+    "balanced": "Recommended: the balanced profile, with weights tuned on July to December 2024."
+  },
+  "leaveCheck": {
+    "coverable": "Coverable.",
+    "coverable_with_trade_off": "Coverable with a trade: {weekends, plural, one {# weekend duty} other {# weekend duties}} in {month} instead of the usual spread.",
+    "not_coverable": "Not coverable without breaking a rule.",
+    "not_applicable": "No trade is checked for these dates.",
+    "reason": {
+      "spans_months": "The leave spans two months.",
+      "month_published": "The month is already published; the planner arranges cover.",
+      "previous_month_planned": "The month before is already planned; a trade is no longer possible there.",
+      "previous_month_unsolved": "No valid roster was found for the month before.",
+      "weekend_limit": "An extra weekend in the month before would exceed the maximum.",
+      "trade_off_infeasible": "With the extra weekend, there is no valid roster for the month before.",
+      "trade_off_invalid": "The roster with the trade did not pass the validator.",
+      "baseline_unsolved": "The month could not be compared without this leave."
+    }
+  },
+  "notification": {
+    "roster_changed": "Your roster on {date} was changed. Reason: {reason}"
   }
 }

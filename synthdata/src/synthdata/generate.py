@@ -64,7 +64,8 @@ def generate(seed: int) -> Dataset:
     years = range(2021, 2027)
     holiday_rows = [h for y in range(2020, 2028) for h in public_holidays(y)]
     holidays = {h.day for h in holiday_rows}
-    last_day = date(2026, 12, 31)
+    # Demand runs to the end of 2027 so leave in 2027 can be checked (UI_SPEC M5: July 2027).
+    last_day = date(2027, 12, 31)
     template = {
         d: template_for(d, holidays) for d in days(HISTORY_START - timedelta(days=7), last_day)
     }

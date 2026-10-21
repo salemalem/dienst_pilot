@@ -6,15 +6,25 @@ with anonymous department statistics only.
 """
 
 from datetime import date, datetime, timedelta
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from dienstpilot.app.common import EngineLabel, department, label, record
+from dienstpilot.app.common import Department, EngineLabel, department, label, record
 from dienstpilot.app.context import CtxDep
-from dienstpilot.app.cover import CHECK, basic_candidates, open_cascades_for
+from dienstpilot.app.cover import (
+    CHECK,
+    basic_candidates,
+    change_violations,
+    offerer_violations,
+    open_cascades_for,
+    swap_escalation,
+    valid_takers,
+)
 from dienstpilot.app.deps import Ctx, physician
+from dienstpilot.app.engine_inputs import Inputs
+from dienstpilot.app.queue import QueueDep
 from dienstpilot.app.roster import (
     Shift,
     approved_leave_days,
@@ -33,7 +43,7 @@ from dienstpilot.operations import service as operations
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.requests import service as requests
-from dienstpilot.shared.ports import EngineNotImplementedError
+from dienstpilot_validator import Assignment
 
 router = APIRouter(prefix="/me", tags=["staff app"])
 Physician = Annotated[UserView, Depends(physician)]
@@ -378,6 +388,9 @@ class LeaveOut(BaseModel):
     status: str
     decided_at: datetime | None
     decision_reason: str | None
+    trade_off: dict[str, Any] | None = Field(
+        None, description="The extra weekend duty committed to with 'Mit Tausch beantragen'"
+    )
 
 
 class LeaveCheckIn(BaseModel):
@@ -395,15 +408,32 @@ class LeaveCheck(BaseModel):
     max_on_leave_same_day: int
     limit: int
     leave_days_taken_this_year: int
-    trade_off: None = Field(None, description="Confirmed trade-off needs C1 (Phase 7)")
-    trade_off_available_from_phase: int = 7
+    trade_off_check_id: str = Field(
+        description="Poll GET /me/leave/checks/{id}: C1 checks coverability and a trade-off"
+    )
+    engine: EngineLabel
+
+
+class TradeOffCheck(BaseModel):
+    """M5: the background check (C1).
+
+    ``result.outcome`` is one of coverable, coverable_with_trade_off, not_coverable,
+    not_applicable (synthdata ASSUMPTIONS §18).
+    """
+
+    id: str
+    start_date: date
+    end_date: date
+    status: Literal["queued", "running", "done", "failed"]
+    result: dict[str, Any] | None
     engine: EngineLabel
 
 
 class LeaveIn(LeaveCheckIn):
-    """A leave request. ``with_trade`` needs C1 and is refused until Phase 7."""
+    """A leave request. ``with_trade`` needs a finished check that offered a trade-off."""
 
     with_trade: bool = False
+    check_id: str | None = None
 
 
 LEAVE_LIMIT = 6  # concurrent approved leave the department plans with (synthdata ASSUMPTIONS §11)
@@ -418,6 +448,7 @@ def _leave_out(r: requests.LeaveRequest) -> LeaveOut:
         status=r.status,
         decided_at=r.decided_at,
         decision_reason=r.decision_reason,
+        trade_off=r.trade_off,
     )
 
 
@@ -434,8 +465,8 @@ def _days_taken(c: Ctx, me: str, year: int) -> int:
 
 
 @router.post("/leave/check")
-def check_leave(c: CtxDep, _: Physician, body: LeaveCheckIn) -> LeaveCheck:
-    """M5: instant hint before submitting (C6 stand-in); the confirmed trade-off waits for C1."""
+def check_leave(c: CtxDep, _: Physician, queue: QueueDep, body: LeaveCheckIn) -> LeaveCheck:
+    """M5: instant hint (C6 stand-in), and a background C1 check of coverability and trade-off."""
     if body.end_date < body.start_date or body.start_date <= c.clock.today():
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, "Choose future dates, start before end"
@@ -454,27 +485,73 @@ def check_leave(c: CtxDep, _: Physician, body: LeaveCheckIn) -> LeaveCheck:
         if r.status in ("approved", "pending")
     }
     h = c.engines.leave.hint(body.start_date, body.end_date, per_day, LEAVE_LIMIT)
-    return LeaveCheck(
+    chk = requests.create_check(c.session, me, body.start_date, body.end_date, c.clock.now())
+    out = LeaveCheck(
         outcome=h.outcome,
         overlapping_colleagues=len(overlapping),
         max_on_leave_same_day=h.max_overlapping,
         limit=h.limit,
         leave_days_taken_this_year=_days_taken(c, me, body.start_date.year),
+        trade_off_check_id=chk.id,
         engine=label(c.engines.leave.info),
+    )
+    c.session.commit()
+    queue.enqueue("check_leave", check_id=chk.id, department_id=c.user.department_id)
+    return out
+
+
+def _my_check(c: Ctx, check_id: str) -> requests.LeaveCheckInfo:
+    try:
+        chk = requests.check(c.session, check_id)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found") from e
+    if chk is None or chk.staff_id != _staff_id(c):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+    return chk
+
+
+@router.get("/leave/checks/{check_id}")
+def leave_check(c: CtxDep, _: Physician, check_id: str) -> TradeOffCheck:
+    """M5: the background check: coverable, coverable with a trade-off, or not coverable."""
+    chk = _my_check(c, check_id)
+    return TradeOffCheck(
+        id=chk.id,
+        start_date=chk.start_date,
+        end_date=chk.end_date,
+        status=chk.status,
+        result=chk.result,
+        engine=label(c.engines.optimizer.info),
     )
 
 
 @router.post("/leave", status_code=status.HTTP_201_CREATED)
 def request_leave(c: CtxDep, _: Physician, body: LeaveIn) -> LeaveOut:
-    """M5: request leave without a trade ("Ohne Tausch beantragen"); the Planner decides."""
-    if body.with_trade:
-        raise EngineNotImplementedError(c.engines.optimizer.info)
+    """M5: request leave ("Ohne Tausch" or "Mit Tausch beantragen"); the Planner decides.
+
+    With a trade, the check must have offered one for exactly these dates; the extra weekend
+    becomes a binding constraint when the earlier month is planned, once the Planner approves.
+    """
     if body.end_date < body.start_date or body.start_date <= c.clock.today():
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, "Choose future dates, start before end"
         )
+    trade_off = None
+    if body.with_trade:
+        if body.check_id is None:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "A trade needs a check_id")
+        chk = _my_check(c, body.check_id)
+        result = chk.result or {}
+        if (chk.start_date, chk.end_date) != (body.start_date, body.end_date):
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY, "The check is for other dates"
+            )
+        if chk.status != "done" or result.get("outcome") != "coverable_with_trade_off":
+            raise HTTPException(
+                status.HTTP_409_CONFLICT, "No trade-off was offered for these dates"
+            )
+        trade_off = {**result["trade_off"], "check_id": chk.id}
     r = requests.create_leave(
-        c.session, _staff_id(c), body.start_date, body.end_date, c.clock.now()
+        c.session, _staff_id(c), body.start_date, body.end_date, c.clock.now(), trade_off
     )
     record(
         c,
@@ -482,7 +559,11 @@ def request_leave(c: CtxDep, _: Physician, body: LeaveIn) -> LeaveOut:
         "leave_request",
         r.id,
         r.staff_id,
-        {"start_date": r.start_date.isoformat(), "end_date": r.end_date.isoformat()},
+        {
+            "start_date": r.start_date.isoformat(),
+            "end_date": r.end_date.isoformat(),
+            "trade_off": trade_off,
+        },
     )
     return _leave_out(r)
 
@@ -507,6 +588,10 @@ class SwapAudience(BaseModel):
 
     assignment_id: str
     eligible_colleagues: int
+    needs_planner: bool = Field(
+        description="Giving the shift away breaks a rule for you (C2), so the Planner decides"
+    )
+    own_rules: list[str] = Field(description="Which rules, e.g. contract_hours_band")
     check: str = CHECK
 
 
@@ -568,10 +653,17 @@ def my_swaps(c: CtxDep, _: Physician) -> list[SwapOut]:
 
 @router.get("/swaps/audience")
 def swap_audience(c: CtxDep, _: Physician, assignment_id: str) -> SwapAudience:
-    """M6: how many colleagues could take this shift (basic filter, not checked against rules)."""
-    s = _my_future_shift(c, assignment_id)
-    n = len(basic_candidates(c, department(c), s, exclude={_staff_id(c)}))
-    return SwapAudience(assignment_id=assignment_id, eligible_colleagues=n)
+    """M6: how many colleagues could take this shift without breaking a rule (C2)."""
+    s, dep = _my_future_shift(c, assignment_id), department(c)
+    inputs = Inputs(c.session, dep, c.clock.now())
+    n = len(valid_takers(c, dep, s, exclude={_staff_id(c)}, inputs=inputs))
+    own = offerer_violations(c, inputs, s)
+    return SwapAudience(
+        assignment_id=assignment_id,
+        eligible_colleagues=n,
+        needs_planner=bool(own),
+        own_rules=sorted({v.rule for v in own}),
+    )
 
 
 @router.post("/swaps", status_code=status.HTTP_201_CREATED)
@@ -598,8 +690,9 @@ def offer_swap(c: CtxDep, _: Physician, body: SwapOfferIn) -> SwapOut:
 
 @router.get("/swap-offers")
 def open_offers(c: CtxDep, _: Physician) -> list[OpenOffer]:
-    """M6: open offers of colleagues the person could take (basic filter)."""
+    """M6: open offers of colleagues the person could take without breaking a rule (C2)."""
     me, dep = _staff_id(c), department(c)
+    inputs = Inputs(c.session, dep, c.clock.now())
     out = []
     for sw in operations.swaps(c.session, statuses=["open"]):
         if sw.offered_by == me or sw.offered_by not in dep.staff:
@@ -608,31 +701,73 @@ def open_offers(c: CtxDep, _: Physician) -> list[OpenOffer]:
         if a is None or a.day <= c.clock.today():
             continue
         s = Shift(a.id, a.day, a.shift_type, sw.offered_by, a.staff_id, "planned")
-        if any(p.id == me for p in basic_candidates(c, dep, s, exclude={sw.offered_by})):
+        if me in dep.staff and _can_take(c, dep, inputs, s, me):
             out.append(OpenOffer(swap_id=sw.id, shift=_shift_out(c, s), offered_at=sw.offered_at))
     return out
 
 
+def _can_take(c: Ctx, dep: Department, inputs: Inputs, s: Shift, me: str) -> bool:
+    """Return whether the person passes the quick filter and C2 for taking the shift."""
+    return any(p.id == me for p in valid_takers(c, dep, s, exclude={s.holder or ""}, inputs=inputs))
+
+
 @router.post("/swap-offers/{swap_id}/take")
 def take_offer(c: CtxDep, _: Physician, swap_id: str) -> SwapOut:
-    """M6: take a colleague's offer. Without the validator (C2) the Planner decides."""
+    """M6: take a colleague's offer.
+
+    C2 checks both people. A valid swap is approved by the Planner's policy (logged as
+    policy-approved); a swap with a new violation, or with the policy off, goes to the Planner.
+    """
     me, dep = _staff_id(c), department(c)
-    sw = operations.swap(c.session, swap_id)
+    try:
+        sw = operations.swap(c.session, swap_id)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found") from e
     if sw is None or sw.offered_by not in dep.staff:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
     a = planning.assignment(c.session, sw.assignment_id)
     assert a is not None
     s = Shift(a.id, a.day, a.shift_type, sw.offered_by, a.staff_id, "planned")
-    if not any(p.id == me for p in basic_candidates(c, dep, s, exclude={sw.offered_by})):
+    inputs = Inputs(c.session, dep, c.clock.now())
+    if (
+        me not in dep.staff
+        or me == sw.offered_by
+        or not any(p.id == me for p in basic_candidates(c, dep, s, exclude={sw.offered_by}))
+    ):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "You cannot take this shift")
+    introduced = change_violations(
+        c,
+        inputs,
+        [Assignment(sw.offered_by, a.day, a.shift_type)],
+        [Assignment(me, a.day, a.shift_type)],
+        {sw.offered_by, me},
+    )
+    reason = swap_escalation(introduced, sw.offered_by)
+    if reason is None and not operations.policy(c.session, dep.id).auto_approve_swaps:
+        reason = operations.POLICY_OFF
     try:
-        taken = operations.take_swap(c.session, swap_id, me, c.clock.now())
+        taken = operations.take_swap(c.session, swap_id, me, c.clock.now(), reason)
     except ValueError as e:
         raise HTTPException(status.HTTP_409_CONFLICT, str(e)) from e
     record(
-        c, "swap.taken", "swap_offer", swap_id, me, {"escalation_reason": taken.escalation_reason}
+        c,
+        "swap.taken",
+        "swap_offer",
+        swap_id,
+        me,
+        {
+            "escalation_reason": taken.escalation_reason,
+            "rules": sorted({v.rule for v in introduced}),
+        },
     )
+    if reason is None:
+        _record_policy(c, "swap.approved", "swap_offer", swap_id, me)
     return _swap_out(c, taken, me)
+
+
+def _record_policy(c: Ctx, action: str, subject_type: str, subject_id: str, staff_id: str) -> None:
+    """Record an approval by the Planner's auto-approval policy (PROCESS §2)."""
+    record(c, action, subject_type, subject_id, staff_id, {"approval": "policy"})
 
 
 # --- M7 Krank melden / Report sick ------------------------------------------------------------
@@ -769,18 +904,60 @@ def cover_requests(c: CtxDep, _: Physician) -> list[CoverRequestOut]:
     return out
 
 
+def _cover_escalation(c: Ctx, offer_id: str, me: str) -> str | None:
+    """Return why an acceptance must go to the Planner, or None if the policy approves it.
+
+    The policy approves only cover by a colleague of the department that passes C2 and stays
+    within the contract hours. A locum or someone from another department is always the
+    Planner's decision (W7b), so it never reaches this path.
+    """
+    dep = department(c)
+    found = operations.offer(c.session, offer_id)
+    if found is None or me not in dep.staff:
+        return operations.RULE_VIOLATION
+    a = planning.assignment(c.session, found[1])
+    assert a is not None
+    inputs = Inputs(c.session, dep, c.clock.now())
+    if change_violations(c, inputs, [], [Assignment(me, a.day, a.shift_type)], {me}):
+        return operations.RULE_VIOLATION
+    m = month_start(a.day)
+    rules = organization.rules_for(c.session, m).rules
+    h = hours_for(
+        dep.staff[me],
+        m,
+        effective(c.session, m, month_end(m)),
+        approved_leave_days(c.session, [me], m, month_end(m)).get(me, set()),
+        set(organization.holidays(c.session, m, month_end(m))),
+        rules,
+        organization.shift_types(c.session),
+        c.clock.now(),
+    )
+    if h.planned_hours + h.leave_credit + credit(a.shift_type, rules) > h.contract_hours + 1e-9:
+        return operations.OVERTIME
+    if not operations.policy(c.session, dep.id).auto_approve_cover:
+        return operations.POLICY_OFF
+    return None
+
+
 @router.post("/cover-requests/{offer_id}")
 def respond_cover(c: CtxDep, _: Physician, offer_id: str, body: RespondIn) -> RespondOut:
-    """M8: take the shift ("Übernehmen") or decline. Taking it waits for the Planner until C2."""
+    """M8: take the shift ("Übernehmen") or decline.
+
+    A valid cover within the contract hours is approved by the policy; otherwise the Planner
+    decides (W7b).
+    """
     me = _staff_id(c)
     operations.advance(c.session, c.clock.now())
     try:
-        cas = operations.respond(c.session, offer_id, me, body.accept, c.clock.now())
+        reason = _cover_escalation(c, offer_id, me) if body.accept else None
+        cas = operations.respond(c.session, offer_id, me, body.accept, c.clock.now(), reason)
     except KeyError as e:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found") from e
     except ValueError as e:
         raise HTTPException(status.HTTP_409_CONFLICT, str(e)) from e
     record(c, "cover.accepted" if body.accept else "cover.declined", "cover_cascade", cas.id, me)
+    if body.accept and cas.approval == "policy":
+        _record_policy(c, "cover.decided", "cover_cascade", cas.id, me)
     return RespondOut(status=cas.status, escalation_reason=cas.escalation_reason)
 
 
@@ -852,6 +1029,16 @@ def my_fairness(c: CtxDep, _: Physician, year: int | None = None) -> MyFairness:
 # --- M10 Stunden / Hours ----------------------------------------------------------------------
 
 
+class RestCompliance(BaseModel):
+    """Rest periods below the minimum in the month (validator C2)."""
+
+    violations: int
+    compliant: bool
+    days: list[date]
+    min_rest_hours: float
+    validator: EngineLabel
+
+
 class HoursOut(BaseModel):
     """M10: contract, planned, worked and overtime hours of a month."""
 
@@ -861,13 +1048,21 @@ class HoursOut(BaseModel):
     planned_hours: float
     worked_hours: float
     overtime_hours: float
-    rest_compliance: None = Field(None, description="Needs the validator C2 (Phase 7)")
-    rest_compliance_available_from_phase: int = 7
+    rest_compliance: RestCompliance | None = Field(
+        None, description="Rest periods in the month as it stands, checked by C2"
+    )
 
 
-def hours_table(c: Ctx, m: date, staff_ids: list[str]) -> dict[str, HoursOut]:
+def hours_table(c: Ctx, m: date, staff_ids: list[str], rest: bool = True) -> dict[str, HoursOut]:
     """Return the hours of several physicians in a month, computing the month once."""
     dep = department(c)
+    rests: dict[str, list[date]] = {sid: [] for sid in staff_ids}
+    min_rest = float(organization.rules_for(c.session, m).rules["min_rest_hours"])
+    if rest:
+        inp = Inputs(c.session, dep, c.clock.now()).month(m)
+        for v in c.engines.validator.validate(inp):
+            if v.rule == "min_rest" and v.staff_id in rests:
+                rests[v.staff_id].append(v.day)
     shifts = effective(c.session, m, month_end(m))
     leave = approved_leave_days(c.session, staff_ids, m, month_end(m))
     holidays = set(organization.holidays(c.session, m, month_end(m)))
@@ -885,6 +1080,15 @@ def hours_table(c: Ctx, m: date, staff_ids: list[str]) -> dict[str, HoursOut]:
             planned_hours=h.planned_hours,
             worked_hours=h.worked_hours,
             overtime_hours=h.overtime_hours,
+            rest_compliance=RestCompliance(
+                violations=len(rests[sid]),
+                compliant=not rests[sid],
+                days=sorted(rests[sid]),
+                min_rest_hours=min_rest,
+                validator=label(c.engines.validator.info),
+            )
+            if rest
+            else None,
         )
     return out
 
@@ -915,7 +1119,7 @@ class Notification(BaseModel):
 
 @router.get("/notifications")
 def notifications(c: CtxDep, _: Physician) -> list[Notification]:
-    """M11: roster published, swap updates, leave decisions, cover requests."""
+    """M11: roster published or changed, swap updates, leave decisions, cover requests."""
     me, now = _staff_id(c), c.clock.now()
     out: list[Notification] = []
     for m in planning.published_months(c.session)[-3:]:
@@ -949,6 +1153,20 @@ def notifications(c: CtxDep, _: Physician) -> list[Notification]:
             and s.status in ("approved", "declined", "accepted", "pending_approval")
         ):
             out.append(Notification(kind=f"swap_{s.status}", at=at, data={"swap_id": s.id}))
+    for ch in planning.changes_for(c.session, me):
+        if ch.changed_at <= now:
+            out.append(
+                Notification(
+                    kind="roster_changed",
+                    at=ch.changed_at,
+                    data={
+                        "date": ch.day.isoformat(),
+                        "shift_type": ch.shift_type,
+                        "change": "added" if ch.staff_after == me else "removed",
+                        "reason": ch.reason,
+                    },
+                )
+            )
     for task in _cover_tasks(c):
         out.append(
             Notification(

@@ -77,6 +77,8 @@ class CoverCascade(Base):
     escalation_reason: Mapped[str | None] = mapped_column(String(40))
     # Colleagues still to ask, in order (staff ids). Empty when the list is exhausted.
     candidate_queue: Mapped[list[str] | None] = mapped_column(JSONB)
+    # Who approved the cover: the Planner, or the auto-approval policy (PROCESS §2).
+    approval: Mapped[str | None] = mapped_column(String(10))
 
 
 class CoverOffer(Base):
@@ -96,3 +98,14 @@ class CoverOffer(Base):
     responded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     response: Mapped[str] = mapped_column(String(15))
     deadline_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class Policy(Base):
+    """The Planner's auto-approval policy for a department (PROCESS §2)."""
+
+    __tablename__ = "policy"
+    department_id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    auto_approve_swaps: Mapped[bool] = mapped_column(server_default="true")
+    auto_approve_cover: Mapped[bool] = mapped_column(server_default="true")
+    updated_by: Mapped[uuid.UUID | None]
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

@@ -223,7 +223,10 @@ export interface paths {
         put?: never;
         /**
          * Request Leave
-         * @description M5: request leave without a trade ("Ohne Tausch beantragen"); the Planner decides.
+         * @description M5: request leave ("Ohne Tausch" or "Mit Tausch beantragen"); the Planner decides.
+         *
+         *     With a trade, the check must have offered one for exactly these dates; the extra weekend
+         *     becomes a binding constraint when the earlier month is planned, once the Planner approves.
          */
         post: operations["request_leave_me_leave_post"];
         delete?: never;
@@ -243,9 +246,29 @@ export interface paths {
         put?: never;
         /**
          * Check Leave
-         * @description M5: instant hint before submitting (C6 stand-in); the confirmed trade-off waits for C1.
+         * @description M5: instant hint (C6 stand-in), and a background C1 check of coverability and trade-off.
          */
         post: operations["check_leave_me_leave_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/leave/checks/{check_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Leave Check
+         * @description M5: the background check: coverable, coverable with a trade-off, or not coverable.
+         */
+        get: operations["leave_check_me_leave_checks__check_id__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -285,7 +308,7 @@ export interface paths {
         };
         /**
          * Swap Audience
-         * @description M6: how many colleagues could take this shift (basic filter, not checked against rules).
+         * @description M6: how many colleagues could take this shift without breaking a rule (C2).
          */
         get: operations["swap_audience_me_swaps_audience_get"];
         put?: never;
@@ -305,7 +328,7 @@ export interface paths {
         };
         /**
          * Open Offers
-         * @description M6: open offers of colleagues the person could take (basic filter).
+         * @description M6: open offers of colleagues the person could take without breaking a rule (C2).
          */
         get: operations["open_offers_me_swap_offers_get"];
         put?: never;
@@ -327,7 +350,10 @@ export interface paths {
         put?: never;
         /**
          * Take Offer
-         * @description M6: take a colleague's offer. Without the validator (C2) the Planner decides.
+         * @description M6: take a colleague's offer.
+         *
+         *     C2 checks both people. A valid swap is approved by the Planner's policy (logged as
+         *     policy-approved); a swap with a new violation, or with the policy off, goes to the Planner.
          */
         post: operations["take_offer_me_swap_offers__swap_id__take_post"];
         delete?: never;
@@ -387,7 +413,10 @@ export interface paths {
         put?: never;
         /**
          * Respond Cover
-         * @description M8: take the shift ("Übernehmen") or decline. Taking it waits for the Planner until C2.
+         * @description M8: take the shift ("Übernehmen") or decline.
+         *
+         *     A valid cover within the contract hours is approved by the policy; otherwise the Planner
+         *     decides (W7b).
          */
         post: operations["respond_cover_me_cover_requests__offer_id__post"];
         delete?: never;
@@ -445,7 +474,7 @@ export interface paths {
         };
         /**
          * Notifications
-         * @description M11: roster published, swap updates, leave decisions, cover requests.
+         * @description M11: roster published or changed, swap updates, leave decisions, cover requests.
          */
         get: operations["notifications_me_notifications_get"];
         put?: never;
@@ -490,6 +519,8 @@ export interface paths {
         /**
          * Roster
          * @description W4 grid and the full roster for Staff+: shifts, absences, leave, coverage per shift.
+         *
+         *     With ``variant_id`` (Planner only) the grid shows a draft variant of a C1 run.
          */
         get: operations["roster_roster_get"];
         put?: never;
@@ -515,7 +546,7 @@ export interface paths {
         head?: never;
         /**
          * Change Assignment
-         * @description W4: change a published roster. Every change must pass the validator, so this waits for C2.
+         * @description W4: change a draft (live validation) or a published roster (reason, C2-valid, notify).
          */
         patch: operations["change_assignment_planner_roster_assignments_patch"];
         trace?: never;
@@ -531,7 +562,7 @@ export interface paths {
         put?: never;
         /**
          * Validate
-         * @description W4: live validation (C2, Phase 7).
+         * @description W4: live validation with C2 (all rules, the whole month).
          */
         post: operations["validate_planner_validate_post"];
         delete?: never;
@@ -549,15 +580,35 @@ export interface paths {
         };
         /**
          * Runs
-         * @description W3: existing runs of a month (December 2026 has none until C1 exists).
+         * @description W3: every run of a month (the seeded manual roster and C1 runs), newest first.
          */
         get: operations["runs_planner_runs_get"];
         put?: never;
         /**
          * Generate
-         * @description W3: generate variants with the optimizer (C1, Phase 7).
+         * @description W3: queue a C1 run for a month that is not published yet; the worker solves it.
          */
         post: operations["generate_planner_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Run Detail
+         * @description W3: a run's progress, its variants with metrics, or why no valid roster exists.
+         */
+        get: operations["run_detail_planner_runs__run_id__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -575,9 +626,33 @@ export interface paths {
         put?: never;
         /**
          * Publish
-         * @description W5: approve and publish. A variant must pass the validator first, so this waits for C2.
+         * @description W5: approve and publish a draft. It must pass the validator (C2) without a violation.
          */
         post: operations["publish_planner_variants__variant_id__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Policy
+         * @description W11: the auto-approval policy.
+         */
+        get: operations["get_policy_planner_policy_get"];
+        /**
+         * Put Policy
+         * @description W11: change the auto-approval policy (audited).
+         */
+        put: operations["put_policy_planner_policy_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -715,7 +790,7 @@ export interface paths {
         put?: never;
         /**
          * Decide Swap
-         * @description W6: approve or decline a taken swap (escalated while C2 is not available).
+         * @description W6: approve or decline an escalated swap. An approval must pass the validator (C2).
          */
         post: operations["decide_swap_planner_swaps__swap_id__decision_post"];
         delete?: never;
@@ -833,7 +908,7 @@ export interface paths {
         };
         /**
          * Hours Report
-         * @description Per-person hours and overtime of a month (Planner and Oversight).
+         * @description Per-person hours, overtime and rest compliance (C2) of a month (Planner and Oversight).
          */
         get: operations["hours_report_compliance_hours_get"];
         put?: never;
@@ -1051,6 +1126,21 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
+         * AddShift
+         * @description A shift to add.
+         */
+        AddShift: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
+            /** Staff Id */
+            staff_id: string;
+        };
+        /**
          * AskIn
          * @description A question for the copilot.
          */
@@ -1082,16 +1172,26 @@ export interface components {
             engine: components["schemas"]["EngineLabel"];
         };
         /**
-         * AssignmentChange
-         * @description A change to a published roster. Needs a reason (PROCESS §2).
+         * AssignmentEdit
+         * @description W4: one change. A draft changes directly; a published roster needs a reason.
+         *
+         *     ``assignment_id`` with ``new_staff_id`` reassigns (``null`` removes the shift); ``add``
+         *     adds a shift. A change to a published roster must not break any rule (C2), and everyone
+         *     affected is notified.
          */
-        AssignmentChange: {
+        AssignmentEdit: {
+            /**
+             * Variant Id
+             * @description A draft variant; omit for the published roster
+             */
+            variant_id?: string | null;
             /** Assignment Id */
-            assignment_id: string;
+            assignment_id?: string | null;
             /** New Staff Id */
             new_staff_id?: string | null;
+            add?: components["schemas"]["AddShift"] | null;
             /** Reason */
-            reason: string;
+            reason?: string | null;
         };
         /**
          * AuditEventOut
@@ -1194,6 +1294,11 @@ export interface components {
         Cell: {
             /** Shifts */
             shifts: string[];
+            /**
+             * Assignment Ids
+             * @description Same order as shifts (W4 edits)
+             */
+            assignment_ids: string[];
             /** Changed */
             changed: boolean;
             /** On Leave */
@@ -1268,7 +1373,7 @@ export interface components {
             can_change_roster: boolean;
             /**
              * Eval Metric
-             * @description From eval/results; None until evaluated
+             * @description Written by an eval/ script (eval/results/c1.json …); None until then
              */
             eval_metric?: {
                 [key: string]: unknown;
@@ -1309,7 +1414,7 @@ export interface components {
             hours: components["schemas"]["HoursImpact"];
             /**
              * Check
-             * @default unchecked
+             * @default validated
              */
             check: string;
         };
@@ -1423,6 +1528,26 @@ export interface components {
             values: number[];
         };
         /**
+         * EditOut
+         * @description What the change did, and the violations of the changed people and days.
+         */
+        EditOut: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Change Id */
+            change_id: string | null;
+            /** Notified */
+            notified: string[];
+            /** Introduced */
+            introduced: components["schemas"]["ViolationOut"][];
+            /** Violations */
+            violations: components["schemas"]["ViolationOut"][];
+            validator: components["schemas"]["EngineLabel"];
+        };
+        /**
          * EngineLabel
          * @description Which component produced a value, and whether it is a stand-in.
          */
@@ -1488,7 +1613,7 @@ export interface components {
         };
         /**
          * GapSuggestion
-         * @description Who could fill a gap (Planner only; unchecked until C2).
+         * @description Who could fill a gap (Planner only; checked by C2, ranked by C5).
          */
         GapSuggestion: {
             /**
@@ -1502,7 +1627,7 @@ export interface components {
             candidates: string[];
             /**
              * Check
-             * @default unchecked
+             * @default validated
              */
             check: string;
             engine: components["schemas"]["EngineLabel"];
@@ -1556,16 +1681,8 @@ export interface components {
             worked_hours: number;
             /** Overtime Hours */
             overtime_hours: number;
-            /**
-             * Rest Compliance
-             * @description Needs the validator C2 (Phase 7)
-             */
-            rest_compliance?: null;
-            /**
-             * Rest Compliance Available From Phase
-             * @default 7
-             */
-            rest_compliance_available_from_phase: number;
+            /** @description Rest periods in the month as it stands, checked by C2 */
+            rest_compliance?: components["schemas"]["RestCompliance"] | null;
         };
         /**
          * HoursReport
@@ -1582,15 +1699,10 @@ export interface components {
             /** Total Overtime Hours */
             total_overtime_hours: number;
             /**
-             * Rest Compliance
-             * @description Needs the validator C2 (Phase 7)
+             * Rest Violations Total
+             * @description Rest periods below the minimum (C2)
              */
-            rest_compliance?: null;
-            /**
-             * Rest Compliance Available From Phase
-             * @default 7
-             */
-            rest_compliance_available_from_phase: number;
+            rest_violations_total: number;
         };
         /**
          * Inbox
@@ -1622,15 +1734,10 @@ export interface components {
             /** Leave Days Taken This Year */
             leave_days_taken_this_year: number;
             /**
-             * Trade Off
-             * @description Confirmed trade-off needs C1 (Phase 7)
+             * Trade Off Check Id
+             * @description Poll GET /me/leave/checks/{id}: C1 checks coverability and a trade-off
              */
-            trade_off?: null;
-            /**
-             * Trade Off Available From Phase
-             * @default 7
-             */
-            trade_off_available_from_phase: number;
+            trade_off_check_id: string;
             engine: components["schemas"]["EngineLabel"];
         };
         /**
@@ -1668,7 +1775,7 @@ export interface components {
         };
         /**
          * LeaveIn
-         * @description A leave request. ``with_trade`` needs C1 and is refused until Phase 7.
+         * @description A leave request. ``with_trade`` needs a finished check that offered a trade-off.
          */
         LeaveIn: {
             /**
@@ -1686,6 +1793,8 @@ export interface components {
              * @default false
              */
             with_trade: boolean;
+            /** Check Id */
+            check_id?: string | null;
         };
         /**
          * LeaveOut
@@ -1715,6 +1824,13 @@ export interface components {
             decided_at: string | null;
             /** Decision Reason */
             decision_reason: string | null;
+            /**
+             * Trade Off
+             * @description The extra weekend duty committed to with 'Mit Tausch beantragen'
+             */
+            trade_off?: {
+                [key: string]: unknown;
+            } | null;
         };
         /**
          * LoginRequest
@@ -1885,7 +2001,7 @@ export interface components {
             offered_at: string;
             /**
              * Check
-             * @default unchecked
+             * @default validated
              */
             check: string;
         };
@@ -1911,7 +2027,7 @@ export interface components {
             overtime_after?: number | null;
             /**
              * Check
-             * @default unchecked
+             * @default validated
              */
             check: string;
         };
@@ -2119,16 +2235,8 @@ export interface components {
             worked_hours: number;
             /** Overtime Hours */
             overtime_hours: number;
-            /**
-             * Rest Compliance
-             * @description Needs the validator C2 (Phase 7)
-             */
-            rest_compliance?: null;
-            /**
-             * Rest Compliance Available From Phase
-             * @default 7
-             */
-            rest_compliance_available_from_phase: number;
+            /** @description Rest periods in the month as it stands, checked by C2 */
+            rest_compliance?: components["schemas"]["RestCompliance"] | null;
             /** Staff Id */
             staff_id: string;
             /** Display Name */
@@ -2145,6 +2253,33 @@ export interface components {
             display_name: string;
             /** Role */
             role: string;
+        };
+        /**
+         * PolicyIn
+         * @description Switch auto-approval on or off.
+         */
+        PolicyIn: {
+            /** Auto Approve Swaps */
+            auto_approve_swaps: boolean;
+            /** Auto Approve Cover */
+            auto_approve_cover: boolean;
+        };
+        /**
+         * PolicyOut
+         * @description What the system approves on its own: only C2-valid swaps and cover inside the department.
+         *
+         *     Cover by a locum or from another department, and cover that means overtime, always go to
+         *     the Planner.
+         */
+        PolicyOut: {
+            /** Auto Approve Swaps */
+            auto_approve_swaps: boolean;
+            /** Auto Approve Cover */
+            auto_approve_cover: boolean;
+            /** Updated By */
+            updated_by: string | null;
+            /** Updated At */
+            updated_at: string | null;
         };
         /**
          * ProposalCreated
@@ -2198,6 +2333,27 @@ export interface components {
             roster_month: string | null;
             /** Status */
             status: string;
+        };
+        /**
+         * Published
+         * @description W5: the published variant and its approval.
+         */
+        Published: {
+            /** Variant Id */
+            variant_id: string;
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /**
+             * Published At
+             * Format: date-time
+             */
+            published_at: string;
+            /** Approved By */
+            approved_by: string;
+            validator: components["schemas"]["EngineLabel"];
         };
         /**
          * Readiness
@@ -2291,6 +2447,21 @@ export interface components {
             responded_at: string | null;
         };
         /**
+         * RestCompliance
+         * @description Rest periods below the minimum in the month (validator C2).
+         */
+        RestCompliance: {
+            /** Violations */
+            violations: number;
+            /** Compliant */
+            compliant: boolean;
+            /** Days */
+            days: string[];
+            /** Min Rest Hours */
+            min_rest_hours: number;
+            validator: components["schemas"]["EngineLabel"];
+        };
+        /**
          * RosterDay
          * @description One day of the physician's month.
          */
@@ -2319,7 +2490,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "published" | "not_planned";
+            status: "published" | "draft" | "not_planned";
             /** Published At */
             published_at: string | null;
             /** Rule Set Version */
@@ -2406,23 +2577,50 @@ export interface components {
         RunOut: {
             /** Run Id */
             run_id: string;
-            /** Variant Id */
-            variant_id: string;
-            /** Label */
-            label: string;
             /**
              * Status
              * @enum {string}
              */
-            status: "published" | "draft";
+            status: "queued" | "running" | "done" | "infeasible" | "failed";
             /** Planner Kind */
             planner_kind: string;
             /** Rule Set Version */
             rule_set_version: string;
             /** Generator Version */
             generator_version: string | null;
-            /** Published At */
-            published_at: string | null;
+            /** Solver Version */
+            solver_version: string | null;
+            /** Validator Version */
+            validator_version: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Finished At */
+            finished_at: string | null;
+            /** Config */
+            config: {
+                [key: string]: unknown;
+            } | null;
+            /** Explanations */
+            explanations: {
+                [key: string]: unknown;
+            }[];
+            /** Error */
+            error: string | null;
+            /** Variants */
+            variants: components["schemas"]["VariantOut"][];
+        };
+        /**
+         * RunQueued
+         * @description The run is queued; poll ``GET /planner/runs/{run_id}``.
+         */
+        RunQueued: {
+            /** Run Id */
+            run_id: string;
+            /** Status */
+            status: string;
         };
         /**
          * RunsOut
@@ -2587,8 +2785,18 @@ export interface components {
             /** Eligible Colleagues */
             eligible_colleagues: number;
             /**
+             * Needs Planner
+             * @description Giving the shift away breaks a rule for you (C2), so the Planner decides
+             */
+            needs_planner: boolean;
+            /**
+             * Own Rules
+             * @description Which rules, e.g. contract_hours_band
+             */
+            own_rules: string[];
+            /**
              * Check
-             * @default unchecked
+             * @default validated
              */
             check: string;
         };
@@ -2662,12 +2870,45 @@ export interface components {
             user: components["schemas"]["Me"];
         };
         /**
+         * TradeOffCheck
+         * @description M5: the background check (C1).
+         *
+         *     ``result.outcome`` is one of coverable, coverable_with_trade_off, not_coverable,
+         *     not_applicable (synthdata ASSUMPTIONS §18).
+         */
+        TradeOffCheck: {
+            /** Id */
+            id: string;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "running" | "done" | "failed";
+            /** Result */
+            result: {
+                [key: string]: unknown;
+            } | null;
+            engine: components["schemas"]["EngineLabel"];
+        };
+        /**
          * ValidateIn
-         * @description A month to validate.
+         * @description A month to validate: the published roster as it stands, or a draft variant.
          */
         ValidateIn: {
             /** Roster Month */
             roster_month: string;
+            /** Variant Id */
+            variant_id?: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -2681,6 +2922,87 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /**
+         * ValidationOut
+         * @description W4: every violation of the month.
+         */
+        ValidationOut: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Variant Id */
+            variant_id: string | null;
+            /** Valid */
+            valid: boolean;
+            /** By Rule */
+            by_rule: {
+                [key: string]: number;
+            };
+            /** Violations */
+            violations: components["schemas"]["ViolationOut"][];
+            validator: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * VariantOut
+         * @description A variant and what it achieves (metrics from C1, checked by C2).
+         */
+        VariantOut: {
+            /** Variant Id */
+            variant_id: string;
+            /** Label */
+            label: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "published" | "draft" | "discarded";
+            /** Profile */
+            profile: string | null;
+            /** Recommended */
+            recommended: boolean;
+            /**
+             * Recommendation Key
+             * @description i18n key of the reason (deterministic: the balanced profile)
+             */
+            recommendation_key?: string | null;
+            /** Metrics */
+            metrics: {
+                [key: string]: unknown;
+            } | null;
+            /** Published At */
+            published_at: string | null;
+        };
+        /**
+         * ViolationOut
+         * @description A broken rule, as i18n keys with parameters (packages/i18n: violation.*, fix.*).
+         */
+        ViolationOut: {
+            /** Rule */
+            rule: string;
+            /** Key */
+            key: string;
+            /** Staff Id */
+            staff_id: string | null;
+            /** Display Name */
+            display_name: string | null;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Params */
+            params: {
+                [key: string]: unknown;
+            };
+            /** Fix Key */
+            fix_key: string;
+            /** Fix Params */
+            fix_params: {
+                [key: string]: unknown;
+            };
         };
         /**
          * WindowDetail
@@ -3193,6 +3515,39 @@ export interface operations {
             };
         };
     };
+    leave_check_me_leave_checks__check_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                check_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TradeOffCheck"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     my_swaps_me_swaps_get: {
         parameters: {
             query?: never;
@@ -3626,6 +3981,7 @@ export interface operations {
         parameters: {
             query: {
                 month: string;
+                variant_id?: string | null;
             };
             header?: {
                 authorization?: string | null;
@@ -3666,7 +4022,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AssignmentChange"];
+                "application/json": components["schemas"]["AssignmentEdit"];
             };
         };
         responses: {
@@ -3676,7 +4032,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["EditOut"];
                 };
             };
             /** @description Validation Error */
@@ -3711,7 +4067,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ValidationOut"];
                 };
             };
             /** @description Validation Error */
@@ -3774,12 +4130,45 @@ export interface operations {
         };
         responses: {
             /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunQueued"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_detail_planner_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["RunOut"];
                 };
             };
             /** @description Validation Error */
@@ -3812,7 +4201,73 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Published"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_policy_planner_policy_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_policy_planner_policy_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PolicyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyOut"];
                 };
             };
             /** @description Validation Error */
@@ -4236,6 +4691,7 @@ export interface operations {
         parameters: {
             query: {
                 month: string;
+                rest?: boolean;
             };
             header?: {
                 authorization?: string | null;

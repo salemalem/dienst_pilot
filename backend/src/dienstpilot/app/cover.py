@@ -1,14 +1,18 @@
-"""Candidate lists for swaps and cover, and opening cover cascades.
+"""Candidate lists for swaps and cover, auto-approval checks, and opening cover cascades.
 
-Until the validator (C2) exists, candidates come from a basic filter only: on the roster that
-day, the role and qualifications the shift needs, no other working shift that day, not on
-leave and not absent. Rest periods and monthly limits are NOT checked; every list says so.
+A quick filter (on the roster that day, role and qualifications, no other working shift, not on
+leave or absent) narrows the department down; then the validator (C2) checks the change for
+each remaining colleague: rest periods, consecutive nights, weekends, on-call limits, the free
+day after Bereitschaftsdienst, the hours band and the qualification mix. Every list says
+``check: "validated"``.
 """
 
+from collections.abc import Iterable
 from datetime import date, timedelta
 
 from dienstpilot.app.common import Department
 from dienstpilot.app.deps import Ctx
+from dienstpilot.app.engine_inputs import Inputs
 from dienstpilot.app.roster import (
     Shift,
     approved_leave_days,
@@ -22,6 +26,7 @@ from dienstpilot.operations import service as operations
 from dienstpilot.organization import service as organization
 from dienstpilot.organization.service import StaffMember
 from dienstpilot.shared.ports import CoverCandidate
+from dienstpilot_validator import Assignment, Violation
 
 ROLE_SHIFTS = {
     "chefaerztin": {"ruf"},
@@ -30,7 +35,7 @@ ROLE_SHIFTS = {
     "assistenzarzt": {"frueh", "spaet", "nacht", "bereitschaft"},
 }
 WORKING = {"frueh", "spaet", "nacht", "bereitschaft"}
-CHECK = "unchecked"  # rule check (rest periods, limits) arrives with C2 in Phase 7
+CHECK = "validated"  # every candidate passed the validator (C2)
 
 
 def needed_qualifications(holder: StaffMember | None, day: date, shift_type: str) -> set[str]:
@@ -52,7 +57,7 @@ def needed_qualifications(holder: StaffMember | None, day: date, shift_type: str
 def basic_candidates(
     ctx: Ctx, dep: Department, shift: Shift, exclude: set[str]
 ) -> list[StaffMember]:
-    """Return colleagues who pass the basic filter for a shift (unchecked against the rules)."""
+    """Return colleagues who pass the quick filter for a shift (before the C2 check)."""
     day = shift.day
     holder = dep.staff.get(shift.planned_holder)
     needs = needed_qualifications(holder, day, shift.shift_type)
@@ -77,6 +82,68 @@ def basic_candidates(
             continue
         out.append(p)
     return out
+
+
+def change_violations(
+    ctx: Ctx,
+    inputs: Inputs,
+    remove: Iterable[Assignment],
+    add: Iterable[Assignment],
+    people: set[str],
+) -> list[Violation]:
+    """Return the violations a change introduces for the given people or for coverage.
+
+    The month of every changed day is checked, and the next month too when the change is in
+    the last week (rest periods and night runs reach across the boundary).
+    """
+    remove, add = list(remove), list(add)
+    months = set()
+    for a in (*remove, *add):
+        m = month_start(a.day)
+        months.add(m)
+        if a.day > month_end(m) - timedelta(days=7):
+            months.add(month_start(month_end(m) + timedelta(days=1)))
+    out = []
+    for m in sorted(months):
+        _, introduced = ctx.engines.validator.validate_change(inputs.month(m), remove, add)
+        out += [v for v in introduced if v.staff_id is None or v.staff_id in people]
+    return out
+
+
+def valid_takers(
+    ctx: Ctx, dep: Department, shift: Shift, exclude: set[str], inputs: Inputs | None = None
+) -> list[StaffMember]:
+    """Return colleagues who could take a shift without breaking a rule (C2-checked)."""
+    inputs = inputs or Inputs(ctx.session, dep, ctx.clock.now())
+    remove = [Assignment(shift.holder, shift.day, shift.shift_type)] if shift.holder else []
+    return [
+        p
+        for p in basic_candidates(ctx, dep, shift, exclude)
+        if not change_violations(
+            ctx, inputs, remove, [Assignment(p.id, shift.day, shift.shift_type)], {p.id}
+        )
+    ]
+
+
+def offerer_violations(ctx: Ctx, inputs: Inputs, shift: Shift) -> list[Violation]:
+    """Return what giving the shift away breaks for its holder (e.g. the hours band)."""
+    if not shift.holder:
+        return []
+    remove = [Assignment(shift.holder, shift.day, shift.shift_type)]
+    return [
+        v
+        for v in change_violations(ctx, inputs, remove, [], {shift.holder})
+        if v.staff_id == shift.holder
+    ]
+
+
+def swap_escalation(introduced: list[Violation], offerer: str) -> str | None:
+    """Return why a swap needs the Planner (None: C2 found nothing new)."""
+    if not introduced:
+        return None
+    if all(v.rule == "contract_hours_band" and v.staff_id == offerer for v in introduced):
+        return operations.HOURS_BAND
+    return operations.RULE_VIOLATION
 
 
 def ranked(ctx: Ctx, dep: Department, people: list[StaffMember], day: date) -> list[CoverCandidate]:
@@ -114,7 +181,7 @@ def open_cascades_for(
             continue
         if span(types[s.shift_type], s.day)[0] <= now:
             continue  # already started; the Planner handles it directly
-        people = basic_candidates(ctx, dep, s, exclude={staff_id})
+        people = valid_takers(ctx, dep, s, exclude={staff_id})
         order = [c.staff_id for c in ranked(ctx, dep, people, s.day)]
         c = operations.open_cascade(ctx.session, s.assignment_id, absence_id, order, now)
         opened.append(c.id)

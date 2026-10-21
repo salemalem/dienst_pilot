@@ -10,9 +10,9 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | — | Process design (roles, approvals, monthly cycle) | Domain design | Done, with clinical input |
 | — | System architecture (this document) | Design | Done |
 | — | Synthetic data generator (`synthdata/`) | Simulation | Prototype |
-| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C3–C8) | Application | Prototype |
-| C1 | Roster Optimizer | Constraint optimization | Designed |
-| C2 | Rule and Compliance Validator | Deterministic | Designed |
+| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C3–C8), job worker | Application | Prototype |
+| C1 | Roster Optimizer (`engine/solver/`) | Constraint optimization | Built & evaluated on synthetic data (`eval/results/benchmark.json`) |
+| C2 | Rule and Compliance Validator (`engine/validator/`) | Deterministic | Built & evaluated on synthetic data (`eval/results/c2.json`) |
 | C3 | Absence Forecaster | ML, time series | Designed |
 | C4 | Preference Learner | ML, Bayesian | Designed |
 | C5 | Cover Acceptance Ranker | ML, classification + policy | Designed |
@@ -155,7 +155,8 @@ All generator assumptions are documented in `synthdata/ASSUMPTIONS.md`, and the 
 - minimum rest between consecutive shifts (pairs that would violate it are forbidden)
 - maximum consecutive night shifts; maximum weekends and on-call duties per period
 - approved leave and declared unavailability
-- contract hours within the configured band (overtime modelled as a bounded, penalized slack variable)
+- contract hours within the configured band (planned hours plus leave credit; hours above the contract, up to the band's upper edge, count as overtime and are penalized)
+- the free day after Bereitschaftsdienst, Rufbereitschaft only alongside a Frühdienst, and promised trade-offs (at least *n* weekends with duty for a person, from an approved leave with "Mit Tausch beantragen")
 
 **Soft objectives** (weighted sum, minimized):
 - unmet wishes, with "important" wishes weighted higher
@@ -168,13 +169,17 @@ All generator assumptions are documented in `synthdata/ASSUMPTIONS.md`, and the 
 
 **Infeasibility.** Constraint groups are guarded by assumption literals. When no plan exists, CP-SAT's sufficient-assumptions-for-infeasibility returns a small conflicting set, which is translated into a sentence such as "Not coverable: 23 Dec late shift needs two internists, only one is available after approved leave."
 
-**Evaluation.** Solve time, optimality gap, zero hard violations (checked by C2), and comparison with the manual-planner baseline on wish rate, burden spread and overtime.
+**Evaluation.** Solve time, optimality gap, zero hard violations (checked by C2), and comparison with the manual-planner baseline on wish rate, burden spread and overtime (§17.1). The recommended ("balanced") profile's weights are chosen on July to December 2024 only (`eval/tune_profiles.py` → `eval/results/tuning.json`); 2025 is held out.
+
+**Implementation.** `engine/solver/` (`dienstpilot_solver`). Runs stop at a deterministic time budget with interleaved multi-thread search and a fixed seed, and the model is built in a fixed order, so the same inputs give the same rosters on any machine; a test solves in two processes with different hash seeds. Runs execute in the arq worker (ADR-009). A CI property test checks that every solver output on perturbed real months passes C2.
 
 ### C2: Rule and Compliance Validator (Regelprüfung)
 
 A pure function `validate(roster, ruleset) → list[Violation]`, implemented independently of the solver from the same declarative rules (N-version safety). It runs on every solver output, on every drag-and-drop in the planner editor (target: under 50 ms for a month), on every swap and cover acceptance, and before any write to a published roster.
 
 **Tests.** Hypothesis property tests: every solver output validates clean; every randomly mutated plan that breaks a rule is caught; violation messages exist in DE and EN for every rule type.
+
+**Implementation.** `engine/validator/` (`dienstpilot_validator`), with no dependency on the solver (import-linter). Times are real Europe/Berlin timestamps, so rest periods across a daylight-saving change are exact. Each violation is an i18n key with parameters plus a fix (`violation.*`, `fix.*` in `packages/i18n`). `validate_change` re-checks only the people and days a change touches, for live editing. `eval/run_validator_eval.py` compares it with the generator's independent checker on every published month and on seeded random changes and measures latency (`eval/results/c2.json`).
 
 ### C3: Absence Forecaster (Ausfallprognose)
 
@@ -371,14 +376,24 @@ These are planning estimates; `eval/cost_model.py` recomputes them from measured
 
 `eval/run_benchmark.py` compares the manual-planner baseline with C1 on held-out months and writes `eval/results/benchmark.json`. The table below is rendered from that file. Violations in published rosters and in in-month changes are counted separately: the manual baseline's in-month rate follows from a simulation parameter (`synthdata/ASSUMPTIONS.md` §13), so it is not a finding about real planners.
 
-| Metric | Manual baseline | DienstPilot |
+<!-- benchmark:start -->
+*Generated by `eval/render_tables.py` from `eval/results/benchmark.json` (12 held-out months, 2025-01 to 2025-12; dataset seed 20261020, generator 1.2.0; solver c1-1.0.1, validator c2-1.0.0). Do not edit by hand.*
+
+| Metric | Manual baseline | DienstPilot (C1) |
 |---|---|---|
-| Hard-rule violations, published rosters | *pending eval* | *pending eval* |
-| Hard-rule violations, in-month changes | *pending eval* | *pending eval* |
-| Wishes granted | *pending eval* | *pending eval* |
-| Weighted-burden spread (max − min) | *pending eval* | *pending eval* |
-| Overtime hours | *pending eval* | *pending eval* |
-| Solve time | — | *pending eval* |
+| Hard-rule violations, published rosters (counted by C2) | 5 | 0 |
+| Hard-rule violations, in-month changes (simulation parameter, see note) | 43 | — |
+| Wishes granted | 39.6% | 62.8% |
+| Important wishes granted | 41.0% | 63.9% |
+| Weighted-burden spread (max − min, mean per month) | 43.5 | 35.42 |
+| Overtime hours (sum) | 492.75 | 55.45 |
+| Isolated single nights (sum) | 90 | 26 |
+| Solve time per variant (median, wall clock, not reproducible) | — | 1.61 s |
+
+C1 is the recommended variant (profile `balanced`), its weights tuned on 2024-07 to 2024-12 (`eval/results/tuning.json`). Results hash `7d0797f5077b`.
+
+Limitations: Each month is compared independently from the same as-worked history (the manual roster and its in-month changes); C1's months are not chained into a year. In-month violations exist only for the baseline and follow from a simulation parameter (manual_rule_check_rate, synthdata ASSUMPTIONS.md §13); they are not a finding about real planners. Synthetic data of a fictional department; no real hospital.
+<!-- benchmark:end -->
 
 Model metrics (C3–C6) and agent eval results (C7, C8) are reported in their model cards and in `eval/results/`.
 

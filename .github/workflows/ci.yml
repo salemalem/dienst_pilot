@@ -11,19 +11,32 @@ concurrency:
 
 jobs:
   python:
-    name: Python (ruff, mypy, import-linter, pytest)
+    name: Python (ruff, mypy, import-linter, pytest, benchmark smoke)
     runs-on: ubuntu-latest
+    env:
+      DIENSTPILOT_SEED_DIR: data/synthetic/v1
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0 (no floating major tag)
         with:
           version: "0.11.26"
       - run: uv sync --frozen
+      - name: Generate the dataset from the seed
+        run: uv run python -m synthdata generate --out data/synthetic/v1
       - run: uv run ruff check backend
       - run: uv run ruff format --check backend
       - run: uv run mypy
       - run: uv run lint-imports
-      - run: uv run pytest
+      - name: Tests, incl. the property test "every solver output passes the validator"
+        run: uv run pytest
+      - name: Benchmark smoke run reproduces the committed result (C1 vs baseline, one month)
+        run: |
+          expected=$(python3 -c "import json; print(json.load(open('eval/results/benchmark_smoke.json'))['results_sha256'])")
+          uv run python eval/run_benchmark.py --smoke --data data/synthetic/v1
+          actual=$(python3 -c "import json; print(json.load(open('eval/results/benchmark_smoke.json'))['results_sha256'])")
+          test "$expected" = "$actual" || { echo "smoke benchmark changed: $expected -> $actual"; exit 1; }
+      - name: ARCHITECTURE §17.1 table matches eval/results/benchmark.json
+        run: uv run python eval/render_tables.py --check
 
   seed:
     name: Seed loads into Postgres
@@ -39,9 +52,16 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U dienstpilot -d dienstpilot"
           --health-interval 2s --health-timeout 3s --health-retries 30
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s --health-timeout 3s --health-retries 30
     env:
       DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@localhost:5432/dienstpilot
       TEST_DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@localhost:5432/dienstpilot
+      TEST_REDIS_URL: redis://localhost:6379/15
       DIENSTPILOT_SEED_DIR: data/synthetic/v1
     steps:
       - uses: actions/checkout@v7
@@ -56,7 +76,7 @@ jobs:
         run: uv run alembic upgrade head
       - name: Load the seed
         run: uv run python -m dienstpilot.seeding data/synthetic/v1
-      - name: Database tests (load twice, demo state, models match migrations)
+      - name: Database and API tests (seed, flows with C1/C2, the arq queue on Redis)
         run: uv run pytest -m db backend/tests
 
   seeds:

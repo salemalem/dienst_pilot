@@ -423,7 +423,8 @@ class ComponentOut(BaseModel):
     planned_phase: int | None
     can_change_roster: bool = False
     eval_metric: dict[str, Any] | None = Field(
-        None, description="From eval/results; None until evaluated"
+        None,
+        description="Written by an eval/ script (eval/results/c1.json …); None until then",
     )
 
 

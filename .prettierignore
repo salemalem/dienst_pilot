@@ -11,3 +11,6 @@ packages/api-client/src/schema.ts
 backend/
 packages/design-tokens/src/generated/
 packages/api-client/openapi.json
+
+# Written by the eval/ scripts; never edited by hand
+eval/results/

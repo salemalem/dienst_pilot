@@ -1,4 +1,5 @@
-# Local development stack: Postgres 16 + pgvector, Redis 7, and the API with hot reload.
+# Local development stack: Postgres 16 + pgvector, Redis 7, the API with hot reload and the
+# job worker.
 # The dashboard and the Expo app run on the host (see `make dev`).
 name: dienstpilot
 
@@ -55,6 +56,20 @@ services:
       interval: 3s
       timeout: 3s
       retries: 40
+
+  worker:
+    # Solver runs (C1) and leave checks (M5) outside the API process (arq on Redis).
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@postgres:5432/dienstpilot
+      REDIS_URL: redis://redis:6379/0
+      DEMO_MODE: "true"
+    command: arq dienstpilot.worker.WorkerSettings
+    volumes: ["../backend/src:/app/backend/src"]
+    depends_on:
+      api: { condition: service_healthy }
 
 volumes:
   postgres-data:

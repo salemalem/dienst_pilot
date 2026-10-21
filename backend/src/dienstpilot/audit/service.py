@@ -39,11 +39,8 @@ def record(
     payload: dict[str, Any] | None = None,
 ) -> str:
     """Append one event and return its id."""
-    event_id = (
-        uuid.uuid4()
-        if subject_id is None
-        else uuid.uuid5(uuid.UUID(subject_id), f"{action}/{occurred_at.isoformat()}")
-    )
+    key = f"{action}/{occurred_at.isoformat()}" + (f"/{staff_id}" if staff_id else "")
+    event_id = uuid.uuid4() if subject_id is None else uuid.uuid5(uuid.UUID(subject_id), key)
     session.add(
         Event(
             id=event_id,

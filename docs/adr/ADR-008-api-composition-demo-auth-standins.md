@@ -1,6 +1,6 @@
 # ADR-008: API composition layer, demo sign-in, demo clock and engine stand-ins
 
-- Status: Accepted
+- Status: Accepted; points 4 and 5 for C1 and C2 superseded by ADR-001 and ADR-009 (Phase 7)
 - Date: 2026-10-21
 - Phase: 3A (API for the screens)
 

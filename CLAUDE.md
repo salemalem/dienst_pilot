@@ -121,12 +121,14 @@ Tests pass; type checks clean; import-linter contracts hold; docs updated (statu
 
 Fill these in as they are built: `make train`, `make eval`, `make screenshots`.
 
-- `make dev`: installs dependencies, starts Postgres 16 + pgvector, Redis and the API in Docker (`infra/compose.dev.yml`, API on :8000), then the dashboard (:3000) and the Expo app on web (:8081). `make down` stops Docker.
+- `make dev`: installs dependencies, starts Postgres 16 + pgvector, Redis, the API and the job worker in Docker (`infra/compose.dev.yml`, API on :8000), then the dashboard (:3000) and the Expo app on web (:8081). `make down` stops Docker.
 - `make seed`: rebuilds the database from the synthetic seed. Generates `data/synthetic/v1/` if the seed or generator version changed (`SEED=20261020` by default), resets the schema with Alembic, then loads the Parquet. The Docker Postgres listens on host port 5433.
 - `make test`: pytest, then vitest for the packages. Database tests run when `TEST_DATABASE_URL` points to a Postgres the tests may wipe.
 - `make lint`: ruff, mypy `--strict`, import-linter, eslint, tsc, prettier.
 - `make format`: apply ruff and prettier formatting.
 - `make api-client`: regenerate `packages/api-client` from the backend's OpenAPI schema.
+- `make eval`: validator eval (`eval/results/c2.json`), the full benchmark on 2025 (`benchmark.json`, `c1.json`, about 10 minutes) and the ARCHITECTURE §17.1 table. CI runs the one-month smoke benchmark and checks that its results hash matches the committed one.
+- `make tune`: re-tune the balanced profile on July to December 2024 (`eval/results/tuning.json`); copy the winner into `PROFILES` (a test checks they agree).
 
 API: see `docs/API.md` (screens → endpoints, roles, privacy). Demo sign-in with a persona; `DEMO_MODE=true` (dev stack) adds `PUT /demo/clock` for the Administrator.
 

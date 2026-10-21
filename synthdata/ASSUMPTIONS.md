@@ -201,3 +201,24 @@ Training and application code must not read it. A test fails if anything in `bac
 - **Christmas leave:** leave blocks are only placed in school-holiday periods of at least ten days, so the Christmas holidays get no holiday-period leave.
 - **User accounts:** there are no user accounts or app roles (identity context), and HR staff (Katrin Vogel) are not in the dataset yet.
 - **December 2026:** there is no roster for it, and no burden ledger.
+- **2027:** only demand exists (§17); there are no staff changes, request windows, leave or absences in 2027.
+
+## 17. Demand through 2027 (generator 1.2.0)
+
+- **Assumption.** Demand (`organization/shift_demand`) runs to 31 December 2027 with the same templates as §7, so that leave requests for 2027 (M5, for example Dr. Kaya's July leave) can be checked with the optimizer.
+- Nothing else changed from 1.1.0: every other table is byte-identical apart from the `generator_version` column of `planning/roster_run`, and the demand rows before 2027 are unchanged (checked when the version was bumped).
+- Contracts that run past 2026 keep running; nobody joins or leaves in 2027.
+
+## 18. Leave trade-off (M5, "Mit Tausch beantragen")
+
+The staff app checks a leave request in the background with the optimizer (C1). These are product rules for this prototype; the thresholds are parameters in `backend/src/dienstpilot/app/jobs.py`, not findings.
+
+- **Coverable.** The leave month has a valid roster (every hard rule, checked by C2) with the leave, and covering it does not burden colleagues beyond the thresholds below.
+- **Coverable with a trade-off.** The leave month is coverable, **but** covering it pushes colleagues beyond a threshold, **and** one extra weekend duty by the requester in the month before compensates:
+  - burden thresholds (comparing the leave month solved with and without this leave, one balanced variant each): the department's overtime rises by more than **8 hours**, or the highest weighted burden among colleagues (nights, weekends and public holidays, including the year so far) rises by more than **2 points**;
+  - the month before is not yet published and starts after the current month;
+  - the requester's weekends with duty in that month = their weekends in an unconstrained plan + 1, and this stays within the weekend limit and every other hard rule: C1 must find a roster with the commitment and C2 must pass it. Otherwise no trade-off is offered (the outcome stays "coverable").
+- **Not coverable.** No valid roster exists for the leave month with the leave; the explanation comes from C1's infeasibility analysis.
+- **Not applicable.** The leave spans two months, or the leave month is already published (the Planner arranges cover).
+- An approved leave with a trade-off is a binding commitment: when the Planner runs C1 for that earlier month, the requester gets at least that many weekends with duty in every variant.
+- **What the tests show.** In the API test of a two-week January 2027 leave (real solver), the leave is coverable without crossing either threshold, so no trade-off is offered. How often the trade-off applies has not been measured; the tests drive that branch with a test-only wrapper around the real solver.

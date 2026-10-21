@@ -39,7 +39,7 @@ class RedisClock(Clock):
     def now(self) -> datetime:
         """Return the current demo instant in Europe/Berlin."""
         raw = self._client.get(REDIS_KEY)
-        text = raw.decode() if isinstance(raw, bytes) else raw
+        text = raw.decode() if isinstance(raw, bytes) else str(raw) if raw else None
         value = datetime.fromisoformat(text) if text else self._default
         return value.astimezone(TZ)
 

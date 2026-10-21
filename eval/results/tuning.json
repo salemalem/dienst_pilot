@@ -1,0 +1,571 @@
+{
+  "description": "Weights of C1's recommended profile, chosen on the tuning months only.",
+  "dataset": {
+    "seed": 20261020,
+    "generator_version": "1.2.0"
+  },
+  "solver_version": "c1-1.0.1",
+  "tuning_months": [
+    "2024-07-01",
+    "2024-08-01",
+    "2024-09-01",
+    "2024-10-01",
+    "2024-11-01",
+    "2024-12-01"
+  ],
+  "criterion": "C2-valid in every month; lowest rank sum over wishes granted, important wishes granted, mean burden spread and overtime hours; a tie keeps the earlier candidate (the design weights 6/8/3 are first).",
+  "grid": "wishes {4,6,8} x spread {5,8,12} x overtime {3,6}; isolated_nights 2, stability 1",
+  "deterministic_time_per_month": 20.0,
+  "candidates": [
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 6,
+        "spread": 8,
+        "overtime": 3,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.7173,
+      "important_wishes_granted_rate": 0.7328,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 5,
+        "important_wishes_granted_rate": 3,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 10
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 4,
+        "spread": 5,
+        "overtime": 3,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.715,
+      "important_wishes_granted_rate": 0.7252,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 6,
+        "important_wishes_granted_rate": 4,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 12
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 4,
+        "spread": 5,
+        "overtime": 6,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.715,
+      "important_wishes_granted_rate": 0.7252,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 6,
+        "important_wishes_granted_rate": 4,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 12
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 4,
+        "spread": 8,
+        "overtime": 3,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.715,
+      "important_wishes_granted_rate": 0.7252,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 6,
+        "important_wishes_granted_rate": 4,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 12
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 4,
+        "spread": 8,
+        "overtime": 6,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.715,
+      "important_wishes_granted_rate": 0.7252,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 6,
+        "important_wishes_granted_rate": 4,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 12
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 4,
+        "spread": 12,
+        "overtime": 3,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.715,
+      "important_wishes_granted_rate": 0.7252,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 6,
+        "important_wishes_granted_rate": 4,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 12
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 4,
+        "spread": 12,
+        "overtime": 6,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.715,
+      "important_wishes_granted_rate": 0.7252,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 6,
+        "important_wishes_granted_rate": 4,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 12
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 6,
+        "spread": 5,
+        "overtime": 3,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.722,
+      "important_wishes_granted_rate": 0.7405,
+      "burden_spread_mean": 36.5,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 4,
+        "important_wishes_granted_rate": 2,
+        "burden_spread_mean": 2,
+        "overtime_hours": 1
+      },
+      "rank_sum": 9
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 6,
+        "spread": 5,
+        "overtime": 6,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.722,
+      "important_wishes_granted_rate": 0.7405,
+      "burden_spread_mean": 36.5,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 4,
+        "important_wishes_granted_rate": 2,
+        "burden_spread_mean": 2,
+        "overtime_hours": 1
+      },
+      "rank_sum": 9
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 6,
+        "spread": 8,
+        "overtime": 6,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.7173,
+      "important_wishes_granted_rate": 0.7328,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 5,
+        "important_wishes_granted_rate": 3,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 10
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 6,
+        "spread": 12,
+        "overtime": 3,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.7173,
+      "important_wishes_granted_rate": 0.7328,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 5,
+        "important_wishes_granted_rate": 3,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 10
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 6,
+        "spread": 12,
+        "overtime": 6,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.7173,
+      "important_wishes_granted_rate": 0.7328,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 5,
+        "important_wishes_granted_rate": 3,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 10
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 8,
+        "spread": 5,
+        "overtime": 3,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.7383,
+      "important_wishes_granted_rate": 0.7557,
+      "burden_spread_mean": 36.833,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 1,
+        "important_wishes_granted_rate": 1,
+        "burden_spread_mean": 3,
+        "overtime_hours": 1
+      },
+      "rank_sum": 6
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 8,
+        "spread": 5,
+        "overtime": 6,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.7336,
+      "important_wishes_granted_rate": 0.7557,
+      "burden_spread_mean": 36.833,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 2,
+        "important_wishes_granted_rate": 1,
+        "burden_spread_mean": 3,
+        "overtime_hours": 1
+      },
+      "rank_sum": 7
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 8,
+        "spread": 8,
+        "overtime": 3,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.7243,
+      "important_wishes_granted_rate": 0.7328,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 3,
+        "important_wishes_granted_rate": 3,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 8
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 8,
+        "spread": 8,
+        "overtime": 6,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.7336,
+      "important_wishes_granted_rate": 0.7405,
+      "burden_spread_mean": 36.5,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 2,
+        "important_wishes_granted_rate": 2,
+        "burden_spread_mean": 2,
+        "overtime_hours": 1
+      },
+      "rank_sum": 7
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 8,
+        "spread": 12,
+        "overtime": 3,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.7243,
+      "important_wishes_granted_rate": 0.7328,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 3,
+        "important_wishes_granted_rate": 3,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 8
+    },
+    {
+      "profile": {
+        "name": "balanced",
+        "wishes": 8,
+        "spread": 12,
+        "overtime": 6,
+        "isolated_nights": 2,
+        "stability": 1
+      },
+      "statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ],
+      "hard_violations": 0,
+      "wishes_granted_rate": 0.7243,
+      "important_wishes_granted_rate": 0.7328,
+      "burden_spread_mean": 36.333,
+      "overtime_hours": 0.0,
+      "ranks": {
+        "wishes_granted_rate": 3,
+        "important_wishes_granted_rate": 3,
+        "burden_spread_mean": 1,
+        "overtime_hours": 1
+      },
+      "rank_sum": 8
+    }
+  ],
+  "chosen": {
+    "name": "balanced",
+    "wishes": 8,
+    "spread": 5,
+    "overtime": 3,
+    "isolated_nights": 2,
+    "stability": 1
+  },
+  "differs_from_design_weights": true,
+  "results_sha256": "b7212a49517c0e5c6db5c9e0842d38cad5258d12ce192c322349d5f3f56110b1"
+}
