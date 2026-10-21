@@ -3,16 +3,26 @@
 from alembic import context
 from sqlalchemy import MetaData, create_engine, pool
 
+from dienstpilot.audit import models as _audit  # noqa: F401
+from dienstpilot.identity import models as _identity  # noqa: F401
 from dienstpilot.operations import models as _operations  # noqa: F401
 from dienstpilot.organization import models as _organization  # noqa: F401
 from dienstpilot.planning import models as _planning  # noqa: F401
 from dienstpilot.requests import models as _requests  # noqa: F401
-from dienstpilot.shared.db import OperationsBase, OrganizationBase, PlanningBase, RequestsBase
+from dienstpilot.shared.db import (
+    AuditBase,
+    IdentityBase,
+    OperationsBase,
+    OrganizationBase,
+    PlanningBase,
+    RequestsBase,
+)
 from dienstpilot.shared.settings import get_settings
 
 # One schema per bounded context.
 TARGET: list[MetaData] = [
-    b.metadata for b in (OrganizationBase, RequestsBase, PlanningBase, OperationsBase)
+    b.metadata
+    for b in (OrganizationBase, RequestsBase, PlanningBase, OperationsBase, IdentityBase, AuditBase)
 ]
 SCHEMAS = {m.schema for m in TARGET}
 

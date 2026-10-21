@@ -3,7 +3,7 @@
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, Index, String
+from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from dienstpilot.shared.db import PlanningBase as Base
@@ -55,3 +55,23 @@ class Approval(Base):
     approved_by: Mapped[uuid.UUID]
     approved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     kind: Mapped[str] = mapped_column(String(10))
+
+
+class Proposal(Base):
+    """A suggested roster change for the Planner's inbox. Agents may create proposals only."""
+
+    __tablename__ = "proposal"
+    __table_args__ = (
+        CheckConstraint("status IN ('open','accepted','dismissed')", name="status"),
+        CheckConstraint("source IN ('copilot','planner')", name="source"),
+    )
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    department_id: Mapped[uuid.UUID]
+    roster_month: Mapped[date | None] = mapped_column(Date)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    created_by: Mapped[uuid.UUID]  # the user on whose behalf it was created
+    source: Mapped[str] = mapped_column(String(10))
+    title: Mapped[str] = mapped_column(String(200))
+    body: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(10))
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
