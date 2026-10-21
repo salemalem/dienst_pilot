@@ -2620,6 +2620,8 @@ export interface components {
             }[];
             /** Error */
             error: string | null;
+            /** Trial */
+            trial: boolean;
             /** Variants */
             variants: components["schemas"]["VariantOut"][];
         };

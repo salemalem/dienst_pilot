@@ -119,11 +119,12 @@ Tests pass; type checks clean; import-linter contracts hold; docs updated (statu
 
 ## Commands
 
-Fill these in as they are built: `make train`, `make eval`, `make screenshots`.
+Fill these in as they are built: `make train`, `make eval`, `make screenshots` (Phase 6, after the staff app).
 
 - `make dev`: installs dependencies, starts Postgres 16 + pgvector, Redis, the API and the job worker in Docker (`infra/compose.dev.yml`, API on :8000), then the dashboard (:3000) and the Expo app on web (:8081). `make down` stops Docker.
 - `make seed`: rebuilds the database from the synthetic seed. Generates `data/synthetic/v1/` if the seed or generator version changed (`SEED=20261020` by default), resets the schema with Alembic, then loads the Parquet. The Docker Postgres listens on host port 5433.
 - `make test`: pytest, then vitest for the packages. Database tests run when `TEST_DATABASE_URL` points to a Postgres the tests may wipe.
+- `make e2e`: Playwright on the demo clock for the planner dashboard. Own database `dienstpilot_e2e` and Redis db 14, API on :8100 with the worker, dashboard on :3100 (`apps/dashboard/e2e`). Rebuilds the e2e database from the seed each run; the dev database is untouched.
 - `make lint`: ruff, mypy `--strict`, import-linter, eslint, tsc, prettier.
 - `make format`: apply ruff and prettier formatting.
 - `make api-client`: regenerate `packages/api-client` from the backend's OpenAPI schema.

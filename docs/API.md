@@ -42,7 +42,7 @@ Every query is limited to the signed-in user's department.
 | The Planner decides an escalated swap or cover | The approval must still pass C2 (422 otherwise) |
 | Draft edits (W4) | Direct, with live validation: the response lists the violations the change introduced and those of the changed people and days |
 | Changes to a published roster (W4) | Need a `reason`; refused with 422 if they break a rule; stored as `assignment_change` records on top of the published roster; every affected physician gets an audit event and an M11 notification (`roster_changed`) |
-| Publishing (W5) | The whole month must pass C2; records the Planner's `Approval` and an audit event; the other drafts of the month become `discarded`; a published month answers 409 |
+| Publishing (W5) | The request window of the month must be closed (409 otherwise): a run while it is open is a **trial run** (`trial: true` on the run, W3 labels it). The whole month must pass C2; records the Planner's `Approval` and an audit event; the other drafts of the month become `discarded`; a published month answers 409 |
 | Rest-period compliance (M10, W8, W12) | `rest_compliance` per person from C2, `rest_violations_total` per report |
 
 Cover cascades give each colleague 15 minutes on the demo clock. When a request times out, the next colleague is asked the next time the cascade is read. Durable timers come with the workflows in Phase 9.
@@ -100,8 +100,8 @@ Every write records an audit event (`GET /audit/events`). The seed loader also t
 |---|---|
 | W1 Übersicht / Overview | `GET /planner/overview` (window progress, escalations, coverage of the next 14 days with the C3 band, recent changes) |
 | W2 Wunschphase / Request window | `GET /planner/windows/{month}`, `POST /planner/windows/{month}/reminders`, `POST /planner/windows/{month}/close` |
-| W3 Varianten / Variants | `POST /planner/runs` (202 with a run id), `GET /planner/runs/{run_id}` (status, variants with metrics, the recommended one, or why no valid roster exists), `GET /planner/runs?month=` |
-| W4 Dienstplan-Editor / Roster editor | `GET /roster?month=` (grid with assignment ids, absences, wish marks, coverage per shift and qualification, C2-checked gap suggestions), `GET /roster?month=&variant_id=` (a draft), `PATCH /planner/roster/assignments`, `POST /planner/validate` (all violations of a month or draft) |
+| W3 Varianten / Variants | `POST /planner/runs` (202 with a run id), `GET /planner/runs/{run_id}` (status, `trial`, variants with metrics, the recommended one, or why no valid roster exists), `GET /planner/runs?month=` |
+| W4 Dienstplan-Editor / Roster editor | `GET /roster?month=` (grid with assignment ids, absences, wish marks, coverage per shift and qualification, C2-checked gap suggestions for a published month; a draft has none). A reassignment creates a new assignment id, so an undo looks the id up again in the refreshed grid, `GET /roster?month=&variant_id=` (a draft), `PATCH /planner/roster/assignments`, `POST /planner/validate` (all violations of a month or draft) |
 | W5 Freigabe / Approval | `POST /planner/variants/{variant_id}/publish` |
 | W6 Anfragen / Requests inbox | `GET /planner/requests`, `POST /planner/leave/{request_id}/decision`, `POST /planner/swaps/{swap_id}/decision`, `POST /planner/proposals/{proposal_id}/decision` |
 | W7 Ausfälle live / Absences live | `GET /planner/cascades` (timelines) |
@@ -114,3 +114,7 @@ Every write records an audit event (`GET /audit/events`). The seed loader also t
 | W13 KI-Transparenz | `GET /transparency/components` (C1 and C2 with the summaries in `eval/results/c1.json` and `c2.json`) |
 
 The Staff+ department roster uses `GET /roster?month=` as well: the same grid, without absence categories, wish marks or gap suggestions.
+
+### Dashboard access
+
+The dashboard calls the API through its own origin: Next.js proxies `/api/*` to the backend (`API_URL`, default `http://localhost:8000`), so no CORS is needed (ADR-010). The browser signs in with `POST /auth/demo-login` as Brandt by default; the persona switch (Vogel, IT-Administration) signs in again.

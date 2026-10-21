@@ -6861,6 +6861,10 @@
             ],
             "title": "Error"
           },
+          "trial": {
+            "type": "boolean",
+            "title": "Trial"
+          },
           "variants": {
             "items": {
               "$ref": "#/components/schemas/VariantOut"
@@ -6883,6 +6887,7 @@
           "config",
           "explanations",
           "error",
+          "trial",
           "variants"
         ],
         "title": "RunOut",

@@ -558,6 +558,7 @@ class RunOut(BaseModel):
     config: dict[str, Any] | None
     explanations: list[dict[str, Any]]
     error: str | None
+    trial: bool
     variants: list[VariantOut]
 
 
@@ -569,7 +570,13 @@ class RunsOut(BaseModel):
     optimizer: EngineLabel
 
 
-def _run_out(r: planning.Run, kind: str, generator: str | None) -> RunOut:
+def _is_trial(c: Ctx, month: date) -> bool:
+    """Tell whether the request window of a month is open, so its runs are trial runs."""
+    w = requests.window_for(c.session, month)
+    return w is not None and w.status == "open"
+
+
+def _run_out(r: planning.Run, kind: str, generator: str | None, trial: bool) -> RunOut:
     return RunOut(
         run_id=r.id,
         status=r.status,
@@ -583,6 +590,7 @@ def _run_out(r: planning.Run, kind: str, generator: str | None) -> RunOut:
         config=r.config,
         explanations=r.explanations or [],
         error=r.error,
+        trial=trial,
         variants=[
             VariantOut(
                 variant_id=v.id,
@@ -603,11 +611,15 @@ def _run_out(r: planning.Run, kind: str, generator: str | None) -> RunOut:
 def runs(c: CtxDep, _: PlannerDep, month: Month) -> RunsOut:
     """W3: every run of a month (the seeded manual roster and C1 runs), newest first."""
     m = parse_month(month)
+    trial = _is_trial(c, m)
     kinds = {r.run_id: (r.planner_kind, r.generator_version) for r in planning.runs(c.session, m)}
     return RunsOut(
         roster_month=m,
         optimizer=label(c.engines.optimizer.info),
-        runs=[_run_out(r, *kinds.get(r.id, ("c1", None))) for r in planning.runs_of(c.session, m)],
+        runs=[
+            _run_out(r, *kinds.get(r.id, ("c1", None)), trial)
+            for r in planning.runs_of(c.session, m)
+        ],
     )
 
 
@@ -656,7 +668,7 @@ def run_detail(c: CtxDep, _: PlannerDep, run_id: str) -> RunOut:
         x.run_id: (x.planner_kind, x.generator_version)
         for x in planning.runs(c.session, r.roster_month)
     }
-    return _run_out(r, *kinds.get(r.id, ("c1", None)))
+    return _run_out(r, *kinds.get(r.id, ("c1", None)), _is_trial(c, r.roster_month))
 
 
 class Published(BaseModel):
@@ -684,6 +696,11 @@ def publish(c: CtxDep, _: PlannerDep, variant_id: str) -> Published:
         raise HTTPException(status.HTTP_409_CONFLICT, "This month is already published")
     if v.status != "draft":
         raise HTTPException(status.HTTP_409_CONFLICT, "Only a draft can be published")
+    if _is_trial(c, m):
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "The request window is still open: close it before publishing",
+        )
     vs = c.engines.validator.validate(Inputs(c.session, dep, c.clock.now()).variant(variant_id))
     if vs:
         raise _unprocessable(dep, "The variant breaks a rule", vs)

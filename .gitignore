@@ -33,3 +33,8 @@ web-build/
 
 # Generated synthetic data (reproducible from the seed; see synthdata/)
 data/
+
+# Playwright
+test-results/
+playwright-report/
+.claude/launch.json

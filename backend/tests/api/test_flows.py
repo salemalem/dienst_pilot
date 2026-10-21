@@ -166,6 +166,21 @@ def _offer_and_find_taker(
     pytest.skip("no demo persona may take this shift under the rules")
 
 
+def test_the_policy_can_be_switched_several_times_at_the_same_demo_instant(
+    client: TestClient, login: Any
+) -> None:
+    """The demo clock stands still, so each switch is its own audit event (no id collision)."""
+    h = login("brandt")
+    for swaps in (False, True, False, True):
+        r = client.put(
+            "/planner/policy",
+            json={"auto_approve_swaps": swaps, "auto_approve_cover": True},
+            headers=h,
+        )
+        assert r.status_code == 200, r.text
+    assert _actions(client, login, "policy").count("policy.changed") >= 4
+
+
 def test_situation_b_valid_swap_is_approved_by_the_policy(client: TestClient, login: Any) -> None:
     shift, swap_id, taker = _offer_and_find_taker(client, login)
     taken = client.post(f"/me/swap-offers/{swap_id}/take", headers=login(taker)).json()
@@ -318,7 +333,13 @@ def test_w3_to_w5_run_validate_edit_and_publish(client: TestClient, login: Any) 
     assert [v["label"] for v in variants] == ["A", "B", "C"]
     assert sum(v["recommended"] for v in variants) == 1
     assert all(0 <= v["metrics"]["wish_rate"] <= 1 for v in variants)
+    # The December request window is still open: this run is a trial and cannot be published.
+    assert run["trial"] is True
     best = next(v for v in variants if v["recommended"])
+    blocked = client.post(f"/planner/variants/{best['variant_id']}/publish", headers=h)
+    assert blocked.status_code == 409 and "window" in blocked.json()["detail"]
+    assert client.post("/planner/windows/2026-12/close", headers=h).status_code == 200
+    assert client.get(f"/planner/runs/{run['run_id']}", headers=h).json()["trial"] is False
     # A second run at the same demo instant is a new run (the demo clock can stand still).
     second_run = client.post("/planner/runs", json={"roster_month": "2026-12"}, headers=h).json()
     assert second_run["run_id"] != run["run_id"]

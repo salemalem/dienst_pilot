@@ -1,0 +1,22 @@
+/** Audit actions the API records; the catalog has a readable label for each (`audit.action.*`). */
+export const AUDIT_ACTIONS = [
+  "absence.reported",
+  "cover.search_started",
+  "cover.accepted",
+  "cover.decided",
+  "leave.requested",
+  "leave.approved",
+  "leave.declined",
+  "swap.offered",
+  "swap.accepted",
+  "swap.decided",
+  "preferences.submitted",
+  "window.reminder_sent",
+  "window.closed",
+  "run.requested",
+  "roster.published",
+  "roster.changed",
+  "proposal.created",
+  "policy.changed",
+  "demo.clock_set",
+] as const;
