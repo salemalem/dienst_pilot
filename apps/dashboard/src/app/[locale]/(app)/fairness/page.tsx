@@ -47,7 +47,55 @@ export default function FairnessPage(): ReactNode {
   if (!y || !m) return <Loading />;
   return (
     <>
-      <PageHeader title={t("title")} status={planner ? t("statusPlanner") : t("statusOversight")} />
+      <PageHeader
+        title={
+          hours.data
+            ? hours.data.rest_violations_total === 0
+              ? t("headlineRestOk", { month: fmt.month(m) })
+              : t("headlineRestBad", {
+                  month: fmt.month(m),
+                  count: hours.data.rest_violations_total,
+                })
+            : t("title")
+        }
+        status={planner ? t("statusPlanner") : t("statusOversight")}
+      />
+      {hours.data && fairness.data ? (
+        <div
+          className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))]"
+          data-testid="kpis"
+        >
+          <div className="flex flex-col gap-1 border border-rule bg-sheet p-5">
+            <span className="label text-ink-muted">
+              {t("kpiRest", { month: fmt.monthShort(m) })}
+            </span>
+            <span className="num-figure">
+              {hours.data.rest_violations_total === 0
+                ? t("restOk")
+                : t("restViolations", { count: hours.data.rest_violations_total })}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 border border-rule bg-sheet p-5">
+            <span className="label text-ink-muted">
+              {t("kpiOvertime", { month: fmt.monthShort(m) })}
+            </span>
+            <span className="num-figure">{fmt.hours(hours.data.total_overtime_hours)}</span>
+          </div>
+          {fairness.data.distributions
+            .filter((d) => d.metric === "weekends")
+            .map((d) => (
+              <div key={d.metric} className="flex flex-col gap-1 border border-rule bg-sheet p-5">
+                <span className="label text-ink-muted">{t("kpiWeekends")}</span>
+                <span className="num-figure">
+                  {t("kpiMedian", { median: fmt.number(d.median, 1) })}
+                </span>
+                <span className="caption text-ink-muted">
+                  {t("kpiRange", { min: d.minimum, max: d.maximum })}
+                </span>
+              </div>
+            ))}
+        </div>
+      ) : null}
       <Section
         title={t("fairnessTitle", { year: y })}
         aside={

@@ -274,7 +274,8 @@
     "colPerson": "Person",
     "colStatus": "Status",
     "answered": "Geantwortet am {date}",
-    "notAnswered": "Noch offen"
+    "notAnswered": "Noch offen",
+    "remindNote": "Die Erinnerung geht nur an {count, plural, one {die 1 Person} other {die # Personen}} ohne Antwort."
   },
   "rules": {
     "coverage": "Besetzung",
@@ -482,13 +483,9 @@
   "w7": {
     "title": "Ausfälle live",
     "statusNone": "Keine Vertretungssuche läuft",
-    "statusEscalated": "{count, plural, one {Eine Eskalation wartet auf Ihre Entscheidung} other {# Eskalationen warten auf Ihre Entscheidung}}",
-    "statusRunning": "{count, plural, one {Eine Vertretungssuche} other {# Vertretungssuchen}} im Verlauf",
     "none": "Es gibt keine Vertretungssuchen.",
     "cascadeTitle": "Vertretungssuche",
     "decide": "Entscheiden",
-    "absent": "{name} ist abwesend",
-    "opened": "Eröffnet {time}",
     "closed": "Lücke geschlossen: {name} übernimmt, {time}",
     "pendingApproval": "Wartet auf Ihre Entscheidung",
     "outcome": {
@@ -505,9 +502,17 @@
       "accepted": "Übernommen"
     },
     "someone": "Kolleg:in an Position {rank}",
-    "askedAt": "angefragt {time}",
-    "replyBy": "Antwort bis {time}",
-    "answeredAt": "beantwortet {time}"
+    "lineAsked": "{name}, Antwort bis {time}",
+    "lineAskedPlain": "{name}",
+    "lineTimedOut": "{name}, weiter zur nächsten Person",
+    "lineDeclined": "{name}",
+    "lineAccepted": "{name}",
+    "absentSince": "Abwesend: {name}, gemeldet um {time}",
+    "noAction": "Keine Aktion nötig. Die Lücke wurde um {time} nach der Regelprüfung automatisch geschlossen.",
+    "partClosed": "{count, plural, one {1 Lücke geschlossen} other {# Lücken geschlossen}}",
+    "partRunning": "{count, plural, one {1 Suche läuft} other {# Suchen laufen}}",
+    "partEscalated": "{count, plural, one {1 Eskalation wartet auf Sie} other {# Eskalationen warten auf Sie}}",
+    "sublineAsking": "Seit {date}. Die Suche fragt eine Person nach der anderen, jeweils mit {minutes} Minuten Zeit."
   },
   "w7b": {
     "title": "Eskalation",
@@ -562,7 +567,14 @@
     "hoursOnW12": "Stunden je Person (Abrechnung, Arbeitszeitnachweis) finden Sie unter Aufsicht.",
     "trendTitle": "Überstunden im Verlauf",
     "trendLabel": "Überstunden je Monat",
-    "colMonth": "Monat"
+    "colMonth": "Monat",
+    "headlineRestOk": "Alle Ruhezeiten im {month} eingehalten",
+    "headlineRestBad": "{count, plural, one {1 Ruhezeit-Verstoß} other {# Ruhezeit-Verstöße}} im {month}",
+    "kpiRest": "Ruhezeit {month}",
+    "kpiOvertime": "Überstunden {month}",
+    "kpiWeekends": "Wochenenddienste pro Person",
+    "kpiMedian": "Median {median}",
+    "kpiRange": "Spanne {min} bis {max}"
   },
   "w10": {
     "title": "Protokoll",
@@ -685,7 +697,7 @@
   "w13": {
     "title": "KI-Transparenz",
     "status": "{built, plural, one {# Komponente gebaut} other {# Komponenten gebaut}}, {standIn, plural, one {# Platzhalter} other {# Platzhalter}}",
-    "intro": "Acht Komponenten arbeiten im Dienstplan. Keine davon kann den Dienstplan ändern: Der Optimierer entscheidet über Zuteilung und Machbarkeit, Modelle schätzen Unsicheres, Sprachmodelle verstehen und erklären nur. Veröffentlicht wird ausschließlich durch die Planung.",
+    "intro": "Acht Komponenten arbeiten im Dienstplan. Keine kann den Dienstplan ändern: Freigeben und veröffentlichen kann nur die Planung. Gebaut sind die Komponenten, deren Messwerte aus eval/results stammen; alle anderen sind als Platzhalter gekennzeichnet, bis ihre Skripte laufen.",
     "name": {
       "C1": "Dienstplan-Optimierer",
       "C2": "Unabhängiger Regelprüfer",
@@ -727,6 +739,20 @@
       "seconds": "Median {seconds} s je Variante",
       "agreePublished": "Übereinstimmung mit dem unabhängigen Prüfer, veröffentlichte Monate",
       "agreeRandom": "Übereinstimmung bei zufälligen Änderungen"
+    },
+    "group": {
+      "rules": {
+        "title": "Optimierung und Regeln",
+        "tagline": "Finden und prüfen gültige Pläne. Regeln werden nie gebrochen."
+      },
+      "ml": {
+        "title": "Maschinelles Lernen",
+        "tagline": "Schätzen Unsicheres. Eine Schätzung wird nie zu einer Dienstzuteilung."
+      },
+      "llm": {
+        "title": "Sprachmodelle",
+        "tagline": "Lesen und erklären Sprache. Ein Satz wird nie zu einer Dienstzuteilung."
+      }
     }
   }
 }

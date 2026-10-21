@@ -28,6 +28,16 @@ describe("catalog", () => {
     expect(keys("en")).toEqual(keys("de"));
   });
 
+  it("no key contains a dot (both apps nest on dots, so 'run.requested' must be 'run_requested')", () => {
+    const dotted = (tree: Tree, path = ""): string[] =>
+      Object.entries(tree).flatMap(([k, v]) => [
+        ...(k.includes(".") ? [`${path}${k}`] : []),
+        ...(typeof v === "string" ? [] : dotted(v, `${path}${k}.`)),
+      ]);
+    expect(dotted(messages.de)).toEqual([]);
+    expect(dotted(messages.en)).toEqual([]);
+  });
+
   it.each(locales)("every %s message is non-empty, valid ICU", (locale) => {
     for (const [key, value] of leaves(messages[locale])) {
       expect(value.trim(), key).not.toBe("");

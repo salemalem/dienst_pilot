@@ -116,9 +116,9 @@ function Card({ c }: { c: Component }): ReactNode {
       aria-label={c.component}
     >
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="heading m-0">
+        <h3 className="heading m-0">
           {c.component} · {known ? t(`name.${c.component as "C1"}`) : c.component}
-        </h2>
+        </h3>
         <EngineBadge
           engine={{
             component: c.component,
@@ -159,6 +159,12 @@ function Card({ c }: { c: Component }): ReactNode {
   );
 }
 
+const GROUPS = [
+  { key: "rules", kinds: ["optimization", "deterministic"] },
+  { key: "ml", kinds: ["ml"] },
+  { key: "llm", kinds: ["llm"] },
+] as const;
+
 /** W13: one card per component with its real status; the portfolio's "how it works" screen. */
 export default function TransparencyPage(): ReactNode {
   const t = useTranslations("w13");
@@ -179,10 +185,30 @@ export default function TransparencyPage(): ReactNode {
       <p className="body m-0 max-w-[80ch]">{t("intro")}</p>
       <Async query={q}>
         {(list) => (
-          <div className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(380px,1fr))]">
-            {list.map((c) => (
-              <Card key={c.component} c={c} />
-            ))}
+          <div className="flex flex-col gap-8">
+            {GROUPS.map((g) => {
+              const members = list.filter((c) => (g.kinds as readonly string[]).includes(c.kind));
+              if (members.length === 0) return null;
+              return (
+                <section
+                  key={g.key}
+                  aria-labelledby={`group-${g.key}`}
+                  className="flex flex-col gap-3"
+                >
+                  <div>
+                    <h2 id={`group-${g.key}`} className="heading m-0">
+                      {t(`group.${g.key}.title`)} · {members.map((c) => c.component).join(", ")}
+                    </h2>
+                    <p className="body m-0 text-ink-muted">{t(`group.${g.key}.tagline`)}</p>
+                  </div>
+                  <div className="grid items-start gap-6 [grid-template-columns:repeat(auto-fit,minmax(380px,1fr))]">
+                    {members.map((c) => (
+                      <Card key={c.component} c={c} />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </div>
         )}
       </Async>

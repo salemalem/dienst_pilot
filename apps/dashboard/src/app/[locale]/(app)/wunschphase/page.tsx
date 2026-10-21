@@ -102,6 +102,11 @@ export default function WindowPage(): ReactNode {
                 max={w.recipients}
                 label={t("progress", { responded: w.responded, recipients: w.recipients })}
               />
+              {open ? (
+                <p className="caption m-0 text-ink-muted">
+                  {t("remindNote", { count: waiting.length })}
+                </p>
+              ) : null}
               <div className="flex gap-3">
                 <Button
                   variant={filter === "all" ? "primary" : "secondary"}

@@ -36,7 +36,10 @@ function usages(source: string): { key: string; candidates: string[] }[] {
   const out: { key: string; candidates: string[] }[] = [];
   for (const [fn, spaces] of bound) {
     for (const c of source.matchAll(new RegExp(`\\b${fn}\\(\\s*"([\\w.]+)"`, "g"))) {
-      out.push({ key: String(c[1]), candidates: spaces.map((ns) => (ns ? `${ns}.${String(c[1])}` : String(c[1]))) });
+      out.push({
+        key: String(c[1]),
+        candidates: spaces.map((ns) => (ns ? `${ns}.${String(c[1])}` : String(c[1]))),
+      });
     }
   }
   return out;
@@ -49,8 +52,12 @@ describe("dashboard strings go through the catalog", () => {
     const missing: string[] = [];
     for (const f of all) {
       for (const { key, candidates } of usages(readFileSync(f, "utf8"))) {
-        for (const [name, cat] of [["de", de], ["en", en]] as const) {
-          if (!candidates.some((c) => has(cat as Tree, c))) missing.push(`${name}: ${key} (${f.replace(SRC, "")})`);
+        for (const [name, cat] of [
+          ["de", de],
+          ["en", en],
+        ] as const) {
+          if (!candidates.some((c) => has(cat as Tree, c)))
+            missing.push(`${name}: ${key} (${f.replace(SRC, "")})`);
         }
       }
     }
@@ -66,7 +73,8 @@ describe("dashboard strings go through the catalog", () => {
         const text = m[1]?.trim() ?? "";
         const line = src.slice(src.lastIndexOf("\n", m.index), m.index + m[0].length);
         if (/Promise<|=>|<[A-Z]\w*[,>]/.test(line) && !/<\/?[a-z]/.test(line)) continue;
-        if (text && !/^(DienstPilot|C[1-8]|W\d+)$/.test(text)) offenders.push(`${f.replace(SRC, "")}: ${text}`);
+        if (text && !/^(DienstPilot|C[1-8]|W\d+)$/.test(text))
+          offenders.push(`${f.replace(SRC, "")}: ${text}`);
       }
     }
     expect(offenders).toEqual([]);

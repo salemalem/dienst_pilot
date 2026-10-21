@@ -131,3 +131,46 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @dienstpilot/api-client generate
       - run: git diff --exit-code packages/api-client
+
+  e2e:
+    name: Playwright e2e (planner dashboard on the demo clock)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: dienstpilot
+          POSTGRES_PASSWORD: dienstpilot
+          POSTGRES_DB: dienstpilot
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U dienstpilot -d dienstpilot"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      E2E_DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@localhost:5432/dienstpilot
+      E2E_REDIS_URL: redis://localhost:6379/14
+      DIENSTPILOT_SEED_DIR: data/synthetic/v1
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0 (no floating major tag)
+        with:
+          version: "0.11.26"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: uv sync --frozen
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:packages
+      - name: Install the browser
+        working-directory: apps/dashboard
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Seed, start the API and the worker, build the dashboard, run the specs
+        run: pnpm --filter @dienstpilot/dashboard e2e
