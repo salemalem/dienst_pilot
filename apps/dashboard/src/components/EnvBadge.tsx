@@ -1,3 +1,4 @@
+import { FlaskConical } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
@@ -5,10 +6,8 @@ import type { ReactNode } from "react";
 export function EnvBadge(): ReactNode {
   const t = useTranslations("app");
   return (
-    <span
-      role="status"
-      className="caption inline-flex h-[26px] items-center whitespace-nowrap rounded-mark border border-env bg-env-wash px-2 text-env"
-    >
+    <span role="status" className="dp-env caption">
+      <FlaskConical size={14} strokeWidth={1.75} absoluteStrokeWidth aria-hidden />
       {t("env")}
     </span>
   );

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "@dienstpilot/design-tokens/tokens.css";
 @import "@dienstpilot/design-tokens/tailwind.css";
+@import "./components.css";
 
 body {
   margin: 0;
@@ -12,4 +13,32 @@ body {
 :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
+}
+
+/* The navigation collapses to a 56px rail when the copilot panel is open on a narrow screen. */
+@media (max-width: 1439px) {
+  [data-copilot="open"] .shell-nav {
+    width: 56px;
+  }
+  [data-copilot="open"] .shell-nav .nav-label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* The roster grid's focusable cells are the <td>s; the focus ring is drawn inset. */
+td[role="gridcell"]:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -3px;
+  position: relative;
+  z-index: 2;
+}
+.dp-grid td[draggable="true"] {
+  cursor: grab;
 }
