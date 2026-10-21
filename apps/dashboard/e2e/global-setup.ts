@@ -54,7 +54,7 @@ export default async function globalSetup(): Promise<() => void> {
     SEED_DIR,
     "--if-changed",
   ]);
-  run("uv", ["run", "python", "apps/dashboard/e2e/reset-db.py", DATABASE_URL]);
+  run("uv", ["run", "python", "-m", "dienstpilot.seeding", "--reset"]);
   run("uv", ["run", "alembic", "upgrade", "head"], join(ROOT, "backend"));
   run("uv", ["run", "python", "-m", "dienstpilot.seeding", SEED_DIR]);
   run("uv", [

@@ -19,10 +19,11 @@ down: ## Stop the Docker services
 logs: ## Follow the API, Postgres and Redis logs
 	$(COMPOSE) logs -f
 
-seed: ## Rebuild the database from the seed: generate (if changed), reset the schema, load
+seed: ## Rebuild the dev database from the seed (also after the app wrote to it): generate (if changed), drop the schemas, migrate, load
 	$(COMPOSE) up -d --wait postgres
 	uv run python -m synthdata generate --seed $(SEED) --out $(SEED_DIR) --if-changed
-	cd backend && uv run alembic downgrade base && uv run alembic upgrade head
+	DEMO_MODE=true uv run python -m dienstpilot.seeding --reset
+	cd backend && uv run alembic upgrade head
 	uv run python -m dienstpilot.seeding $(SEED_DIR)
 
 test: ## Python and TypeScript tests
