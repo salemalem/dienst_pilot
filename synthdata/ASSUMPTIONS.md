@@ -125,18 +125,27 @@ The lower edge of the hours band was 85 % in the Phase 2 plan. It is 80 % becaus
   - **Seniors on days:** seniors take Frühdienst first.
   - **Noise:** a little random noise.
 - **Assumption.** The planner never breaks a hard rule on purpose: an ineligible person is never assigned. If nobody is eligible, the slot stays a gap.
-- **Assumption.** After the greedy pass, two steps help anyone below the hours band:
+- **Assumption.** After the greedy pass the planner reshuffles each day to close gaps. A free colleague takes the gap directly. Failing that, a colleague moves from another shift that day into the gap and a free colleague takes the shift they left (for example from Früh to Spät, with a senior taking the Frühdienst). A change is kept only if nobody involved breaks a rule.
+- **Assumption.** Then two steps help anyone below the hours band:
   - **Repair:** move a shift to them from someone above the band, if they hold every qualification the giver holds for that shift.
   - **Top-up:** give them extra Früh- or Spätdienste beyond the minimum demand.
 - **Assumption.** The planner tries 12 different random passes per historical month and keeps the one with the fewest gaps. For November 2026 it tries up to 300.
-- Consequence: published historical rosters break only the coverage rule, on days the heuristic could not fill. They are recorded in `_truth/published_violations.parquet`. The generator refuses to write a November 2026 roster that breaks any hard rule, and a separate test checks that roster against the rules read from the data.
+- Consequence: every published roster satisfies every hard rule, including the 80 % hours floor, except coverage on days the heuristic could not fill. Those gaps are recorded in `_truth/published_violations.parquet`.
+- **Enforced:**
+  - The generator refuses to write any published month that breaks a rule other than coverage, and a November 2026 roster with any violation at all.
+  - A separate checker reads the rules, times and qualifications from the output. A test runs it over every published month and requires its coverage gaps to equal the recorded ones.
+  - `synthdata/scripts/check_seeds.py` (CI job "seeds") does the same for nine seeds.
 
 ## 11. Leave
 
 - **Assumption.** Entitlement is 30 working days a year, pro rata for part-year employment. Each person and year draws one block pattern: (10, 10, 5, 5), (15, 10, 5), (10, 10, 10) or (10, 5, 5, 5, 5) working days.
-- **Assumption.** Blocks start on a Monday. With probability equal to a latent holiday-period preference (Beta(1.6, 3)), a block is placed in a school-holiday period of at least ten days; otherwise anywhere in the year. A block never crosses a year boundary or a rotation.
+- **Assumption.** Blocks start on a Monday. With probability equal to a person's holiday-period preference, a block is placed in a school-holiday period of at least ten days; otherwise anywhere in the year. A block never crosses a year boundary or a rotation. The preference is a latent Beta(1.6, 3) value times a department-wide scale (capped at 1), set by the calibration below.
 - **Assumption.** A request is submitted 60 to 150 days ahead and decided 1 to 10 days later. The planner approves it unless, on some day, 6 people are already on approved leave, or 2 seniors (Oberärzt:innen and the Chefärztin) are when a senior asks.
-- **Assumption.** After a decline the person asks again with the block shifted (one week later, then a week earlier, then two weeks later), up to three times.
+- **Assumption.** After a decline the person asks again with the block shifted (one week later, then a week earlier, then two weeks later), up to three times. A follow-up request records the declined request it follows (`previous_request_id`); a request without one is a *first request*.
+- **Assumption (parameter, PLACEHOLDER).** `target_first_request_decline_rate` = 0.15: the share of decided first requests the planner declines. This value is a placeholder until it is confirmed with a physician.
+  - **Calibration:** the generator searches for the department-wide holiday-clustering scale that brings the overall first-request decline rate closest to the target. The search is a deterministic bisection, and every candidate uses the same random streams.
+  - **Recorded:** the scale it uses and the rate it achieves go to `_truth/params.json` under `calibration`.
+  - **Reported:** `synthdata/scripts/sanity_report.py` reports the rate per holiday period. Only the overall rate is calibrated; the per-period rates follow from where the holidays cluster.
 - Requests submitted after the demo moment do not exist. Requests decided after it are `pending`.
 - Only the planner's decision is stored: a reason code and the planner's sentence for a decline. The requester's own reason is never collected (data minimisation, ARCHITECTURE C7).
 
@@ -149,11 +158,15 @@ The lower edge of the hours band was 85 % in the Phase 2 plan. It is 80 % becaus
 - **Assumption.** The seasonal factor is a respiratory wave per season: a Gaussian bump peaking between mid-December and late February, 14 to 30 days wide, with an amplitude between 0.8 and 2.4, all varying by year. There is also a smaller autumn bump around early November.
 - **Assumption.** The hazard is 1.4 times higher in the three days after a night shift (`post_night_hazard_factor`). This shapes the department-level pattern; ARCHITECTURE C3 forecasts only at department × day level.
 - **Assumption.** An episode lasts 1 + Poisson(2.6) days, at most 21. It is reported between 06:00 and 07:30 on its first day. Nobody falls sick while on leave.
+- **Assumption.** All of a day's sick reports are drawn first; their cover searches then run in report-time order. Nobody who reports sick that day is asked to cover.
 - Sickness is stored as "absent (sick)" with dates and report time only. There is no diagnosis field.
 
 ## 13. In-month changes (the manual era)
 
-- **Assumption.** Swaps: each month, each person offers at most one published shift, with probability equal to a latent swap propensity. It is the shift they like least. Up to eight free colleagues with the right qualifications are asked in random order. Each accepts with a probability from their latent preference for that shift. An offer nobody takes expires after three days.
+- **Assumption.** Swaps: each month, each person offers at most one published shift, with probability equal to a latent swap propensity. It is the shift they like least.
+  - **Who is asked:** up to eight free colleagues with the right qualifications, in random order. Each accepts with a probability from their latent preference for that shift.
+  - **Timing (a simplification):** swaps are offered and settled between publication and the start of the month, within 48 hours of the offer. So every swap comes before the month's own sick reports.
+  - **Order of events:** swaps and the cover for sickness reported after publication run in the order they happen, so every change in the data follows the one before it in time.
 - **Assumption.** Cover: every shift of a sick person is searched for at report time. The planner asks free, qualified colleagues one by one, up to 6, favourites first. Each accepts with a probability that falls with how often they covered in the last 30 days (latent `cover_willingness`, `cover_load_decay`). If nobody accepts:
   - **Frühdienst, with a senior free that day:** the senior takes it as overtime.
   - **Any other case:** a locum, with probability 0.7; otherwise the shift stays unfilled.
@@ -177,6 +190,7 @@ Training and application code must not read it. A test fails if anything in `bac
 
 - The output depends only on the seed (default 20261020) and the generator version. Each part of the simulation has its own named random stream, IDs are UUIDv5 values from stable keys, rows are sorted, every column has a fixed type, and nothing uses the wall clock.
 - A test checks that two runs with the same seed produce byte-identical files. `manifest.json` records the seed, the generator version, the periods, the rule-set versions, and the row count and SHA-256 hash of every file.
+- Sanity report: `uv run python synthdata/scripts/sanity_report.py` writes `reports/absence_and_leave.png` and `reports/sanity_report.md` into the dataset folder.
 - `data/` is not committed. `make seed` regenerates it when the seed or generator version changes. Dataset versioning with DVC starts in the ML phase (ADR-007).
 
 ## 16. Known limitations

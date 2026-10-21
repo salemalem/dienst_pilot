@@ -43,6 +43,9 @@ class Params:
     response_rate: float = 0.86
     # Leave: entitlement and concurrency limits used by the planner when deciding.
     leave_days_per_year: int = 30
+    # Target share of first leave requests the planner declines. PLACEHOLDER, to be confirmed
+    # with a physician; the generator calibrates holiday clustering to approach it.
+    target_first_request_decline_rate: float = 0.15
     max_concurrent_leave: int = 6
     max_concurrent_senior_leave: int = 2
     # Cover: maximum colleagues asked before the planner escalates.

@@ -202,12 +202,18 @@ def upgrade() -> None:
         sa.Column("decided_by", sa.Uuid(), nullable=True),
         sa.Column("decision_reason_code", sa.String(length=40), nullable=True),
         sa.Column("decision_reason", sa.Text(), nullable=True),
+        sa.Column("previous_request_id", sa.Uuid(), nullable=True),
         sa.CheckConstraint(
             "decision_reason IS NULL OR status = 'declined'",
             name=op.f("ck_leave_request_reason_only_for_declines"),
         ),
         sa.CheckConstraint(
             "status IN ('pending','approved','declined')", name=op.f("ck_leave_request_status")
+        ),
+        sa.ForeignKeyConstraint(
+            ["previous_request_id"],
+            ["requests.leave_request.id"],
+            name=op.f("fk_leave_request_previous_request_id_leave_request"),
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_leave_request")),
         schema="requests",

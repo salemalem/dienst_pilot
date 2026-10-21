@@ -133,3 +133,28 @@ def test_operations_refer_to_published_assignments(dataset: Path) -> None:
         ("operations/cover_offer", "staff_id"),
     ]:
         assert set(read(dataset, name)[col].to_list()) <= staff, name
+
+
+def test_leave_follow_ups_point_at_a_declined_request_of_the_same_person(dataset: Path) -> None:
+    lr = read(dataset, "requests/leave_request")
+    prev = lr.filter(pl.col("previous_request_id").is_not_null()).join(
+        lr.select(
+            pl.col("id").alias("previous_request_id"),
+            pl.col("staff_id").alias("p_staff"),
+            pl.col("status").alias("p_status"),
+        ),
+        on="previous_request_id",
+    )
+    assert prev.height == lr.filter(pl.col("previous_request_id").is_not_null()).height
+    assert (prev["p_status"] == "declined").all()
+    assert (prev["staff_id"] == prev["p_staff"]).all()
+
+
+def test_first_request_decline_rate_is_calibrated_to_the_target(dataset: Path) -> None:
+    params = json.loads((dataset / "_truth" / "params.json").read_text())
+    lr = read(dataset, "requests/leave_request").filter(
+        pl.col("previous_request_id").is_null() & (pl.col("status") != "pending")
+    )
+    rate = lr.filter(pl.col("status") == "declined").height / lr.height
+    assert abs(rate - params["calibration"]["first_request_decline_rate_achieved"]) < 1e-3
+    assert abs(rate - params["target_first_request_decline_rate"]) < 0.02

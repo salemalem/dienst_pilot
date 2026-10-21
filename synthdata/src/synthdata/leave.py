@@ -37,6 +37,17 @@ class LeaveRequest:
     decided_at: datetime | None
     decision_reason_code: str | None
     decision_reason: str | None
+    previous_id: object | None = None  # the declined request this one follows up
+
+
+@dataclass(frozen=True)
+class LeaveOutcome:
+    """Leave requests, approved days, and how the holiday clustering was calibrated."""
+
+    requests: list[LeaveRequest]
+    approved: dict[str, set[date]]
+    affinity_scale: float
+    first_request_decline_rate: float
 
 
 def _block(start_monday: date, working_days: int) -> tuple[date, date]:
@@ -54,11 +65,16 @@ def generate_leave(
     people: list[Person],
     latents: dict[str, Latent],
     years: range,
+    affinity_scale: float = 1.0,
 ) -> tuple[list[LeaveRequest], dict[str, set[date]]]:
-    """All leave requests of the period and the resulting approved leave days per person."""
+    """Return all leave requests of the period and the approved leave days per person.
+
+    ``affinity_scale`` multiplies each person's latent holiday-period preference (capped at 1);
+    it is the knob the calibration turns to reach the target decline rate.
+    """
     wishes: list[tuple[datetime, str, date, date]] = []
     for p in people:
-        lat = latents[p.key]
+        affinity = min(1.0, latents[p.key].holiday_period_affinity * affinity_scale)
         for year in years:
             rng = streams.get("leave", p.key, year)
             employed = [
@@ -76,7 +92,7 @@ def generate_leave(
                     break
                 n = min(n, budget)
                 for _ in range(20):
-                    if rng.random() < lat.holiday_period_affinity and periods:
+                    if rng.random() < affinity and periods:
                         a, b = periods[int(rng.integers(0, len(periods)))]
                         lo = a - timedelta(days=a.weekday())
                         start = lo + timedelta(
@@ -115,6 +131,7 @@ def generate_leave(
     requests: list[LeaveRequest] = []
     for at, key, a, b in sorted(wishes, key=lambda w: (w[0], w[1])):
         rng = streams.get("leave-decision", key, a.isoformat())
+        previous: object | None = None
         for attempt in range(4):
             if at > DEMO_NOW:
                 break
@@ -132,12 +149,17 @@ def generate_leave(
             )
             rid = uid("leave", key, a, attempt)
             if decided > DEMO_NOW:
-                requests.append(LeaveRequest(rid, key, a, b, at, "pending", None, None, None))
+                requests.append(
+                    LeaveRequest(rid, key, a, b, at, "pending", None, None, None, previous)
+                )
                 break
             if too_many or too_many_senior:
                 code = "senior_overlap" if too_many_senior else "overlap"
                 reason = DECLINE_SENIOR_REASON_DE if too_many_senior else DECLINE_REASON_DE
-                requests.append(LeaveRequest(rid, key, a, b, at, "declined", decided, code, reason))
+                requests.append(
+                    LeaveRequest(rid, key, a, b, at, "declined", decided, code, reason, previous)
+                )
+                previous = rid
                 # Try again, shifted by a week (later, earlier, two weeks later).
                 shift = timedelta(days=(7, -14, 21)[attempt]) if attempt < 3 else timedelta(0)
                 a, b = a + shift, b + shift
@@ -145,7 +167,9 @@ def generate_leave(
                 if p.role_on(b) is None or p.on_rotation(b) or p.on_rotation(a):
                     break
                 continue
-            requests.append(LeaveRequest(rid, key, a, b, at, "approved", decided, None, None))
+            requests.append(
+                LeaveRequest(rid, key, a, b, at, "approved", decided, None, None, previous)
+            )
             for d in span_days:
                 approved.setdefault(key, set()).add(d)
                 if p.role_on(d) in BANDED_ROLES or is_senior:
@@ -154,3 +178,42 @@ def generate_leave(
                     senior[d] = senior.get(d, 0) + 1
             break
     return requests, approved
+
+
+def first_request_decline_rate(requests: list[LeaveRequest]) -> float:
+    """Share of decided first requests (not follow-ups) that the planner declined."""
+    first = [r for r in requests if r.previous_id is None and r.status != "pending"]
+    return sum(r.status == "declined" for r in first) / len(first) if first else 0.0
+
+
+def calibrated_leave(
+    streams: Streams, people: list[Person], latents: dict[str, Latent], years: range
+) -> LeaveOutcome:
+    """Generate leave with the holiday clustering scaled to hit the target decline rate.
+
+    Bisection on the scale (deterministic: every candidate uses the same random streams). If
+    the target lies outside what the scale can reach, the nearest end is used; the achieved
+    rate is recorded either way.
+    """
+    target = PARAMS.target_first_request_decline_rate
+    lo, hi = 0.0, 4.0
+    best: tuple[float, float, float] | None = None  # distance, scale, rate
+    for _ in range(14):
+        mid = (lo + hi) / 2
+        reqs, _ = generate_leave(streams, people, latents, years, mid)
+        rate = first_request_decline_rate(reqs)
+        if best is None or abs(rate - target) < best[0]:
+            best = (abs(rate - target), mid, rate)
+        if rate > target:
+            hi = mid
+        else:
+            lo = mid
+    for edge in (0.0, 4.0):
+        reqs, _ = generate_leave(streams, people, latents, years, edge)
+        rate = first_request_decline_rate(reqs)
+        if best is None or abs(rate - target) < best[0]:
+            best = (abs(rate - target), edge, rate)
+    assert best is not None
+    scale = round(best[1], 4)
+    reqs, approved = generate_leave(streams, people, latents, years, scale)
+    return LeaveOutcome(reqs, approved, scale, first_request_decline_rate(reqs))

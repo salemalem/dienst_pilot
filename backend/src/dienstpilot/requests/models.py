@@ -69,3 +69,5 @@ class LeaveRequest(Base):
     decided_by: Mapped[uuid.UUID | None]
     decision_reason_code: Mapped[str | None] = mapped_column(String(40))
     decision_reason: Mapped[str | None] = mapped_column(Text)
+    # A follow-up after a decline points at the declined request.
+    previous_request_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("leave_request.id"))

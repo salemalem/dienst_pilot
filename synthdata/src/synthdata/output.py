@@ -113,6 +113,7 @@ SCHEMAS: dict[str, dict[str, Any]] = {
         "decided_by": S,
         "decision_reason_code": S,
         "decision_reason": S,
+        "previous_request_id": S,
     },
     "planning/roster_run": {
         "id": S,
@@ -216,7 +217,8 @@ def write_dataset(ds: Dataset, seed: int, out: Path) -> dict[str, Any]:
         truth_files[f"_truth/{name}.parquet"] = _write(
             out, f"_truth/{name}.parquet", _frame(rows, schema)
         )
-    params = {k: getattr(PARAMS, k) for k in PARAMS.__dataclass_fields__}
+    params: dict[str, Any] = {k: getattr(PARAMS, k) for k in PARAMS.__dataclass_fields__}
+    params["calibration"] = ds.calibration
     (out / "_truth").mkdir(parents=True, exist_ok=True)
     (out / "_truth" / "params.json").write_text(
         json.dumps(params, indent=2, sort_keys=True) + "\n", encoding="utf-8"
