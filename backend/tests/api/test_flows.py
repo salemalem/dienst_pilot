@@ -318,7 +318,13 @@ def test_w3_to_w5_run_validate_edit_and_publish(client: TestClient, login: Any) 
     assert [v["label"] for v in variants] == ["A", "B", "C"]
     assert sum(v["recommended"] for v in variants) == 1
     assert all(0 <= v["metrics"]["wish_rate"] <= 1 for v in variants)
+    # The December request window is still open: this run is a trial and cannot be published.
+    assert run["trial"] is True
     best = next(v for v in variants if v["recommended"])
+    blocked = client.post(f"/planner/variants/{best['variant_id']}/publish", headers=h)
+    assert blocked.status_code == 409 and "window" in blocked.json()["detail"]
+    assert client.post("/planner/windows/2026-12/close", headers=h).status_code == 200
+    assert client.get(f"/planner/runs/{run['run_id']}", headers=h).json()["trial"] is False
     # A second run at the same demo instant is a new run (the demo clock can stand still).
     second_run = client.post("/planner/runs", json={"roster_month": "2026-12"}, headers=h).json()
     assert second_run["run_id"] != run["run_id"]
