@@ -118,3 +118,7 @@ The Staff+ department roster uses `GET /roster?month=` as well: the same grid, w
 ### Dashboard access
 
 The dashboard calls the API through its own origin: Next.js proxies `/api/*` to the backend (`API_URL`, default `http://localhost:8000`), so no CORS is needed (ADR-010). The browser signs in with `POST /auth/demo-login` as Brandt by default; the persona switch (Vogel, IT-Administration) signs in again.
+
+### Staff app access
+
+The staff app (Expo) calls the API at `EXPO_PUBLIC_API_URL` (default `http://localhost:8000`). Expo web needs CORS: with `DEMO_MODE` on, the API answers preflights for the origins in `CORS_ORIGINS` (default `http://localhost:8081,http://localhost:8083`), and for no other origin; with `DEMO_MODE` off it sends no CORS headers. Native apps are not subject to CORS (ADR-011).

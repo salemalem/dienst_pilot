@@ -128,15 +128,65 @@
       "trade_off_infeasible": "Mit dem zusätzlichen Wochenende gibt es im Vormonat keinen gültigen Plan.",
       "trade_off_invalid": "Der Plan mit Tausch hat die Prüfung durch den Validator nicht bestanden.",
       "baseline_unsolved": "Der Monat ließ sich ohne diesen Urlaub nicht vergleichen."
-    }
+    },
+    "title": "Urlaub beantragen",
+    "pick": "Tippen Sie auf den ersten und den letzten Urlaubstag.",
+    "range": "Urlaub {range}",
+    "startDay": "erster Urlaubstag",
+    "endDay": "letzter Urlaubstag",
+    "hintNotCoverable": "Voraussichtlich nicht abdeckbar.",
+    "hintTight": "{count, plural, =0 {Knapp, aber voraussichtlich abdeckbar.} one {Knapp: eine Kolleg:in hat überschneidende Tage beantragt.} other {Knapp: # Kolleg:innen haben überschneidende Tage beantragt.}}",
+    "hintWhy": "Schnelle Schätzung: höchstens {max} Personen gleichzeitig im Urlaub, Grenze {limit}. Die genaue Prüfung folgt.",
+    "checking": "Der Optimierer prüft die Besetzung …",
+    "checkFailed": "Die genaue Prüfung ist nicht gelaufen. Sie können den Urlaub trotzdem beantragen; die Planung entscheidet.",
+    "sentTitle": "Urlaub beantragt",
+    "sentBody": "Die Planung entscheidet. Die Antwort erscheint unter Mitteilungen.",
+    "toToday": "Zurück zu Heute",
+    "statusOpen": "Offen, wartet auf die Planung"
   },
   "m6": {
     "offerExchange": "Tausch anbieten",
     "audience": "Angebot geht an {n} Kolleg:innen, die mit Ihnen tauschen dürfen",
-    "giveawayBelowHours": "Allein abgeben geht nicht: Sie lägen unter Ihren Vertragsstunden. Bieten Sie einen Tausch an."
+    "giveawayBelowHours": "Allein abgeben geht nicht: Sie lägen unter Ihren Vertragsstunden. Bieten Sie einen Tausch an.",
+    "title": "Dienst tauschen",
+    "pick": "Wählen Sie den Dienst, den Sie abgeben möchten.",
+    "picked": "Gewählt: {date}",
+    "noShifts": "Keine kommenden Dienste im veröffentlichten Plan.",
+    "offeredTitle": "Tausch angeboten",
+    "offeredBody": "Das Angebot ging an die Kolleg:innen, die mit Ihnen tauschen dürfen. Sie erhalten eine Mitteilung, sobald jemand zusagt.",
+    "takenTitle": "Tausch bestätigt",
+    "pendingTitle": "Tausch wartet auf die Planung",
+    "takenApproved": "Die Prüfung war erfolgreich, beide Dienstpläne sind aktualisiert.",
+    "takenPending": "Die Planung entscheidet. {reason}",
+    "toToday": "Zurück zu Heute",
+    "status": {
+      "open": "Angeboten",
+      "approved": "Bestätigt",
+      "pending_approval": "Wartet auf die Planung",
+      "declined": "Abgelehnt"
+    },
+    "inReturn": "Dafür geben Sie ab: {date}, {shift}",
+    "incoming": "Angebote an Sie",
+    "noOffers": "Zurzeit liegt kein Angebot für Sie vor.",
+    "take": "Dienst übernehmen",
+    "exchangeFor": "Tauschen gegen:",
+    "takeAgainst": "Übernehmen und {date} {shift} abgeben"
   },
   "notification": {
-    "roster_changed": "Ihr Dienstplan am {date} wurde geändert. Grund: {reason}"
+    "roster_changed": "Ihr Dienstplan am {date} wurde geändert. Grund: {reason}",
+    "roster_published": "Dienstplan {month} veröffentlicht",
+    "leave_approved": "Urlaub genehmigt: {range}",
+    "leave_declined": "Urlaub abgelehnt: {range}. Grund: {reason}",
+    "leave_pending": "Urlaub beantragt: {range}",
+    "swap_approved": "Tausch bestätigt",
+    "swap_declined": "Tausch abgelehnt",
+    "swap_accepted": "Tausch angenommen",
+    "swap_pending_approval": "Tausch wartet auf die Planung",
+    "cover_request": "Vertretungsanfrage für {date}, {shift}",
+    "change": {
+      "added": "hinzugefügt",
+      "removed": "entfernt"
+    }
   },
   "common": {
     "loading": "Wird geladen …",
@@ -162,7 +212,8 @@
     "prevMonth": "Vorheriger Monat",
     "nextMonth": "Nächster Monat",
     "synthetic": "Synthetische Daten",
-    "engine": "Berechnet von"
+    "engine": "Berechnet von",
+    "back": "Zurück"
   },
   "nav": {
     "group": {
@@ -760,5 +811,183 @@
     "facharzt": "Facharzt",
     "nachtdienstfaehig": "nachtdienstfähig",
     "oberarzt": "Oberarzt"
+  },
+  "tabs": {
+    "today": "Heute",
+    "roster": "Dienstplan",
+    "notifications": "Mitteilungen",
+    "settings": "Einstellungen"
+  },
+  "demo": {
+    "title": "Demo-Menü",
+    "note": "Wechseln Sie die Demo-Person. Alle Daten sind synthetisch.",
+    "persona": {
+      "kaya": "Dr. Aylin Kaya, Assistenzärztin",
+      "weber": "Dr. Jonas Weber, Assistenzarzt",
+      "alvarez": "Dr. Sofía Alvarez, Assistenzärztin",
+      "mehta": "Dr. Rohan Mehta, Assistenzarzt",
+      "lorenz": "Dr. Lea Lorenz, Fachärztin"
+    },
+    "hint": {
+      "kaya": "Standard: Heute, Wünsche, Urlaub",
+      "weber": "Für Krank melden",
+      "alvarez": "Für die Vertretungsanfrage",
+      "mehta": "Für das Tauschangebot",
+      "lorenz": "Für das Annehmen des Tauschs"
+    }
+  },
+  "m1": {
+    "intro": "Melden Sie sich an, um Ihren Dienstplan zu sehen, Wünsche abzugeben und Dienste zu tauschen.",
+    "signIn": "Mit Klinik-Konto anmelden",
+    "demo": "Demo-Menü öffnen",
+    "hideDemo": "Demo-Menü schließen"
+  },
+  "m2": {
+    "title": "Heute",
+    "statusCover": "Eine Vertretungsanfrage wartet auf Sie",
+    "statusNext": "Ihr nächster Dienst: {day} {date}",
+    "statusNone": "Zurzeit ist kein Dienst für Sie geplant",
+    "coverTitle": "Vertretungsanfrage",
+    "coverOpen": "Anfrage ansehen",
+    "nextShift": "Ihr nächster Dienst",
+    "colleagues": "Im Dienst mit",
+    "noShift": "Kein weiterer Dienst im veröffentlichten Plan.",
+    "wishes": "Wünsche für {month} abgeben, noch {days, plural, one {# Tag} other {# Tage}}",
+    "wishesOpen": "Wünsche eintragen",
+    "leave": "Urlaub",
+    "sick": "Krank melden",
+    "swap": "Dienst tauschen"
+  },
+  "m3": {
+    "title": "Mein Dienstplan",
+    "published": "Veröffentlicht am {date}",
+    "free": "kein Dienst",
+    "list": "Meine Dienste",
+    "empty": "In diesem Monat sind keine Dienste für Sie eingetragen.",
+    "changed": "Geändert",
+    "wish": {
+      "granted": "Wunsch erfüllt",
+      "missed": "Wunsch nicht erfüllt"
+    },
+    "sync": "Mit Kalender synchronisieren"
+  },
+  "m4": {
+    "title": "Wünsche",
+    "status": "Wünsche für {month}, noch {days, plural, one {# Tag} other {# Tage}}",
+    "howTo": "Tippen Sie auf einen Tag: einmal für „kann nicht“, zweimal für „möchte arbeiten“, dreimal zum Löschen.",
+    "cannot": "kann nicht",
+    "want": "möchte arbeiten",
+    "important": "wichtig",
+    "none": "keine Angabe",
+    "unstar": "Nicht mehr wichtig",
+    "star": "Als wichtig markieren (max. {max})",
+    "hintAvoid": "Sie haben {shift} am {weekday} {n} Mal abgegeben. Als „kann nicht“ eintragen?",
+    "hintPrefer": "Sie wünschen oft {shift} am {weekday} ({n} Mal). Eintragen?",
+    "hintApply": "Eintragen",
+    "hintDismiss": "Ausblenden",
+    "hintWhy": "Grundlage: {n} frühere Angaben und Tausche, nur von Ihnen.",
+    "freeText": "In eigenen Worten",
+    "example": "Lieber Nächte als Wochenenden",
+    "understand": "Verstehen lassen",
+    "understood": "Wir haben verstanden:",
+    "parseWhy": "Ihr Text wird nur nach bekannten Wörtern und Daten gelesen; nichts darin wird als Anweisung ausgeführt.",
+    "parseApply": "Tage übernehmen",
+    "parsedDays": "Sie können nicht an: {days}",
+    "parsedPrefer": "Lieber: {shifts}",
+    "parsedAvoid": "Lieber nicht: {shifts}",
+    "parsedWeekends": "Möglichst keine Wochenenden",
+    "save": "Wünsche speichern",
+    "saved": "Gespeichert. Wünsche sind keine Zusage."
+  },
+  "m7": {
+    "title": "Krank melden",
+    "status": "Eine Meldung genügt. Es wird keine Diagnose abgefragt.",
+    "range": "Zeitraum",
+    "less": "Einen Tag weniger",
+    "more": "Einen Tag mehr",
+    "report": "Krank melden",
+    "noDiagnosis": "Es gibt kein Feld für Gründe oder Diagnosen. Kolleg:innen sehen nur „abwesend“.",
+    "doneTitle": "Gemeldet",
+    "done": "Sie sind ab heute als abwesend eingetragen. Wir suchen eine Vertretung für Ihren {shift}. Gute Besserung.",
+    "doneNoShift": "Sie sind als abwesend eingetragen. In diesem Zeitraum ist kein Dienst von Ihnen betroffen. Gute Besserung.",
+    "toToday": "Zurück zu Heute",
+    "absent": "Abwesend: {range}",
+    "coverStarted": "{count, plural, =0 {Es wurde keine Vertretungssuche gestartet.} one {Eine Vertretungssuche läuft.} other {# Vertretungssuchen laufen.}}"
+  },
+  "m8": {
+    "title": "Vertretungsanfrage",
+    "none": "Keine offene Anfrage",
+    "noneBody": "Zurzeit fragt Sie niemand nach einer Vertretung.",
+    "question": "Können Sie {date} den {shift} übernehmen? {from}–{to}",
+    "questionPlain": "Können Sie {date} den {shift} übernehmen?",
+    "replyBy": "Antwort bis {time}",
+    "replySoon": "Bitte bald antworten",
+    "left": "Noch {time} Minuten",
+    "hours": "Folgen für Ihre Stunden",
+    "hoursImpact": "Geplant {before} h, danach {after} h von {contract} h Vertragsstunden.",
+    "checked": "Geprüft: Ruhezeiten, Qualifikation und Stundenrahmen bleiben eingehalten.",
+    "take": "Übernehmen",
+    "decline": "Ablehnen",
+    "accepted": "Übernommen",
+    "declined": "Abgelehnt",
+    "confirmedTitle": "Übernommen",
+    "confirmedClosed": "Danke. Die Prüfung war erfolgreich, Ihr Dienstplan ist aktualisiert und die Lücke ist geschlossen.",
+    "confirmedPlanner": "Danke. Die Planung entscheidet noch über die Übernahme.",
+    "declinedTitle": "Abgelehnt",
+    "declinedBody": "Kein Problem. Die Anfrage geht an die nächste Person.",
+    "backToday": "Zurück zu Heute"
+  },
+  "m9": {
+    "title": "Fairness-Bilanz",
+    "status": "{year}, Stand {date}",
+    "equal": "Sie liegen bei {word} genau im Durchschnitt",
+    "below": "Sie liegen bei {word} {n} unter dem Durchschnitt",
+    "above": "Sie liegen bei {word} {n} über dem Durchschnitt",
+    "lineLabel": "{name}: Sie {mine}, Durchschnitt {mean}, Abteilung von {min} bis {max}",
+    "figures": "Sie {mine}, Durchschnitt {mean}",
+    "privacy": "Verglichen wird nur mit dem Durchschnitt der Abteilung. Kolleg:innen werden nicht genannt.",
+    "word": {
+      "nights": "Nachtdiensten",
+      "weekends": "Wochenenddiensten",
+      "holidays": "Feiertagsdiensten"
+    }
+  },
+  "m10": {
+    "title": "Stunden",
+    "overtimeMonth": "Überstunden diesen Monat",
+    "contract": "Vertragsstunden",
+    "planned": "Geplant",
+    "worked": "Geleistet",
+    "leaveCredit": "Urlaub (angerechnet)",
+    "rest": "Ruhezeiten",
+    "restOk": "Alle Ruhezeiten von mindestens {hours} Stunden eingehalten.",
+    "restViolations": "{count, plural, one {Eine Ruhezeit} other {# Ruhezeiten}} unter {hours} Stunden."
+  },
+  "m11": {
+    "title": "Mitteilungen",
+    "status": "{count, plural, =0 {Keine Mitteilungen} one {Eine Mitteilung} other {# Mitteilungen}}",
+    "empty": "Noch keine Mitteilungen."
+  },
+  "m12": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "theme": "Darstellung",
+    "themeAuto": "Automatisch",
+    "themeLight": "Hell",
+    "themeDark": "Dunkel",
+    "themeAutoNote": "Automatisch: dunkel von 20:00 bis 07:00 nach der Demo-Uhr. Die Demo-Uhr zeigt {time}, jetzt {theme}.",
+    "themeFixedNote": "Fest gewählt, unabhängig von der Uhrzeit.",
+    "now": {
+      "light": "hell",
+      "dark": "dunkel"
+    },
+    "notifications": "Benachrichtigungen",
+    "sync": "Mit Kalender synchronisieren",
+    "suggestions": "Wunschvorschläge anzeigen",
+    "mine": "Meine Übersichten",
+    "wishes": "Wünsche",
+    "fairness": "Fairness-Bilanz",
+    "hours": "Stunden",
+    "signOut": "Abmelden"
   }
 }

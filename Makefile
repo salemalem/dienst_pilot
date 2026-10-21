@@ -19,21 +19,23 @@ down: ## Stop the Docker services
 logs: ## Follow the API, Postgres and Redis logs
 	$(COMPOSE) logs -f
 
-seed: ## Rebuild the database from the seed: generate (if changed), reset the schema, load
+seed: ## Rebuild the dev database from the seed (also after the app wrote to it): generate (if changed), drop the schemas, migrate, load
 	$(COMPOSE) up -d --wait postgres
 	uv run python -m synthdata generate --seed $(SEED) --out $(SEED_DIR) --if-changed
-	cd backend && uv run alembic downgrade base && uv run alembic upgrade head
+	DEMO_MODE=true uv run python -m dienstpilot.seeding --reset
+	cd backend && uv run alembic upgrade head
 	uv run python -m dienstpilot.seeding $(SEED_DIR)
 
 test: ## Python and TypeScript tests
 	uv run pytest
 	pnpm test
 
-e2e: ## Playwright e2e on the demo clock (own database dienstpilot_e2e; API on :8100, dashboard on :3100)
+e2e: ## Playwright e2e on the demo clock: dashboard (:3100) and staff app on Expo web (:8083), own database dienstpilot_e2e, API on :8100
 	$(COMPOSE) up -d --wait postgres redis
 	$(COMPOSE) exec -T postgres psql -U dienstpilot -c "CREATE DATABASE dienstpilot_e2e" 2>/dev/null || true
 	pnpm build:packages
 	pnpm --filter @dienstpilot/dashboard e2e
+	pnpm --filter @dienstpilot/mobile e2e
 
 lint: ## ruff, mypy, import-linter, eslint, tsc, prettier
 	uv run ruff check backend

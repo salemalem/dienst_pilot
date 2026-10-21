@@ -5,6 +5,11 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "web": { "bundler": "metro" }
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "scheme": "dienstpilot",
+    "plugins": ["expo-router"]
   }
 }

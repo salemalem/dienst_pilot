@@ -128,15 +128,65 @@
       "trade_off_infeasible": "With the extra weekend, there is no valid roster for the month before.",
       "trade_off_invalid": "The roster with the trade did not pass the validator.",
       "baseline_unsolved": "The month could not be compared without this leave."
-    }
+    },
+    "title": "Request leave",
+    "pick": "Tap the first and the last day of your leave.",
+    "range": "Leave {range}",
+    "startDay": "first day of leave",
+    "endDay": "last day of leave",
+    "hintNotCoverable": "Probably not coverable.",
+    "hintTight": "{count, plural, =0 {Tight, but probably coverable.} one {Tight: one colleague has requested overlapping days.} other {Tight: # colleagues have requested overlapping days.}}",
+    "hintWhy": "Quick estimate: at most {max} people on leave at once, limit {limit}. The exact check follows.",
+    "checking": "The optimizer is checking staffing …",
+    "checkFailed": "The exact check did not run. You can still request the leave; the planner decides.",
+    "sentTitle": "Leave requested",
+    "sentBody": "The planner decides. The answer appears under Notifications.",
+    "toToday": "Back to Today",
+    "statusOpen": "Open, waiting for the planner"
   },
   "m6": {
     "offerExchange": "Offer exchange",
     "audience": "Offer goes to {n} colleagues who can exchange with you",
-    "giveawayBelowHours": "You can't give this shift away alone: you'd fall below your contract hours. Offer an exchange instead."
+    "giveawayBelowHours": "You can't give this shift away alone: you'd fall below your contract hours. Offer an exchange instead.",
+    "title": "Swap a shift",
+    "pick": "Choose the shift you want to give away.",
+    "picked": "Chosen: {date}",
+    "noShifts": "No upcoming shifts in the published roster.",
+    "offeredTitle": "Exchange offered",
+    "offeredBody": "The offer went to the colleagues who can exchange with you. You'll be notified when someone agrees.",
+    "takenTitle": "Exchange confirmed",
+    "pendingTitle": "Exchange waiting for the planner",
+    "takenApproved": "The check passed, both rosters are updated.",
+    "takenPending": "The planner decides. {reason}",
+    "toToday": "Back to Today",
+    "status": {
+      "open": "Offered",
+      "approved": "Confirmed",
+      "pending_approval": "Waiting for the planner",
+      "declined": "Declined"
+    },
+    "inReturn": "In return you give: {date}, {shift}",
+    "incoming": "Offers to you",
+    "noOffers": "No offer is waiting for you right now.",
+    "take": "Take the shift",
+    "exchangeFor": "Exchange against:",
+    "takeAgainst": "Take it and give {date} {shift}"
   },
   "notification": {
-    "roster_changed": "Your roster on {date} was changed. Reason: {reason}"
+    "roster_changed": "Your roster on {date} was changed. Reason: {reason}",
+    "roster_published": "Roster {month} published",
+    "leave_approved": "Leave approved: {range}",
+    "leave_declined": "Leave declined: {range}. Reason: {reason}",
+    "leave_pending": "Leave requested: {range}",
+    "swap_approved": "Exchange confirmed",
+    "swap_declined": "Exchange declined",
+    "swap_accepted": "Exchange accepted",
+    "swap_pending_approval": "Exchange waiting for the planner",
+    "cover_request": "Cover request for {date}, {shift}",
+    "change": {
+      "added": "added",
+      "removed": "removed"
+    }
   },
   "common": {
     "loading": "Loading …",
@@ -162,7 +212,8 @@
     "prevMonth": "Previous month",
     "nextMonth": "Next month",
     "synthetic": "Synthetic data",
-    "engine": "Computed by"
+    "engine": "Computed by",
+    "back": "Back"
   },
   "nav": {
     "group": {
@@ -760,5 +811,183 @@
     "facharzt": "specialist",
     "nachtdienstfaehig": "cleared for night duty",
     "oberarzt": "senior physician"
+  },
+  "tabs": {
+    "today": "Today",
+    "roster": "Roster",
+    "notifications": "Notifications",
+    "settings": "Settings"
+  },
+  "demo": {
+    "title": "Demo menu",
+    "note": "Switch the demo persona. All data is synthetic.",
+    "persona": {
+      "kaya": "Dr. Aylin Kaya, resident",
+      "weber": "Dr. Jonas Weber, resident",
+      "alvarez": "Dr. Sofía Alvarez, resident",
+      "mehta": "Dr. Rohan Mehta, resident",
+      "lorenz": "Dr. Lea Lorenz, specialist"
+    },
+    "hint": {
+      "kaya": "Default: Today, wishes, leave",
+      "weber": "For reporting sick",
+      "alvarez": "For the cover request",
+      "mehta": "For the exchange offer",
+      "lorenz": "For taking the exchange"
+    }
+  },
+  "m1": {
+    "intro": "Sign in to see your roster, submit wishes and exchange shifts.",
+    "signIn": "Sign in with hospital account",
+    "demo": "Open demo menu",
+    "hideDemo": "Close demo menu"
+  },
+  "m2": {
+    "title": "Today",
+    "statusCover": "A cover request is waiting for you",
+    "statusNext": "Your next shift: {day} {date}",
+    "statusNone": "No shift is planned for you right now",
+    "coverTitle": "Cover request",
+    "coverOpen": "View request",
+    "nextShift": "Your next shift",
+    "colleagues": "On shift with",
+    "noShift": "No further shift in the published roster.",
+    "wishes": "Submit your wishes for {month}, {days, plural, one {# day} other {# days}} left",
+    "wishesOpen": "Enter wishes",
+    "leave": "Leave",
+    "sick": "Report sick",
+    "swap": "Swap a shift"
+  },
+  "m3": {
+    "title": "My roster",
+    "published": "Published on {date}",
+    "free": "no shift",
+    "list": "My shifts",
+    "empty": "No shifts are entered for you this month.",
+    "changed": "Changed",
+    "wish": {
+      "granted": "Wish granted",
+      "missed": "Wish not granted"
+    },
+    "sync": "Sync to calendar"
+  },
+  "m4": {
+    "title": "Wishes",
+    "status": "Wishes for {month}, {days, plural, one {# day} other {# days}} left",
+    "howTo": "Tap a day: once for “can't work”, twice for “would like to work”, three times to clear.",
+    "cannot": "can't work",
+    "want": "would like to work",
+    "important": "important",
+    "none": "no entry",
+    "unstar": "No longer important",
+    "star": "Mark as important (max. {max})",
+    "hintAvoid": "You gave away {shift} on {weekday} {n} times. Enter as “can't work”?",
+    "hintPrefer": "You often wish for {shift} on {weekday} ({n} times). Enter it?",
+    "hintApply": "Enter",
+    "hintDismiss": "Hide",
+    "hintWhy": "Based on {n} earlier entries and swaps, yours only.",
+    "freeText": "In your own words",
+    "example": "Rather nights than weekends",
+    "understand": "Let it be understood",
+    "understood": "Here's what we understood:",
+    "parseWhy": "Your text is only read for known words and dates; nothing in it is carried out as an instruction.",
+    "parseApply": "Take over days",
+    "parsedDays": "You can't work on: {days}",
+    "parsedPrefer": "Rather: {shifts}",
+    "parsedAvoid": "Rather not: {shifts}",
+    "parsedWeekends": "Preferably no weekends",
+    "save": "Save wishes",
+    "saved": "Saved. Wishes are not a promise."
+  },
+  "m7": {
+    "title": "Report sick",
+    "status": "One report is enough. No diagnosis is asked for.",
+    "range": "Period",
+    "less": "One day less",
+    "more": "One day more",
+    "report": "Report sick",
+    "noDiagnosis": "There is no field for reasons or diagnoses. Colleagues only see “absent”.",
+    "doneTitle": "Reported",
+    "done": "You're marked absent from today. We're finding cover for your {shift}. Get well soon.",
+    "doneNoShift": "You're marked absent. None of your shifts is affected in this period. Get well soon.",
+    "toToday": "Back to Today",
+    "absent": "Absent: {range}",
+    "coverStarted": "{count, plural, =0 {No cover search was started.} one {One cover search is running.} other {# cover searches are running.}}"
+  },
+  "m8": {
+    "title": "Cover request",
+    "none": "No open request",
+    "noneBody": "Nobody is asking you for cover right now.",
+    "question": "Can you take the {shift} on {date}? {from}–{to}",
+    "questionPlain": "Can you take the {shift} on {date}?",
+    "replyBy": "Reply by {time}",
+    "replySoon": "Please reply soon",
+    "left": "{time} minutes left",
+    "hours": "Effect on your hours",
+    "hoursImpact": "Planned {before} h, afterwards {after} h of {contract} h contract hours.",
+    "checked": "Checked: rest periods, qualification and hours band stay within the rules.",
+    "take": "Take shift",
+    "decline": "Decline",
+    "accepted": "Taken",
+    "declined": "Declined",
+    "confirmedTitle": "Taken",
+    "confirmedClosed": "Thank you. The check passed, your roster is updated and the gap is closed.",
+    "confirmedPlanner": "Thank you. The planner still decides on the takeover.",
+    "declinedTitle": "Declined",
+    "declinedBody": "No problem. The request goes to the next person.",
+    "backToday": "Back to Today"
+  },
+  "m9": {
+    "title": "Fairness balance",
+    "status": "{year}, as of {date}",
+    "equal": "You're exactly at the department average for {name}",
+    "below": "You're {n} {word} below the department average",
+    "above": "You're {n} {word} above the department average",
+    "lineLabel": "{name}: you {mine}, average {mean}, department from {min} to {max}",
+    "figures": "You {mine}, average {mean}",
+    "privacy": "You are compared with the department average only. Colleagues are not named.",
+    "word": {
+      "nights": "{n, plural, one {night} other {nights}}",
+      "weekends": "{n, plural, one {weekend} other {weekends}}",
+      "holidays": "{n, plural, one {holiday} other {holidays}}"
+    }
+  },
+  "m10": {
+    "title": "Hours",
+    "overtimeMonth": "Overtime this month",
+    "contract": "Contract hours",
+    "planned": "Planned",
+    "worked": "Worked",
+    "leaveCredit": "Leave (credited)",
+    "rest": "Rest periods",
+    "restOk": "All rest periods of at least {hours} hours were met.",
+    "restViolations": "{count, plural, one {One rest period} other {# rest periods}} under {hours} hours."
+  },
+  "m11": {
+    "title": "Notifications",
+    "status": "{count, plural, =0 {No notifications} one {One notification} other {# notifications}}",
+    "empty": "No notifications yet."
+  },
+  "m12": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Appearance",
+    "themeAuto": "Automatic",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeAutoNote": "Automatic: dark from 20:00 to 07:00 by the demo clock. The demo clock shows {time}, now {theme}.",
+    "themeFixedNote": "Fixed, whatever the time of day.",
+    "now": {
+      "light": "light",
+      "dark": "dark"
+    },
+    "notifications": "Notifications",
+    "sync": "Sync to calendar",
+    "suggestions": "Show preference suggestions",
+    "mine": "My overviews",
+    "wishes": "Wishes",
+    "fairness": "Fairness balance",
+    "hours": "Hours",
+    "signOut": "Sign out"
   }
 }

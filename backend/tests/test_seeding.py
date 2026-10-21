@@ -10,7 +10,15 @@ import polars as pl
 import pytest
 from sqlalchemy import create_engine, text
 
-from dienstpilot.seeding import SeedError, load, verify
+from dienstpilot.seeding import (
+    ResetRefusedError,
+    SeedError,
+    check_reset_target,
+    load,
+    reset,
+    verify,
+)
+from dienstpilot.shared.settings import get_settings
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -110,3 +118,66 @@ def test_models_match_the_migrations(database_url: str) -> None:
         ["alembic", "check"], cwd=REPO / "backend", env=env, capture_output=True, text=True
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize(
+    ("url", "demo_mode", "ci", "why"),
+    [
+        ("postgresql+psycopg://u:p@localhost:5433/prod", True, False, "not a DienstPilot"),
+        ("postgresql+psycopg://u:p@localhost:5433/postgres", True, False, "not a DienstPilot"),
+        ("postgresql+psycopg://u:p@localhost:5432/dienstpilot", True, False, "only port 5433"),
+        ("postgresql+psycopg://u:p@db.example.com:5433/dienstpilot", True, False, "not a local"),
+        ("postgresql+psycopg://u:p@localhost:5433/dienstpilot", False, False, "DEMO_MODE"),
+        ("postgresql+psycopg://u:p@localhost:6543/dienstpilot_e2e", True, True, "only port 5433"),
+    ],
+)
+def test_reset_refuses_a_database_that_is_not_the_dev_or_e2e_one(
+    url: str, demo_mode: bool, ci: bool, why: str
+) -> None:
+    with pytest.raises(ResetRefusedError, match=why):
+        check_reset_target(url, demo_mode=demo_mode, ci=ci)
+
+
+def test_reset_accepts_the_dev_and_e2e_databases_and_names_them() -> None:
+    dev = "postgresql+psycopg://u:p@localhost:5433/dienstpilot"
+    e2e = "postgresql+psycopg://u:p@127.0.0.1:5433/dienstpilot_e2e"
+    ci = "postgresql+psycopg://u:p@localhost:5432/dienstpilot"
+    assert check_reset_target(dev, demo_mode=True) == "dienstpilot on localhost:5433"
+    assert "dienstpilot_e2e" in check_reset_target(e2e, demo_mode=True)
+    assert check_reset_target(ci, demo_mode=True, ci=True) == "dienstpilot on localhost:5432"
+
+
+@pytest.mark.db
+def test_reset_rebuilds_a_database_the_app_has_written_to(
+    seed_dir: Path, database_url: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """After the app wrote rows (an approved swap), `make seed` must still rebuild from nothing."""
+    monkeypatch.setenv("DEMO_MODE", "true")
+    get_settings.cache_clear()
+    try:
+        expected = verify(seed_dir)["files"]["operations/swap_offer.parquet"]["rows"]
+        load(seed_dir, database_url)
+        engine = create_engine(database_url)
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "UPDATE operations.swap_offer SET status = 'approved' "
+                    "WHERE id = (SELECT id FROM operations.swap_offer LIMIT 1)"
+                )
+            )
+        engine.dispose()
+        reset(database_url, ci=os.environ.get("CI") == "true")
+        env = {**os.environ, "DATABASE_URL": database_url}
+        subprocess.run(["alembic", "upgrade", "head"], check=True, cwd=REPO / "backend", env=env)
+        load(seed_dir, database_url)
+        engine = create_engine(database_url)
+        with engine.connect() as conn:
+            n = conn.execute(text("SELECT count(*) FROM operations.swap_offer")).scalar_one()
+            approved = conn.execute(
+                text("SELECT count(*) FROM operations.swap_offer WHERE status = 'approved'")
+            ).scalar_one()
+        engine.dispose()
+        assert n == expected
+        assert approved == 0
+    finally:
+        get_settings.cache_clear()

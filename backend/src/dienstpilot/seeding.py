@@ -6,6 +6,7 @@ foreign keys between schemas), then replaces the seeded tables in one transactio
 
 import hashlib
 import json
+import os
 import sys
 import uuid
 from collections.abc import Callable
@@ -14,6 +15,7 @@ from typing import Any
 
 import polars as pl
 from sqlalchemy import Connection, create_engine, func, select, text
+from sqlalchemy.engine import make_url
 
 from dienstpilot.audit import seed as audit
 from dienstpilot.identity import seed as identity
@@ -282,9 +284,73 @@ def history_events(root: Path, department_id: str, names: dict[str, str]) -> lis
     return ev
 
 
+# The only databases `reset` may empty: the dev, e2e and test databases of this project, on this
+# machine. A Postgres on another port, host or name is never touched.
+RESETTABLE_DATABASES = frozenset({"dienstpilot", "dienstpilot_e2e", "dienstpilot_test"})
+LOCAL_HOSTS = frozenset({"localhost", "127.0.0.1", "::1"})
+DEV_PORT = 5433  # compose.dev.yml publishes Postgres here, away from a host Postgres on 5432
+
+
+class ResetRefusedError(SeedError):
+    """The reset was refused because the target is not a DienstPilot dev or e2e database."""
+
+
+def check_reset_target(url: str, *, demo_mode: bool, ci: bool = False) -> str:
+    """Return a description of the database `reset` would empty, or raise ``ResetRefusedError``.
+
+    Allowed: ``DEMO_MODE`` on, a local host, a database named like this project's dev, e2e or
+    test database, and port 5433 (the dev stack). Port 5432 only on a CI runner, whose service
+    container is that database.
+    """
+    target = make_url(url)
+    where = f"{target.database} on {target.host}:{target.port}"
+    if not demo_mode:
+        raise ResetRefusedError(f"refusing to reset {where}: DEMO_MODE is not on")
+    if target.host not in LOCAL_HOSTS:
+        raise ResetRefusedError(f"refusing to reset {where}: not a local host")
+    if target.database not in RESETTABLE_DATABASES:
+        raise ResetRefusedError(f"refusing to reset {where}: not a DienstPilot dev or e2e database")
+    if target.port != DEV_PORT and not (ci and target.port == 5432):
+        raise ResetRefusedError(f"refusing to reset {where}: only port {DEV_PORT} (the dev stack)")
+    return where
+
+
+def reset(url: str | None = None, *, ci: bool | None = None) -> str:
+    """Drop every schema of the dev or e2e database, so migrations and seed start from nothing.
+
+    ``alembic downgrade base`` cannot do this once the app has written rows (its check
+    constraints reject them), so the schemas are dropped instead. Guarded by
+    ``check_reset_target``; returns the description of the database that was reset.
+    """
+    settings = get_settings()
+    target = url or settings.database_url
+    where = check_reset_target(
+        target,
+        demo_mode=settings.demo_mode,
+        ci=os.environ.get("CI") == "true" if ci is None else ci,
+    )
+    print(f"reset: dropping every schema of {where}")
+    engine = create_engine(target, isolation_level="AUTOCOMMIT")
+    with engine.connect() as conn:
+        names = conn.execute(
+            text(
+                "SELECT nspname FROM pg_namespace "
+                "WHERE nspname !~ '^pg_' AND nspname <> 'information_schema'"
+            )
+        ).scalars()
+        for name in list(names):
+            conn.execute(text(f'DROP SCHEMA IF EXISTS "{name}" CASCADE'))
+        conn.execute(text("CREATE SCHEMA public"))
+    engine.dispose()
+    return where
+
+
 def main(argv: list[str] | None = None) -> int:
-    """Entry point."""
+    """Entry point: ``--reset`` empties the dev or e2e database; otherwise load the seed."""
     args = sys.argv[1:] if argv is None else argv
+    if args == ["--reset"]:
+        reset()
+        return 0
     root = Path(args[0] if args else "data/synthetic/v1")
     counts = load(root)
     manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
