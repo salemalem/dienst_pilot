@@ -34,13 +34,9 @@ class IntakeStandIn(IntakeParser):
     The text is only searched for known words and dates; nothing in it is executed or followed.
     """
 
-    info = EngineInfo(
-        "C7",
-        "stand-in",
-        STANDIN_VERSION,
-        "Keyword and date matching (DE/EN); LLM with structured output in phase 10.",
-        10,
-    )
+    def __init__(self, note: str = "Keyword and date matching (DE/EN).") -> None:
+        """Describe the stand-in; the registry says whether an LLM version was evaluated."""
+        self.info = EngineInfo("C7", "stand-in", STANDIN_VERSION, note, 10)
 
     def parse(self, text: str, month: date, language: str) -> ParsedPreferences:
         """Parse untrusted free text into a typed preference set."""

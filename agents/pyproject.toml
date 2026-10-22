@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "C7 and C8 agents, the RAG rulebook and the LLM port adapter. Imports no backend context."
 requires-python = ">=3.12,<3.13"
 dependencies = [
+  "anthropic==1.15.0",
   "numpy>=2.0",
   "onnxruntime==1.31.0",
   "sqlalchemy[asyncio]>=2.1.5",

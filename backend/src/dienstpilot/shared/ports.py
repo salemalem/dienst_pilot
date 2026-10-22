@@ -203,14 +203,32 @@ class LeaveFeasibility(Engine):
 
 
 @dataclass(frozen=True)
+class ShiftOnDay:
+    """A date and one shift type: the soft ``avoid_shift`` entry of the wishes (Phase 8b)."""
+
+    date: date
+    shift_type: str
+
+
+@dataclass(frozen=True)
 class ParsedPreferences:
-    """C7 output: a typed preference set the person confirms before anything is saved."""
+    """C7 output: a typed preference set the person confirms before anything is saved.
+
+    ``unavailable`` is a hard block (explicit inability); ``avoid_shift_days`` is a soft "rather
+    not this shift on this day". ``engine_info`` is set when the answer came from another
+    implementation than the engine's own (a fallback), so the screen can say so;
+    ``ai_generated`` and ``replayed`` say how it was made.
+    """
 
     unavailable: list[date] = field(default_factory=list)
     prefer_shifts: list[str] = field(default_factory=list)
     avoid_shifts: list[str] = field(default_factory=list)
     avoid_weekends: bool = False
     clarifying_question: str | None = None
+    avoid_shift_days: list[ShiftOnDay] = field(default_factory=list)
+    engine_info: "EngineInfo | None" = None
+    ai_generated: bool = False
+    replayed: bool = False
 
 
 class IntakeParser(Engine):

@@ -25,7 +25,9 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://dienstpilot:dienstpilot@localhost:5433/dienstpilot"
     redis_url: str = "redis://localhost:6379/0"
     llm_model_intake: str = "claude-haiku-5-5"
-    llm_model_copilot: str = "claude-sonnet-5-5"
+    llm_model_copilot: str = "claude-haiku-5-5"  # Haiku for both (budget, ADR-020)
+    # auto: live when a key is set, else off. replay: recorded fixtures, never the network.
+    llm_mode: Literal["auto", "live", "replay", "off"] = "auto"
     # The Anthropic key comes only from the environment or the git-ignored .env, never from code.
     # Without it C7 and C8 run as their labelled stand-ins (Phase 10).
     anthropic_api_key: SecretStr | None = None

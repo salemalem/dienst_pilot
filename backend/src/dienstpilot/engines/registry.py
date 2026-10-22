@@ -7,10 +7,8 @@ from dienstpilot.engines.c3 import C3Forecaster
 from dienstpilot.engines.c4 import C4PreferenceLearner
 from dienstpilot.engines.c5 import C5CoverRanker
 from dienstpilot.engines.c6 import C6LeaveFeasibility
-from dienstpilot.engines.standins import (
-    CopilotStandIn,
-    IntakeStandIn,
-)
+from dienstpilot.engines.c7 import build_intake
+from dienstpilot.engines.standins import CopilotStandIn
 from dienstpilot.shared.ports import (
     AbsenceForecaster,
     Copilot,
@@ -22,6 +20,7 @@ from dienstpilot.shared.ports import (
     RosterOptimizer,
     Validator,
 )
+from dienstpilot.shared.settings import get_settings
 
 
 @dataclass(frozen=True)
@@ -63,6 +62,6 @@ def default_engines() -> Engines:
         C4PreferenceLearner(),
         C5CoverRanker(),
         C6LeaveFeasibility(),
-        IntakeStandIn(),
+        build_intake(get_settings()),
         CopilotStandIn(),
     )

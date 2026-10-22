@@ -20,12 +20,16 @@ COPY ml/absence_forecast/artifacts ml/absence_forecast/artifacts
 COPY agents/pyproject.toml agents/pyproject.toml
 COPY agents/src agents/src
 COPY agents/rag agents/rag
+COPY agents/intake agents/intake
+COPY agents/fixtures agents/fixtures
 COPY mcp_servers/pyproject.toml mcp_servers/pyproject.toml
 COPY synthdata/pyproject.toml synthdata/pyproject.toml
 COPY eval/pyproject.toml eval/pyproject.toml
 RUN uv sync --frozen --no-dev --package dienstpilot
 # The transparency screen (W13) shows the eval summaries written by eval/ scripts.
 COPY eval/results eval/results
+COPY eval/pricing.json eval/pricing.json
+COPY eval/usage eval/usage
 
 COPY backend backend
 WORKDIR /app/backend

@@ -392,15 +392,27 @@ class ParseRequest(BaseModel):
     language: Literal["de", "en"] = "de"
 
 
+class ShiftOnDayOut(BaseModel):
+    """A soft "rather not this shift on this day" (the avoid_shift entry)."""
+
+    date: date
+    shift_type: str
+
+
 class ParsedOut(BaseModel):
     """C7: what was understood. Nothing is saved until the person confirms."""
 
-    unavailable: list[date]
+    unavailable: list[date] = Field(description="Hard: the person said they cannot work")
+    avoid_shift_days: list[ShiftOnDayOut] = Field(
+        description="Soft: rather not this shift that day"
+    )
     prefer_shifts: list[str]
     avoid_shifts: list[str]
     avoid_weekends: bool
     clarifying_question: str | None
     engine: EngineLabel
+    ai_generated: bool = Field(description="True when a language model produced this text")
+    replayed: bool = Field(description="True when it is a recorded answer, not a live call")
 
 
 @router.post("/wishes/parse")
@@ -408,7 +420,19 @@ def parse_wishes(c: CtxDep, _: Physician, body: ParseRequest) -> ParsedOut:
     """M4: interpret free text ("Wir haben verstanden: …"). The text is not stored."""
     w = _open_window(c)
     p = c.engines.intake.parse(body.text, w.roster_month, body.language)
-    return ParsedOut(**p.__dict__, engine=label(c.engines.intake.info))
+    return ParsedOut(
+        unavailable=p.unavailable,
+        avoid_shift_days=[
+            ShiftOnDayOut(date=x.date, shift_type=x.shift_type) for x in p.avoid_shift_days
+        ],
+        prefer_shifts=p.prefer_shifts,
+        avoid_shifts=p.avoid_shifts,
+        avoid_weekends=p.avoid_weekends,
+        clarifying_question=p.clarifying_question,
+        engine=label(p.engine_info or c.engines.intake.info),
+        ai_generated=p.ai_generated,
+        replayed=p.replayed,
+    )
 
 
 # --- M5 Urlaub / Leave ------------------------------------------------------------------------
