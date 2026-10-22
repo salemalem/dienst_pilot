@@ -35,9 +35,13 @@ def report() -> None:
         v[2] += e.output_tokens
         v[3] += e.cache_read_tokens
         v[4] += e.cost_usd
-    print(f"{'component':9} {'purpose':8} {'mode':6} {'calls':>6} {'prompt tok':>11} {'out tok':>8} {'cached':>9} {'USD':>9}")
+    print(
+        f"{'component':9} {'purpose':8} {'mode':6} {'calls':>6} {'prompt tok':>11} {'out tok':>8} {'cached':>9} {'USD':>9}"
+    )
     for (comp, purpose, mode), v in sorted(by.items()):
-        print(f"{comp:9} {purpose:8} {mode:6} {int(v[0]):6d} {int(v[1]):11d} {int(v[2]):8d} {int(v[3]):9d} {v[4]:9.4f}")
+        print(
+            f"{comp:9} {purpose:8} {mode:6} {int(v[0]):6d} {int(v[1]):11d} {int(v[2]):8d} {int(v[3]):9d} {v[4]:9.4f}"
+        )
     total = Ledger().total_usd()
     print(f"\nTotal spent: ${total:.4f} of ${LIMIT_USD:.2f}  (left: ${LIMIT_USD - total:.4f})")
 
@@ -69,11 +73,17 @@ def estimate_c7() -> dict[str, dict[str, float]]:
             )
             total += cost_usd(usage, MODEL, batch=batch, ttl="1h" if batch else "5m")
         worst = sum(worst_case_usd(r, batch=batch) for r in rs)
-        return {"calls": len(rs), "expected_usd": round(total, 4), "worst_case_usd": round(worst, 4)}
+        return {
+            "calls": len(rs),
+            "expected_usd": round(total, 4),
+            "worst_case_usd": round(worst, 4),
+        }
 
     return {
         "dev (60, batch)": run(reqs["dev"], batch=True, cached_after_first=True),
-        "latency (30 live, sequential)": run(reqs["dev"][:30], batch=False, cached_after_first=True),
+        "latency (30 live, sequential)": run(
+            reqs["dev"][:30], batch=False, cached_after_first=True
+        ),
         "test (140, batch, once)": run(reqs["test"], batch=True, cached_after_first=True),
     }
 
@@ -86,7 +96,9 @@ def main() -> None:
     elif cmd == "estimate" and sys.argv[2:3] == ["c7"]:
         est = estimate_c7()
         for name, v in est.items():
-            print(f"{name:32} {int(v['calls']):4d} calls  expected ${v['expected_usd']:.4f}  worst case ${v['worst_case_usd']:.4f}")
+            print(
+                f"{name:32} {int(v['calls']):4d} calls  expected ${v['expected_usd']:.4f}  worst case ${v['worst_case_usd']:.4f}"
+            )
         print(
             f"{'all three':32} expected ${sum(v['expected_usd'] for v in est.values()):.4f}  "
             f"worst case ${sum(v['worst_case_usd'] for v in est.values()):.4f}  "

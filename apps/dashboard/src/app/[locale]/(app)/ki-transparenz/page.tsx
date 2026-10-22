@@ -420,6 +420,92 @@ function C6Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
   );
 }
 
+type C7Side = {
+  exact_match: number;
+  soft_to_hard: number;
+  injections_followed: number;
+  injections: number;
+  question_on_ambiguous: number;
+  question_on_others: number;
+};
+
+function C7Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
+  const t = useTranslations("w13");
+  const test = m.test as { llm?: C7Side; standin?: C7Side } | undefined;
+  const checks = m.checks as Record<string, boolean> | undefined;
+  const promoted = m.promoted === true;
+  const cost = m.cost as { phase_total_usd?: number; limit_usd?: number } | undefined;
+  const rows: { key: string; label: string; f: (s: C7Side) => string }[] = [
+    { key: "em", label: t("m.c7Exact"), f: (s) => fmt.percent(s.exact_match) },
+    { key: "s2h", label: t("m.c7SoftHard"), f: (s) => fmt.number(s.soft_to_hard, 0) },
+    {
+      key: "inj",
+      label: t("m.c7Injection"),
+      f: (s) => `${String(s.injections_followed)} / ${String(s.injections)}`,
+    },
+    {
+      key: "q",
+      label: t("m.c7Question"),
+      f: (s) => `${fmt.percent(s.question_on_ambiguous)} / ${fmt.percent(s.question_on_others)}`,
+    },
+  ];
+  return (
+    <div className="flex flex-col gap-2" data-testid="c7-metrics">
+      <p className="caption m-0 text-ink-muted">
+        {t("evalSource", { source: "eval/results/c7.json", months: "" })}
+      </p>
+      <p className="body-strong m-0" data-testid="c7-served">
+        {promoted ? t("m.c7ServedLlm", { model: String(m.model ?? "") }) : t("m.c7ServedStandIn")}
+      </p>
+      {test?.llm && test.standin ? (
+        <Table label={t("m.label")}>
+          <thead>
+            <tr>
+              <th scope="col">{t("m.metric")}</th>
+              <th scope="col" className="text-right">
+                {t("m.c7Llm")}
+              </th>
+              <th scope="col" className="text-right">
+                {t("m.c7StandIn")}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.key}>
+                <td>{r.label}</td>
+                <td className="num-time text-right">{r.f(test.llm as C7Side)}</td>
+                <td className="num-time text-right text-ink-muted">
+                  {r.f(test.standin as C7Side)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      ) : null}
+      {checks ? (
+        <p className="caption m-0 text-ink-muted" data-testid="c7-promotion">
+          {t(promoted ? "m.c7Promoted" : "m.c7NotPromoted", {
+            failed: Object.entries(checks)
+              .filter(([, ok]) => !ok)
+              .map(([k]) => k.split("_")[0])
+              .join(", "),
+          })}
+        </p>
+      ) : null}
+      {cost?.phase_total_usd !== undefined ? (
+        <p className="caption m-0 text-ink-muted">
+          {t("m.c7Cost", {
+            spent: fmt.number(cost.phase_total_usd, 3),
+            limit: fmt.number(cost.limit_usd ?? 0, 2),
+          })}
+        </p>
+      ) : null}
+      <p className="caption m-0 text-ink-muted">{t("m.c7Note")}</p>
+    </div>
+  );
+}
+
 type RagMode = { "recall@5": number; mrr: number };
 
 function RagMetrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
@@ -528,9 +614,11 @@ function Card({ c }: { c: Component }): ReactNode {
                   ? t("trainedC6")
                   : c.component === "RAG"
                     ? t("trainedRAG")
-                    : c.kind === "ml"
-                      ? t("notTrained")
-                      : t("notApplicable")}
+                    : c.component === "C7"
+                      ? t("trainedC7")
+                      : c.kind === "ml"
+                        ? t("notTrained")
+                        : t("notApplicable")}
         </dd>
         <dt className="text-ink-muted">{t("modelCard")}</dt>
         <dd className="m-0">
@@ -544,7 +632,9 @@ function Card({ c }: { c: Component }): ReactNode {
                   ? t("modelCardC6")
                   : c.component === "RAG"
                     ? t("modelCardRAG")
-                    : t("modelCardNone")}
+                    : c.component === "C7"
+                      ? t("modelCardC7")
+                      : t("modelCardNone")}
         </dd>
         <dt className="text-ink-muted">{t("canChange")}</dt>
         <dd className="body-strong m-0" data-testid="can-change">
@@ -563,6 +653,8 @@ function Card({ c }: { c: Component }): ReactNode {
         <C5Metrics m={metrics} fmt={fmt} />
       ) : metrics && c.component === "C6" ? (
         <C6Metrics m={metrics} fmt={fmt} />
+      ) : metrics && c.component === "C7" ? (
+        <C7Metrics m={metrics} fmt={fmt} />
       ) : metrics && c.component === "RAG" ? (
         <RagMetrics m={metrics} fmt={fmt} />
       ) : (

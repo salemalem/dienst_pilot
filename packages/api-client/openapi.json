@@ -6646,7 +6646,16 @@
               "format": "date"
             },
             "type": "array",
-            "title": "Unavailable"
+            "title": "Unavailable",
+            "description": "Hard: the person said they cannot work"
+          },
+          "avoid_shift_days": {
+            "items": {
+              "$ref": "#/components/schemas/ShiftOnDayOut"
+            },
+            "type": "array",
+            "title": "Avoid Shift Days",
+            "description": "Soft: rather not this shift that day"
           },
           "prefer_shifts": {
             "items": {
@@ -6679,16 +6688,29 @@
           },
           "engine": {
             "$ref": "#/components/schemas/EngineLabel"
+          },
+          "ai_generated": {
+            "type": "boolean",
+            "title": "Ai Generated",
+            "description": "True when a language model produced this text"
+          },
+          "replayed": {
+            "type": "boolean",
+            "title": "Replayed",
+            "description": "True when it is a recorded answer, not a live call"
           }
         },
         "type": "object",
         "required": [
           "unavailable",
+          "avoid_shift_days",
           "prefer_shifts",
           "avoid_shifts",
           "avoid_weekends",
           "clarifying_question",
-          "engine"
+          "engine",
+          "ai_generated",
+          "replayed"
         ],
         "title": "ParsedOut",
         "description": "C7: what was understood. Nothing is saved until the person confirms."
@@ -8194,6 +8216,26 @@
         ],
         "title": "SettingsOut",
         "description": "M12: personal settings."
+      },
+      "ShiftOnDayOut": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "shift_type"
+        ],
+        "title": "ShiftOnDayOut",
+        "description": "A soft \"rather not this shift on this day\" (the avoid_shift entry)."
       },
       "ShiftOut": {
         "properties": {

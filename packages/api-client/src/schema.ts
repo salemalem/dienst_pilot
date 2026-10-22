@@ -2474,8 +2474,16 @@ export interface components {
          * @description C7: what was understood. Nothing is saved until the person confirms.
          */
         ParsedOut: {
-            /** Unavailable */
+            /**
+             * Unavailable
+             * @description Hard: the person said they cannot work
+             */
             unavailable: string[];
+            /**
+             * Avoid Shift Days
+             * @description Soft: rather not this shift that day
+             */
+            avoid_shift_days: components["schemas"]["ShiftOnDayOut"][];
             /** Prefer Shifts */
             prefer_shifts: string[];
             /** Avoid Shifts */
@@ -2485,6 +2493,16 @@ export interface components {
             /** Clarifying Question */
             clarifying_question: string | null;
             engine: components["schemas"]["EngineLabel"];
+            /**
+             * Ai Generated
+             * @description True when a language model produced this text
+             */
+            ai_generated: boolean;
+            /**
+             * Replayed
+             * @description True when it is a recorded answer, not a live call
+             */
+            replayed: boolean;
         };
         /**
          * Passage
@@ -3146,6 +3164,19 @@ export interface components {
             calendar_sync: boolean;
             /** Preference Suggestions */
             preference_suggestions: boolean;
+        };
+        /**
+         * ShiftOnDayOut
+         * @description A soft "rather not this shift on this day" (the avoid_shift entry).
+         */
+        ShiftOnDayOut: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
         };
         /**
          * ShiftOut

@@ -152,7 +152,7 @@ Implement the bounded contexts with transactional outbox and Redis Streams, idem
 ```
 Read CLAUDE.md and docs/ARCHITECTURE.md §9 (C7, C8), §10 and §11. Plan first.
 
-Build the five MCP servers (Streamable HTTP, role-scoped tokens, tool annotations, output schemas). Build the RAG pipeline with paragraph-aware chunking, local bge-m3 embeddings and hybrid retrieval over the rule corpus. Build C7 with schema-validated structured output and C8 as a LangGraph agent using only MCP tools, with the numeric grounding check and no publish tool. Write the eval suites (200 intake utterances, 50 planner tasks, refusal and prompt-injection tests) and wire them into CI for prompt changes. Add eval/cost_model.py from the Postgres usage log (tokens per call; Langfuse is not used, ADR-018). Update W9, W13 and the status table.
+Build the five MCP servers (Streamable HTTP, role-scoped tokens, tool annotations, output schemas). Build the RAG pipeline with paragraph-aware chunking, local bge-m3 embeddings and hybrid retrieval over the rule corpus. Build C7 with schema-validated structured output and C8 as a LangGraph agent using only MCP tools, with the numeric grounding check and no publish tool. Write the eval suites (200 intake utterances, 50 planner tasks, refusal and prompt-injection tests) and wire them into CI for prompt changes. Add eval/cost_model.py from the usage ledger file (tokens and cost per call; Langfuse is not used, ADR-018, ADR-020). Update W9, W13 and the status table.
 ```
 
 **Phase 11: case study**

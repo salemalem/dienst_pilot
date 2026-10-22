@@ -979,7 +979,19 @@
       "ragMrr": "Mittlerer Rang (MRR)",
       "ragCheckFailed": "Die vorab festgelegte Prüfung „Hybrid mindestens so gut wie das beste Einzelverfahren“ ist durchgefallen. Eingesetzt wird deshalb das bessere Einzelverfahren; Hybrid bleibt per Einstellung (RAG_RETRIEVAL) für die nächste Runde verfügbar. Die Auswahl wurde nach Kenntnis der Ergebnisse getroffen.",
       "ragNoSource": "Fragen ohne Quelle: {found} von {n} korrekt als „keine Quelle gefunden“ erkannt.",
-      "ragCaveat": "60 Fragen, vom Autor des Textbestands geschrieben, davon 41 zum Test; sie sind leichter als Fragen Fremder. Ohne die Modelldateien fällt die Suche auf Volltext zurück und sagt das."
+      "ragCaveat": "60 Fragen, vom Autor des Textbestands geschrieben, davon 41 zum Test; sie sind leichter als Fragen Fremder. Ohne die Modelldateien fällt die Suche auf Volltext zurück und sagt das.",
+      "c7Exact": "Gesamter Wunschsatz richtig",
+      "c7SoftHard": "Lieber-nicht als harte Sperre eingetragen (harter Fehler)",
+      "c7Injection": "Eingeschleuste Anweisung befolgt",
+      "c7Question": "Rückfrage bei unklaren / bei klaren Texten",
+      "c7Llm": "Sprachmodell",
+      "c7StandIn": "Stichwort-Platzhalter",
+      "c7ServedLlm": "Eingesetzt: Sprachmodell ({model}). Es hat die vorab festgelegte Regel erfüllt; die Person bestätigt jedes Ergebnis.",
+      "c7ServedStandIn": "Eingesetzt: der Stichwort-Platzhalter. Das Sprachmodell wurde nach der vorab festgelegten Regel bewertet und hat sie nicht erfüllt.",
+      "c7Promoted": "Alle sieben Prüfungen der vorab festgelegten Regel bestanden.",
+      "c7NotPromoted": "Nicht bestandene Prüfungen der vorab festgelegten Regel: {failed}. Das Modell wurde nicht gewechselt und der Text der Anweisung nicht nachträglich geändert.",
+      "c7Cost": "Kosten aller bezahlten Aufrufe der Phase bisher: {spent} von {limit} US-Dollar.",
+      "c7Note": "140 synthetische Testsätze (Deutsch und Englisch), einmal bewertet, nachdem die Anweisung eingefroren war; die Sätze sind erzeugt, nicht von Beschäftigten geschrieben."
     },
     "group": {
       "rules": {
@@ -1015,7 +1027,9 @@
     "modelCardRAG": "docs/model-cards/rag-rulebook.md",
     "statusExtra": "Zusätzlich, ohne Nummer: {extras}",
     "built": "gebaut",
-    "standIn": "Platzhalter"
+    "standIn": "Platzhalter",
+    "trainedC7": "Nicht trainiert: ein vortrainiertes Sprachmodell mit festem Prompt",
+    "modelCardC7": "docs/model-cards/c7-request-intake.md"
   },
   "qualification": {
     "any": "ohne besondere Qualifikation",
@@ -1106,13 +1120,15 @@
     "understand": "Verstehen lassen",
     "understood": "Wir haben verstanden:",
     "parseWhy": "Ihr Text wird nur nach bekannten Wörtern und Daten gelesen; nichts darin wird als Anweisung ausgeführt.",
-    "parseApply": "Tage übernehmen",
+    "parseApply": "Übernehmen",
     "parsedDays": "Sie können nicht an: {days}",
     "parsedPrefer": "Lieber: {shifts}",
     "parsedAvoid": "Lieber nicht: {shifts}",
     "parsedWeekends": "Möglichst keine Wochenenden",
     "save": "Wünsche speichern",
-    "saved": "Gespeichert. Wünsche sind keine Zusage."
+    "saved": "Gespeichert. Wünsche sind keine Zusage.",
+    "parseWhyAi": "Ihr Text wurde von einem Sprachmodell gelesen. Nichts darin wird als Anweisung ausgeführt, Gründe werden weder erfragt noch gespeichert, und es wird erst etwas übernommen, wenn Sie es bestätigen.",
+    "parsedSoft": "Lieber nicht: {items}"
   },
   "m7": {
     "title": "Krank melden",
@@ -1220,5 +1236,9 @@
     "fairness": "Fairness-Bilanz",
     "hours": "Stunden",
     "settings": "Einstellungen"
+  },
+  "ai": {
+    "generated": "KI-generiert",
+    "recorded": "Aufzeichnung einer echten Antwort"
   }
 }

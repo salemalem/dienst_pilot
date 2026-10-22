@@ -3,7 +3,7 @@ COMPOSE := docker compose $(if $(wildcard .env),--env-file .env) -f infra/compos
 SEED ?= 20261020
 SEED_DIR := data/synthetic/v1
 
-.PHONY: install dev down logs seed test e2e screenshots lint format api-client eval tune train labels rag-embed rag-check rag-index
+.PHONY: llm-cost install dev down logs seed test e2e screenshots lint format api-client eval tune train labels rag-embed rag-check rag-index
 
 install: ## Install Python and Node dependencies
 	uv sync
@@ -87,7 +87,12 @@ eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.
 	-C6_WRITE_LATENCY=1 uv run pytest backend/tests/api/test_leave_hint.py -k endpoint_latency -q
 	uv run python eval/run_c6_eval.py --data $(SEED_DIR)
 	TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+psycopg://dienstpilot:dienstpilot@localhost:5433/dienstpilot_test} uv run python eval/run_rag_eval.py
+	test ! -f eval/results/c7.json || uv run python eval/run_c7_eval.py report
 	uv run python eval/render_tables.py
+
+llm-cost: ## Spending of the paid LLM calls so far (the ledger) and the estimate of the C7 runs
+	uv run python eval/cost_model.py report
+	uv run python eval/cost_model.py estimate c7
 
 rag-embed: ## Re-embed the rulebook corpus and the RAG eval questions with the local bge-m3 (needs the ONNX model; rewrites agents/rag/embeddings/)
 	uv run python -m dienstpilot_agents.rag.index embed

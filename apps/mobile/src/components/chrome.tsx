@@ -59,6 +59,37 @@ export interface EngineLabel {
 }
 
 /**
+ * Marks text a language model wrote ("KI-generiert"), and says when it is a recording of a real
+ * answer (screenshots, tests) rather than a live one. Every AI-generated text carries it.
+ */
+export function AiLabel({ replayed = false }: { replayed?: boolean }): ReactNode {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  return (
+    <View
+      testID="ai-label"
+      accessible
+      accessibilityLabel={
+        replayed ? `${t("ai.generated")}, ${t("ai.recorded")}` : t("ai.generated")
+      }
+      style={{
+        alignSelf: "flex-start",
+        borderWidth: 1,
+        borderColor: theme.ruleStrong,
+        borderRadius: radius.mark,
+        paddingHorizontal: spacing[2],
+        paddingVertical: 2,
+      }}
+    >
+      <Txt variant="caption" color={theme.inkMuted}>
+        {t("ai.generated")}
+        {replayed ? ` · ${t("ai.recorded")}` : ""}
+      </Txt>
+    </View>
+  );
+}
+
+/**
  * Tells whether an answer came from a built component or a stand-in, as the API reports it:
  * the same label as the dashboard ("C6 · Platzhalter · standin-0.1"), driven by `engine`.
  */

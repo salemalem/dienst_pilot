@@ -238,7 +238,7 @@ A pure function `validate(roster, ruleset) → list[Violation]`, implemented ind
 
 **Job.** Turn free text or dictation in German or English ("lieber Nächte als Wochenenden, und am 14.12. kann ich nicht") into a typed `PreferenceSet`.
 
-**Method.** Haiku-tier Claude model with schema-constrained structured output, validated with Pydantic. Ambiguities come back as one clarifying question. The person sees the parsed result and confirms before anything is saved.
+**Method.** `claude-haiku-5-5` with a forced tool call whose input schema is the `PreferenceSet` (structured output), validated with Pydantic and deterministic filters. A dated "rather not this shift" is a soft `avoid_shift_days` entry, never a hard `unavailable` day (a soft turned into a hard block counts as a hard error in the promotion rule). It is served only if the pre-registered rule (`agents/intake/PROMOTION_RULE.md`) says so; otherwise the keyword stand-in stays and says so. Ambiguities come back as one clarifying question. The person sees the parsed result and confirms before anything is saved.
 
 **Guardrails.** Reasons are not stored (data minimization). A deterministic filter and the prompt both ensure no health information is extracted or kept. Input is delimited and treated as data, never as instructions.
 
@@ -248,7 +248,7 @@ A pure function `validate(roster, ruleset) → list[Violation]`, implemented ind
 
 **Job.** A side panel in the planner dashboard that explains variants, answers questions ("Why does Dr. Weber have three weekends?"), runs what-ifs, cites rules, and drafts change reasons and announcements.
 
-**Method.** LangGraph agent on a Sonnet-tier Claude model. All data access goes through MCP tools (§10); there is no raw SQL. Rule questions go through RAG (§11). Variant summaries are generated from C1's metrics object.
+**Method.** LangGraph agent on `claude-haiku-5-5` (Haiku for both agents: the phase has a hard budget of 5 euros; if C8 fails its pre-registered gates the stand-in stays, and the model is not changed afterwards). All data access goes through MCP tools (§10); there is no raw SQL. Rule questions go through RAG (§11). Variant summaries are generated from C1's metrics object.
 
 **Guardrails.**
 - No approve or publish tool exists. The agent can create `Proposal` records that appear in the planner's inbox.
@@ -353,7 +353,7 @@ The agent service is an MCP client. The same servers can be connected to other M
 - **Stack:** Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2, Alembic; Next.js and Expo in TypeScript; OpenAPI-generated client shared by both apps.
 - **Testing:** unit tests; property-based tests for C1/C2; contract tests for event schemas; Playwright end-to-end tests for the leave, swap and sick-call flows; agent eval suites in CI on prompt changes.
 - **CI/CD:** GitHub Actions running lint, type checks, import-linter, tests and evals; container images built and deployed to the VPS via Docker Compose; migrations run as a release step.
-- **Observability:** OpenTelemetry traces across API, workers and agents; Prometheus metrics; Grafana dashboards; Loki logs. LLM calls are logged to a Postgres usage table (tokens, latency, model, prompt version, outcome; never prompt text) that `eval/cost_model.py` reads, with OpenTelemetry spans (ADR-018).
+- **Observability:** OpenTelemetry traces across API, workers and agents; Prometheus metrics; Grafana dashboards; Loki logs. LLM calls are logged to an append-only ledger file (tokens, cost, run id; never prompt text) that the budget guard and `eval/cost_model.py` read, with OpenTelemetry spans (ADR-018, ADR-020).
 - **Architecture decision records** in `docs/adr/`:
   - ADR-001 Constraint optimization, not ML, for roster assignment
   - ADR-002 Modular monolith with enforced boundaries before microservices
@@ -366,6 +366,7 @@ The agent service is an MCP client. The same servers can be connected to other M
   - ADR-017 Durable workflows and timers due in demo time
   - ADR-018 MCP servers as REST wrappers, the usage log instead of Langfuse, and the key in .env
   - ADR-019 The rulebook: corpus, chunking, local embeddings, hybrid retrieval and how CI runs without the model
+  - ADR-020 A hard budget for paid calls, three LLM modes, and when C7 serves the model
 
 ## 15. Security and compliance
 

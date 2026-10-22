@@ -6,10 +6,10 @@
   "note": "Copied from the pricing page on the retrieval date, not typed from memory. Prompts over 100,000 tokens cost more on Haiku 5.5 ($0.50 input, $2.50 output); this project keeps every prompt below that. Batch: 50 % on input and output, cache multipliers stack. Minimum cacheable prompt: 512 tokens. Forced tool use adds 406 system tokens per request. No extended thinking is used anywhere.",
   "models": {
     "claude-haiku-5-5": {
-      "input": 0.10,
-      "output": 0.50,
+      "input": 0.1,
+      "output": 0.5,
       "cache_write_5m": 0.125,
-      "cache_write_1h": 0.20,
+      "cache_write_1h": 0.2,
       "cache_read": 0.01,
       "batch_input": 0.05,
       "batch_output": 0.25,

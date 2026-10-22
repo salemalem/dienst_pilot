@@ -6,6 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
+import { AiLabel } from "../components/chrome";
 import { MonthCalendar } from "../components/MonthCalendar";
 import { Suggestion } from "../components/Suggestion";
 import { Async, Button, Card, ErrorBox, Field, Txt } from "../components/ui";
@@ -77,10 +78,19 @@ export function WishesScreen(): ReactNode {
     setSaved(false);
     setEntries((prev) => {
       const list = prev ?? [];
-      const add = parsed.unavailable
+      const hard = parsed.unavailable
         .filter((d) => !list.some((e) => e.date === d))
         .map((d): Entry => ({ date: d, kind: "unavailable", shift_type: null, important: false }));
-      return [...list, ...add];
+      // A soft "rather not this shift that day" stays soft: an avoid_shift entry, never a block.
+      const soft = parsed.avoid_shift_days
+        .filter((x) => !list.some((e) => e.date === x.date) && !hard.some((e) => e.date === x.date))
+        .map((x): Entry => ({
+          date: x.date,
+          kind: "avoid_shift",
+          shift_type: SHIFT_KEYS.find((k) => k === x.shift_type) ?? null,
+          important: false,
+        }));
+      return [...list, ...hard, ...soft];
     });
     setParsed(null);
     setText("");
@@ -309,9 +319,9 @@ export function WishesScreen(): ReactNode {
                 <Suggestion
                   engine={parsed.engine}
                   testID="parsed"
-                  reasons={[t("m4.parseWhy")]}
+                  reasons={[parsed.ai_generated ? t("m4.parseWhyAi") : t("m4.parseWhy")]}
                   actions={
-                    parsed.unavailable.length > 0 ? (
+                    parsed.unavailable.length > 0 || parsed.avoid_shift_days.length > 0 ? (
                       <Button
                         label={t("m4.parseApply")}
                         kind="primary"
@@ -322,10 +332,23 @@ export function WishesScreen(): ReactNode {
                   }
                 >
                   <Txt variant="bodyStrong">{t("m4.understood")}</Txt>
+                  {parsed.ai_generated ? <AiLabel replayed={parsed.replayed} /> : null}
                   {parsed.unavailable.length > 0 ? (
                     <Txt>
                       {t("m4.parsedDays", {
                         days: parsed.unavailable.map((d) => fmt.dayMonth(d)).join(", "),
+                      })}
+                    </Txt>
+                  ) : null}
+                  {parsed.avoid_shift_days.length > 0 ? (
+                    <Txt testID="parsed-soft">
+                      {t("m4.parsedSoft", {
+                        items: parsed.avoid_shift_days
+                          .map(
+                            (x) =>
+                              `${t(`shift.${x.shift_type as "frueh"}.name`)} ${fmt.dayMonth(x.date)}`,
+                          )
+                          .join(", "),
                       })}
                     </Txt>
                   ) : null}
