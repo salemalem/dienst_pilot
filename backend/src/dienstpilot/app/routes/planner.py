@@ -244,7 +244,10 @@ def _grid(
             ):
                 probe = Shift("", d, shift_type, None, "", "open")
                 people = valid_takers(c, dep, probe, exclude=set(), inputs=inputs)
-                top = [dep.staff[x.staff_id].display_name for x in ranked(c, dep, people, d)[:3]]
+                top = [
+                    dep.staff[x.staff_id].display_name
+                    for x in ranked(c, dep, people, d, shift_type)[:3]
+                ]
                 gaps.append(
                     GapSuggestion(
                         date=d,
@@ -1435,7 +1438,7 @@ def escalation(c: CtxDep, _: PlannerDep, cascade_id: str) -> EscalationOut:
         holidays = set(organization.holidays(c.session, m, month_end(m)))
         leave = approved_leave_days(c.session, [p.id for p in people], m, month_end(m))
         types = organization.shift_types(c.session)
-        for cand in ranked(c, dep, people, a.day)[:5]:
+        for cand in ranked(c, dep, people, a.day, a.shift_type)[:5]:
             h = hours_for(
                 dep.staff[cand.staff_id],
                 m,

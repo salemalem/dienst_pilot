@@ -221,6 +221,121 @@ function C4Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
   );
 }
 
+type C5Test = { brier: number; auc: number; ece: number };
+type C5Policy = {
+  time_to_fill_mean_min: { mean: number };
+  cover_burden_gini: { mean: number };
+  escalation_rate: { mean: number };
+  contacted_per_filled_gap: { mean: number };
+};
+
+function C5Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
+  const t = useTranslations("w13");
+  const test = m.test_2025 as Record<string, C5Test> | undefined;
+  const champion = (m.champion as { kind?: string; promoted_learner?: boolean } | undefined) ?? {};
+  const kinds = ["base_rate", "logistic", "lightgbm"] as const;
+  const kind = champion.kind as (typeof kinds)[number] | undefined;
+  const replay = m.replay_2025 as
+    { policies?: Record<string, C5Policy>; replicates?: number } | undefined;
+  const policies = [
+    "fairness_first_champion",
+    "stand_in",
+    "most_reliable_first",
+    "fairness_first_exact_buckets_sensitivity",
+  ] as const;
+  return (
+    <div className="flex flex-col gap-2" data-testid="c5-metrics">
+      <p className="caption m-0 text-ink-muted">
+        {t("evalSource", { source: "eval/results/c5.json", months: "" })}
+      </p>
+      {kind ? (
+        <p className="body-strong m-0" data-testid="c5-served">
+          {t("m.c5Served", { model: t(`m.c5Models.${kind}`) })}
+        </p>
+      ) : null}
+      <Table label={t("m.label")}>
+        <thead>
+          <tr>
+            <th scope="col">{t("m.c5Model")}</th>
+            <th scope="col" className="text-right">
+              {t("m.c5Brier")}
+            </th>
+            <th scope="col" className="text-right">
+              {t("m.c5Auc")}
+            </th>
+            <th scope="col" className="text-right">
+              {t("m.c5Ece")}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {kinds.map((k) =>
+            test?.[k] ? (
+              <tr key={k} data-served={k === kind}>
+                <td className={k === kind ? "body-strong" : undefined}>{t(`m.c5Models.${k}`)}</td>
+                <td className="num-time text-right">{fmt.number(test[k].brier, 4)}</td>
+                <td className="num-time text-right">{fmt.number(test[k].auc, 3)}</td>
+                <td className="num-time text-right">{fmt.number(test[k].ece, 3)}</td>
+              </tr>
+            ) : null,
+          )}
+        </tbody>
+      </Table>
+      <p className="caption m-0 text-ink-muted" data-testid="c5-promotion">
+        {champion.promoted_learner ? t("m.c5Promoted") : t("m.c5NotPromoted")}
+      </p>
+      {replay?.policies ? (
+        <>
+          <p className="body-strong m-0">
+            {t("m.c5ReplayTitle", { n: String(replay.replicates ?? "") })}
+          </p>
+          <Table label={t("m.c5ReplayTitle", { n: String(replay.replicates ?? "") })}>
+            <thead>
+              <tr>
+                <th scope="col">{t("m.c5Policy")}</th>
+                <th scope="col" className="text-right">
+                  {t("m.c5Time")}
+                </th>
+                <th scope="col" className="text-right">
+                  {t("m.c5Gini")}
+                </th>
+                <th scope="col" className="text-right">
+                  {t("m.c5Escalation")}
+                </th>
+                <th scope="col" className="text-right">
+                  {t("m.c5Contacted")}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {policies.map((k) =>
+                replay.policies?.[k] ? (
+                  <tr key={k} data-testid={`c5-policy-${k}`}>
+                    <td>{t(`m.c5Policies.${k}`)}</td>
+                    <td className="num-time text-right">
+                      {fmt.number(replay.policies[k].time_to_fill_mean_min.mean, 1)}
+                    </td>
+                    <td className="num-time text-right">
+                      {fmt.number(replay.policies[k].cover_burden_gini.mean, 2)}
+                    </td>
+                    <td className="num-time text-right">
+                      {fmt.percent(replay.policies[k].escalation_rate.mean)}
+                    </td>
+                    <td className="num-time text-right">
+                      {fmt.number(replay.policies[k].contacted_per_filled_gap.mean, 2)}
+                    </td>
+                  </tr>
+                ) : null,
+              )}
+            </tbody>
+          </Table>
+          <p className="caption m-0 text-ink-muted">{t("m.c5ReplayNote")}</p>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
 function Card({ c }: { c: Component }): ReactNode {
   const t = useTranslations("w13");
   const fmt = useFmt();
@@ -259,9 +374,11 @@ function Card({ c }: { c: Component }): ReactNode {
             ? t("trainedC3")
             : c.component === "C4"
               ? t("trainedC4")
-              : c.kind === "ml"
-                ? t("notTrained")
-                : t("notApplicable")}
+              : c.component === "C5"
+                ? t("trainedC5")
+                : c.kind === "ml"
+                  ? t("notTrained")
+                  : t("notApplicable")}
         </dd>
         <dt className="text-ink-muted">{t("modelCard")}</dt>
         <dd className="m-0">
@@ -269,7 +386,9 @@ function Card({ c }: { c: Component }): ReactNode {
             ? t("modelCardC3")
             : c.component === "C4"
               ? t("modelCardC4")
-              : t("modelCardNone")}
+              : c.component === "C5"
+                ? t("modelCardC5")
+                : t("modelCardNone")}
         </dd>
         <dt className="text-ink-muted">{t("canChange")}</dt>
         <dd className="body-strong m-0" data-testid="can-change">
@@ -284,6 +403,8 @@ function Card({ c }: { c: Component }): ReactNode {
         <C3Metrics m={metrics} fmt={fmt} />
       ) : metrics && c.component === "C4" ? (
         <C4Metrics m={metrics} fmt={fmt} />
+      ) : metrics && c.component === "C5" ? (
+        <C5Metrics m={metrics} fmt={fmt} />
       ) : (
         <p
           className="body m-0 rounded-mark border border-dashed border-pencil bg-pencil-wash p-3 text-pencil"

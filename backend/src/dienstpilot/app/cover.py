@@ -8,7 +8,7 @@ day after Bereitschaftsdienst, the hours band and the qualification mix. Every l
 """
 
 from collections.abc import Iterable
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from dienstpilot.app.common import Department
 from dienstpilot.app.deps import Ctx
@@ -17,7 +17,6 @@ from dienstpilot.app.roster import (
     Shift,
     approved_leave_days,
     effective,
-    hours_for,
     month_end,
     month_start,
     span,
@@ -25,7 +24,17 @@ from dienstpilot.app.roster import (
 from dienstpilot.operations import service as operations
 from dienstpilot.organization import service as organization
 from dienstpilot.organization.service import StaffMember
+from dienstpilot.requests import service as requests
 from dienstpilot.shared.ports import CoverCandidate
+from dienstpilot.shared.settings import TZ
+from dienstpilot_ml.features.cover import (
+    confirmed_pref,
+    credited_hours,
+    days_since,
+    month_contract_hours,
+    notice_hours,
+    request_hour,
+)
 from dienstpilot_validator import Assignment, Violation
 
 ROLE_SHIFTS = {
@@ -183,26 +192,50 @@ def swap_escalation(introduced: list[Violation], offerer: str) -> str | None:
     return operations.RULE_VIOLATION
 
 
-def ranked(ctx: Ctx, dep: Department, people: list[StaffMember], day: date) -> list[CoverCandidate]:
-    """Order candidates with the C5 stand-in (cover burden, then hours against contract)."""
-    since = ctx.clock.now() - timedelta(days=90)
-    covers: dict[str, int] = {}
-    for c in operations.cascades(ctx.session, statuses=["closed"], since=since):
-        if c.covered_by:
-            covers[c.covered_by] = covers.get(c.covered_by, 0) + 1
+def ranked(
+    ctx: Ctx, dep: Department, people: list[StaffMember], day: date, shift_type: str
+) -> list[CoverCandidate]:
+    """Order candidates with C5 (burden buckets, then P(accept) inside a bucket).
+
+    The features are the shared definitions of ``dienstpilot_ml.features.cover``, computed as of
+    the demo clock. Nothing but the order leaves this function: P(accept) stays inside C5.
+    """
+    now = ctx.clock.now()
+    local = now.astimezone(TZ)
     month = month_start(day)
-    shifts = effective(ctx.session, month, month_end(month))
-    ids = [p.id for p in people]
-    leave = approved_leave_days(ctx.session, ids, month, month_end(month))
-    holidays = set(organization.holidays(ctx.session, month, month_end(month)))
-    rules = organization.rules_for(ctx.session, month).rules
-    types = organization.shift_types(ctx.session)
+    covers: dict[str, list[datetime]] = {}
+    for cas in operations.cascades(
+        ctx.session, statuses=["closed"], since=now - timedelta(days=365)
+    ):
+        if cas.covered_by and cas.closed_at:
+            covers.setdefault(cas.covered_by, []).append(cas.closed_at)
+    held = effective(ctx.session, month, month_end(month))
+    week = effective(ctx.session, day - timedelta(days=7), day - timedelta(days=1))
+    start = span(organization.shift_types(ctx.session)[shift_type], day)[0]
+    since90 = now - timedelta(days=90)
     cands = []
     for p in people:
-        h = hours_for(
-            p, month, shifts, leave.get(p.id, set()), holidays, rules, types, ctx.clock.now()
+        entries = requests.wishes_of(ctx.session, p.id)
+        wishes = [(e.day, e.shift_type) for e in entries if e.kind == "wish_work"]
+        avoids = [(e.day, e.shift_type) for e in entries if e.kind == "avoid_shift"]
+        contract = p.contract_on(day)
+        target = month_contract_hours(contract.weekly_hours if contract else 40.0, month)
+        hours = sum(credited_hours(s.shift_type) for s in held if s.holder == p.id)
+        mine = covers.get(p.id, [])
+        cands.append(
+            CoverCandidate(
+                p.id,
+                sum(1 for t in mine if t >= since90),
+                round(hours / target, 3) if target else 0.0,
+                days_since(max(mine) if mine else None, now),
+                float(sum(1 for s in week if s.holder == p.id and s.shift_type in WORKING)),
+                notice_hours(now, start),
+                shift_type,
+                day.weekday(),
+                request_hour(local),
+                confirmed_pref(wishes, avoids, local.date(), shift_type),
+            )
         )
-        cands.append(CoverCandidate(p.id, covers.get(p.id, 0), round(h.ratio, 3)))
     return ctx.engines.cover_ranker.rank(cands)
 
 
@@ -219,7 +252,7 @@ def open_cascades_for(
         if span(types[s.shift_type], s.day)[0] <= now:
             continue  # already started; the Planner handles it directly
         people = valid_takers(ctx, dep, s, exclude={staff_id})
-        order = [c.staff_id for c in ranked(ctx, dep, people, s.day)]
+        order = [c.staff_id for c in ranked(ctx, dep, people, s.day, s.shift_type)]
         c = operations.open_cascade(ctx.session, s.assignment_id, absence_id, order, now)
         opened.append(c.id)
     return opened

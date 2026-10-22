@@ -12,6 +12,9 @@ ML_SOURCES = REPO / "ml" / "src" / "dienstpilot_ml"
 
 
 C4_PATHS = ("preference_learner/", "features/preference.py", "training/c4")
+C5_RULE = REPO / "ml" / "cover_ranker" / "PROMOTION_RULE.md"
+C5_CHAMPION_DIR = REPO / "ml" / "cover_ranker" / "artifacts" / "champion"
+C5_PATHS = ("cover_ranker/", "features/cover.py", "training/c5")
 
 
 def is_c4(rel: str) -> bool:
@@ -19,10 +22,17 @@ def is_c4(rel: str) -> bool:
     return rel.startswith(C4_PATHS)
 
 
-def _sources_sha256(want_c4: bool) -> str:
+def is_c5(rel: str) -> bool:
+    """Return whether a source path (relative to the package) belongs to C5."""
+    return rel.startswith(C5_PATHS)
+
+
+def _sources_sha256(component: str) -> str:
     h = hashlib.sha256()
     for f in sorted(ML_SOURCES.rglob("*.py")):
-        if is_c4(str(f.relative_to(ML_SOURCES))) != want_c4:
+        rel = str(f.relative_to(ML_SOURCES))
+        belongs = "c4" if is_c4(rel) else "c5" if is_c5(rel) else "c3"
+        if belongs != component:
             continue
         h.update(str(f.relative_to(ML_SOURCES)).encode() + b"\0" + f.read_bytes() + b"\0")
     return h.hexdigest()
@@ -30,14 +40,19 @@ def _sources_sha256(want_c4: bool) -> str:
 
 def ml_sources_sha256() -> str:
     """Return one hash over the C3 source code (every .py file of the ML package except C4's)."""
-    return _sources_sha256(False)
+    return _sources_sha256("c3")
 
 
 def c4_sources_sha256() -> str:
     """Return one hash over the C4 source code (see ``C4_PATHS``)."""
-    return _sources_sha256(True)
+    return _sources_sha256("c4")
 
 
 def sha256_file(path: Path) -> str:
     """Return the sha256 of a file."""
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def c5_sources_sha256() -> str:
+    """Return one hash over the C5 source code (see ``C5_PATHS``)."""
+    return _sources_sha256("c5")

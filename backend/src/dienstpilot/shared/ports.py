@@ -159,6 +159,13 @@ class CoverCandidate:
     staff_id: str
     covers_last_90_days: int
     hours_ratio: float
+    days_since_last_cover: float = 365.0
+    shifts_last_7d: float = 0.0
+    notice_hours: float = 72.0
+    shift_type: str = "frueh"
+    weekday: int = 0
+    request_hour: float = 8.0
+    confirmed_pref: float = 0.0
 
 
 class CoverRanker(Engine):

@@ -11,7 +11,15 @@ from .helpers import future_shift, walk
 
 pytestmark = pytest.mark.db
 PERSONAS = ["kaya", "weber", "lorenz", "brandt", "hoffmann", "vogel", "it-admin"]
-FORBIDDEN_KEYS = ("diagnos", "requester_reason", "personal_reason", "leave_reason", "icd")
+FORBIDDEN_KEYS = (
+    "diagnos",
+    "requester_reason",
+    "personal_reason",
+    "leave_reason",
+    "icd",
+    "p_accept",  # C5's probability of accepting a cover request is never returned to anyone
+    "accept_prob",
+)
 QUERIES = {
     "/roster": "?month=2026-11",
     "/me/roster": "?month=2026-11",

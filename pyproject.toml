@@ -190,5 +190,6 @@ source_modules = [
   "dienstpilot_ml.features",
   "dienstpilot_ml.absence_forecast",
   "dienstpilot_ml.preference_learner",
+  "dienstpilot_ml.cover_ranker",
 ]
 forbidden_modules = ["dienstpilot_ml.training", "mlflow", "statsmodels", "scipy"]
