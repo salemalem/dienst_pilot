@@ -164,6 +164,63 @@ function C3Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
   );
 }
 
+type C4Test = { wish: { mean_ll: number }; avoid: { mean_ll: number } };
+
+function C4Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
+  const t = useTranslations("w13");
+  const test = m.test_2025 as Record<string, C4Test> | undefined;
+  const champion = (m.champion as { kind?: string; promoted_learner?: boolean } | undefined) ?? {};
+  const kinds = ["pooled", "raw", "hierarchical"] as const;
+  const kind = champion.kind as (typeof kinds)[number] | undefined;
+  const recovery = (m.truth_recovery as { models?: Record<string, { all?: Metrics }> } | undefined)
+    ?.models;
+  const corr = num(recovery?.[kind ?? ""]?.all, "mean_spearman_vs_affinity");
+  return (
+    <div className="flex flex-col gap-2" data-testid="c4-metrics">
+      <p className="caption m-0 text-ink-muted">
+        {t("evalSource", { source: "eval/results/c4.json", months: "" })}
+      </p>
+      {kind ? (
+        <p className="body-strong m-0" data-testid="c4-served">
+          {t("m.c4Served", { model: t(`m.c4Models.${kind}`) })}
+        </p>
+      ) : null}
+      <Table label={t("m.label")}>
+        <thead>
+          <tr>
+            <th scope="col">{t("m.c4Model")}</th>
+            <th scope="col" className="text-right">
+              {t("m.c4Wish")}
+            </th>
+            <th scope="col" className="text-right">
+              {t("m.c4Avoid")}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {kinds.map((k) =>
+            test?.[k] ? (
+              <tr key={k} data-served={k === kind}>
+                <td className={k === kind ? "body-strong" : undefined}>{t(`m.c4Models.${k}`)}</td>
+                <td className="num-time text-right">{fmt.number(test[k].wish.mean_ll, 4)}</td>
+                <td className="num-time text-right">{fmt.number(test[k].avoid.mean_ll, 4)}</td>
+              </tr>
+            ) : null,
+          )}
+        </tbody>
+      </Table>
+      <p className="caption m-0 text-ink-muted" data-testid="c4-promotion">
+        {champion.promoted_learner ? t("m.c4Promoted") : t("m.c4NotPromoted")}
+      </p>
+      {corr !== null ? (
+        <p className="caption m-0 text-ink-muted">
+          {t("m.c4Truth", { corr: fmt.number(corr, 2) })}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function Card({ c }: { c: Component }): ReactNode {
   const t = useTranslations("w13");
   const fmt = useFmt();
@@ -200,12 +257,20 @@ function Card({ c }: { c: Component }): ReactNode {
         <dd className="m-0">
           {c.component === "C3"
             ? t("trainedC3")
-            : c.kind === "ml"
-              ? t("notTrained")
-              : t("notApplicable")}
+            : c.component === "C4"
+              ? t("trainedC4")
+              : c.kind === "ml"
+                ? t("notTrained")
+                : t("notApplicable")}
         </dd>
         <dt className="text-ink-muted">{t("modelCard")}</dt>
-        <dd className="m-0">{c.component === "C3" ? t("modelCardC3") : t("modelCardNone")}</dd>
+        <dd className="m-0">
+          {c.component === "C3"
+            ? t("modelCardC3")
+            : c.component === "C4"
+              ? t("modelCardC4")
+              : t("modelCardNone")}
+        </dd>
         <dt className="text-ink-muted">{t("canChange")}</dt>
         <dd className="body-strong m-0" data-testid="can-change">
           {c.can_change_roster ? t("yes") : t("no")}
@@ -217,6 +282,8 @@ function Card({ c }: { c: Component }): ReactNode {
         <C2Metrics m={metrics} />
       ) : metrics && c.component === "C3" ? (
         <C3Metrics m={metrics} fmt={fmt} />
+      ) : metrics && c.component === "C4" ? (
+        <C4Metrics m={metrics} fmt={fmt} />
       ) : (
         <p
           className="body m-0 rounded-mark border border-dashed border-pencil bg-pencil-wash p-3 text-pencil"
