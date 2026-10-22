@@ -28,7 +28,8 @@ test("W10: a clock that moves past the nightly check keeps the log verified by t
   await asPersona(page, "brandt");
   await page.goto("/de/protokoll");
   await expect(page.getByTestId("chain")).toHaveAttribute("data-state", "verified");
-  await api(admin, "PUT", "/demo/clock", { reset: true });
+  // A token follows the demo clock: sign in again before putting it back.
+  await api(await login("it-admin"), "PUT", "/demo/clock", { reset: true });
 });
 
 test("W12: the month end is prepared by itself, the Planner confirms with one click, then payroll is released", async ({
