@@ -10,12 +10,12 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | — | Process design (roles, approvals, monthly cycle) | Domain design | Done, with clinical input |
 | — | System architecture (this document) | Design | Done |
 | — | Synthetic data generator (`synthdata/`) | Simulation | Prototype |
-| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C5–C8), job worker | Application | Prototype |
+| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C6–C8), job worker | Application | Prototype |
 | C1 | Roster Optimizer (`engine/solver/`) | Constraint optimization | Built & evaluated on synthetic data (`eval/results/benchmark.json`) |
 | C2 | Rule and Compliance Validator (`engine/validator/`) | Deterministic | Built & evaluated on synthetic data (`eval/results/c2.json`) |
 | C3 | Absence Forecaster (`ml/`) | ML, time series | Built & evaluated on synthetic data (`eval/results/c3.json`). The served model is the seasonal-naive baseline: the LightGBM challenger did not meet the promotion rule (model card) |
 | C4 | Preference Learner (`ml/`) | ML, Bayesian | Built & evaluated on synthetic data (`eval/results/c4.json`). The served model is the raw per-person-rates baseline: the hierarchical learner did not meet the promotion rule (model card) |
-| C5 | Cover Acceptance Ranker | ML, classification + policy | Designed |
+| C5 | Cover Acceptance Ranker (`ml/`) | ML, classification + policy | Built & evaluated on synthetic data (`eval/results/c5.json`). The served model is the base-rate baseline: the LightGBM learner did not meet the promotion rule, so inside a burden bucket the order follows hours against contract (model card) |
 | C6 | Leave Feasibility Surrogate | ML, simulation-trained | Designed |
 | C7 | Request Intake Agent | LLM, structured output | Designed |
 | C8 | Planner Copilot | LLM agent, MCP tools, RAG | Designed |
@@ -215,7 +215,9 @@ A pure function `validate(roster, ruleset) → list[Violation]`, implemented ind
 
 **Policy (separate from the model).** Candidates first come from C2 (qualified, rested, within hours). They are bucketed by cover burden; buckets are contacted least-burdened first, and P(accept) only orders candidates within a bucket. Each candidate gets a 15-minute window before the cascade moves on.
 
-**Evaluation.** ROC-AUC, Brier score, expected calibration error; an offline simulator replays historical sick calls to compare time-to-fill and cover-burden Gini against a naive "ask the most reliable person" policy.
+**Evaluation.** Brier score, ROC-AUC and expected calibration error on the held-out 2025, against a base rate and a logistic regression; an offline replay of the 2025 sick calls (`eval/`) compares time to fill, cover-burden Gini, escalation rate and people asked per filled gap for the fairness-first policy with the champion, the previous stand-in ordering and a naive "ask the most reliable person" policy.
+
+**Status.** Built and evaluated on synthetic data under `ml/cover_ranker/PROMOTION_RULE.md` (committed before any fitting): the result file `eval/results/c5.json` and the model card `docs/model-cards/c5-cover-ranker.md` say which model is served and why (ADR-014). The probability is never returned to anyone.
 
 ### C6: Leave Feasibility Surrogate (Urlaubs-Schnellprüfung)
 

@@ -60,18 +60,19 @@ format: ## Apply ruff and prettier formatting
 	uv run ruff check --fix backend ml
 	pnpm format
 
-train: ## C3 and C4: rolling-origin CV on 2021-2024, fit the candidates, log and register them in the local MLflow (ml/mlflow)
+train: ## C3, C4 and C5: rolling-origin CV on 2021-2024, fit the candidates, log and register them in the local MLflow (ml/mlflow)
 	uv run python -m dienstpilot_ml.training --data $(SEED_DIR)
 	uv run python -m dienstpilot_ml.training.c4 --data $(SEED_DIR)
 	uv run python -m dienstpilot_ml.training.c5 --data $(SEED_DIR)
 
-eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.1 table, C3 and C4 (runs make train first)
+eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.1 table, C3, C4 and C5 (runs make train first)
 	uv run python eval/run_validator_eval.py --data $(SEED_DIR)
 	uv run python eval/run_benchmark.py --data $(SEED_DIR)
 	uv run python eval/render_tables.py
 	$(MAKE) train
 	uv run python eval/run_c3_eval.py --data $(SEED_DIR)
 	uv run python eval/run_c4_eval.py --data $(SEED_DIR)
+	uv run python eval/run_c5_eval.py --data $(SEED_DIR)
 
 tune: ## Re-tune the balanced profile on July-December 2024 (eval/results/tuning.json)
 	uv run python eval/tune_profiles.py --data $(SEED_DIR)

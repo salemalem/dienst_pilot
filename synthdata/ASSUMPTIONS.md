@@ -227,7 +227,7 @@ The staff app checks a leave request in the background with the optimizer (C1). 
 
 ## 19. Scripted demo scenarios (generator 1.3.0)
 
-The three situations of `docs/PROCESS.md` §4 are played live with the real engines (C1, C2 and the C5 stand-in) on the demo clock; `backend/tests/api/test_demo_scenarios.py` runs each one end to end. The simulation is unchanged; for the default seed only, `synthdata/src/synthdata/scenarios.py` applies the edits below to its finished output, each with a precondition check. Nothing else in the dataset differs from 1.2.0 apart from the `generator_version` column (checked row by row when the version was bumped).
+The three situations of `docs/PROCESS.md` §4 are played live with the real engines (C1, C2 and C5) on the demo clock; `backend/tests/api/test_demo_scenarios.py` runs each one end to end. The simulation is unchanged; for the default seed only, `synthdata/src/synthdata/scenarios.py` applies the edits below to its finished output, each with a precondition check. Nothing else in the dataset differs from 1.2.0 apart from the `generator_version` column (checked row by row when the version was bumped).
 
 **Situation A: Dr. Kaya asks for 14–27 July 2027.**
 - Seeded: two pending leave requests that overlap her dates. Dr. Carla Franke asks for 12–23 July 2027 (submitted 14 October 2026, 09:12). Dr. Niklas Stein asks for 19–30 July 2027 (submitted 16 October 2026, 18:47).
@@ -243,6 +243,6 @@ The three situations of `docs/PROCESS.md` §4 are played live with the real engi
   - He works the Frühdienst from Tuesday 20 to Friday 23 October, on top of the minimum demand (within the Früh cap), so his hours stay as they were and nobody else loses a shift.
   - Dr. Nadia Kaiser works her Frühdienst of Thursday 22 October on Tuesday 20 October instead (Thursday stays covered through Dr. Weber).
   - Dr. Felix Wagner and Dr. Mira Okafor exchange Spätdienste: Wagner works 20 October, Okafor 27 October.
-- Why: without the last two edits, C5 ranks Dr. Kaiser and Dr. Wagner above Dr. Alvarez, because their hours are further below their contracts. With them, Dr. Alvarez is first in the C5 order (fewest covers in the last 90 days, then hours against contract) among the colleagues C2 allows to cover the shift.
+- Why: without the last two edits, C5 ranks Dr. Kaiser and Dr. Wagner above Dr. Alvarez, because their hours are further below their contracts. With them, Dr. Alvarez is first in the C5 order among the colleagues C2 allows to cover the shift. The C5 order is: burden bucket (covers in the last 90 days, two wide, least first), then P(accept), then hours against contract. With the served base-rate champion every P is equal, so she is first through the hours tie-break inside bucket 0 (she has the lowest hours against contract of the two people there); a champion with real signal could reorder that bucket, and the story would then be updated, not the model or the data.
 - C2 finds no new violation in October or November after these edits. None of the edited assignments is referenced by a swap or a cover search.
 - Live: at 06:40 (Frühdienst starts at 07:30) Dr. Weber reports sick. The cover search asks Dr. Alvarez first with a 15-minute deadline. She accepts at 06:43 within her contract hours, the policy approves it, and the Planner sees the closed gap under recent changes (W1).
