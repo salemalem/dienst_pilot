@@ -3107,6 +3107,9 @@ export interface components {
         /**
          * WishEntry
          * @description A request-window entry.
+         *
+         *     ``avoid_shift`` is a soft "rather not this shift" on that day: the person stays available for
+         *     every other shift, and only the solver's objective sees it.
          */
         WishEntry: {
             /**
@@ -3118,7 +3121,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "unavailable" | "wish_work";
+            kind: "unavailable" | "wish_work" | "avoid_shift";
             /** Shift Type */
             shift_type?: ("frueh" | "spaet" | "nacht" | "bereitschaft" | "ruf") | null;
             /**

@@ -7982,7 +7982,8 @@
             "type": "string",
             "enum": [
               "unavailable",
-              "wish_work"
+              "wish_work",
+              "avoid_shift"
             ],
             "title": "Kind"
           },
@@ -8016,7 +8017,7 @@
           "kind"
         ],
         "title": "WishEntry",
-        "description": "A request-window entry."
+        "description": "A request-window entry.\n\n``avoid_shift`` is a soft \"rather not this shift\" on that day: the person stays available for\nevery other shift, and only the solver's objective sees it."
       }
     }
   }

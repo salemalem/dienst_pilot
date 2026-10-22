@@ -38,10 +38,16 @@ class WindowResponse(Base):
 
 
 class Preference(Base):
-    """One entry: a day the physician cannot work, or wants to work (optionally a shift)."""
+    """One entry of a request window.
+
+    A day the physician cannot work, wants to work (optionally a shift), or would rather not work
+    a given shift on (soft, never a block).
+    """
 
     __tablename__ = "preference"
-    __table_args__ = (CheckConstraint("kind IN ('unavailable','wish_work')", name="kind"),)
+    __table_args__ = (
+        CheckConstraint("kind IN ('unavailable','wish_work','avoid_shift')", name="kind"),
+    )
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
     window_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("request_window.id"), index=True)
     staff_id: Mapped[uuid.UUID] = mapped_column(index=True)

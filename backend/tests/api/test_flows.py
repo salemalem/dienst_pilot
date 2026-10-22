@@ -491,3 +491,72 @@ def test_w1_coverage_band_comes_from_the_built_c3_forecaster(
     for day in o["coverage"]:
         assert 0 <= day["expected_low"] <= day["expected_absences"] <= day["expected_high"]
         assert day["expected_absences"] > 0
+
+
+def test_confirming_an_avoid_chip_is_a_soft_per_shift_preference(
+    client: TestClient, login: Any, app_factory: Any, clock: Any
+) -> None:
+    """A "rather not Spätdienst on Mondays" stays available for everything else and only moves
+    the solver's soft objective: no blocked day, no change to wishes, leave or hard inputs."""
+    from dataclasses import replace
+    from datetime import date
+
+    from sqlalchemy import text
+    from sqlalchemy.orm import Session
+
+    from dienstpilot.app.engine_inputs import Inputs
+    from dienstpilot.app.jobs import _department
+    from dienstpilot_solver.model import AvoidIn
+
+    kaya = login("kaya")
+    mondays = ["2026-12-07", "2026-12-14", "2026-12-21", "2026-12-28"]
+    chip = [{"date": d, "kind": "avoid_shift", "shift_type": "spaet"} for d in mondays]
+    month = date(2026, 12, 1)
+
+    def solver_problem() -> Any:
+        with Session(bind=app_factory.conn, join_transaction_mode="create_savepoint") as s:
+            dept = s.execute(text("SELECT id FROM organization.department LIMIT 1")).scalar_one()
+            return Inputs(s, _department(s, str(dept)), clock.now()).problem(month)
+
+    staff_id = str(
+        app_factory.conn.execute(
+            text("SELECT id FROM organization.staff WHERE display_name LIKE '%Kaya'")
+        ).scalar_one()
+    )
+    before = solver_problem()
+    assert before.avoid == ()
+
+    # A "rather not" entry names one shift and is never "important" (it is soft, not a promise).
+    assert (
+        client.put(
+            "/me/wishes", json=[{"date": mondays[0], "kind": "avoid_shift"}], headers=kaya
+        ).status_code
+        == 422
+    )
+    assert (
+        client.put("/me/wishes", json=[{**chip[0], "important": True}], headers=kaya).status_code
+        == 422
+    )
+
+    saved = client.put("/me/wishes", json=chip, headers=kaya)
+    assert saved.status_code == 200
+    assert {(e["kind"], e["shift_type"]) for e in saved.json()["entries"]} == {
+        ("avoid_shift", "spaet")
+    }
+
+    after = solver_problem()
+    assert after.avoid == tuple(AvoidIn(staff_id, date.fromisoformat(d), "spaet") for d in mondays)
+    blocked = after.blocked.get(staff_id, frozenset())
+    assert not blocked & {date.fromisoformat(d) for d in mondays}  # never a "kann nicht"
+    assert not any(w.staff_id == staff_id for w in after.wishes)  # not a "möchte arbeiten" either
+    # Nothing but the soft objective changed: every hard input and every wish is identical
+    # (Kaya's own answer replaced her earlier one, so compare with that answer removed).
+    assert replace(after, avoid=(), wishes=(), blocked=before.blocked) == replace(
+        before, wishes=(), blocked=before.blocked
+    )
+    assert {w for w in after.wishes if w.staff_id != staff_id} == {
+        w for w in before.wishes if w.staff_id != staff_id
+    }
+    assert {b: v for b, v in after.blocked.items() if b != staff_id} == {
+        b: v for b, v in before.blocked.items() if b != staff_id
+    }

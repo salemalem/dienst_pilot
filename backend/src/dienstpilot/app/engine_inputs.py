@@ -18,7 +18,7 @@ from dienstpilot.operations import service as operations
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.requests import service as requests
-from dienstpilot_solver.model import Commitment, Doctor, Problem, WishIn
+from dienstpilot_solver.model import AvoidIn, Commitment, Doctor, Problem, WishIn
 from dienstpilot_solver.model import Shift as SolverShift
 from dienstpilot_validator import Assignment, MonthInput, Person, ShiftType
 
@@ -147,6 +147,15 @@ class Inputs:
             if window is not None
             else ()
         )
+        avoid = (
+            tuple(
+                AvoidIn(e.staff_id, e.day, e.shift_type)
+                for e in requests.preferences(self.session, window.id)
+                if e.kind == "avoid_shift" and e.shift_type and e.staff_id in self.dep.staff
+            )
+            if window is not None
+            else ()
+        )
         if commitments is None:
             commitments = tuple(
                 Commitment(sid, w) for sid, w in requests.trade_off_commitments(self.session, m)
@@ -168,6 +177,7 @@ class Inputs:
             blocked=facts.blocked,
             history=tuple((a.staff_id, a.day, a.shift_type) for a in self.history(m)),
             wishes=wishes,
+            avoid=avoid,
             ytd=self.ytd(m),
             commitments=commitments,
         )

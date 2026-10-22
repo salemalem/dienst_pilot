@@ -241,6 +241,10 @@ class _Model:
                 m.add(miss == 1)
             unmet.append((miss, cfg.important_wish_weight if w.important else 1))
         terms += [prof.wishes * k * v for v, k in unmet]
+        # "Rather not this shift" (soft): a penalty like one unmet wish, only when it is assigned.
+        for a in p.avoid:
+            if (v := self.x.get((a.staff_id, a.day, a.shift))) is not None:
+                terms.append(prof.wishes * v)
         # Burden spread among specialists and residents (year to date + this month).
         wn, ww, wh = cfg.burden_weights
         loads = []

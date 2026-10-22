@@ -29,7 +29,7 @@ class PreferenceEntry:
 
     staff_id: str
     day: date
-    kind: str  # unavailable | wish_work
+    kind: str  # unavailable | wish_work | avoid_shift (soft, needs a shift type)
     shift_type: str | None
     important: bool
 

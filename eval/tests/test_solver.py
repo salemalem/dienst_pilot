@@ -8,7 +8,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
-from dienstpilot_solver.model import Config
+from dienstpilot_solver.model import AvoidIn, Config
 from dienstpilot_solver.solve import solve
 from dienstpilot_validator import Assignment, validate
 from hypothesis import HealthCheck, given, settings
@@ -70,7 +70,7 @@ _IN_A_FRESH_PROCESS = """
 import hashlib, sys
 from datetime import date
 from pathlib import Path
-from dienstpilot_solver.model import Config
+from dienstpilot_solver.model import AvoidIn, Config
 from dienstpilot_solver.solve import solve
 from dienstpilot_eval.inputs import Data, to_problem
 p = to_problem(Data(Path(sys.argv[1])).month(date(2025, 3, 1)))
@@ -115,3 +115,26 @@ def test_commitments_bind(data: Data, m: date) -> None:
     weekends = {d - timedelta(days=d.weekday() - 5) for s, d, _ in res.variants[0].assignments
                 if s == kaya and d.weekday() >= 5}
     assert len(weekends) >= 2
+
+
+def test_a_soft_avoid_never_blocks_and_only_moves_the_objective(data: Data) -> None:
+    """"Rather not Spätdienst" on some days: same hard inputs, still valid, and the shift is
+    assigned to that person no more often than before."""
+    md = data.month(date(2025, 3, 1))
+    base = to_problem(md)
+    first = solve(base, FAST).variants[0]
+    person = next(s for s, _, sh in first.assignments if sh == "spaet")
+    mine = tuple((d, sh) for s, d, sh in first.assignments if s == person and sh == "spaet")
+    avoid = tuple(AvoidIn(person, d, sh) for d, sh in mine)
+    soft = replace(base, avoid=avoid)
+    # Only the soft input differs; nothing is blocked or taken off the person's leave.
+    assert replace(soft, avoid=()) == base
+    assert soft.blocked == base.blocked and soft.leave == base.leave and soft.wishes == base.wishes
+    res = solve(soft, FAST)
+    assert res.status == "ok"
+    v = res.variants[0]
+    assert _passes_c2(md, v.assignments) == []  # still a rule-valid roster
+    assert v.metrics.wishes_total == first.metrics.wishes_total  # wishes are counted as before
+    kept = sum(1 for s, d, sh in v.assignments if s == person and (d, sh) in set(mine))
+    assert kept < len(mine)  # the penalty moved at least one of them to somebody else
+    assert any(s == person for s, _, _ in v.assignments)  # and the person still works

@@ -59,7 +59,7 @@ Every write records an audit event (`GET /audit/events`). The seed loader also t
 
 | Write | Who | Approval (PROCESS §2) |
 |---|---|---|
-| `PUT /me/wishes` | Physician | None: input, not a promise |
+| `PUT /me/wishes` | Physician | None: input, not a promise. Entry kinds: `unavailable` (hard), `wish_work`, `avoid_shift` (soft "rather not this shift" on that day; needs `shift_type`, never `important`) |
 | `POST /me/leave` | Physician | Planner: `POST /planner/leave/{id}/decision` (a decline needs a reason) |
 | `POST /me/swaps`, `POST /me/swap-offers/{id}/take` | Physician | The policy if C2-valid, else the Planner: `POST /planner/swaps/{id}/decision` |
 | `POST /me/sick` | Physician | None; cover searches start for each affected shift that has not begun |
