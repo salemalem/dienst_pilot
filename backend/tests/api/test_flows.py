@@ -251,7 +251,7 @@ def test_situation_a_leave_without_trade_and_planner_decline(
     check = client.post(
         "/me/leave/check", json={"start_date": "2027-07-26", "end_date": "2027-08-06"}, headers=kaya
     ).json()
-    assert check["engine"]["implementation"] == "stand-in" and check["trade_off_check_id"]
+    assert check["engine"]["component"] == "C6" and check["trade_off_check_id"]
     # The leave spans two months: the C1 check offers no trade-off.
     result = client.get(f"/me/leave/checks/{check['trade_off_check_id']}", headers=kaya).json()
     assert result["status"] == "done" and result["engine"]["component"] == "C1"
@@ -445,9 +445,10 @@ def test_transparency_lists_eight_components_none_can_change_the_roster(
         "C3",
         "C4",
         "C5",
+        "C6",
     }
     assert {c["component"] for c in comps if c["implementation"] == "stand-in"} == {
-        f"C{i}" for i in range(6, 9)
+        f"C{i}" for i in range(7, 9)
     }
     c3 = next(c for c in comps if c["component"] == "C3")
     assert c3["eval_metric"]["test_2025"][c3["eval_metric"]["champion"]["kind"]]["mae"] > 0

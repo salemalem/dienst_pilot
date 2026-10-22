@@ -1,12 +1,11 @@
-"""Deterministic stand-ins for C4–C8.
+"""Deterministic stand-ins for C7 and C8.
 
 They have the shape of the real components but none of their method: no trained model, no LLM.
 Every response that uses one says so.
 """
 
 import re
-from datetime import date, timedelta
-from typing import Literal
+from datetime import date
 
 from dienstpilot.shared.ports import (
     Copilot,
@@ -14,39 +13,10 @@ from dienstpilot.shared.ports import (
     CopilotFacts,
     EngineInfo,
     IntakeParser,
-    LeaveFeasibility,
-    LeaveHint,
     ParsedPreferences,
 )
 
 STANDIN_VERSION = "standin-0.1"
-
-
-class LeaveFeasibilityStandIn(LeaveFeasibility):
-    """C6 stand-in: compares approved leave on the requested days with the concurrency limit."""
-
-    info = EngineInfo(
-        "C6",
-        "stand-in",
-        STANDIN_VERSION,
-        "Approved leave per day against the concurrency limit; surrogate model in phase 8.",
-        8,
-    )
-
-    def hint(
-        self, start: date, end: date, approved_leave_per_day: dict[date, int], limit: int
-    ) -> LeaveHint:
-        """Return a hint for the requested days."""
-        d, worst, any_overlap = start, 0, 0
-        while d <= end:
-            n = approved_leave_per_day.get(d, 0)
-            worst = max(worst, n)
-            any_overlap = max(any_overlap, n)
-            d += timedelta(days=1)
-        outcome: Literal["coverable", "tight", "not_coverable"] = (
-            "not_coverable" if worst >= limit else "tight" if worst >= limit - 1 else "coverable"
-        )
-        return LeaveHint(outcome, worst, limit, any_overlap)
 
 
 SHIFT_WORDS = {

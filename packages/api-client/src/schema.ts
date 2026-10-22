@@ -246,7 +246,7 @@ export interface paths {
         put?: never;
         /**
          * Check Leave
-         * @description M5: instant hint (C6 stand-in), and a background C1 check of coverability and trade-off.
+         * @description M5: instant hint (C6), and a background C1 check of coverability and trade-off.
          */
         post: operations["check_leave_me_leave_check_post"];
         delete?: never;

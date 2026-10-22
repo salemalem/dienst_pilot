@@ -19,8 +19,9 @@ import { useTheme } from "../lib/theme";
 type Check = components["schemas"]["TradeOffCheck"];
 
 /**
- * M5: request leave. Instant C6 hint (a stand-in estimate), then the real C1 check. The default
- * state is "coverable"; the trade-off appears only when the solver finds one. No colleague names.
+ * M5: request leave. Instant C6 hint (advisory), then the real C1 check, whose answer is the one
+ * shown and the only one the buttons follow. The default state is "coverable"; the trade-off
+ * appears only when the solver finds one. No colleague names.
  */
 export function LeaveScreen(): ReactNode {
   const { t } = useTranslation();
@@ -70,6 +71,13 @@ export function LeaveScreen(): ReactNode {
 
   const result = (check?.status === "done" ? check.result : null) as Result | null;
   const outcome = result?.outcome ?? null;
+  // The hint is advisory: when the solver says otherwise, the solver's answer stays on screen.
+  const hintDiffered =
+    hint !== null &&
+    outcome !== null &&
+    outcome !== "not_applicable" &&
+    ((hint.outcome === "coverable" && outcome !== "coverable") ||
+      (hint.outcome === "not_coverable" && outcome === "coverable"));
   const request = useAction(async (withTrade: boolean) => {
     if (!start || !end) return;
     try {
@@ -202,6 +210,11 @@ export function LeaveScreen(): ReactNode {
       {checking ? (
         <Txt muted accessibilityRole="progressbar" testID="leave-checking">
           {t("m5.checking")}
+        </Txt>
+      ) : null}
+      {hintDiffered ? (
+        <Txt muted testID="leave-hint-differed">
+          {t("m5.hintDiffered")}
         </Txt>
       ) : null}
       {check?.status === "failed" ? <Txt color={theme.alert}>{t("m5.checkFailed")}</Txt> : null}

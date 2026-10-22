@@ -10,6 +10,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, Literal
 
+from dienstpilot_ml.features.leave import LeaveFacts as LeaveFacts
+
 if TYPE_CHECKING:
     from dienstpilot_solver.model import Config as SolverConfig
     from dienstpilot_solver.model import Problem
@@ -178,22 +180,23 @@ class CoverRanker(Engine):
 
 @dataclass(frozen=True)
 class LeaveHint:
-    """An instant hint whether a leave request is likely coverable."""
+    """An instant hint whether a leave request is likely coverable (the solver decides)."""
 
     outcome: Literal["coverable", "tight", "not_coverable"]
     max_overlapping: int
     limit: int
     overlapping_colleagues: int
+    basis: Literal["model", "rule"] = (
+        "model"  # "rule": the stand-in rule (a window over two months)
+    )
 
 
 class LeaveFeasibility(Engine):
-    """C6: instant leave feasibility hint."""
+    """C6: instant leave feasibility hint. Advisory only: the C1/C2 check answers."""
 
     @abstractmethod
-    def hint(
-        self, start: date, end: date, approved_leave_per_day: dict[date, int], limit: int
-    ) -> LeaveHint:
-        """Estimate whether the days are coverable given leave already approved."""
+    def hint(self, facts: LeaveFacts, limit: int) -> LeaveHint:
+        """Estimate whether the window is coverable from the department's state around it."""
 
 
 # --- C7, C8: language ------------------------------------------------------------------------

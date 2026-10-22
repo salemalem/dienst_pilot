@@ -5,8 +5,8 @@ same code. Every variant is checked by the validator (C2) before it is stored.
 """
 
 from collections.abc import Callable
-from dataclasses import asdict, replace
-from datetime import date, timedelta
+from dataclasses import asdict
+from datetime import date
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -14,26 +14,27 @@ from sqlalchemy.orm import Session
 from dienstpilot.app.common import Department
 from dienstpilot.app.engine_inputs import Inputs
 from dienstpilot.app.roster import month_end, month_start
+from dienstpilot.audit import service as audit
 from dienstpilot.engines.registry import Engines
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.requests import service as requests
 from dienstpilot.shared.ports import Clock
-from dienstpilot_solver.model import PROFILES, Commitment, Config, Metrics, Result
+from dienstpilot_solver.coverability import (
+    CHECK_CONFIG,
+    TRADE_OFF_OVERTIME_HOURS,
+    TRADE_OFF_PEAK_BURDEN,
+    Assignments,
+    Callbacks,
+    days,
+    decide,
+)
+from dienstpilot_solver.model import Config, Metrics, Problem, Result
 from dienstpilot_validator import Assignment
 
 LABELS = "ABCDEFGH"
 RECOMMENDED_PROFILE = "balanced"  # the benchmark's recommended profile (eval/run_benchmark.py)
 RUN_CONFIG = Config()
-# M5: one balanced variant per question, shorter time (synthdata ASSUMPTIONS §18).
-CHECK_CONFIG = Config(
-    deterministic_time=5.0,
-    variants=1,
-    profiles=tuple(p for p in PROFILES if p.name == RECOMMENDED_PROFILE),
-)
-# When covering a leave counts as a burden for colleagues (synthdata ASSUMPTIONS §18).
-TRADE_OFF_OVERTIME_HOURS = 8.0
-TRADE_OFF_PEAK_BURDEN = 2  # weighted points (nights, weekends, holidays incl. the year so far)
 
 
 def _department(session: Session, department_id: str) -> Department:
@@ -123,20 +124,6 @@ def _assignment(a: tuple[str, date, str]) -> Assignment:
     return Assignment(*a)
 
 
-def _days(a: date, b: date) -> set[date]:
-    return {a + timedelta(days=i) for i in range((b - a).days + 1)}
-
-
-def _weekends(staff_id: str, assignments: tuple[tuple[str, date, str], ...]) -> int:
-    return len(
-        {
-            d - timedelta(days=d.weekday() - 5)
-            for s, d, _ in assignments
-            if s == staff_id and d.weekday() >= 5
-        }
-    )
-
-
 def check_leave(
     session: Session, engines: Engines, clock: Clock, *, check_id: str, department_id: str
 ) -> None:
@@ -149,10 +136,60 @@ def check_leave(
     try:
         result = _coverability(session, engines, clock, chk, department_id)
         requests.set_check(session, check_id, "done", result)
+        _score_hint(session, clock, chk, result, department_id)
     except Exception as e:
         session.rollback()
         requests.set_check(session, check_id, "failed", {"error": repr(e)[:500]})
     session.commit()
+
+
+def hint_agreement(hint: str | None, solver: str) -> str:
+    """Compare the instant hint (C6) with the solver's answer.
+
+    A hint of "coverable" against a trade-off or "not coverable", or "not coverable" against
+    "coverable", is a disagreement; "tight" abstains; ``not_applicable`` is not scored.
+    """
+    if hint is None or solver == "not_applicable":
+        return "not_scored"
+    if hint == "tight":
+        return "abstain"
+    if hint == "coverable":
+        return "agree" if solver == "coverable" else "disagree"
+    return "agree" if solver != "coverable" else "disagree"
+
+
+def _score_hint(
+    session: Session,
+    clock: Clock,
+    chk: requests.LeaveCheckInfo,
+    result: dict[str, Any],
+    department_id: str,
+) -> None:
+    """Record whether the solver agreed with the hint; log every disagreement (no names)."""
+    agreement = hint_agreement(chk.hint_outcome, result["outcome"])
+    requests.set_agreement(session, chk.id, agreement)
+    if agreement == "disagree":
+        audit.record(
+            session,
+            occurred_at=clock.now(),
+            department_id=department_id,
+            actor_user_id=None,
+            actor_label="C6 / C1",
+            action="leave.hint_disagreed",
+            subject_type="leave_check",
+            subject_id=chk.id,
+            # No staff id: the audit trail shows names to its readers; the check id joins to the
+            # requester inside the database.
+            payload={
+                "start_date": chk.start_date.isoformat(),
+                "end_date": chk.end_date.isoformat(),
+                "hint": chk.hint_outcome,
+                "hint_version": chk.hint_version,
+                "hint_basis": chk.hint_basis,
+                "solver": result["outcome"],
+                "solver_version": result.get("solver_version"),
+            },
+        )
 
 
 def _coverability(
@@ -190,66 +227,33 @@ def _coverability(
     )
     for r in asked:
         pending.setdefault(r.staff_id, set()).update(
-            _days(max(r.start_date, leave_month), min(r.end_date, last))
+            days(max(r.start_date, leave_month), min(r.end_date, last))
         )
     base["pending_colleague_requests_counted"] = len(asked)
-    without = engines.optimizer.solve(
-        inputs.problem(leave_month, extra_leave=pending), CHECK_CONFIG
+    today_month = month_start(clock.today())
+
+    def problem(m: date, extra: dict[str, set[date]] | None) -> Problem:
+        return inputs.problem(m, extra_leave=extra)
+
+    def month_open(m: date) -> bool:
+        return planning.published(session, m) is None and m > today_month
+
+    def valid(m: date, assignments: Assignments) -> bool:
+        month = inputs.month(m, tuple(_assignment(x) for x in assignments))
+        return not engines.validator.validate(month)
+
+    cb = Callbacks(
+        problem=problem,
+        solve=lambda p: engines.optimizer.solve(p, CHECK_CONFIG),
+        month_open=month_open,
+        valid=valid,
+        weekend_limit=lambda m: int(
+            organization.rules_for(session, m).rules["max_weekends_per_month"]
+        ),
     )
-    extra = {**pending, me: _days(chk.start_date, chk.end_date)}
-    with_leave = engines.optimizer.solve(
-        inputs.problem(leave_month, extra_leave=extra), CHECK_CONFIG
+    return decide(
+        cb, requester=me, start=chk.start_date, end=chk.end_date, pending=pending, base=base
     )
-    if with_leave.status != "ok":
-        return {
-            **base,
-            "outcome": "not_coverable",
-            "explanations": [{"key": e.key, "params": e.params} for e in with_leave.explanations],
-        }
-    if without.status != "ok":  # the month is hard even without this leave
-        return {**base, "outcome": "coverable", "reason": "baseline_unsolved"}
-    a, b = without.variants[0].metrics, with_leave.variants[0].metrics
-    impact = {
-        "overtime_hours_delta": round(b.overtime_hours - a.overtime_hours, 2),
-        "peak_burden_delta": b.burden_max - a.burden_max,
-    }
-    base = {**base, "impact": impact}
-    burdens = (
-        impact["overtime_hours_delta"] > TRADE_OFF_OVERTIME_HOURS
-        or impact["peak_burden_delta"] > TRADE_OFF_PEAK_BURDEN
-    )
-    if not burdens:
-        return {**base, "outcome": "coverable"}
-    # Covering it burdens colleagues: offer one extra weekend in the month before, if that month
-    # is still open and stays within every hard rule (including the weekend limit).
-    before = month_start(leave_month - timedelta(days=1))
-    if planning.published(session, before) is not None or before <= month_start(clock.today()):
-        return {**base, "outcome": "coverable", "reason": "previous_month_planned"}
-    prev = engines.optimizer.solve(inputs.problem(before), CHECK_CONFIG)
-    if prev.status != "ok":
-        return {**base, "outcome": "coverable", "reason": "previous_month_unsolved"}
-    weekends = _weekends(me, prev.variants[0].assignments) + 1
-    rules = organization.rules_for(session, before).rules
-    if weekends > int(rules["max_weekends_per_month"]):
-        return {**base, "outcome": "coverable", "reason": "weekend_limit"}
-    problem = inputs.problem(before)
-    committed = replace(
-        problem,
-        commitments=(*problem.commitments, Commitment(me, weekends)),
-    )
-    trade = engines.optimizer.solve(committed, CHECK_CONFIG)
-    if trade.status != "ok":
-        return {**base, "outcome": "coverable", "reason": "trade_off_infeasible"}
-    check = engines.validator.validate(
-        inputs.month(before, tuple(_assignment(x) for x in trade.variants[0].assignments))
-    )
-    if check:
-        return {**base, "outcome": "coverable", "reason": "trade_off_invalid"}
-    return {
-        **base,
-        "outcome": "coverable_with_trade_off",
-        "trade_off": {"month": before.isoformat(), "weekends": weekends},
-    }
 
 
 JOBS: dict[str, Callable[..., None]] = {"run_roster": run_roster, "check_leave": check_leave}

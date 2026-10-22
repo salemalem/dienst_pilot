@@ -97,3 +97,8 @@ class LeaveCheck(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     status: Mapped[str] = mapped_column(String(10))
     result: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    # C6: the instant hint shown before the solver answered, and whether the solver agreed.
+    hint_outcome: Mapped[str | None] = mapped_column(String(14))
+    hint_version: Mapped[str | None] = mapped_column(String(80))
+    hint_basis: Mapped[str | None] = mapped_column(String(5))
+    agreement: Mapped[str | None] = mapped_column(String(10))

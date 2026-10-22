@@ -259,18 +259,37 @@ class LeaveCheckInfo:
     created_at: datetime
     status: str
     result: dict[str, Any] | None
+    hint_outcome: str | None = None
+    hint_version: str | None = None
+    hint_basis: str | None = None
+    agreement: str | None = None
 
 
 def _check(c: m.LeaveCheck) -> LeaveCheckInfo:
     return LeaveCheckInfo(
-        str(c.id), str(c.staff_id), c.start_date, c.end_date, c.created_at, c.status, c.result
+        str(c.id),
+        str(c.staff_id),
+        c.start_date,
+        c.end_date,
+        c.created_at,
+        c.status,
+        c.result,
+        c.hint_outcome,
+        c.hint_version,
+        c.hint_basis,
+        c.agreement,
     )
 
 
 def create_check(
-    session: Session, staff_id: str, start: date, end: date, now: datetime
+    session: Session,
+    staff_id: str,
+    start: date,
+    end: date,
+    now: datetime,
+    hint: tuple[str, str, str] | None = None,
 ) -> LeaveCheckInfo:
-    """Queue a coverability check."""
+    """Queue a coverability check; ``hint`` is (outcome, version, basis) of the instant hint."""
     c = m.LeaveCheck(
         id=uuid.uuid4(),  # random: the same dates may be checked twice at one demo instant
         staff_id=uuid.UUID(staff_id),
@@ -278,6 +297,9 @@ def create_check(
         end_date=end,
         created_at=now,
         status="queued",
+        hint_outcome=None if hint is None else hint[0],
+        hint_version=None if hint is None else hint[1],
+        hint_basis=None if hint is None else hint[2],
     )
     session.add(c)
     session.flush()
@@ -294,6 +316,15 @@ def set_check(
     c.status = status
     if result is not None:
         c.result = result
+    session.flush()
+
+
+def set_agreement(session: Session, check_id: str, agreement: str) -> None:
+    """Record whether the solver agreed with the hint: agree, disagree, abstain or not_scored."""
+    c = session.get(m.LeaveCheck, uuid.UUID(check_id))
+    if c is None:
+        raise KeyError(check_id)
+    c.agreement = agreement
     session.flush()
 
 

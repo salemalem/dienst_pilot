@@ -54,7 +54,8 @@ class WishIn:
 @dataclass(frozen=True)
 class AvoidIn:
     """A soft "rather not" for one shift on one day. Never blocks the person: it only adds a
-    penalty to the objective when that shift is assigned to them."""
+    penalty to the objective when that shift is assigned to them.
+    """
 
     staff_id: str
     day: date

@@ -54,7 +54,7 @@ Not yet tried by the author: the native (Expo Go, simulator) routes. The web rou
 ### A. Leave request (14–27 July 2027)
 
 1. **Staff app, Kaya:** *Heute* → "Urlaub beantragen". Tap the month arrow 9 times (July 2027), tap **14**, then **27**.
-2. See the instant hint (pencil box, labelled "C6 · Platzhalter"), then the optimizer's answer: **"Abdeckbar. Zwei Kolleg:innen …"**. No names, no trade-off (it only appears when the solver offers one).
+2. See the instant hint (box labelled "C6 · Gebaut"; its wording depends on the served model and it is only an estimate), then the optimizer's answer: **"Abdeckbar. Zwei Kolleg:innen …"**. If the estimate and the optimizer differ, the optimizer's answer stays and one line says so. No names, no trade-off (it only appears when the solver offers one).
 3. Tap "Urlaub beantragen".
 4. **Dashboard, Brandt:** *Anfragen*, "Urlaubsantrag, Dr. Aylin Kaya". Check the impact, tap "Genehmigen".
 5. **Staff app, Kaya:** *Mitteilungen* shows "Urlaub genehmigt".
@@ -83,7 +83,7 @@ Not yet tried by the author: the native (Expo Go, simulator) routes. The web rou
 3. "Als Entwurf öffnen" on the recommended one (**Dienstplan-Editor**).
 4. **Break a rule:** drag a late shift (S) onto a colleague's day so the next morning's early shift (F) follows within 11 hours. A red message names the rule and the fix. "Rückgängig" undoes it. Keyboard: arrow keys, Space picks up and drops.
 5. "Freigeben und veröffentlichen" → confirm. Toast: "Dezember 2026 veröffentlicht".
-6. *Protokoll* lists who did what; *KI-Transparenz* shows which components are built (C1 to C5) and which are stand-ins (C6–C8).
+6. *Protokoll* lists who did what; *KI-Transparenz* shows which components are built (C1 to C6) and which are stand-ins (C7, C8).
 7. **Vogel** (Oversight): *Aufsicht* is read-only; *Fairness und Compliance* shows no names.
 
 ## 6. Start over, and automated checks

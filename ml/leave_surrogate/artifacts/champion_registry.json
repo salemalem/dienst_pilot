@@ -1,0 +1,6 @@
+{
+ "registered_model": "c6-leave-surrogate",
+ "alias": "champion",
+ "registry_version": 5,
+ "kind": "logistic"
+}

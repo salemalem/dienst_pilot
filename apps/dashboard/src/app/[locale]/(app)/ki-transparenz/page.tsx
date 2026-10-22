@@ -336,6 +336,90 @@ function C5Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
   );
 }
 
+type C6Cell = { precision: number | null; recall: number | null; n: number };
+type C6Test = { natural: C6Cell; stress: C6Cell; pooled: C6Cell };
+
+function C6Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
+  const t = useTranslations("w13");
+  const test = m.test_2025 as Record<string, C6Test> | undefined;
+  const champion = (m.champion as { kind?: string; promoted_learner?: boolean } | undefined) ?? {};
+  const kinds = ["stand_in", "logistic", "lightgbm"] as const;
+  const kind = champion.kind as (typeof kinds)[number] | undefined;
+  const pct = (v: number | null | undefined): string =>
+    v === null || v === undefined ? "–" : fmt.percent(v);
+  const lat = (m.latency_full_hint_path as Record<string, { p95_ms: number }> | undefined)?.[
+    kind ?? "lightgbm"
+  ];
+  const agr = m.agreement_with_solver_2025 as
+    Record<string, { agreement_rate: number | null }> | undefined;
+  const limit = num(
+    (m.promotion as { checks?: Record<string, unknown> } | undefined)?.checks
+      ?.hint_latency_p95_under_limit,
+    "limit_ms",
+  );
+  return (
+    <div className="flex flex-col gap-2" data-testid="c6-metrics">
+      <p className="caption m-0 text-ink-muted">
+        {t("evalSource", { source: "eval/results/c6.json", months: "" })}
+      </p>
+      {kind ? (
+        <p className="body-strong m-0" data-testid="c6-served">
+          {t("m.c6Served", { model: t(`m.c6Models.${kind}`) })}
+        </p>
+      ) : null}
+      <Table label={t("m.label")}>
+        <thead>
+          <tr>
+            <th scope="col">{t("m.c6Model")}</th>
+            <th scope="col" className="text-right">
+              {t("m.c6Natural")}
+            </th>
+            <th scope="col" className="text-right">
+              {t("m.c6Stress")}
+            </th>
+            <th scope="col" className="text-right">
+              {t("m.c6Pooled")}
+            </th>
+            <th scope="col" className="text-right">
+              {t("m.c6Recall")}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {kinds.map((k) =>
+            test?.[k] ? (
+              <tr key={k} data-served={k === kind} data-testid={`c6-model-${k}`}>
+                <td className={k === kind ? "body-strong" : undefined}>{t(`m.c6Models.${k}`)}</td>
+                <td className="num-time text-right">{pct(test[k].natural.precision)}</td>
+                <td className="num-time text-right">{pct(test[k].stress.precision)}</td>
+                <td className="num-time text-right">{pct(test[k].pooled.precision)}</td>
+                <td className="num-time text-right">{pct(test[k].pooled.recall)}</td>
+              </tr>
+            ) : null,
+          )}
+        </tbody>
+      </Table>
+      <p className="caption m-0 text-ink-muted" data-testid="c6-promotion">
+        {champion.promoted_learner ? t("m.c6Promoted") : t("m.c6NotPromoted")}
+      </p>
+      {lat && limit !== null ? (
+        <p className="caption m-0 text-ink-muted" data-testid="c6-latency">
+          {t("m.c6Latency", { ms: fmt.number(lat.p95_ms, 1), limit: fmt.number(limit, 0) })}
+        </p>
+      ) : null}
+      {agr ? (
+        <p className="caption m-0 text-ink-muted" data-testid="c6-agreement">
+          {t("m.c6Agreement", {
+            natural: pct(agr.natural?.agreement_rate),
+            pooled: pct(agr["pooled including simulated stress states"]?.agreement_rate),
+          })}
+        </p>
+      ) : null}
+      <p className="caption m-0 text-ink-muted">{t("m.c6Note")}</p>
+    </div>
+  );
+}
+
 function Card({ c }: { c: Component }): ReactNode {
   const t = useTranslations("w13");
   const fmt = useFmt();
@@ -376,9 +460,11 @@ function Card({ c }: { c: Component }): ReactNode {
               ? t("trainedC4")
               : c.component === "C5"
                 ? t("trainedC5")
-                : c.kind === "ml"
-                  ? t("notTrained")
-                  : t("notApplicable")}
+                : c.component === "C6"
+                  ? t("trainedC6")
+                  : c.kind === "ml"
+                    ? t("notTrained")
+                    : t("notApplicable")}
         </dd>
         <dt className="text-ink-muted">{t("modelCard")}</dt>
         <dd className="m-0">
@@ -388,7 +474,9 @@ function Card({ c }: { c: Component }): ReactNode {
               ? t("modelCardC4")
               : c.component === "C5"
                 ? t("modelCardC5")
-                : t("modelCardNone")}
+                : c.component === "C6"
+                  ? t("modelCardC6")
+                  : t("modelCardNone")}
         </dd>
         <dt className="text-ink-muted">{t("canChange")}</dt>
         <dd className="body-strong m-0" data-testid="can-change">
@@ -405,6 +493,8 @@ function Card({ c }: { c: Component }): ReactNode {
         <C4Metrics m={metrics} fmt={fmt} />
       ) : metrics && c.component === "C5" ? (
         <C5Metrics m={metrics} fmt={fmt} />
+      ) : metrics && c.component === "C6" ? (
+        <C6Metrics m={metrics} fmt={fmt} />
       ) : (
         <p
           className="body m-0 rounded-mark border border-dashed border-pencil bg-pencil-wash p-3 text-pencil"

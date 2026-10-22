@@ -1,0 +1,9 @@
+{
+ "calls": 40,
+ "max_ms": 64.64887499896577,
+ "p50_ms": 10.003042003518203,
+ "p95_ms": 17.642741699091857,
+ "platform": "macOS-26.6.2-arm64-arm-64bit",
+ "warmup_calls": 5,
+ "what": "POST /me/leave/check through the test client, no network, solver not run, Postgres on the same machine"
+}

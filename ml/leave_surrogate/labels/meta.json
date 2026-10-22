@@ -1,0 +1,60 @@
+{
+ "dataset_manifest_sha256": "1b5910d6eda6df7b8a7ea9f1c075be3fd226a53821359fd8b3c0c2451c29acff",
+ "files": {
+  "sample.jsonl": "a03d5b8ab617857f841c16a49da03f00189293efcd0587d5e92b6ecfda1fd45c",
+  "test.jsonl": "569c648f6cb247039b3db2e948557329c6f3661f4eda74f403ec1e459f838b93",
+  "train.jsonl": "5bf956867667ef96d63755e1587c7aa283e5e7d3923ad9de2f1c756d7ed452fe"
+ },
+ "seed": 20261020,
+ "summary": {
+  "test": {
+   "by_stratum": {
+    "natural": {
+     "coverable": 488,
+     "coverable_with_trade_off": 15,
+     "not_coverable": 1
+    },
+    "stress": {
+     "coverable": 291,
+     "coverable_with_trade_off": 15,
+     "not_coverable": 186
+    }
+   },
+   "mean_solve_seconds": 3.49,
+   "mean_solves": 1.91,
+   "n": 996,
+   "outcomes": {
+    "coverable": 779,
+    "coverable_with_trade_off": 30,
+    "not_coverable": 187
+   }
+  },
+  "train": {
+   "by_stratum": {
+    "natural": {
+     "coverable": 1475,
+     "coverable_with_trade_off": 11,
+     "not_coverable": 2
+    },
+    "stress": {
+     "coverable": 870,
+     "coverable_with_trade_off": 17,
+     "not_coverable": 601
+    }
+   },
+   "mean_solve_seconds": 3.31,
+   "mean_solves": 1.83,
+   "n": 2976,
+   "outcomes": {
+    "coverable": 2345,
+    "coverable_with_trade_off": 28,
+    "not_coverable": 603
+   }
+  }
+ },
+ "versions": {
+  "labels": "c6-labels-1",
+  "solver": "c1-1.0.1",
+  "validator": "c2-1.0.0"
+ }
+}

@@ -6,10 +6,10 @@ from dienstpilot.engines.built import CpSatOptimizer, RuleValidator
 from dienstpilot.engines.c3 import C3Forecaster
 from dienstpilot.engines.c4 import C4PreferenceLearner
 from dienstpilot.engines.c5 import C5CoverRanker
+from dienstpilot.engines.c6 import C6LeaveFeasibility
 from dienstpilot.engines.standins import (
     CopilotStandIn,
     IntakeStandIn,
-    LeaveFeasibilityStandIn,
 )
 from dienstpilot.shared.ports import (
     AbsenceForecaster,
@@ -55,14 +55,14 @@ class Engines:
 
 
 def default_engines() -> Engines:
-    """Return the current set: C1 to C5 built, stand-ins for C6–C8."""
+    """Return the current set: C1 to C6 built, stand-ins for C7 and C8."""
     return Engines(
         CpSatOptimizer(),
         RuleValidator(),
         C3Forecaster(),
         C4PreferenceLearner(),
         C5CoverRanker(),
-        LeaveFeasibilityStandIn(),
+        C6LeaveFeasibility(),
         IntakeStandIn(),
         CopilotStandIn(),
     )

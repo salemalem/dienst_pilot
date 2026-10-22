@@ -2,7 +2,7 @@ COMPOSE := docker compose -f infra/compose.dev.yml
 SEED ?= 20261020
 SEED_DIR := data/synthetic/v1
 
-.PHONY: install dev down logs seed test e2e screenshots lint format api-client eval tune train
+.PHONY: install dev down logs seed test e2e screenshots lint format api-client eval tune train labels
 
 install: ## Install Python and Node dependencies
 	uv sync
@@ -60,12 +60,22 @@ format: ## Apply ruff and prettier formatting
 	uv run ruff check --fix backend ml
 	pnpm format
 
-train: ## C3, C4 and C5: rolling-origin CV on 2021-2024, fit the candidates, log and register them in the local MLflow (ml/mlflow)
+CAFFEINATE := $(shell command -v caffeinate >/dev/null 2>&1 && echo "caffeinate -i")
+
+labels: ## C6 labels: solver runs on simulated leave requests (about an hour, resumable; the Mac stays awake)
+	$(CAFFEINATE) uv run python eval/run_c6_labels.py --split train
+	$(CAFFEINATE) uv run python eval/run_c6_labels.py --split test
+	$(CAFFEINATE) uv run python eval/run_c6_labels.py --fidelity 200
+	uv run python eval/run_c6_labels.py --sample
+	uv run python eval/run_c6_labels.py --seal
+
+train: ## C3, C4, C5 and C6: rolling-origin CV on 2021-2024, fit the candidates, log and register them in the local MLflow (ml/mlflow)
 	uv run python -m dienstpilot_ml.training --data $(SEED_DIR)
 	uv run python -m dienstpilot_ml.training.c4 --data $(SEED_DIR)
 	uv run python -m dienstpilot_ml.training.c5 --data $(SEED_DIR)
+	uv run python -m dienstpilot_ml.training.c6
 
-eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.1 table, C3, C4 and C5 (runs make train first)
+eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.1 table, C3, C4, C5 and C6 (runs make train first; C6 reads the committed labels, `make labels` rebuilds them)
 	uv run python eval/run_validator_eval.py --data $(SEED_DIR)
 	uv run python eval/run_benchmark.py --data $(SEED_DIR)
 	uv run python eval/render_tables.py
@@ -73,6 +83,8 @@ eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.
 	uv run python eval/run_c3_eval.py --data $(SEED_DIR)
 	uv run python eval/run_c4_eval.py --data $(SEED_DIR)
 	uv run python eval/run_c5_eval.py --data $(SEED_DIR)
+	-C6_WRITE_LATENCY=1 uv run pytest backend/tests/api/test_leave_hint.py -k endpoint_latency -q
+	uv run python eval/run_c6_eval.py --data $(SEED_DIR)
 
 tune: ## Re-tune the balanced profile on July-December 2024 (eval/results/tuning.json)
 	uv run python eval/tune_profiles.py --data $(SEED_DIR)
