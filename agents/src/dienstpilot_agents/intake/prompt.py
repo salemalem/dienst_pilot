@@ -6,7 +6,7 @@ import hashlib
 from dienstpilot_agents.intake.schema import TOOL_NAME, TOOL_SCHEMA
 from dienstpilot_agents.llm.types import LlmRequest, SystemBlock, Tool
 
-PROMPT_VERSION = "c7-1"
+PROMPT_VERSION = "c7-2"
 MAX_TOKENS = 400  # an answer is a small JSON object; this leaves room for a long date range
 
 SYSTEM = """You turn a physician's free-text wishes about their duty roster (German or English) into a \
@@ -38,13 +38,16 @@ Shift types: frueh = Frühdienst / Früh / early; spaet = Spätdienst / Spät / 
 Nächte / night; bereitschaft = Bereitschaftsdienst / Bereitschaft / on-call.
 
 Dates
-- A day without a month ("am 14.", "the 14th", "14.12.") belongs to the roster month. Use only dates \
+- A day without a month ("am 14.", "the 14th", "14.12.", or just "14." / "3." in a dictated text) belongs to the roster month. Use only dates \
 inside the roster month; ignore dates outside it.
 - Expand a range ("vom 14. bis 16.12.", "from the 14th to the 16th") into every date in it.
 - If the text is a list of dates, use all of them.
 
 When to ask
-- If the text gives no concrete day or shift to act on (vague, general mood, "lieber nicht", "I need a \
+- A complete answer needs no question: a weekend wish alone ("keine Wochenenden", "no weekends if \
+possible"), a general shift leaning, or any list of dates is a full answer. Ask only when something \
+that matters is missing.
+- If the text gives no concrete day, shift or weekend wish to act on (vague, general mood, "lieber nicht", "I need a \
 week off" without dates, "not too many shifts"), leave all other fields empty and ask ONE short \
 question that asks for the concrete days or shifts.
 - If someone says they would rather not work on a date but names no shift, do not guess: leave that \
