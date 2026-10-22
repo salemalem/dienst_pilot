@@ -1,7 +1,7 @@
 import { unwrap, type components } from "@dienstpilot/api-client";
 import { daysInMonth, formatPercent, weekdayIndex } from "@dienstpilot/i18n";
 import { spacing } from "@dienstpilot/design-tokens";
-import { Check, Star, X } from "lucide-react-native";
+import { Check, Minus, Star, X } from "lucide-react-native";
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
@@ -98,7 +98,7 @@ export function WishesScreen(): ReactNode {
         ...list,
         ...days.map((d): Entry =>
           h.kind === "avoid"
-            ? { date: d, kind: "unavailable", shift_type: null, important: false }
+            ? { date: d, kind: "avoid_shift", shift_type: shift, important: false }
             : { date: d, kind: "wish_work", shift_type: shift, important: false },
         ),
       ];
@@ -117,7 +117,14 @@ export function WishesScreen(): ReactNode {
     settings?.preference_suggestions === false
       ? []
       : (q.data?.suggestions ?? []).filter(
-          (h) => !dismissed.includes(`${h.kind}-${String(h.weekday)}-${h.shift_type}`),
+          (h) =>
+            !dismissed.includes(`${h.kind}-${String(h.weekday)}-${h.shift_type}`) &&
+            !(entries ?? []).some(
+              (e) =>
+                e.kind === (h.kind === "avoid" ? "avoid_shift" : "wish_work") &&
+                e.shift_type === h.shift_type &&
+                weekdayIndex(e.date) === h.weekday,
+            ),
         );
   const weekdayNames = [
     "2026-10-19",
@@ -172,13 +179,20 @@ export function WishesScreen(): ReactNode {
                     return {
                       selected: date === selected,
                       description: e
-                        ? (e.kind === "unavailable" ? t("m4.cannot") : t("m4.want")) +
-                          (e.important ? `, ${t("m4.important")}` : "")
+                        ? (e.kind === "unavailable"
+                            ? t("m4.cannot")
+                            : e.kind === "avoid_shift"
+                              ? t("m4.avoidShift", {
+                                  shift: t(`shift.${(e.shift_type ?? "frueh") as "frueh"}.name`),
+                                })
+                              : t("m4.want")) + (e.important ? `, ${t("m4.important")}` : "")
                         : t("m4.none"),
                       adornment: e ? (
                         <>
                           {e.kind === "unavailable" ? (
                             <X size={14} color={theme.ink} strokeWidth={2} />
+                          ) : e.kind === "avoid_shift" ? (
+                            <Minus size={14} color={theme.ink} strokeWidth={2} />
                           ) : (
                             <Check size={14} color={theme.ink} strokeWidth={2} />
                           )}
@@ -200,12 +214,16 @@ export function WishesScreen(): ReactNode {
                     <Txt variant="caption">{t("m4.want")}</Txt>
                   </View>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: spacing[1] }}>
+                    <Minus size={14} color={theme.ink} strokeWidth={2} />
+                    <Txt variant="caption">{t("m4.avoidLegend")}</Txt>
+                  </View>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: spacing[1] }}>
                     <Star size={12} color={theme.ink} fill={theme.ink} strokeWidth={1.75} />
                     <Txt variant="caption">{t("m4.important")}</Txt>
                   </View>
                 </View>
               </Card>
-              {sel ? (
+              {sel && sel.kind !== "avoid_shift" ? (
                 <Button
                   label={sel.important ? t("m4.unstar") : t("m4.star", { max, used: important })}
                   disabled={!sel.important && important >= max}

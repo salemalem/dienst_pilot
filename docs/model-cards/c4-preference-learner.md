@@ -4,7 +4,7 @@ Status: built and evaluated on synthetic data. Nothing here describes a real dep
 
 ## Intended use
 
-Suggest, in the request window, shift preferences a person has probably shown before ("You offered Monday late shifts for swap more often than most. Enter as 'can't work'?"). The staff app shows them as dismissible chips (M4) with "Warum? / Why?", which gives the numbers behind each one. A suggestion changes nothing until the person taps to enter it as an ordinary wish. It never reaches the solver on its own.
+Suggest, in the request window, shift preferences a person has probably shown before ("You offered Monday late shifts for swap more often than most. Enter 'rather not late shift' for those days?"). The staff app shows them as dismissible chips (M4) with "Warum? / Why?", which gives the numbers behind each one. A suggestion changes nothing until the person taps to enter it. A confirmed "avoid" chip becomes a soft per-shift preference ("lieber nicht Spätdienst") on each day of that weekday in the open window: the person stays available for every other shift that day, and only the solver's soft objective sees it, with the weight of one unmet wish. A confirmed "prefer" chip becomes ordinary "möchte arbeiten" wishes. Nothing reaches the solver on its own.
 
 ## Out-of-scope uses
 
@@ -88,7 +88,7 @@ Reading the table (this run; the generated table above is authoritative): both p
 - Synthetic data: the latent preferences, the wish noise and the swap behaviour are simulation inputs. Results say that the pipeline works, not that real people reveal their preferences like this.
 - Little data per person: about 25 months of wishes and a few dozen swap offers per person over four years. That is why the comparison is sensitive to the margin and interval chosen in the rule; the rule was fixed before the run and not changed afterwards.
 - The model sees only what people did, not why. A swap offer may be about a childcare gap or a one-off appointment; the chip says what happened and asks, it does not claim to know.
-- "Avoid" suggestions are entered as "kann nicht" for that weekday in the staff app (existing M4 behaviour), which is stronger than the model's estimate; the person decides.
+- A confirmed "avoid" chip is soft and per shift (request-window entry kind `avoid_shift`, ADR-013). It is not counted in the "wishes granted" metrics, and the roster grid does not yet mark whether it was honoured. An earlier version of the staff app wrongly turned such a chip into a hard "kann nicht" for the whole day; that was removed in this phase, and tests pin the soft behaviour.
 - The served model is fitted on 2021 to 2024 and is not refitted on 2025, so the published numbers describe exactly the served model. The person's own counts are updated live at request time, from their own tables.
 - The truth-recovery check compares learned scores with the generator's liking per cell (`eval/src/dienstpilot_eval/c4_truth.py`). Its target definition and the use of an undivided score (so that the pooled baseline has a department-level ranking instead of an undefined one) were fixed after seeing the first run; this check plays no part in promotion.
 

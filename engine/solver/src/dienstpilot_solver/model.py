@@ -52,6 +52,16 @@ class WishIn:
 
 
 @dataclass(frozen=True)
+class AvoidIn:
+    """A soft "rather not" for one shift on one day. Never blocks the person: it only adds a
+    penalty to the objective when that shift is assigned to them."""
+
+    staff_id: str
+    day: date
+    shift: str
+
+
+@dataclass(frozen=True)
 class Commitment:
     """A binding promise, e.g. a leave trade-off: at least ``weekends`` weekends with duty."""
 
@@ -73,6 +83,7 @@ class Problem:
     blocked: dict[str, frozenset[date]]
     history: tuple[tuple[str, date, str], ...]  # the seven days before the month, as worked
     wishes: tuple[WishIn, ...] = ()
+    avoid: tuple[AvoidIn, ...] = ()  # soft "rather not this shift" entries (objective only)
     ytd: dict[str, tuple[int, int, int]] = field(default_factory=dict)  # nights, weekends, holidays
     prior: tuple[tuple[str, date, str], ...] = ()  # a previous plan to stay close to (stability)
     commitments: tuple[Commitment, ...] = ()

@@ -252,10 +252,14 @@ def my_roster(
 
 
 class WishEntry(BaseModel):
-    """A request-window entry."""
+    """A request-window entry.
+
+    ``avoid_shift`` is a soft "rather not this shift" on that day: the person stays available for
+    every other shift, and only the solver's objective sees it.
+    """
 
     date: date
-    kind: Literal["unavailable", "wish_work"]
+    kind: Literal["unavailable", "wish_work", "avoid_shift"]
     shift_type: Literal["frueh", "spaet", "nacht", "bereitschaft", "ruf"] | None = None
     important: bool = False
 
@@ -350,6 +354,11 @@ def save_wishes(c: CtxDep, _: Physician, entries: list[WishEntry]) -> MyWishes:
     if sum(e.important for e in entries) > MAX_IMPORTANT:
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, f"At most {MAX_IMPORTANT} important wishes"
+        )
+    if any(e.kind == "avoid_shift" and (e.shift_type is None or e.important) for e in entries):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "A 'rather not' entry names one shift and is never marked important",
         )
     if any(month_start(e.date) != w.roster_month for e in entries):
         raise HTTPException(
