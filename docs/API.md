@@ -9,7 +9,7 @@ The HTTP API behind the staff app and the planner dashboard. It runs against the
   - Tokens expire 12 hours after they are issued on the demo clock, so after moving the clock forward you sign in again.
 - **Engines:** responses that use an intelligence component carry `engine: {component, implementation, version, note}`.
   - **C1 (optimizer) and C2 (validator)** are built (`implementation: "built"`, `engine/solver/`, `engine/validator/`).
-  - **C3** is built: the champion of the C3 model registry, served from a committed bundle (ADR-012). **C4–C8** are deterministic stand-ins (`implementation: "stand-in"`).
+  - **C3** is built: the champion of the C3 model registry, served from a committed bundle (ADR-012). **C4** is built the same way (the champion of the C4 registry; ADR-013). **C5–C8** are deterministic stand-ins (`implementation: "stand-in"`).
 - **Background jobs:** solver runs and the M5 trade-off check run in the arq worker (compose service `worker`). The endpoint answers with an id at once; the client polls (ADR-009).
 - **Rule violations** come back as i18n keys with parameters and a fix: `{rule, key: "violation.min_rest", staff_id, display_name, date, params, fix_key: "fix.min_rest", fix_params}` (`packages/i18n`). A write that would break a rule answers **422** with `{"detail": {"code": "rule_violation", "message", "violations": [...]}}`.
 
@@ -84,7 +84,7 @@ Every write records an audit event (`GET /audit/events`). The seed loader also t
 | M1 Anmeldung / Sign in | `GET /auth/personas`, `POST /auth/demo-login`, `GET /me` |
 | M2 Heute / Today | `GET /me/today` (next shift with colleagues, open window, open cover requests) |
 | M3 Mein Dienstplan / My roster | `GET /me/roster?month=YYYY-MM` (shifts, wish marks granted/missed, published by and when), `GET /me/fairness` (the one-line balance), `GET /me/settings` (calendar sync) |
-| M4 Wünsche / Wishes | `GET /me/wishes` (open window, entries, C4 suggestions), `PUT /me/wishes`, `POST /me/wishes/parse` (C7 preview, not saved) |
+| M4 Wünsche / Wishes | `GET /me/wishes` (open window, entries, C4 suggestions with the numbers behind "Warum? / Why?": `evidence`, `trials`, `rate`, `department_rate`, `probability`; empty when the person switched suggestions off in M12; never available to Planner or Oversight about anybody), `PUT /me/wishes`, `POST /me/wishes/parse` (C7 preview, not saved) |
 | M5 Urlaub beantragen / Request leave | `POST /me/leave/check` (C6 hint and a C1 check id), `GET /me/leave/checks/{id}` (coverable, with trade-off, not coverable), `POST /me/leave` ("Ohne Tausch" or "Mit Tausch beantragen" with `check_id`), `GET /me/leave` |
 | M6 Dienst tauschen / Swap | `GET /me/swaps/audience?assignment_id=` (count only, and whether the Planner must decide), `GET /me/swap-offers` (alone or as an exchange), `POST /me/swaps`, `GET /me/swaps`, `GET /me/swap-offers`, `POST /me/swap-offers/{swap_id}/take` |
 | M7 Krank melden / Report sick | `POST /me/sick` (dates only) |
