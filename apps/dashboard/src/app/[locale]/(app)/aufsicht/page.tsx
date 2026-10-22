@@ -13,6 +13,26 @@ import { useFmt } from "@/lib/fmt";
 import { useAction, useQuery } from "@/lib/hooks";
 import { useSession } from "@/lib/session";
 
+function Kpi({
+  label,
+  value,
+  note,
+  testId,
+}: {
+  label: string;
+  value: string;
+  note?: string | undefined;
+  testId?: string | undefined;
+}): ReactNode {
+  return (
+    <div className="flex flex-col gap-1 border border-rule bg-sheet p-4" data-testid={testId}>
+      <span className="caption text-ink-muted">{label}</span>
+      <span className="num-figure">{value}</span>
+      {note ? <span className="caption text-ink-muted">{note}</span> : null}
+    </div>
+  );
+}
+
 /** W12: read-only view for Klinikleitung and Betriebsrat. Fairness only as anonymous statistics. */
 export default function OversightPage(): ReactNode {
   const t = useTranslations("w12");
@@ -30,7 +50,7 @@ export default function OversightPage(): ReactNode {
     [m],
   );
   const audit = useQuery(
-    (a) => unwrap(a.GET("/audit/events", { params: { query: { limit: 20 } } })),
+    (a) => unwrap(a.GET("/audit/events", { params: { query: { limit: 8 } } })),
     [],
   );
   const exportLog = useAction(async () => {
@@ -46,30 +66,69 @@ export default function OversightPage(): ReactNode {
   });
   if (!m) return <Loading />;
   return (
-    <>
-      <PageHeader
-        title={t("title")}
-        status={
-          <span className="inline-flex items-center gap-2" data-testid="read-only">
-            <Eye {...ICON} /> {t("readOnly")}
-          </span>
-        }
-        actions={<MonthSwitch month={m} onChange={setMonth} />}
-      />
-      <Async query={q}>
-        {(s) => {
-          if (!s) return null;
-          const over = s.hours.people.filter((p) => p.overtime_hours > 0).length;
-          return (
-            <>
+    <Async query={q}>
+      {(s) => {
+        if (!s) return null;
+        const over = s.hours.people.filter((p) => p.overtime_hours > 0).length;
+        const violations = s.hours.rest_violations_total;
+        const weekends = s.fairness.find((d) => d.metric === "weekends");
+        return (
+          <>
+            <span
+              className="label inline-flex w-fit items-center gap-2 border border-rule-strong px-2 py-1"
+              data-testid="read-only"
+            >
+              <Eye {...ICON} /> {t("readOnly")}
+            </span>
+            <PageHeader
+              title={
+                violations === 0
+                  ? t("headlineOk", { month: fmt.month(m) })
+                  : t("headlineBad", { month: fmt.month(m), count: violations })
+              }
+              status={t("sublineOversight", { date: fmt.date(clock.data?.now ?? `${m}-01`) })}
+              actions={<MonthSwitch month={m} onChange={setMonth} />}
+            />
+            <div className="flex flex-wrap gap-2">
+              <Button
+                onClick={() => void exportLog.run()}
+                disabled={exportLog.pending}
+                icon={<Download {...ICON} />}
+              >
+                {t("export")}
+              </Button>
+            </div>
+            <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
+              <Kpi
+                label={t("kpiRest")}
+                value={
+                  violations === 0 ? tf("restOk") : tf("restViolations", { count: violations })
+                }
+                note={t("kpiRestNote", { people: s.hours.people.length })}
+              />
+              <Kpi
+                label={t("kpiOvertime")}
+                value={fmt.hours(s.hours.total_overtime_hours)}
+                note={t("kpiOvertimeNote", { over })}
+              />
+              <Kpi
+                label={t("costTitle")}
+                value="–"
+                note={t("kpiCostNote")}
+                testId="cost-placeholder"
+              />
+              <Kpi
+                label={t("kpiWeekends")}
+                value={weekends ? `${String(weekends.minimum)}–${String(weekends.maximum)}` : "–"}
+                note={
+                  weekends
+                    ? t("kpiWeekendsNote", { median: fmt.number(weekends.median, 1) })
+                    : undefined
+                }
+              />
+            </div>
+            <div className="grid items-start gap-6 [grid-template-columns:minmax(0,3fr)_minmax(320px,2fr)]">
               <Section title={t("hoursTitle", { month: fmt.month(m) })}>
-                <p className="body m-0">
-                  {t("hoursSummary", {
-                    overtime: fmt.number(s.hours.total_overtime_hours, 1),
-                    violations: s.hours.rest_violations_total,
-                    over,
-                  })}
-                </p>
                 <Table label={t("hoursLabel")}>
                   <thead>
                     <tr>
@@ -107,14 +166,29 @@ export default function OversightPage(): ReactNode {
                   </tbody>
                 </Table>
               </Section>
-              <Section title={t("fairnessTitle")}>
-                <p className="caption m-0 text-ink-muted">{t("fairnessNote")}</p>
-                <div className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
+              <div className="flex flex-col gap-6">
+                <Section title={t("auditTitle")}>
+                  <Async query={audit}>
+                    {(d) => (
+                      <>
+                        <ChainIndicator
+                          verified={
+                            (d as { chain_verified?: boolean | null }).chain_verified ?? null
+                          }
+                          fromPhase={d.chain_available_from_phase}
+                        />
+                        <AuditTable events={d.events} />
+                      </>
+                    )}
+                  </Async>
+                </Section>
+                <Section title={t("fairnessTitle")}>
+                  <p className="caption m-0 text-ink-muted">{t("fairnessNote")}</p>
                   {s.fairness.map((d) => {
                     const name = tf(`metric.${d.metric as "nights"}`);
                     return (
-                      <div key={d.metric} className="flex flex-col gap-2">
-                        <h3 className="heading m-0">{name}</h3>
+                      <div key={d.metric} className="flex flex-col gap-1">
+                        <h3 className="label m-0">{name}</h3>
                         <DotStrip
                           values={d.values}
                           min={d.minimum}
@@ -129,7 +203,7 @@ export default function OversightPage(): ReactNode {
                             max: d.maximum,
                           })}
                         />
-                        <p className="num-small m-0 text-ink-muted">
+                        <p className="caption m-0 text-ink-muted">
                           {tf("distFacts", {
                             people: d.people,
                             mean: fmt.number(d.mean, 1),
@@ -141,44 +215,12 @@ export default function OversightPage(): ReactNode {
                       </div>
                     );
                   })}
-                </div>
-              </Section>
-              <Section title={t("costTitle")}>
-                <p
-                  className="body m-0 rounded-mark border border-dashed border-pencil bg-pencil-wash p-3 text-pencil"
-                  data-testid="cost-placeholder"
-                >
-                  {t("costNone")}
-                </p>
-              </Section>
-            </>
-          );
-        }}
-      </Async>
-      <Section
-        title={t("auditTitle")}
-        aside={
-          <Button
-            onClick={() => void exportLog.run()}
-            disabled={exportLog.pending}
-            icon={<Download {...ICON} />}
-          >
-            {t("export")}
-          </Button>
-        }
-      >
-        <Async query={audit}>
-          {(d) => (
-            <>
-              <ChainIndicator
-                verified={(d as { chain_verified?: boolean | null }).chain_verified ?? null}
-                fromPhase={d.chain_available_from_phase}
-              />
-              <AuditTable events={d.events} />
-            </>
-          )}
-        </Async>
-      </Section>
-    </>
+                </Section>
+              </div>
+            </div>
+          </>
+        );
+      }}
+    </Async>
   );
 }

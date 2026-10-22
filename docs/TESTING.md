@@ -92,6 +92,7 @@ Not yet tried by the author: the native (Expo Go, simulator) routes. The web rou
 make seed       # clean demo state (also after you changed data)
 make e2e        # the same walkthroughs as automated tests (own database, ports 8100 / 3100 / 8083)
 make test       # unit and API tests
+make screenshots  # the portfolio screenshots (DE and EN), contact sheets and INDEX.md in screenshots/
 ```
 
 ## 7. If something does not work

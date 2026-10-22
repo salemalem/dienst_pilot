@@ -15,3 +15,4 @@ packages/api-client/openapi.json
 # Written by the eval/ scripts; never edited by hand
 eval/results/
 apps/mobile/dist-e2e
+screenshots/

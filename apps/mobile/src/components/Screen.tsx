@@ -31,8 +31,14 @@ export function Screen({
   footer,
   testID,
   back,
+  eyebrow,
+  strip,
 }: {
   back?: boolean;
+  /** A small line above the title (who and when). */
+  eyebrow?: string | undefined;
+  /** A tab strip above everything (the "Mehr" screens). */
+  strip?: ReactNode;
   title: string;
   status?: string | undefined;
   children: ReactNode;
@@ -50,6 +56,7 @@ export function Screen({
         contentContainerStyle={s.content}
         keyboardShouldPersistTaps="handled"
       >
+        {strip}
         {back === true ? (
           <Pressable
             accessibilityRole="button"
@@ -75,6 +82,11 @@ export function Screen({
           </Pressable>
         ) : null}
         <View style={{ gap: spacing[1] }}>
+          {eyebrow ? (
+            <Txt variant="caption" muted>
+              {eyebrow}
+            </Txt>
+          ) : null}
           <Txt variant="title" accessibilityRole="header">
             {title}
           </Txt>

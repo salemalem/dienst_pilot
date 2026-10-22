@@ -1,7 +1,7 @@
 "use client";
 
 import { unwrap } from "@dienstpilot/api-client";
-import { BellRing, Check } from "lucide-react";
+import { BellRing } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 
@@ -39,7 +39,6 @@ export default function WindowPage(): ReactNode {
     [month],
   );
   const [confirm, setConfirm] = useState(false);
-  const [filter, setFilter] = useState<"all" | "open">("all");
 
   const remind = useAction(async () => {
     if (!month) return;
@@ -68,92 +67,97 @@ export default function WindowPage(): ReactNode {
         if (!w) return null;
         const open = w.status === "open";
         const waiting = w.people.filter((p) => !p.responded_at);
-        const people = filter === "open" ? waiting : w.people;
         return (
           <>
             <PageHeader
-              title={t("title")}
-              status={`${t("progress", { responded: w.responded, recipients: w.recipients })} · ${open ? t("opensCloses", { opens: fmt.date(w.opens_at), closes: fmt.date(w.closes_at) }) : t("statusClosed")}`}
+              title={t("progress", { responded: w.responded, recipients: w.recipients })}
+              status={`${t("subline", { month: fmt.month(month) })} · ${open ? t("opensCloses", { opens: fmt.date(w.opens_at), closes: fmt.date(w.closes_at) }) : t("statusClosed")}`}
               actions={
                 open ? (
                   <>
                     <Button
-                      onClick={() => void remind.run()}
-                      disabled={remind.pending || waiting.length === 0}
-                      icon={<BellRing {...ICON} />}
-                    >
-                      {t("remind")}
-                    </Button>
-                    <Button
-                      variant="primary"
                       onClick={() => {
                         setConfirm(true);
                       }}
                     >
                       {t("close")}
                     </Button>
+                    <Button
+                      variant="primary"
+                      onClick={() => void remind.run()}
+                      disabled={remind.pending || waiting.length === 0}
+                      icon={<BellRing {...ICON} />}
+                    >
+                      {t("remind")}
+                    </Button>
                   </>
                 ) : null
               }
             />
-            <Section title={t("progressTitle", { month: fmt.month(month) })}>
+            <div className="flex flex-col gap-1">
               <Progress
                 value={w.responded}
                 max={w.recipients}
                 label={t("progress", { responded: w.responded, recipients: w.recipients })}
               />
-              {open ? (
+              <div className="flex items-baseline justify-between gap-4">
                 <p className="caption m-0 text-ink-muted">
-                  {t("remindNote", { count: waiting.length })}
+                  {open ? t("remindNote", { count: waiting.length }) : ""}
                 </p>
-              ) : null}
-              <div className="flex gap-3">
-                <Button
-                  variant={filter === "all" ? "primary" : "secondary"}
-                  aria-pressed={filter === "all"}
-                  onClick={() => {
-                    setFilter("all");
-                  }}
-                >
-                  {t("filterAll", { count: w.people.length })}
-                </Button>
-                <Button
-                  variant={filter === "open" ? "primary" : "secondary"}
-                  aria-pressed={filter === "open"}
-                  onClick={() => {
-                    setFilter("open");
-                  }}
-                >
-                  {t("filterOpen", { count: waiting.length })}
-                </Button>
+                <span className="num-small text-ink-muted" data-testid="window-percent">
+                  {fmt.percent(w.recipients > 0 ? w.responded / w.recipients : 0)}
+                </span>
               </div>
-              <Table label={t("listLabel")}>
-                <thead>
-                  <tr>
-                    <th scope="col">{t("colPerson")}</th>
-                    <th scope="col">{t("colStatus")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {people.map((p) => (
-                    <tr key={p.staff_id}>
-                      <td>{p.display_name}</td>
-                      <td>
-                        {p.responded_at ? (
-                          <span className="inline-flex items-center gap-2">
-                            <Check {...ICON} />
-                            {t("answered", { date: fmt.dateTime(p.responded_at) })}
-                          </span>
-                        ) : (
-                          <span className="text-ink-muted">{t("notAnswered")}</span>
-                        )}
-                      </td>
+            </div>
+            {remind.error ? <ErrorState error={remind.error} /> : null}
+            <div className="grid items-start gap-6 [grid-template-columns:repeat(auto-fit,minmax(380px,1fr))]">
+              <Section
+                title={t("waitingTitle")}
+                aside={<span className="num-small">{waiting.length}</span>}
+              >
+                <Table label={t("waitingTitle")}>
+                  <thead>
+                    <tr>
+                      <th scope="col">{t("colPerson")}</th>
+                      <th scope="col">{t("colStatus")}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
-              {remind.error ? <ErrorState error={remind.error} /> : null}
-            </Section>
+                  </thead>
+                  <tbody>
+                    {waiting.map((p) => (
+                      <tr key={p.staff_id}>
+                        <td>{p.display_name}</td>
+                        <td className="text-ink-muted">{t("notAnswered")}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Section>
+              <Section
+                title={t("answeredTitle")}
+                aside={<span className="num-small">{w.people.length - waiting.length}</span>}
+              >
+                <Table label={t("answeredTitle")}>
+                  <thead>
+                    <tr>
+                      <th scope="col">{t("colPerson")}</th>
+                      <th scope="col">{t("colAnswered")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {w.people
+                      .filter((p) => p.responded_at)
+                      .map((p) => (
+                        <tr key={p.staff_id}>
+                          <td>{p.display_name}</td>
+                          <td className="num-small">
+                            {p.responded_at ? fmt.dateTime(p.responded_at) : ""}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </Table>
+              </Section>
+            </div>
             <Dialog
               open={confirm}
               title={t("closeTitle", { month: fmt.month(month) })}

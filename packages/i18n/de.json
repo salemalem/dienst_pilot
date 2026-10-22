@@ -142,7 +142,8 @@
     "sentTitle": "Urlaub beantragt",
     "sentBody": "Die Planung entscheidet. Die Antwort erscheint unter Mitteilungen.",
     "toToday": "Zurück zu Heute",
-    "statusOpen": "Offen, wartet auf die Planung"
+    "statusOpen": "Offen, wartet auf die Planung",
+    "change": "Zeitraum ändern"
   },
   "m6": {
     "offerExchange": "Tausch anbieten",
@@ -170,7 +171,8 @@
     "noOffers": "Zurzeit liegt kein Angebot für Sie vor.",
     "take": "Dienst übernehmen",
     "exchangeFor": "Tauschen gegen:",
-    "takeAgainst": "Übernehmen und {date} {shift} abgeben"
+    "takeAgainst": "Übernehmen und {date} {shift} abgeben",
+    "change": "Anderen Dienst wählen"
   },
   "notification": {
     "roster_changed": "Ihr Dienstplan am {date} wurde geändert. Grund: {reason}",
@@ -326,7 +328,11 @@
     "colStatus": "Status",
     "answered": "Geantwortet am {date}",
     "notAnswered": "Noch offen",
-    "remindNote": "Die Erinnerung geht nur an {count, plural, one {die 1 Person} other {die # Personen}} ohne Antwort."
+    "remindNote": "Die Erinnerung geht nur an {count, plural, one {die 1 Person} other {die # Personen}} ohne Antwort.",
+    "subline": "Wunschphase {month}",
+    "waitingTitle": "Noch keine Antwort",
+    "answeredTitle": "Geantwortet",
+    "colAnswered": "Am"
   },
   "rules": {
     "coverage": "Besetzung",
@@ -588,7 +594,36 @@
     "noConsequence": "Keine Stundenfolge für die Abteilung.",
     "rank": "Position {rank} in der Rangfolge.",
     "checked": "Der Validator (C2) hat diese Option geprüft.",
-    "decided": "Entschieden"
+    "decided": "Entschieden",
+    "headline": "{shift} am {date} ist noch offen: Ihre Entscheidung",
+    "absent": "abwesend: {name}",
+    "suggestionTitle": "Vorschlag: Optionen in dieser Reihenfolge",
+    "optionsQuestion": "Wie soll der {shift} besetzt werden?",
+    "optionN": "Option {n} · {kind}",
+    "consequenceLabel": "Folge:",
+    "whyOrder": "Warum diese Reihenfolge",
+    "aiNote": "Die KI schlägt nur vor. Wählen Sie eine Option.",
+    "runOption": "Option ausführen",
+    "shiftName": {
+      "frueh": "Frühdienst",
+      "spaet": "Spätdienst",
+      "nacht": "Nachtdienst",
+      "bereitschaft": "Bereitschaftsdienst",
+      "ruf": "Rufbereitschaft",
+      "frei": "Urlaub"
+    },
+    "kind": {
+      "confirm_cover": "Übernahme",
+      "assign": "Einteilen",
+      "locum": "Externe Vertretung",
+      "unfilled": "Unbesetzt"
+    },
+    "noConsequenceFor": {
+      "confirm_cover": "Stunden und Überstunden stehen oben.",
+      "assign": "Stunden und Überstunden stehen oben.",
+      "locum": "Keine Überstunden im Team; Kosten und Übergabe regelt die Planung.",
+      "unfilled": "Der Dienst bleibt ohne Besetzung; das Team bleibt im Stundenrahmen."
+    }
   },
   "w8": {
     "title": "Fairness und Compliance",
@@ -669,6 +704,19 @@
       "proposal_created": "Vorschlag angelegt",
       "policy_changed": "Automatische Freigabe geändert",
       "demo_clock_set": "Demo-Uhr gesetzt"
+    },
+    "subject": {
+      "roster_variant": "Dienstplan",
+      "roster_run": "Berechnung",
+      "request_window": "Wunschphase",
+      "leave_request": "Urlaubsantrag",
+      "swap": "Tausch",
+      "swap_offer": "Tausch",
+      "cover_cascade": "Vertretung",
+      "policy": "Automatische Freigabe",
+      "proposal": "Vorschlag",
+      "absence": "Abwesenheit",
+      "clock": "Demo-Uhr"
     }
   },
   "w11": {
@@ -730,7 +778,17 @@
     "colPerson": "Person",
     "colRole": "Funktion",
     "colWeekly": "Wochenstunden",
-    "colQuals": "Qualifikationen"
+    "colQuals": "Qualifikationen",
+    "headline": "Regelversion {version} ist aktiv",
+    "headlineSub": "Gültig seit {date} · Änderungen nimmt die Administration vor, freigegeben von der Klinikleitung",
+    "tabs": "Bereiche",
+    "tab": {
+      "rules": "Regeln",
+      "shifts": "Diensttypen",
+      "demand": "Bedarf",
+      "quals": "Qualifikationen",
+      "contracts": "Verträge"
+    }
   },
   "w12": {
     "title": "Aufsicht",
@@ -743,7 +801,17 @@
     "costTitle": "Kosten",
     "costNone": "Platzhalter: Eine Kostenrechnung gibt es in diesem Prototyp noch nicht. Es wird keine Zahl erfunden.",
     "auditTitle": "Protokoll (jüngste Ereignisse)",
-    "export": "Protokoll exportieren"
+    "export": "Protokoll exportieren",
+    "headlineOk": "{month}: alle Regeln eingehalten",
+    "headlineBad": "{month}: {count, plural, one {1 Ruhezeit-Verstoß} other {# Ruhezeit-Verstöße}}",
+    "sublineOversight": "Klinik für Innere Medizin · Stand {date} · Sie sehen Zahlen und Protokoll, Dienste ändern können Sie hier nicht.",
+    "kpiRest": "Ruhezeit",
+    "kpiRestNote": "bei {people} Personen im Monat",
+    "kpiOvertime": "Überstunden",
+    "kpiOvertimeNote": "{over, plural, =0 {bei niemandem} one {bei 1 Person} other {bei # Personen}}",
+    "kpiCostNote": "Platzhalter: keine Kostenrechnung im Prototyp",
+    "kpiWeekends": "Wochenenddienste im Jahr",
+    "kpiWeekendsNote": "Spanne, Median {median}"
   },
   "w13": {
     "title": "KI-Transparenz",
@@ -804,6 +872,17 @@
         "title": "Sprachmodelle",
         "tagline": "Lesen und erklären Sprache. Ein Satz wird nie zu einer Dienstzuteilung."
       }
+    },
+    "headline": "8 Komponenten. Keine kann den Dienstplan ändern.",
+    "about": {
+      "C1": "Berechnet gültige Dienstpläne und mehrere Varianten; die Regeln sind harte Bedingungen.",
+      "C2": "Prüft jeden Plan unabhängig gegen die Regeln und lässt nichts durch, was eine Regel bricht.",
+      "C3": "Schätzt erwartete Ausfälle pro Tag für die ganze Abteilung, nie für einzelne Personen.",
+      "C4": "Schlägt Wünsche vor, die Sie bisher häufig geäußert haben.",
+      "C5": "Ordnet mögliche Vertretungen nach ihrer bisherigen Belastung.",
+      "C6": "Schätzt sofort, ob ein Urlaub abdeckbar ist; die genaue Prüfung macht C1.",
+      "C7": "Liest Freitext zu Wünschen und macht daraus eine Vorschau, die Sie bestätigen.",
+      "C8": "Beantwortet Fragen zum Plan, zitiert die Regelquelle und legt nur Vorschläge an."
     }
   },
   "qualification": {
@@ -816,7 +895,7 @@
     "today": "Heute",
     "roster": "Dienstplan",
     "notifications": "Mitteilungen",
-    "settings": "Einstellungen"
+    "settings": "Mehr"
   },
   "demo": {
     "title": "Demo-Menü",
@@ -950,7 +1029,12 @@
       "nights": "Nachtdiensten",
       "weekends": "Wochenenddiensten",
       "holidays": "Feiertagsdiensten"
-    }
+    },
+    "exactly": "genau im Durchschnitt",
+    "shortBelow": "{n} unter dem Durchschnitt",
+    "shortAbove": "{n} über dem Durchschnitt",
+    "you": "Sie {n}",
+    "legend": "Punkt: Sie. Strich: Durchschnitt der Abteilung. Linie: niedrigster bis höchster Wert."
   },
   "m10": {
     "title": "Stunden",
@@ -961,7 +1045,11 @@
     "leaveCredit": "Urlaub (angerechnet)",
     "rest": "Ruhezeiten",
     "restOk": "Alle Ruhezeiten von mindestens {hours} Stunden eingehalten.",
-    "restViolations": "{count, plural, one {Eine Ruhezeit} other {# Ruhezeiten}} unter {hours} Stunden."
+    "restViolations": "{count, plural, one {Eine Ruhezeit} other {# Ruhezeiten}} unter {hours} Stunden.",
+    "eyebrow": "{month}, Stand {date}",
+    "restAllOk": "Alle Ruhezeiten eingehalten",
+    "footnote": "Die Stunden gehen mit dem Monatsabschluss an die Personalabteilung.",
+    "overtime": "Überstunden"
   },
   "m11": {
     "title": "Mitteilungen",
@@ -988,6 +1076,13 @@
     "wishes": "Wünsche",
     "fairness": "Fairness-Bilanz",
     "hours": "Stunden",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "syncHint": "Veröffentlichte Dienste erscheinen im Kalender Ihres Telefons.",
+    "suggestionsHint": "Vorschläge aus Ihren bisherigen Wünschen, in Bleistift markiert. Sie werden nie ohne Ihre Zustimmung übernommen."
+  },
+  "more": {
+    "fairness": "Fairness-Bilanz",
+    "hours": "Stunden",
+    "settings": "Einstellungen"
   }
 }

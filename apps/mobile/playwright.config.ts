@@ -29,7 +29,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: `node e2e/serve.mjs dist-e2e ${String(WEB_PORT)}`,
+    command: `node ../../scripts/e2e/serve.mjs dist-e2e ${String(WEB_PORT)}`,
     url: `http://localhost:${String(WEB_PORT)}/`,
     reuseExistingServer: false,
     timeout: 60_000,

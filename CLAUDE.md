@@ -130,6 +130,7 @@ Fill these in as they are built: `make train`, `make eval`, `make screenshots` (
 - `make format`: apply ruff and prettier formatting.
 - `make api-client`: regenerate `packages/api-client` from the backend's OpenAPI schema.
 - `make eval`: validator eval (`eval/results/c2.json`), the full benchmark on 2025 (`benchmark.json`, `c1.json`, about 10 minutes) and the ARCHITECTURE §17.1 table. CI runs the one-month smoke benchmark and checks that its results hash matches the committed one.
+- `make screenshots`: rebuilds both apps, then captures the UI_SPEC §6 list in DE and EN (each language on a fresh seed, demo clock per scene) into `screenshots/<lang>/<theme>/`, with a contact sheet per language and `screenshots/INDEX.md`; PNGs are re-encoded losslessly (sharp). `pnpm --filter @dienstpilot/screenshots compare` writes reference-versus-app side-by-sides to `review/` (git-ignored).
 - `make tune`: re-tune the balanced profile on July to December 2024 (`eval/results/tuning.json`); copy the winner into `PROFILES` (a test checks they agree).
 
 Trying it by hand (devices, walkthrough of the three situations in both apps): `docs/TESTING.md`.
