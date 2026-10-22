@@ -9,7 +9,7 @@ The HTTP API behind the staff app and the planner dashboard. It runs against the
   - Tokens expire 12 hours after they are issued on the demo clock, so after moving the clock forward you sign in again.
 - **Engines:** responses that use an intelligence component carry `engine: {component, implementation, version, note}`.
   - **C1 (optimizer) and C2 (validator)** are built (`implementation: "built"`, `engine/solver/`, `engine/validator/`).
-  - **C3** is built: the champion of the C3 model registry, served from a committed bundle (ADR-012). **C4** is built the same way (the champion of the C4 registry; ADR-013). **C5** is built the same way (the champion of the C5 registry; ADR-014; it returns an order, never a probability). **C6–C8** are deterministic stand-ins (`implementation: "stand-in"`).
+  - **C3** is built: the champion of the C3 model registry, served from a committed bundle (ADR-012). **C4** is built the same way (the champion of the C4 registry; ADR-013). **C5** is built the same way (the champion of the C5 registry; ADR-014; it returns an order, never a probability). **C6** is built the same way (the champion of the C6 registry; ADR-015; an advisory hint only). **C7 and C8** are deterministic stand-ins (`implementation: "stand-in"`).
 - **Background jobs:** solver runs and the M5 trade-off check run in the arq worker (compose service `worker`). The endpoint answers with an id at once; the client polls (ADR-009).
 - **Rule violations** come back as i18n keys with parameters and a fix: `{rule, key: "violation.min_rest", staff_id, display_name, date, params, fix_key: "fix.min_rest", fix_params}` (`packages/i18n`). A write that would break a rule answers **422** with `{"detail": {"code": "rule_violation", "message", "violations": [...]}}`.
 
@@ -51,7 +51,7 @@ The three situations of PROCESS.md §4 run against this API as scripted demo sce
 
 ### M5 trade-off ("Mit Tausch beantragen")
 
-`POST /me/leave/check` returns the instant C6 hint and a `trade_off_check_id`. Poll `GET /me/leave/checks/{id}` until `status: done`; `result.outcome` is `coverable`, `coverable_with_trade_off` (with `trade_off: {month, weekends}`), `not_coverable` (with C1's explanations) or `not_applicable` (with a `reason`). The definition and thresholds are in `synthdata/ASSUMPTIONS.md` §18; colleagues' pending requests in the month count as leave. `POST /me/leave` with `with_trade: true` needs that `check_id` for the same dates and an offered trade-off; once the Planner approves the leave, the weekends become a binding constraint when that earlier month is planned.
+`POST /me/leave/check` returns the instant C6 hint (advisory: `coverable`, `tight` or `not_coverable`) and a `trade_off_check_id`. The hint, the version that gave it and whether the solver agreed are stored with the check; every disagreement (a hint of `coverable` against a trade-off or `not_coverable`, or `not_coverable` against `coverable`) is an audit event `leave.hint_disagreed` without a name. The screen always shows the solver's answer. Poll `GET /me/leave/checks/{id}` until `status: done`; `result.outcome` is `coverable`, `coverable_with_trade_off` (with `trade_off: {month, weekends}`), `not_coverable` (with C1's explanations) or `not_applicable` (with a `reason`). The definition and thresholds are in `synthdata/ASSUMPTIONS.md` §18; colleagues' pending requests in the month count as leave. `POST /me/leave` with `with_trade: true` needs that `check_id` for the same dates and an offered trade-off; once the Planner approves the leave, the weekends become a binding constraint when that earlier month is planned.
 
 ## Writes and the audit trail
 
@@ -64,7 +64,7 @@ Every write records an audit event (`GET /audit/events`). The seed loader also t
 | `POST /me/swaps`, `POST /me/swap-offers/{id}/take` | Physician | The policy if C2-valid, else the Planner: `POST /planner/swaps/{id}/decision` |
 | `POST /me/sick` | Physician | None; cover searches start for each affected shift that has not begun |
 | `POST /me/cover-requests/{offer_id}` | The colleague asked | The policy if C2-valid and no overtime, else the Planner: `POST /planner/cascades/{id}/decision` |
-| `POST /me/leave/check` | Physician | — (queues the C1 trade-off check) |
+| `POST /me/leave/check` | Physician | — (C6 hint now; queues the C1 check) |
 | `POST /planner/runs` | Planner | A run changes nothing; drafts are visible to the Planner only |
 | `PATCH /planner/roster/assignments` | Planner | Draft: direct. Published: reason, C2-valid, everyone affected is notified |
 | `POST /planner/variants/{id}/publish` | Planner | The Planner's approval (C2-valid month) |

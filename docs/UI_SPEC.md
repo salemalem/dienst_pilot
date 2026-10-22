@@ -77,7 +77,7 @@ Remaining staff up to about 28 come from the synthetic generator.
 ### 3.1 How the coded staff app resolves the open points
 
 - **Navigation.** Four tabs in the thumb zone: Heute (M2), Dienstplan (M3), Mitteilungen (M11), Einstellungen (M12). The other screens open from quick actions and links and have a back button; every screen has its own URL (ADR-011).
-- **M5.** The default state is the honest one: the instant C6 hint (a stand-in estimate, labelled as such) and then C1's answer, "Abdeckbar" with the number of overlapping colleagues and no names. "Mit Tausch beantragen" / "Ohne Tausch beantragen" appear only when the solver returns `coverable_with_trade_off`.
+- **M5.** The default state is the honest one: the instant C6 hint (an advisory estimate from the served C6 model, labelled with its engine) and then C1's answer, which is always the one shown and the only one the buttons follow; if the hint differed, one line says so, "Abdeckbar" with the number of overlapping colleagues and no names. "Mit Tausch beantragen" / "Ohne Tausch beantragen" appear only when the solver returns `coverable_with_trade_off`.
 - **M6.** The offer is an exchange: the audience is a count, "Allein abgeben geht nicht" appears when the API says the offerer would fall below the contract-hours band, and incoming offers show the exchange options the validator accepts.
 - **M8.** The countdown is the API's `seconds_left` (the demo clock), read again every 15 seconds; "Antwort bis" is the offer's deadline. The station is not shown because the API has none.
 - **M9.** One sentence per category with the person's own figure against the department average ("Sie liegen bei Nachtdiensten 2 unter dem Durchschnitt"), a dot on a line, no colleague named or ranked.
