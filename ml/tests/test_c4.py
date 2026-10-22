@@ -98,7 +98,7 @@ def test_training_data_stops_at_2024_and_reads_only_the_listed_files() -> None:
 
     d = load(DATA, through=TRAIN_END)
     assert max(max(ys) for ys in d.counts.values()) <= 2024
-    assert all("_truth" not in f for f in FILES)
+    assert all("truth" not in f for f in FILES)  # the ground-truth folder is never a source
     assert set(d.file_sha256) == set(FILES)
 
 
