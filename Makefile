@@ -63,6 +63,7 @@ format: ## Apply ruff and prettier formatting
 train: ## C3 and C4: rolling-origin CV on 2021-2024, fit the candidates, log and register them in the local MLflow (ml/mlflow)
 	uv run python -m dienstpilot_ml.training --data $(SEED_DIR)
 	uv run python -m dienstpilot_ml.training.c4 --data $(SEED_DIR)
+	uv run python -m dienstpilot_ml.training.c5 --data $(SEED_DIR)
 
 eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.1 table, C3 and C4 (runs make train first)
 	uv run python eval/run_validator_eval.py --data $(SEED_DIR)
