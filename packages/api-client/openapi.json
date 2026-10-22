@@ -1558,6 +1558,125 @@
         }
       }
     },
+    "/planner/cover-candidates": {
+      "get": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Cover Candidates",
+        "description": "Colleagues who could take a published shift, validated by C2 and ordered by C5.",
+        "operationId": "cover_candidates_planner_cover_candidates_get",
+        "parameters": [
+          {
+            "name": "assignment_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Assignment Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoverCandidates"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/what-if": {
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "What If",
+        "description": "Check changes to published rosters with C2 without writing anything (a what-if).\n\nThe same checks as a real change (W4): future days only, a published month, department staff.",
+        "operationId": "what_if_planner_what_if_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WhatIfIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhatIfOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/planner/roster/assignments": {
       "patch": {
         "tags": [
@@ -3754,6 +3873,138 @@
         }
       }
     },
+    "/rules/search": {
+      "get": {
+        "tags": [
+          "rules"
+        ],
+        "summary": "Search Rules",
+        "description": "Search the rulebook (German and English questions). Every passage carries its citation.",
+        "operationId": "search_rules_rules_search_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 400,
+              "title": "Q"
+            }
+          },
+          {
+            "name": "k",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10,
+              "minimum": 1,
+              "default": 5,
+              "title": "K"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleSearch"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rules/{chunk_id}": {
+      "get": {
+        "tags": [
+          "rules"
+        ],
+        "summary": "Get Rule",
+        "description": "Return one passage by its id, for example ``arbzg:§5:1``.",
+        "operationId": "get_rule_rules__chunk_id__get",
+        "parameters": [
+          {
+            "name": "chunk_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Chunk Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Passage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/demo/clock": {
       "put": {
         "tags": [
@@ -3902,6 +4153,46 @@
         ],
         "title": "AskOut",
         "description": "The copilot's answer with figures and cited rules."
+      },
+      "AssignmentChange": {
+        "properties": {
+          "assignment_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignment Id"
+          },
+          "new_staff_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Staff Id",
+            "description": "Null with assignment_id: remove"
+          },
+          "add": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AddShift"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "AssignmentChange",
+        "description": "One suggested change to a published roster, as in W4: reassign, remove or add a shift."
       },
       "AssignmentEdit": {
         "properties": {
@@ -4553,6 +4844,48 @@
         "title": "ContractOut",
         "description": "A physician's current contract."
       },
+      "CoverCandidates": {
+        "properties": {
+          "assignment_id": {
+            "type": "string",
+            "title": "Assignment Id"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          },
+          "candidates": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Candidates"
+          },
+          "check": {
+            "type": "string",
+            "title": "Check",
+            "default": "validated"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assignment_id",
+          "date",
+          "shift_type",
+          "candidates",
+          "engine"
+        ],
+        "title": "CoverCandidates",
+        "description": "Who could take a shift, C2-checked and in C5's order (staff ids; names are for the UI)."
+      },
       "CoverRequestOut": {
         "properties": {
           "offer_id": {
@@ -5034,6 +5367,26 @@
         ],
         "title": "FairnessOut",
         "description": "W8: burden distribution. Names only for the Planner; Oversight gets statistics only."
+      },
+      "GapOut": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "shift_type": {
+            "type": "string",
+            "title": "Shift Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "shift_type"
+        ],
+        "title": "GapOut",
+        "description": "A shift the changes leave without a holder."
       },
       "GapSuggestion": {
         "properties": {
@@ -6340,6 +6693,73 @@
         "title": "ParsedOut",
         "description": "C7: what was understood. Nothing is saved until the person confirms."
       },
+      "Passage": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "citation": {
+            "type": "string",
+            "title": "Citation"
+          },
+          "section": {
+            "type": "string",
+            "title": "Section"
+          },
+          "paragraph": {
+            "type": "integer",
+            "title": "Paragraph"
+          },
+          "heading": {
+            "type": "string",
+            "title": "Heading"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "synthetic": {
+            "type": "boolean",
+            "title": "Synthetic",
+            "description": "True for documents written for this prototype"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "cosine": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cosine"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "citation",
+          "section",
+          "paragraph",
+          "heading",
+          "text",
+          "language",
+          "synthetic",
+          "score",
+          "cosine"
+        ],
+        "title": "Passage",
+        "description": "One citable unit of text."
+      },
       "PendingCascade": {
         "properties": {
           "id": {
@@ -6529,6 +6949,25 @@
         ],
         "title": "PersonBurden",
         "description": "One physician's burden (Planner only)."
+      },
+      "PersonEffect": {
+        "properties": {
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "hours_delta": {
+            "type": "number",
+            "title": "Hours Delta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_id",
+          "hours_delta"
+        ],
+        "title": "PersonEffect",
+        "description": "What the changes do to one physician's credited hours."
       },
       "PersonHours": {
         "properties": {
@@ -6798,6 +7237,31 @@
               }
             ],
             "title": "Roster Month"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "change",
+              "announcement"
+            ],
+            "title": "Kind",
+            "default": "change"
+          },
+          "changes": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AssignmentChange"
+                },
+                "type": "array",
+                "maxItems": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changes",
+            "description": "Suggested roster changes (reviewed, never applied)"
           }
         },
         "type": "object",
@@ -6846,6 +7310,26 @@
           "status": {
             "type": "string",
             "title": "Status"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind",
+            "default": "change"
+          },
+          "changes": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changes"
           }
         },
         "type": "object",
@@ -7272,6 +7756,44 @@
         ],
         "title": "RosterRow",
         "description": "A physician's month."
+      },
+      "RuleSearch": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "found": {
+            "type": "boolean",
+            "title": "Found"
+          },
+          "passages": {
+            "items": {
+              "$ref": "#/components/schemas/Passage"
+            },
+            "type": "array",
+            "title": "Passages"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode",
+            "description": "hybrid (full-text + vectors) or fts-only without the model"
+          },
+          "vector_used": {
+            "type": "boolean",
+            "title": "Vector Used"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "found",
+          "passages",
+          "mode",
+          "vector_used"
+        ],
+        "title": "RuleSearch",
+        "description": "Search result. ``found`` is false when no passage supports an answer."
       },
       "RuleSetIn": {
         "properties": {
@@ -8501,6 +9023,67 @@
         ],
         "title": "ViolationOut",
         "description": "A broken rule, as i18n keys with parameters (packages/i18n: violation.*, fix.*)."
+      },
+      "WhatIfIn": {
+        "properties": {
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/AssignmentChange"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Changes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "changes"
+        ],
+        "title": "WhatIfIn",
+        "description": "Several changes to published rosters, checked together. Nothing is written."
+      },
+      "WhatIfOut": {
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "introduced": {
+            "items": {
+              "$ref": "#/components/schemas/ViolationOut"
+            },
+            "type": "array",
+            "title": "Introduced"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/PersonEffect"
+            },
+            "type": "array",
+            "title": "People"
+          },
+          "removed_without_replacement": {
+            "items": {
+              "$ref": "#/components/schemas/GapOut"
+            },
+            "type": "array",
+            "title": "Removed Without Replacement"
+          },
+          "validator": {
+            "$ref": "#/components/schemas/EngineLabel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "valid",
+          "introduced",
+          "people",
+          "removed_without_replacement",
+          "validator"
+        ],
+        "title": "WhatIfOut",
+        "description": "The effect of a change set, as C2 sees it."
       },
       "WindowDetail": {
         "properties": {

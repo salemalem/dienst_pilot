@@ -39,7 +39,7 @@ export function CopilotPanel({ onClose }: { onClose: () => void }): ReactNode {
     if (!turn) return;
     await unwrap(
       api.POST("/copilot/proposals", {
-        body: { title: turn.question.slice(0, 120), body: turn.answer },
+        body: { title: turn.question.slice(0, 120), body: turn.answer, kind: "change" },
       }),
     );
     setTurns((prev) => prev.map((x, i) => (i === index ? { ...x, proposed: true } : x)));

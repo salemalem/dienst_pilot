@@ -14,6 +14,7 @@ from dienstpilot.app.deps import AdminDep, MasterDataReaderDep, OversightReaderD
 from dienstpilot.app.privacy import audit_payload_for
 from dienstpilot.app.roster import approved_leave_days, effective, hours_for, month_end, month_start
 from dienstpilot.app.routes.planner import (
+    AssignmentChange,
     DistributionOut,
     HoursReport,
     fairness_report,
@@ -97,6 +98,10 @@ class ProposalIn(BaseModel):
     title: str = Field(max_length=200)
     body: str = Field(max_length=4000)
     roster_month: str | None = Field(None, pattern=r"^\d{4}-\d{2}$")
+    kind: Literal["change", "announcement"] = "change"
+    changes: list[AssignmentChange] | None = Field(
+        None, max_length=20, description="Suggested roster changes (reviewed, never applied)"
+    )
 
 
 class ProposalCreated(BaseModel):
@@ -122,6 +127,8 @@ def create_proposal(c: CtxDep, _: PlannerDep, body: ProposalIn) -> ProposalCreat
         title=body.title,
         body=body.body,
         now=c.clock.now(),
+        kind=body.kind,
+        changes=None if body.changes is None else [x.model_dump(mode="json") for x in body.changes],
     )
     record(c, "proposal.created", "proposal", p.id, payload={"title": p.title})
     return ProposalCreated(id=p.id, status=p.status)

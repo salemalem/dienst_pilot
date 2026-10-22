@@ -4,7 +4,7 @@ version = "0.0.0"
 requires-python = ">=3.12,<3.13"
 
 [tool.uv.workspace]
-members = ["backend", "synthdata", "engine/validator", "engine/solver", "eval", "ml"]
+members = ["backend", "synthdata", "engine/validator", "engine/solver", "eval", "ml", "agents", "mcp_servers"]
 
 [tool.uv]
 package = false
@@ -13,6 +13,10 @@ constraint-dependencies = [
   "cachetools<7.2.2",
   "databricks-sdk<0.153.0",
   "zipp<4.1.2",
+  # Phase 10a: transitive packages of mcp and tokenizers that were newer than 7 days.
+  "filelock<=4.2.0",
+  "httpx2<=2.13.1",
+  "httpcore2<=2.13.1",
 ]
 
 [tool.uv.sources]
@@ -22,6 +26,8 @@ dienstpilot-validator = { workspace = true }
 dienstpilot-solver = { workspace = true }
 dienstpilot-eval = { workspace = true }
 dienstpilot-ml = { workspace = true }
+dienstpilot-agents = { workspace = true }
+dienstpilot-mcp = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -29,6 +35,8 @@ dev = [
   "synthdata[plots]",
   "dienstpilot-eval",
   "dienstpilot-ml[train]",
+  "dienstpilot-agents",
+  "dienstpilot-mcp",
   "hypothesis>=6.130,<6.170",
   "httpx>=0.28.1",
   "import-linter>=2.15",
@@ -40,7 +48,7 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["backend/src", "backend/tests", "synthdata/src", "synthdata/tests", "engine/validator/src", "engine/solver/src", "eval/src", "ml/src", "ml/tests"]
+src = ["backend/src", "backend/tests", "agents/src", "agents/tests", "mcp_servers/src", "mcp_servers/tests", "synthdata/src", "synthdata/tests", "engine/validator/src", "engine/solver/src", "eval/src", "ml/src", "ml/tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF", "D"]
@@ -56,21 +64,23 @@ ignore = ["D100", "D104", "D203", "D213", "RUF001", "RUF002", "RUF003"]
 "eval/*.py" = ["D"]
 "synthdata/scripts/**" = ["D"]
 "backend/migrations/**" = ["D"]
+"agents/tests/**" = ["D"]
+"mcp_servers/tests/**" = ["D"]
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
-mypy_path = ["backend/src", "synthdata/src", "engine/validator/src", "engine/solver/src", "eval/src", "ml/src"]
-packages = ["dienstpilot", "synthdata", "dienstpilot_validator", "dienstpilot_solver", "dienstpilot_eval", "dienstpilot_ml"]
+mypy_path = ["backend/src", "agents/src", "mcp_servers/src", "synthdata/src", "engine/validator/src", "engine/solver/src", "eval/src", "ml/src"]
+packages = ["dienstpilot", "dienstpilot_agents", "dienstpilot_mcp", "synthdata", "dienstpilot_validator", "dienstpilot_solver", "dienstpilot_eval", "dienstpilot_ml"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["statsmodels.*", "mlflow.*", "lightgbm.*", "scipy.*", "jsonschema.*"]
+module = ["statsmodels.*", "mlflow.*", "lightgbm.*", "scipy.*", "jsonschema.*", "onnxruntime.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-testpaths = ["backend/tests", "synthdata/tests", "engine/validator/tests", "eval/tests", "ml/tests"]
-pythonpath = ["synthdata/tests"]
+testpaths = ["backend/tests", "agents/tests", "mcp_servers/tests", "synthdata/tests", "engine/validator/tests", "eval/tests", "ml/tests"]
+pythonpath = ["synthdata/tests", "mcp_servers/tests"]
 addopts = "-q -m 'not seeds'"
 markers = [
   "db: needs TEST_DATABASE_URL (a Postgres the tests may wipe)",
@@ -80,7 +90,7 @@ markers = [
 
 [tool.importlinter]
 include_external_packages = true
-root_packages = ["dienstpilot", "synthdata", "dienstpilot_validator", "dienstpilot_solver", "dienstpilot_ml"]
+root_packages = ["dienstpilot", "dienstpilot_agents", "dienstpilot_mcp", "synthdata", "dienstpilot_validator", "dienstpilot_solver", "dienstpilot_ml"]
 plugins = ["pydantic.mypy"]
 
 [[tool.importlinter.contracts]]
@@ -198,3 +208,15 @@ source_modules = [
   "dienstpilot_ml.leave_surrogate",
 ]
 forbidden_modules = ["dienstpilot_ml.training", "mlflow", "statsmodels", "scipy"]
+
+[[tool.importlinter.contracts]]
+name = "Agents know nothing of the backend (it imports them, never the reverse)"
+type = "forbidden"
+source_modules = ["dienstpilot_agents"]
+forbidden_modules = ["dienstpilot", "dienstpilot_mcp", "synthdata"]
+
+[[tool.importlinter.contracts]]
+name = "MCP servers reach the system only through the REST API"
+type = "forbidden"
+source_modules = ["dienstpilot_mcp"]
+forbidden_modules = ["dienstpilot", "dienstpilot_agents", "synthdata", "dienstpilot_ml"]

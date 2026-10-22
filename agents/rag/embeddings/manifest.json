@@ -1,0 +1,9 @@
+{
+ "model": "BAAI/bge-m3 (ONNX int8, Xenova/bge-m3)",
+ "model_file_sha256": "f3d37b38cb8d799cd3ff931dcb93282d7a1eedff216a6e88eb0ee95bab5533eb",
+ "corpus_sha256": "3f755477e546e2a380669c4c958af3b2973e10686922b0e3c7b5f3ab2ea2c3cd",
+ "chunks": 167,
+ "chunks_npy_sha256": "c9c84fa3f2ce246d2c07aa33d0cb312e9f4a603459857e7758a7e6f2d832c02c",
+ "questions_json_sha256": "01733c1d944ef4dcdc228d7b1cb681311de52fc6f3270b4ff35e2d4adb619267",
+ "questions_npy_sha256": "96733720f51ea336ab9ed1904f7b50c525adf5bae0a41690367ba8a5571ea71f"
+}

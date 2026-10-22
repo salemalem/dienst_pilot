@@ -532,6 +532,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/planner/cover-candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cover Candidates
+         * @description Colleagues who could take a published shift, validated by C2 and ordered by C5.
+         */
+        get: operations["cover_candidates_planner_cover_candidates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/what-if": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * What If
+         * @description Check changes to published rosters with C2 without writing anything (a what-if).
+         *
+         *     The same checks as a real change (W4): future days only, a published month, department staff.
+         */
+        post: operations["what_if_planner_what_if_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/planner/roster/assignments": {
         parameters: {
             query?: never;
@@ -1202,6 +1244,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/rules/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Rules
+         * @description Search the rulebook (German and English questions). Every passage carries its citation.
+         */
+        get: operations["search_rules_rules_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rules/{chunk_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Rule
+         * @description Return one passage by its id, for example ``arbzg:§5:1``.
+         */
+        get: operations["get_rule_rules__chunk_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/demo/clock": {
         parameters: {
             query?: never;
@@ -1274,6 +1356,20 @@ export interface components {
             /** Understood */
             understood: boolean;
             engine: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * AssignmentChange
+         * @description One suggested change to a published roster, as in W4: reassign, remove or add a shift.
+         */
+        AssignmentChange: {
+            /** Assignment Id */
+            assignment_id?: string | null;
+            /**
+             * New Staff Id
+             * @description Null with assignment_id: remove
+             */
+            new_staff_id?: string | null;
+            add?: components["schemas"]["AddShift"] | null;
         };
         /**
          * AssignmentEdit
@@ -1549,6 +1645,29 @@ export interface components {
             qualifications: string[];
         };
         /**
+         * CoverCandidates
+         * @description Who could take a shift, C2-checked and in C5's order (staff ids; names are for the UI).
+         */
+        CoverCandidates: {
+            /** Assignment Id */
+            assignment_id: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
+            /** Candidates */
+            candidates: string[];
+            /**
+             * Check
+             * @default validated
+             */
+            check: string;
+            engine: components["schemas"]["EngineLabel"];
+        };
+        /**
          * CoverRequestOut
          * @description M8: an open cover request to the person.
          */
@@ -1759,6 +1878,19 @@ export interface components {
             distributions: components["schemas"]["DistributionOut"][];
             /** People */
             people: components["schemas"]["PersonBurden"][] | null;
+        };
+        /**
+         * GapOut
+         * @description A shift the changes leave without a holder.
+         */
+        GapOut: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
         };
         /**
          * GapSuggestion
@@ -2353,6 +2485,35 @@ export interface components {
             engine: components["schemas"]["EngineLabel"];
         };
         /**
+         * Passage
+         * @description One citable unit of text.
+         */
+        Passage: {
+            /** Id */
+            id: string;
+            /** Citation */
+            citation: string;
+            /** Section */
+            section: string;
+            /** Paragraph */
+            paragraph: number;
+            /** Heading */
+            heading: string;
+            /** Text */
+            text: string;
+            /** Language */
+            language: string;
+            /**
+             * Synthetic
+             * @description True for documents written for this prototype
+             */
+            synthetic: boolean;
+            /** Score */
+            score: number;
+            /** Cosine */
+            cosine: number | null;
+        };
+        /**
          * PendingCascade
          * @description A cover search waiting for the Planner.
          */
@@ -2435,6 +2596,16 @@ export interface components {
             weekends: number;
             /** Holidays */
             holidays: number;
+        };
+        /**
+         * PersonEffect
+         * @description What the changes do to one physician's credited hours.
+         */
+        PersonEffect: {
+            /** Staff Id */
+            staff_id: string;
+            /** Hours Delta */
+            hours_delta: number;
         };
         /**
          * PersonHours
@@ -2559,6 +2730,17 @@ export interface components {
             body: string;
             /** Roster Month */
             roster_month?: string | null;
+            /**
+             * Kind
+             * @default change
+             * @enum {string}
+             */
+            kind: "change" | "announcement";
+            /**
+             * Changes
+             * @description Suggested roster changes (reviewed, never applied)
+             */
+            changes?: components["schemas"]["AssignmentChange"][] | null;
         };
         /**
          * ProposalOut
@@ -2582,6 +2764,15 @@ export interface components {
             roster_month: string | null;
             /** Status */
             status: string;
+            /**
+             * Kind
+             * @default change
+             */
+            kind: string;
+            /** Changes */
+            changes?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         /**
          * Published
@@ -2768,6 +2959,25 @@ export interface components {
             cells: {
                 [key: string]: components["schemas"]["Cell"];
             };
+        };
+        /**
+         * RuleSearch
+         * @description Search result. ``found`` is false when no passage supports an answer.
+         */
+        RuleSearch: {
+            /** Query */
+            query: string;
+            /** Found */
+            found: boolean;
+            /** Passages */
+            passages: components["schemas"]["Passage"][];
+            /**
+             * Mode
+             * @description hybrid (full-text + vectors) or fts-only without the model
+             */
+            mode: string;
+            /** Vector Used */
+            vector_used: boolean;
         };
         /**
          * RuleSetIn
@@ -3291,6 +3501,29 @@ export interface components {
             fix_params: {
                 [key: string]: unknown;
             };
+        };
+        /**
+         * WhatIfIn
+         * @description Several changes to published rosters, checked together. Nothing is written.
+         */
+        WhatIfIn: {
+            /** Changes */
+            changes: components["schemas"]["AssignmentChange"][];
+        };
+        /**
+         * WhatIfOut
+         * @description The effect of a change set, as C2 sees it.
+         */
+        WhatIfOut: {
+            /** Valid */
+            valid: boolean;
+            /** Introduced */
+            introduced: components["schemas"]["ViolationOut"][];
+            /** People */
+            people: components["schemas"]["PersonEffect"][];
+            /** Removed Without Replacement */
+            removed_without_replacement: components["schemas"]["GapOut"][];
+            validator: components["schemas"]["EngineLabel"];
         };
         /**
          * WindowDetail
@@ -4293,6 +4526,74 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RosterGrid"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cover_candidates_planner_cover_candidates_get: {
+        parameters: {
+            query: {
+                assignment_id: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoverCandidates"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    what_if_planner_what_if_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WhatIfIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatIfOut"];
                 };
             };
             /** @description Validation Error */
@@ -5471,6 +5772,73 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_rules_rules_search_get: {
+        parameters: {
+            query: {
+                q: string;
+                k?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RuleSearch"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_rule_rules__chunk_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                chunk_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Passage"];
                 };
             };
             /** @description Validation Error */

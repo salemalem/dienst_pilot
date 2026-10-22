@@ -26,3 +26,10 @@ ml/cover_ranker/artifacts/
 # C6 serving bundle (hashed byte for byte, eval/results/c6.json) and the label files written by eval/run_c6_labels.py
 ml/leave_surrogate/artifacts/
 ml/leave_surrogate/labels/
+
+# Phase 10a: files whose bytes are hashed (rulebook questions, vectors, manifest, threshold)
+eval/rag_questions.json
+agents/rag/embeddings/
+agents/rag/threshold.json
+agents/rag/source/
+agents/rag/corpus/

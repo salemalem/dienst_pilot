@@ -18,6 +18,8 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | C4 | Preference Learner (`ml/`) | ML, Bayesian | Built & evaluated on synthetic data (`eval/results/c4.json`). The served model is the raw per-person-rates baseline: the hierarchical learner did not meet the promotion rule (model card) |
 | C5 | Cover Acceptance Ranker (`ml/`) | ML, classification + policy | Built & evaluated on synthetic data (`eval/results/c5.json`). The served model is the base-rate baseline: the LightGBM learner did not meet the promotion rule, so inside a burden bucket the order follows hours against contract (model card) |
 | C6 | Leave Feasibility Surrogate (`ml/`) | ML, simulation-trained classification | Built & evaluated on synthetic data (`eval/results/c6.json`). The served model is the logistic-regression baseline: the LightGBM learner did not meet the promotion rule. Advisory hint only; the solver's answer is the one shown (model card) |
+| — | MCP servers (`mcp_servers/`: roster, planning, rules, forecast, notify) | Application | Built & tested on synthetic data (backend and mcp tests; thin wrappers over the REST API, ADR-018) |
+| — | Rulebook retrieval, RAG (`agents/`, `agents/rag/`) | Retrieval | Built & evaluated on synthetic data (`eval/results/rag.json`, 60 questions written for the prototype). Hybrid retrieval did not beat vectors alone, the pre-registered check failed (model card `rag-rulebook.md`) |
 | C7 | Request Intake Agent | LLM, structured output | Designed |
 | C8 | Planner Copilot | LLM agent, MCP tools, RAG | Designed |
 | — | Staff app and planner dashboard | UI prototype | Designed |
@@ -304,7 +306,7 @@ sequenceDiagram
 
 ## 10. MCP layer
 
-Each MCP server is a small, independently deployable process using the Streamable HTTP transport, protected by OAuth bearer tokens scoped to the user's role and department. Tools declare annotations (`readOnlyHint`, `destructiveHint`) and typed output schemas.
+Each MCP server is a small module with its own ASGI app (the dev stack runs the five in one `mcp` service) using the Streamable HTTP transport. In the demo the bearer token is the user's demo-login token, checked by the API and passed on with every call; the tool list depends on the role (ADR-018). Real OAuth with audience-bound tokens is designed, not built. Tools declare annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`) and typed output schemas.
 
 | Server | Tools | Notes |
 |---|---|---|
@@ -318,11 +320,11 @@ The agent service is an MCP client. The same servers can be connected to other M
 
 ## 11. Retrieval (RAG) over the rulebook
 
-**Corpus.** Public law texts relevant to working time (for example ArbZG), the applicable collective agreement for physicians, a synthetic example works agreement (Betriebsvereinbarung), and synthetic department SOPs. Each document carries a version and validity date.
+**Corpus.** The official ArbZG text, a synthetic example works agreement (Betriebsvereinbarung), synthetic department SOPs and a rule summary written from the seeded rule set. No collective-agreement text: it is copyrighted, and the summary says so. Each document carries a version and a retrieval date; synthetic ones are labelled in the document and in every citation.
 
-**Pipeline.** Structure-aware chunking along legal paragraphs (§, Absatz) so a citation always points at a real unit of text; bge-m3 multilingual embeddings served locally, so documents never leave the server; hybrid retrieval (Postgres full-text + pgvector) with reciprocal rank fusion; optional reranking; answers must cite § and version, and the copilot says it cannot find a source rather than answer without one.
+**Pipeline.** Structure-aware chunking along legal paragraphs (§, Absatz) so a citation always points at a real unit of text; bge-m3 multilingual embeddings served locally (the int8 ONNX export on ONNX Runtime), so documents never leave the server; hybrid retrieval (Postgres full-text + pgvector) with reciprocal rank fusion (no reranker is built); answers must cite § and version, and the copilot says it cannot find a source rather than answer without one.
 
-**Evaluation.** Recall@k on a labelled question set (DE and EN), citation correctness, and faithfulness grading on answers.
+**Evaluation.** Recall@k and citation correctness on a labelled question set (DE and EN), `eval/results/rag.json`, with a rule written before the run (`agents/rag/EVAL_RULE.md`). Result: vectors alone beat the hybrid fusion on these questions (model card). Faithfulness grading of answers comes with C8.
 
 ## 12. Loose coupling: how updates stay safe
 
@@ -351,7 +353,7 @@ The agent service is an MCP client. The same servers can be connected to other M
 - **Stack:** Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2, Alembic; Next.js and Expo in TypeScript; OpenAPI-generated client shared by both apps.
 - **Testing:** unit tests; property-based tests for C1/C2; contract tests for event schemas; Playwright end-to-end tests for the leave, swap and sick-call flows; agent eval suites in CI on prompt changes.
 - **CI/CD:** GitHub Actions running lint, type checks, import-linter, tests and evals; container images built and deployed to the VPS via Docker Compose; migrations run as a release step.
-- **Observability:** OpenTelemetry traces across API, workers and agents; Prometheus metrics; Grafana dashboards; Loki logs; Langfuse for LLM traces and token cost.
+- **Observability:** OpenTelemetry traces across API, workers and agents; Prometheus metrics; Grafana dashboards; Loki logs. LLM calls are logged to a Postgres usage table (tokens, latency, model, prompt version, outcome; never prompt text) that `eval/cost_model.py` reads, with OpenTelemetry spans (ADR-018).
 - **Architecture decision records** in `docs/adr/`:
   - ADR-001 Constraint optimization, not ML, for roster assignment
   - ADR-002 Modular monolith with enforced boundaries before microservices
@@ -362,6 +364,8 @@ The agent service is an MCP client. The same servers can be connected to other M
   - ADR-013 C4 serving, the person-only privacy boundary, and the same promotion convention
   - ADR-016 Event outbox, Redis Streams, idempotent consumers and the audit hash chain
   - ADR-017 Durable workflows and timers due in demo time
+  - ADR-018 MCP servers as REST wrappers, the usage log instead of Langfuse, and the key in .env
+  - ADR-019 The rulebook: corpus, chunking, local embeddings, hybrid retrieval and how CI runs without the model
 
 ## 15. Security and compliance
 

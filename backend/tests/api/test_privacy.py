@@ -25,6 +25,7 @@ QUERIES = {
     "/me/roster": "?month=2026-11",
     "/planner/runs": "?month=2026-12",
     "/compliance/hours": "?month=2026-10",
+    "/rules/search": "?q=Ruhezeit",
 }
 
 
@@ -35,7 +36,7 @@ def _get_paths(client: TestClient, cascade_id: str, assignment_id: str) -> list[
         if "get" not in ops or path.startswith("/health"):
             continue  # health checks carry no data (and /health/ready needs Redis)
         p = path.replace("{month}", "2026-12").replace("{cascade_id}", cascade_id)
-        if p == "/me/swaps/audience":
+        if p in ("/me/swaps/audience", "/planner/cover-candidates"):
             p += f"?assignment_id={assignment_id}"
         paths.append(p + QUERIES.get(path, ""))
     return paths

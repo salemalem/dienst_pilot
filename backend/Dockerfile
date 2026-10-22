@@ -15,6 +15,12 @@ COPY engine engine
 COPY ml/pyproject.toml ml/pyproject.toml
 COPY ml/src ml/src
 COPY ml/absence_forecast/artifacts ml/absence_forecast/artifacts
+# The rulebook: the agents package, the committed corpus and vectors (the bge-m3 model itself is
+# mounted, see infra/compose.dev.yml; without it search is full-text only and says so)
+COPY agents/pyproject.toml agents/pyproject.toml
+COPY agents/src agents/src
+COPY agents/rag agents/rag
+COPY mcp_servers/pyproject.toml mcp_servers/pyproject.toml
 COPY synthdata/pyproject.toml synthdata/pyproject.toml
 COPY eval/pyproject.toml eval/pyproject.toml
 RUN uv sync --frozen --no-dev --package dienstpilot
