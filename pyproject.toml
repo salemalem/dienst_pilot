@@ -3,11 +3,17 @@ name = "dienstpilot-workspace"
 version = "0.0.0"
 requires-python = ">=3.12,<3.13"
 
+[tool.uv.workspace]
+members = ["backend", "synthdata", "engine/validator", "engine/solver", "eval", "ml"]
+
 [tool.uv]
 package = false
-
-[tool.uv.workspace]
-members = ["backend", "synthdata", "engine/validator", "engine/solver", "eval"]
+constraint-dependencies = [
+  # 7-day release-age rule: transitive packages of mlflow that were newer than 7 days when added.
+  "cachetools<7.2.2",
+  "databricks-sdk<0.153.0",
+  "zipp<4.1.2",
+]
 
 [tool.uv.sources]
 dienstpilot = { workspace = true }
@@ -15,12 +21,14 @@ synthdata = { workspace = true }
 dienstpilot-validator = { workspace = true }
 dienstpilot-solver = { workspace = true }
 dienstpilot-eval = { workspace = true }
+dienstpilot-ml = { workspace = true }
 
 [dependency-groups]
 dev = [
   "dienstpilot",
   "synthdata[plots]",
   "dienstpilot-eval",
+  "dienstpilot-ml[train]",
   "hypothesis>=6.130,<6.170",
   "httpx>=0.28.1",
   "import-linter>=2.15",
@@ -32,7 +40,7 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["backend/src", "backend/tests", "synthdata/src", "synthdata/tests", "engine/validator/src", "engine/solver/src", "eval/src"]
+src = ["backend/src", "backend/tests", "synthdata/src", "synthdata/tests", "engine/validator/src", "engine/solver/src", "eval/src", "ml/src", "ml/tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF", "D"]
@@ -44,6 +52,7 @@ ignore = ["D100", "D104", "D203", "D213", "RUF001", "RUF002", "RUF003"]
 "synthdata/tests/**" = ["D"]
 "engine/*/tests/**" = ["D"]
 "eval/tests/**" = ["D"]
+"ml/tests/**" = ["D"]
 "eval/*.py" = ["D"]
 "synthdata/scripts/**" = ["D"]
 "backend/migrations/**" = ["D"]
@@ -51,12 +60,16 @@ ignore = ["D100", "D104", "D203", "D213", "RUF001", "RUF002", "RUF003"]
 [tool.mypy]
 python_version = "3.12"
 strict = true
-mypy_path = ["backend/src", "synthdata/src", "engine/validator/src", "engine/solver/src", "eval/src"]
-packages = ["dienstpilot", "synthdata", "dienstpilot_validator", "dienstpilot_solver", "dienstpilot_eval"]
+mypy_path = ["backend/src", "synthdata/src", "engine/validator/src", "engine/solver/src", "eval/src", "ml/src"]
+packages = ["dienstpilot", "synthdata", "dienstpilot_validator", "dienstpilot_solver", "dienstpilot_eval", "dienstpilot_ml"]
 plugins = ["pydantic.mypy"]
 
+[[tool.mypy.overrides]]
+module = ["statsmodels.*", "mlflow.*", "lightgbm.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
-testpaths = ["backend/tests", "synthdata/tests", "engine/validator/tests", "eval/tests"]
+testpaths = ["backend/tests", "synthdata/tests", "engine/validator/tests", "eval/tests", "ml/tests"]
 pythonpath = ["synthdata/tests"]
 addopts = "-q -m 'not seeds'"
 markers = [
@@ -66,7 +79,8 @@ markers = [
 ]
 
 [tool.importlinter]
-root_packages = ["dienstpilot", "synthdata", "dienstpilot_validator", "dienstpilot_solver"]
+include_external_packages = true
+root_packages = ["dienstpilot", "synthdata", "dienstpilot_validator", "dienstpilot_solver", "dienstpilot_ml"]
 plugins = ["pydantic.mypy"]
 
 [[tool.importlinter.contracts]]
@@ -154,3 +168,23 @@ name = "The engines know nothing of the backend or the generator"
 type = "forbidden"
 source_modules = ["dienstpilot_validator", "dienstpilot_solver"]
 forbidden_modules = ["dienstpilot", "synthdata"]
+
+[[tool.importlinter.contracts]]
+name = "The API never imports the training stack (it loads a bundle with numpy and LightGBM only)"
+type = "forbidden"
+allow_indirect_imports = true
+source_modules = ["dienstpilot"]
+forbidden_modules = ["dienstpilot_ml.training", "mlflow", "statsmodels"]
+
+[[tool.importlinter.contracts]]
+name = "ML code knows nothing of the backend or the generator"
+type = "forbidden"
+source_modules = ["dienstpilot_ml"]
+forbidden_modules = ["dienstpilot", "synthdata"]
+
+[[tool.importlinter.contracts]]
+name = "Serving-side ML modules do not import the training stack"
+type = "forbidden"
+allow_indirect_imports = true
+source_modules = ["dienstpilot_ml.features", "dienstpilot_ml.absence_forecast"]
+forbidden_modules = ["dienstpilot_ml.training", "mlflow", "statsmodels"]
