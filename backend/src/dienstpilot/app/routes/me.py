@@ -26,6 +26,7 @@ from dienstpilot.app.cover import (
 )
 from dienstpilot.app.deps import Ctx, physician
 from dienstpilot.app.engine_inputs import Inputs
+from dienstpilot.app.leave_hint import facts_for
 from dienstpilot.app.queue import QueueDep
 from dienstpilot.app.roster import (
     Shift,
@@ -492,29 +493,25 @@ def _days_taken(c: Ctx, me: str, year: int) -> int:
 
 @router.post("/leave/check")
 def check_leave(c: CtxDep, _: Physician, queue: QueueDep, body: LeaveCheckIn) -> LeaveCheck:
-    """M5: instant hint (C6 stand-in), and a background C1 check of coverability and trade-off."""
+    """M5: instant hint (C6), and a background C1 check of coverability and trade-off."""
     if body.end_date < body.start_date or body.start_date <= c.clock.today():
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, "Choose future dates, start before end"
         )
     dep, me = department(c), _staff_id(c)
-    others = [s for s in dep.staff if s != me]
-    per_day: dict[date, int] = {}
-    for days in approved_leave_days(c.session, others, body.start_date, body.end_date).values():
-        for d in days:
-            per_day[d] = per_day.get(d, 0) + 1
-    overlapping = {
-        r.staff_id
-        for r in requests.leave_requests(
-            c.session, others, overlapping=(body.start_date, body.end_date)
-        )
-        if r.status in ("approved", "pending")
-    }
-    h = c.engines.leave.hint(body.start_date, body.end_date, per_day, LEAVE_LIMIT)
-    chk = requests.create_check(c.session, me, body.start_date, body.end_date, c.clock.now())
+    facts = facts_for(c.session, dep, me, body.start_date, body.end_date, c.clock.today())
+    h = c.engines.leave.hint(facts, LEAVE_LIMIT)
+    chk = requests.create_check(
+        c.session,
+        me,
+        body.start_date,
+        body.end_date,
+        c.clock.now(),
+        (h.outcome, c.engines.leave.info.version, h.basis),
+    )
     out = LeaveCheck(
         outcome=h.outcome,
-        overlapping_colleagues=len(overlapping),
+        overlapping_colleagues=h.overlapping_colleagues,
         max_on_leave_same_day=h.max_overlapping,
         limit=h.limit,
         leave_days_taken_this_year=_days_taken(c, me, body.start_date.year),

@@ -47,13 +47,12 @@ test.describe.serial("the three PROCESS.md situations on the demo clock", () => 
     await page.getByTestId("day-2027-07-14").click();
     await page.getByTestId("day-2027-07-27").click();
 
-    // The instant hint is C6, a stand-in, and says so.
+    // The instant hint is C6 (advisory). Its wording depends on the served model, so only its
+    // presence and its label are asserted; the solver's answer below is the one that counts.
     const hint = page.getByTestId("leave-hint");
     await expect(hint).toBeVisible();
-    await expect(hint.getByTestId("engine-C6")).toContainText(msg("common.standIn"));
-    await expect(page.getByTestId("leave-hint-text")).toContainText(
-      msg("m5.coverable", { count: 2 }).slice(0, 20),
-    );
+    await expect(hint.getByTestId("engine-C6")).toContainText(msg("common.built"));
+    await expect(page.getByTestId("leave-hint-text")).not.toBeEmpty();
 
     // Then the real check by C1: coverable, with the two overlapping colleagues counted, not named.
     const result = page.getByTestId("leave-result");

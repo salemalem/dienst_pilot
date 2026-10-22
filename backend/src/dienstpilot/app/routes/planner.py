@@ -23,6 +23,7 @@ from dienstpilot.app.context import CtxDep
 from dienstpilot.app.cover import CHECK, change_violations, ranked, valid_takers
 from dienstpilot.app.deps import Ctx, OversightReaderDep, PlannerDep, RosterReaderDep
 from dienstpilot.app.engine_inputs import Inputs
+from dienstpilot.app.leave_hint import facts_for
 from dienstpilot.app.privacy import absence_for
 from dienstpilot.app.queue import QueueDep
 from dienstpilot.app.roster import (
@@ -1119,13 +1120,8 @@ def inbox(c: CtxDep, _: PlannerDep) -> Inbox:
     mean_taken = round(sum(taken.get(p, 0) for p in active) / len(active), 1) if active else 0.0
     leave = []
     for r in requests.leave_requests(c.session, ids, status="pending"):
-        per_day: dict[date, int] = {}
-        for _sid, days in approved_leave_days(
-            c.session, [i for i in ids if i != r.staff_id], r.start_date, r.end_date
-        ).items():
-            for d in days:
-                per_day[d] = per_day.get(d, 0) + 1
-        h = c.engines.leave.hint(r.start_date, r.end_date, per_day, 6)
+        facts = facts_for(c.session, dep, r.staff_id, r.start_date, r.end_date, c.clock.today())
+        h = c.engines.leave.hint(facts, 6)
         leave.append(
             PendingLeave(
                 id=r.id,

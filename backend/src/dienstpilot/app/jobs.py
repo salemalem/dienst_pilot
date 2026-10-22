@@ -14,12 +14,14 @@ from sqlalchemy.orm import Session
 from dienstpilot.app.common import Department
 from dienstpilot.app.engine_inputs import Inputs
 from dienstpilot.app.roster import month_end, month_start
+from dienstpilot.audit import service as audit
 from dienstpilot.engines.registry import Engines
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.requests import service as requests
 from dienstpilot.shared.ports import Clock
 from dienstpilot_solver.coverability import (
+    CHECK_CONFIG,
     TRADE_OFF_OVERTIME_HOURS,
     TRADE_OFF_PEAK_BURDEN,
     Assignments,
@@ -27,19 +29,12 @@ from dienstpilot_solver.coverability import (
     days,
     decide,
 )
-from dienstpilot_solver.model import PROFILES, Config, Metrics, Problem, Result
+from dienstpilot_solver.model import Config, Metrics, Problem, Result
 from dienstpilot_validator import Assignment
 
 LABELS = "ABCDEFGH"
 RECOMMENDED_PROFILE = "balanced"  # the benchmark's recommended profile (eval/run_benchmark.py)
 RUN_CONFIG = Config()
-# M5: one balanced variant per question, shorter time (synthdata ASSUMPTIONS §18).
-CHECK_CONFIG = Config(
-    deterministic_time=5.0,
-    variants=1,
-    profiles=tuple(p for p in PROFILES if p.name == RECOMMENDED_PROFILE),
-)
-# When covering a leave counts as a burden for colleagues (synthdata ASSUMPTIONS §18).
 
 
 def _department(session: Session, department_id: str) -> Department:
@@ -141,10 +136,60 @@ def check_leave(
     try:
         result = _coverability(session, engines, clock, chk, department_id)
         requests.set_check(session, check_id, "done", result)
+        _score_hint(session, clock, chk, result, department_id)
     except Exception as e:
         session.rollback()
         requests.set_check(session, check_id, "failed", {"error": repr(e)[:500]})
     session.commit()
+
+
+def hint_agreement(hint: str | None, solver: str) -> str:
+    """Compare the instant hint (C6) with the solver's answer.
+
+    A hint of "coverable" against a trade-off or "not coverable", or "not coverable" against
+    "coverable", is a disagreement; "tight" abstains; ``not_applicable`` is not scored.
+    """
+    if hint is None or solver == "not_applicable":
+        return "not_scored"
+    if hint == "tight":
+        return "abstain"
+    if hint == "coverable":
+        return "agree" if solver == "coverable" else "disagree"
+    return "agree" if solver != "coverable" else "disagree"
+
+
+def _score_hint(
+    session: Session,
+    clock: Clock,
+    chk: requests.LeaveCheckInfo,
+    result: dict[str, Any],
+    department_id: str,
+) -> None:
+    """Record whether the solver agreed with the hint; log every disagreement (no names)."""
+    agreement = hint_agreement(chk.hint_outcome, result["outcome"])
+    requests.set_agreement(session, chk.id, agreement)
+    if agreement == "disagree":
+        audit.record(
+            session,
+            occurred_at=clock.now(),
+            department_id=department_id,
+            actor_user_id=None,
+            actor_label="C6 / C1",
+            action="leave.hint_disagreed",
+            subject_type="leave_check",
+            subject_id=chk.id,
+            # No staff id: the audit trail shows names to its readers; the check id joins to the
+            # requester inside the database.
+            payload={
+                "start_date": chk.start_date.isoformat(),
+                "end_date": chk.end_date.isoformat(),
+                "hint": chk.hint_outcome,
+                "hint_version": chk.hint_version,
+                "hint_basis": chk.hint_basis,
+                "solver": result["outcome"],
+                "solver_version": result.get("solver_version"),
+            },
+        )
 
 
 def _coverability(
