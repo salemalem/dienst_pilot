@@ -351,6 +351,31 @@ export default function VariantsPage(): ReactNode {
             })}
           </p>
         </>
+      ) : shown?.status === "failed" ? (
+        <Section title={t("failedTitle")}>
+          <p className="body m-0" role="alert" data-testid="run-failed">
+            {t("failedBody")}
+          </p>
+          <p className="body m-0 text-ink-muted" data-testid="run-failed-reason">
+            {t(
+              `failedReason.${
+                shown.error === "worker_restarted" || shown.error === "job_timeout"
+                  ? shown.error
+                  : "other"
+              }`,
+            )}
+          </p>
+          <div>
+            <Button
+              variant="primary"
+              onClick={() => void start.run()}
+              disabled={pending}
+              data-testid="retry-run"
+            >
+              {t("retry")}
+            </Button>
+          </div>
+        </Section>
       ) : shown ? (
         <Section title={t("noRosterTitle")}>
           <p className="body m-0">{t("noRosterBody")}</p>

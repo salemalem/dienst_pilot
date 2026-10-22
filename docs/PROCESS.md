@@ -82,7 +82,7 @@ Swaps, short-term absences and sick reports are handled inside the app, describe
 
 ### Step 7: End of month
 
-The system produces the documentation automatically: hours worked per person, overtime, rest-period compliance, night and weekend distribution, and the complete decision trail. This goes to payroll and, on request, to the works council. What used to be a separate manual task disappears.
+As soon as the month is over, the system prepares the documentation by itself: hours worked per person, overtime, rest-period compliance, night and weekend distribution, and the complete decision trail. The planner reads it and confirms it with one click; that locks the month and releases the payroll export. Only then does the documentation go to payroll and, on request, to the works council. What used to be a separate manual task shrinks to one confirmation.
 
 ---
 

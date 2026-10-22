@@ -10,6 +10,7 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | — | Process design (roles, approvals, monthly cycle) | Domain design | Done, with clinical input |
 | — | System architecture (this document) | Design | Done |
 | — | Synthetic data generator (`synthdata/`) | Simulation | Prototype |
+| — | Events (outbox, Redis Streams, idempotent consumers, versioned schemas), hash-chained audit trail, durable workflows with demo-time timers, month-end report (`backend/src/dienstpilot/shared/`, `audit/`, `workflows/`; ADR-016, ADR-017) | Application | Built & tested on synthetic data (backend tests; one consumer so far; narrative text is a placeholder until C8) |
 | — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C7 and C8), job worker | Application | Prototype |
 | C1 | Roster Optimizer (`engine/solver/`) | Constraint optimization | Built & evaluated on synthetic data (`eval/results/benchmark.json`) |
 | C2 | Rule and Compliance Validator (`engine/validator/`) | Deterministic | Built & evaluated on synthetic data (`eval/results/c2.json`) |
@@ -109,7 +110,7 @@ Contexts never read each other's tables. Cross-context reads use public query se
 
 **Rules as data.** Rules are typed, declarative records (`min_rest_hours`, `max_consecutive_nights`, `max_weekends_per_month`, `max_on_call_per_month`, `contract_hours_band`, `qualification_mix`), not code. The solver compiles them into constraints; the validator interprets them directly. Values follow the department's legal and collective-agreement framework (for example, the 11-hour rest period of §5 ArbZG) and are configured by the Administrator, never hard-coded.
 
-**Audit trail.** Every event is appended with `hash = sha256(prev_hash ‖ canonical_json(event))`. A nightly job verifies the chain. Oversight can export it.
+**Audit trail.** Every event is appended with `hash = sha256(prev_hash ‖ canonical_json(event))`, in order of a sequence number, in one chain per department plus one for events without a department (ADR-016). The seeded history is chained too. A verifier runs nightly (a timer, ADR-017) and on demand; W10 shows "Protokoll vollständig und unverändert" only when a check actually passed. Oversight can export the log with the hashes.
 
 **Events.** Written to an outbox table in the same transaction as the state change, relayed to Redis Streams, consumed idempotently (event IDs deduplicated per consumer). Schemas are JSON Schema files with explicit versions; breaking changes create a new version and both are consumed during migration.
 
@@ -264,7 +265,7 @@ A pure function `validate(roster, ruleset) → list[Violation]`, implemented ind
 | Request window | `RequestWindowOpened` | push to all staff; reminders at configurable intervals; progress shown to Planner |
 | Month-end | `MonthClosed` | hours, overtime, rest compliance, burden distribution, decision trail → payroll export and Oversight report; C8 writes a short narrative over the computed figures |
 
-Workflows are durable state machines persisted in Postgres with timers on the Redis job queue, so a server restart never loses a cascade in progress.
+Workflows are durable state machines persisted in Postgres (`workflow.instance`, `workflow.timer`). Timers are rows due in demo time; an arq cron on the worker, the API handlers and `PUT /demo/clock` fire what has become due, in order and exactly once, so a restart never loses a cascade in progress (ADR-017). Redis only wakes the worker up. The four workflows are persisted; the month-end narrative is a placeholder until C8.
 
 ```mermaid
 stateDiagram-v2
@@ -359,6 +360,8 @@ The agent service is an MCP client. The same servers can be connected to other M
   - ADR-005 Self-hosted embeddings for the rulebook
   - ADR-012 C3 serving, the promotion rule, and dataset identity without DVC
   - ADR-013 C4 serving, the person-only privacy boundary, and the same promotion convention
+  - ADR-016 Event outbox, Redis Streams, idempotent consumers and the audit hash chain
+  - ADR-017 Durable workflows and timers due in demo time
 
 ## 15. Security and compliance
 

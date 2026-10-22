@@ -26,4 +26,4 @@ A solver run takes seconds to minutes, too long for an HTTP request. Once C2 exi
 - Because swaps also check the offerer, giving a shift away while already near the lower edge of the hours band goes to the Planner. The staff app shows this before the offer (`needs_planner`); an exchange keeps both people's hours and is the usual way out (PROCESS.md Situation B).
 - Swap and cover rows written before Phase 7 keep their old escalation reason `validator_unavailable`.
 - Run, leave-check and change ids are random (the demo clock can stand still, and arq de-duplicates jobs by id).
-- If the worker is down, a run stays `queued` and blocks a new run for that month; recovering stuck runs comes with the durable workflows (Phase 9).
+- If the worker is down, a run stays `queued` and blocks a new run for that month. (Phase 9, ADR-017: the worker marks such runs `failed` when it starts, and arq's job timeout fails a run that takes too long; W3 offers a retry.)

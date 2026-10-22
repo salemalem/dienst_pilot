@@ -3149,6 +3149,56 @@
         }
       }
     },
+    "/audit/verify": {
+      "post": {
+        "tags": [
+          "insight"
+        ],
+        "summary": "Audit Verify",
+        "description": "W10: verify the whole hash chain now (Planner or Oversight) and return the result.",
+        "operationId": "audit_verify_audit_verify_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/master-data": {
       "get": {
         "tags": [
@@ -3464,13 +3514,253 @@
         }
       }
     },
+    "/oversight/months": {
+      "get": {
+        "tags": [
+          "month end"
+        ],
+        "summary": "Months",
+        "description": "Months whose documentation has been prepared, newest first.",
+        "operationId": "months_oversight_months_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonthRow"
+                  },
+                  "title": "Response Months Oversight Months Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oversight/months/{month}/report": {
+      "get": {
+        "tags": [
+          "month end"
+        ],
+        "summary": "Month Report",
+        "description": "Return the month-end report: hours, overtime, rest, burden and the decision trail.",
+        "operationId": "month_report_oversight_months__month__report_get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planner/months/{month}/close": {
+      "post": {
+        "tags": [
+          "month end"
+        ],
+        "summary": "Close Month",
+        "description": "Confirm the prepared documentation with one click: locks the month, releases payroll.",
+        "operationId": "close_month_planner_months__month__close_post",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Closed"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oversight/months/{month}/payroll": {
+      "get": {
+        "tags": [
+          "month end"
+        ],
+        "summary": "Payroll",
+        "description": "Return the payroll export of a closed month (409 until the Planner has closed it).",
+        "operationId": "payroll_oversight_months__month__payroll_get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(json|csv)$",
+              "default": "json",
+              "title": "Format"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/demo/clock": {
       "put": {
         "tags": [
           "demo"
         ],
         "summary": "Set Clock",
-        "description": "Move the demo clock (Administrator, DEMO_MODE only). Stored in Redis.",
+        "description": "Move the demo clock (Administrator, DEMO_MODE only). Stored in Redis.\n\nMoving it forward fires every timer that has become due, in order, before the call returns\n(ADR-017); moving it back un-fires nothing.",
         "operationId": "set_clock_demo_clock_put",
         "parameters": [
           {
@@ -3725,6 +4015,14 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Payload"
+          },
+          "seq": {
+            "type": "integer",
+            "title": "Seq"
+          },
+          "hash": {
+            "type": "string",
+            "title": "Hash"
           }
         },
         "type": "object",
@@ -3736,7 +4034,9 @@
           "subject_type",
           "subject_id",
           "staff_name",
-          "payload"
+          "payload",
+          "seq",
+          "hash"
         ],
         "title": "AuditEventOut",
         "description": "An audit event as the viewer may see it."
@@ -3754,21 +4054,15 @@
             "type": "array",
             "title": "Events"
           },
-          "chain_verified": {
-            "type": "null",
-            "title": "Chain Verified",
-            "description": "The hash chain arrives in Phase 9"
-          },
-          "chain_available_from_phase": {
-            "type": "integer",
-            "title": "Chain Available From Phase",
-            "default": 9
+          "chain": {
+            "$ref": "#/components/schemas/ChainOut"
           }
         },
         "type": "object",
         "required": [
           "total",
-          "events"
+          "events",
+          "chain"
         ],
         "title": "AuditPage",
         "description": "W10: a page of the audit trail."
@@ -3967,6 +4261,98 @@
         "title": "Cell",
         "description": "What a physician has on a day."
       },
+      "ChainOut": {
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "stale",
+              "failed",
+              "never_checked"
+            ],
+            "title": "State"
+          },
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "trigger": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "nightly",
+                  "on_demand",
+                  "seed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trigger"
+          },
+          "rows": {
+            "type": "integer",
+            "title": "Rows",
+            "default": 0
+          },
+          "newer_events": {
+            "type": "integer",
+            "title": "Newer Events",
+            "description": "Entries appended since the check; each links up",
+            "default": 0
+          },
+          "head_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Head Hash"
+          },
+          "first_bad_seq": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Bad Seq"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state"
+        ],
+        "title": "ChainOut",
+        "description": "What the log may claim about itself: the result of the last real verification."
+      },
       "ClockIn": {
         "properties": {
           "now": {
@@ -4010,6 +4396,32 @@
         ],
         "title": "ClockOut",
         "description": "The demo clock."
+      },
+      "Closed": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "closed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Closed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "status",
+          "closed_at"
+        ],
+        "title": "Closed",
+        "description": "The month is closed."
       },
       "Colleague": {
         "properties": {
@@ -5173,6 +5585,119 @@
         "title": "Me",
         "description": "The signed-in user."
       },
+      "MonthReportOut": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "prepared_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Prepared At"
+          },
+          "closed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "report_hash": {
+            "type": "string",
+            "title": "Report Hash"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/PersonMonth"
+            },
+            "type": "array",
+            "title": "People"
+          },
+          "total_overtime_hours": {
+            "type": "number",
+            "title": "Total Overtime Hours"
+          },
+          "rest_violations_total": {
+            "type": "integer",
+            "title": "Rest Violations Total"
+          },
+          "distributions": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Distributions"
+          },
+          "decision_trail": {
+            "items": {
+              "$ref": "#/components/schemas/TrailEntry"
+            },
+            "type": "array",
+            "title": "Decision Trail"
+          },
+          "audit_head_seq": {
+            "type": "integer",
+            "title": "Audit Head Seq"
+          },
+          "narrative": {
+            "$ref": "#/components/schemas/Narrative"
+          },
+          "payroll_released": {
+            "type": "boolean",
+            "title": "Payroll Released"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "status",
+          "prepared_at",
+          "closed_at",
+          "report_hash",
+          "people",
+          "total_overtime_hours",
+          "rest_violations_total",
+          "distributions",
+          "decision_trail",
+          "audit_head_seq",
+          "narrative",
+          "payroll_released"
+        ],
+        "title": "MonthReportOut",
+        "description": "The month-end report (Oversight and Planner)."
+      },
+      "MonthRow": {
+        "properties": {
+          "roster_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Roster Month"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roster_month",
+          "status"
+        ],
+        "title": "MonthRow",
+        "description": "One month with a prepared report."
+      },
       "MyFairness": {
         "properties": {
           "year": {
@@ -5324,6 +5849,25 @@
         ],
         "title": "MyWishes",
         "description": "M4: the open window and the person's answer."
+      },
+      "Narrative": {
+        "properties": {
+          "engine": {
+            "type": "string",
+            "title": "Engine"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "engine",
+          "text"
+        ],
+        "title": "Narrative",
+        "description": "Explanatory text. Until Phase 10 it is a labelled placeholder, not generated text."
       },
       "NextShift": {
         "properties": {
@@ -6046,6 +6590,70 @@
         ],
         "title": "PersonHours",
         "description": "A physician's hours in a month (Planner and Oversight: payroll, working-time records)."
+      },
+      "PersonMonth": {
+        "properties": {
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "contract_hours": {
+            "type": "number",
+            "title": "Contract Hours"
+          },
+          "leave_credit_hours": {
+            "type": "number",
+            "title": "Leave Credit Hours"
+          },
+          "planned_hours": {
+            "type": "number",
+            "title": "Planned Hours"
+          },
+          "worked_hours": {
+            "type": "number",
+            "title": "Worked Hours"
+          },
+          "overtime_hours": {
+            "type": "number",
+            "title": "Overtime Hours"
+          },
+          "rest_violations": {
+            "type": "integer",
+            "title": "Rest Violations"
+          },
+          "nights": {
+            "type": "integer",
+            "title": "Nights"
+          },
+          "weekends": {
+            "type": "integer",
+            "title": "Weekends"
+          },
+          "holidays": {
+            "type": "integer",
+            "title": "Holidays"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_id",
+          "display_name",
+          "contract_hours",
+          "leave_credit_hours",
+          "planned_hours",
+          "worked_hours",
+          "overtime_hours",
+          "rest_violations",
+          "nights",
+          "weekends",
+          "holidays"
+        ],
+        "title": "PersonMonth",
+        "description": "One physician's month (names are resolved here; the stored report holds ids only)."
       },
       "Persona": {
         "properties": {
@@ -7590,6 +8198,41 @@
         ],
         "title": "TradeOffCheck",
         "description": "M5: the background check (C1).\n\n``result.outcome`` is one of coverable, coverable_with_trade_off, not_coverable,\nnot_applicable (synthdata ASSUMPTIONS §18)."
+      },
+      "TrailEntry": {
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "title": "Seq"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "actor": {
+            "type": "string",
+            "title": "Actor"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "subject_type": {
+            "type": "string",
+            "title": "Subject Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seq",
+          "at",
+          "actor",
+          "action",
+          "subject_type"
+        ],
+        "title": "TrailEntry",
+        "description": "One entry of the decision trail."
       },
       "ValidateIn": {
         "properties": {

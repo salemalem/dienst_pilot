@@ -1,1 +1,1 @@
-"""Versioned domain event schemas. Added as contexts start publishing events."""
+"""Versioned domain events: schemas, outbox, relay to Redis Streams, idempotent consumers."""

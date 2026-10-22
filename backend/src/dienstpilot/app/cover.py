@@ -253,6 +253,8 @@ def open_cascades_for(
             continue  # already started; the Planner handles it directly
         people = valid_takers(ctx, dep, s, exclude={staff_id})
         order = [c.staff_id for c in ranked(ctx, dep, people, s.day, s.shift_type)]
-        c = operations.open_cascade(ctx.session, s.assignment_id, absence_id, order, now)
+        c = operations.open_cascade(
+            ctx.session, s.assignment_id, absence_id, order, now, department_id=dep.id
+        )
         opened.append(c.id)
     return opened

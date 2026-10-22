@@ -19,6 +19,7 @@ from dienstpilot.engines.registry import Engines
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.requests import service as requests
+from dienstpilot.shared.events import outbox
 from dienstpilot.shared.ports import Clock
 from dienstpilot_solver.coverability import (
     CHECK_CONFIG,
@@ -66,6 +67,19 @@ def run_roster(
     except Exception as e:  # recorded on the run; the Planner sees it in W3
         session.rollback()
         planning.set_run_status(session, run_id, "failed", now=clock.now(), error=repr(e)[:500])
+    done = planning.run(session, run_id)
+    if done is not None:
+        outbox.publish(
+            session,
+            "RosterGenerated",
+            {
+                "run_id": run_id,
+                "roster_month": done.roster_month.isoformat(),
+                "status": done.status,
+            },
+            occurred_at=clock.now(),
+            department_id=department_id,
+        )
     session.commit()
 
 

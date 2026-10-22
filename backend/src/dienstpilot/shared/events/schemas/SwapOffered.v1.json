@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/SwapOffered.v1",
+  "title": "SwapOffered",
+  "description": "A shift was offered for a swap. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "swap_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "staff_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "swap_id",
+    "staff_id"
+  ],
+  "additionalProperties": false
+}

@@ -16,20 +16,36 @@ from typing import Any
 import polars as pl
 from sqlalchemy import Connection, create_engine, func, select, text
 from sqlalchemy.engine import make_url
+from sqlalchemy.orm import Session
 
 from dienstpilot.audit import seed as audit
+from dienstpilot.audit import service as audit_service
+from dienstpilot.fairness import models as _fairness  # noqa: F401  (registers the table)
 from dienstpilot.identity import seed as identity
+from dienstpilot.notifications import models as _notifications  # noqa: F401
 from dienstpilot.operations import seed as operations
 from dienstpilot.organization import seed as organization
 from dienstpilot.planning import seed as planning
 from dienstpilot.requests import seed as requests
+from dienstpilot.shared.db import EventsBase, FairnessBase, NotificationsBase, WorkflowBase
+from dienstpilot.shared.events import models as _events  # noqa: F401
 from dienstpilot.shared.settings import get_settings
+from dienstpilot.shared.workflows import models as _workflows  # noqa: F401
+from dienstpilot.workflows.arming import arm_defaults
 
 CONTEXTS: list[tuple[str, Callable[[Connection, Path], dict[str, int]], list[Any]]] = [
     ("organization", organization.load, organization.TABLES),
     ("requests", requests.load, requests.TABLES),
     ("planning", planning.load, planning.TABLES),
     ("operations", operations.load, operations.TABLES),
+]
+
+# Tables of the shared kernel and the contexts without seeded data: emptied by every seed.
+SHARED_TABLES: list[Any] = [
+    *EventsBase.metadata.sorted_tables,
+    *WorkflowBase.metadata.sorted_tables,
+    *NotificationsBase.metadata.sorted_tables,
+    *FairnessBase.metadata.sorted_tables,
 ]
 
 # Cross-context references: (table, column) → (table, column) it must exist in.
@@ -80,7 +96,10 @@ def load(root: Path, url: str | None = None) -> dict[str, int]:
     counts: dict[str, int] = {}
     with engine.begin() as conn:
         all_tables = (
-            [t for _, _, tables in CONTEXTS for t in tables] + identity.TABLES + audit.TABLES
+            [t for _, _, tables in CONTEXTS for t in tables]
+            + identity.TABLES
+            + audit.TABLES
+            + SHARED_TABLES
         )
         names = ", ".join(t.fullname for t in reversed(all_tables))
         conn.execute(text(f"TRUNCATE {names}"))
@@ -91,6 +110,10 @@ def load(root: Path, url: str | None = None) -> dict[str, int]:
         counts["audit/event"] = audit.load_events(
             conn, history_events(root, department_id, names_by_id)
         )
+        with Session(bind=conn) as s:
+            # The seeded history is chained and verified once, as of the default demo moment.
+            audit_service.run_check(s, department_id, get_settings().demo_now, "seed")
+            arm_defaults(s, department_id, get_settings().demo_now)
         for _, _, tables in CONTEXTS:
             for t in tables:
                 key = f"{t.schema}/{t.name}.parquet"

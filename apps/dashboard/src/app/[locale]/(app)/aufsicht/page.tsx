@@ -7,6 +7,7 @@ import { useState, type ReactNode } from "react";
 
 import { AuditTable, ChainIndicator } from "@/components/AuditTable";
 import { DotStrip } from "@/components/charts";
+import { MonthEnd } from "@/components/MonthEnd";
 import { MonthSwitch } from "@/components/MonthSwitch";
 import { Async, Button, ICON, Loading, PageHeader, Section, Table } from "@/components/ui";
 import { useFmt } from "@/lib/fmt";
@@ -171,12 +172,7 @@ export default function OversightPage(): ReactNode {
                   <Async query={audit}>
                     {(d) => (
                       <>
-                        <ChainIndicator
-                          verified={
-                            (d as { chain_verified?: boolean | null }).chain_verified ?? null
-                          }
-                          fromPhase={d.chain_available_from_phase}
-                        />
+                        <ChainIndicator chain={d.chain} />
                         <AuditTable events={d.events} />
                       </>
                     )}
@@ -218,6 +214,7 @@ export default function OversightPage(): ReactNode {
                 </Section>
               </div>
             </div>
+            <MonthEnd />
           </>
         );
       }}

@@ -86,6 +86,20 @@ Not yet tried by the author: the native (Expo Go, simulator) routes. The web rou
 6. *Protokoll* lists who did what; *KI-Transparenz* shows which components are built (C1 to C6) and which are stand-ins (C7, C8).
 7. **Vogel** (Oversight): *Aufsicht* is read-only; *Fairness und Compliance* shows no names.
 
+## 5b. Walkthrough: timers, the audit chain and the month end
+
+1. **Brandt → Protokoll:** the indicator says "Protokoll vollständig und unverändert" with the time of the last check. "Jetzt prüfen" runs the verifier again.
+2. **Timers follow the demo clock.** As IT-Administration, report nothing yet: first do Situation C up to Weber's sick report, but do **not** answer as Alvarez. Move the demo clock to **06:56**: Alvarez's 15 minutes are over, the next colleague has the request (*Ausfälle live* shows the timeline). Move it to **09:00**: everybody in the list was asked in turn, the cascade waits for Brandt (*Eskalation*). Nobody was asked twice.
+3. **Reminders and the nightly check.** Move the clock to **25.10.2026 09:00**. Colleagues who have not answered the December window find "Erinnerung: Die Wunschphase …" in *Mitteilungen* (Staff app); *Protokoll* shows "Erinnerung gesendet" by "System". The check at 02:00 on the way ran too.
+4. **Month end.** Move the clock to **02.11.2026**. **Vogel → Aufsicht → Monatsabschluss**: October is prepared, the payroll export is locked. **Brandt** confirms with "Monat bestätigen und abschließen"; the export is released.
+5. **Tamper, then catch it** (developer check, with `make dev` running):
+
+```bash
+docker compose -f infra/compose.dev.yml exec postgres psql -U dienstpilot -d dienstpilot -c "UPDATE audit.event SET actor_label = 'Someone else' WHERE seq = 10 AND chain_key = (SELECT chain_key FROM audit.chain_head WHERE chain_key <> 'system' LIMIT 1)"
+```
+
+   Then **Protokoll → Jetzt prüfen**: the indicator turns into "Protokoll verändert: Prüfung fehlgeschlagen ab Eintrag 10". `make seed` restores the clean state.
+
 ## 6. Start over, and automated checks
 
 ```bash

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/CoverDecided.v1",
+  "title": "CoverDecided",
+  "description": "A cover search was closed. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "cascade_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "approval": {
+      "enum": [
+        "policy",
+        "planner"
+      ]
+    }
+  },
+  "required": [
+    "cascade_id",
+    "approval"
+  ],
+  "additionalProperties": false
+}

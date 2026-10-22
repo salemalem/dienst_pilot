@@ -6,7 +6,7 @@ from fastapi import Depends, FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from dienstpilot import health
-from dienstpilot.app.routes import auth, insight, me, planner
+from dienstpilot.app.routes import auth, insight, me, months, planner
 from dienstpilot.shared.settings import Settings, get_settings
 
 
@@ -41,7 +41,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             status="ok" if ok else "fail", postgres=postgres, pgvector=pgvector, redis=redis
         )
 
-    for router in (auth.router, me.router, planner.router, insight.router):
+    for router in (auth.router, me.router, planner.router, insight.router, months.router):
         app.include_router(router)
     if settings.demo_mode:
         app.include_router(auth.demo_router)

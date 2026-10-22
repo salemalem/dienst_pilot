@@ -26,13 +26,13 @@ test("W9: the copilot answers with a rule citation, is labelled a stand-in and c
   );
 });
 
-test("W10: filterable event log, with the chain indicator that says what is not there yet", async ({
+test("W10: filterable event log, with the chain indicator that is backed by a real verification", async ({
   page,
 }) => {
   await asPersona(page, "brandt");
   await page.goto("/de/protokoll");
   await expect(page.getByTestId("audit-rows").getByRole("row").first()).toBeVisible();
-  await expect(page.getByTestId("chain")).toContainText("Hash-Kette");
+  await expect(page.getByTestId("chain")).toContainText("Protokoll vollständig und unverändert");
   await page
     .getByLabel("Ereignis", { exact: true })
     .selectOption({ label: "Dienstplan veröffentlicht" });

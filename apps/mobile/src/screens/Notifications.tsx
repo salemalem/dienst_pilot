@@ -29,6 +29,7 @@ export function NotificationsScreen(): ReactNode {
       date: s("date") ? fmt.dayMonth(s("date")) : "",
       range: s("start_date") && s("end_date") ? fmt.range(s("start_date"), s("end_date")) : "",
       shift: s("shift_type") ? t(`shift.${s("shift_type") as "frueh"}.name`) : "",
+      closes: s("closes_at") ? fmt.dateTime(s("closes_at")) : "",
       reason: s("reason"),
       change: s("change") ? t(`notification.change.${s("change") as "added"}`) : "",
     });

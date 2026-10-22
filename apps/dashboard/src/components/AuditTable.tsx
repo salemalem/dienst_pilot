@@ -1,11 +1,11 @@
 "use client";
 
 import type { components } from "@dienstpilot/api-client";
-import { ShieldCheck } from "lucide-react";
+import { ShieldAlert, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
-import { ICON, Table } from "@/components/ui";
+import { Button, ICON, Table } from "@/components/ui";
 import { AUDIT_ACTIONS } from "@/lib/audit";
 import { useFmt } from "@/lib/fmt";
 
@@ -60,25 +60,58 @@ export function AuditTable({ events }: { events: Event[] }): ReactNode {
   );
 }
 
-/** The hash chain arrives in Phase 9; until then the indicator says so instead of showing a tick. */
+type Chain = components["schemas"]["ChainOut"];
+
+/**
+ * What the log says about itself. The tick appears only when the last real verification passed
+ * (and is recent); a broken chain, a stale check and "never checked" each say so.
+ */
 export function ChainIndicator({
-  verified,
-  fromPhase,
+  chain,
+  onVerify,
+  verifying = false,
 }: {
-  verified: boolean | null;
-  fromPhase: number;
+  chain: Chain;
+  onVerify?: () => void;
+  verifying?: boolean;
 }): ReactNode {
   const t = useTranslations("w10");
-  if (verified) {
-    return (
-      <p className="body-strong m-0 flex items-center gap-2" data-testid="chain">
-        <ShieldCheck {...ICON} size={20} /> {t("chainOk")}
-      </p>
-    );
-  }
+  const fmt = useFmt();
+  const checked = chain.checked_at ? fmt.dateTime(chain.checked_at) : "";
+  const headline =
+    chain.state === "verified"
+      ? t("chainOk")
+      : chain.state === "stale"
+        ? t("chainStale")
+        : chain.state === "failed"
+          ? t("chainFailed", { seq: chain.first_bad_seq ?? 0 })
+          : t("chainNever");
   return (
-    <p className="body m-0 text-ink-muted" data-testid="chain">
-      {t("chainLater", { phase: fromPhase })}
-    </p>
+    <div className="flex flex-col gap-1" data-testid="chain" data-state={chain.state}>
+      <p
+        className={`${chain.state === "verified" ? "body-strong" : "body"} m-0 flex items-center gap-2 ${
+          chain.state === "failed" ? "text-danger" : ""
+        }`}
+        role={chain.state === "failed" ? "alert" : undefined}
+      >
+        {chain.state === "verified" ? (
+          <ShieldCheck {...ICON} size={20} />
+        ) : (
+          <ShieldAlert {...ICON} size={20} />
+        )}{" "}
+        {headline}
+      </p>
+      {chain.checked_at && (
+        <p className="caption m-0 text-ink-muted">
+          {t("chainDetail", { time: checked, rows: chain.rows })}
+          {chain.reason ? ` ${chain.reason}` : ""}
+        </p>
+      )}
+      {onVerify && (
+        <Button onClick={onVerify} disabled={verifying}>
+          {t("chainVerify")}
+        </Button>
+      )}
+    </div>
   );
 }

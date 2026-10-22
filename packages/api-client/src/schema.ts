@@ -1002,6 +1002,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/audit/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Audit Verify
+         * @description W10: verify the whole hash chain now (Planner or Oversight) and return the result.
+         */
+        post: operations["audit_verify_audit_verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/master-data": {
         parameters: {
             query?: never;
@@ -1102,6 +1122,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/oversight/months": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Months
+         * @description Months whose documentation has been prepared, newest first.
+         */
+        get: operations["months_oversight_months_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/oversight/months/{month}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Month Report
+         * @description Return the month-end report: hours, overtime, rest, burden and the decision trail.
+         */
+        get: operations["month_report_oversight_months__month__report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planner/months/{month}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Close Month
+         * @description Confirm the prepared documentation with one click: locks the month, releases payroll.
+         */
+        post: operations["close_month_planner_months__month__close_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/oversight/months/{month}/payroll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Payroll
+         * @description Return the payroll export of a closed month (409 until the Planner has closed it).
+         */
+        get: operations["payroll_oversight_months__month__payroll_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/demo/clock": {
         parameters: {
             query?: never;
@@ -1113,6 +1213,9 @@ export interface paths {
         /**
          * Set Clock
          * @description Move the demo clock (Administrator, DEMO_MODE only). Stored in Redis.
+         *
+         *     Moving it forward fires every timer that has become due, in order, before the call returns
+         *     (ADR-017); moving it back un-fires nothing.
          */
         put: operations["set_clock_demo_clock_put"];
         post?: never;
@@ -1220,6 +1323,10 @@ export interface components {
             payload: {
                 [key: string]: unknown;
             };
+            /** Seq */
+            seq: number;
+            /** Hash */
+            hash: string;
         };
         /**
          * AuditPage
@@ -1230,16 +1337,7 @@ export interface components {
             total: number;
             /** Events */
             events: components["schemas"]["AuditEventOut"][];
-            /**
-             * Chain Verified
-             * @description The hash chain arrives in Phase 9
-             */
-            chain_verified?: null;
-            /**
-             * Chain Available From Phase
-             * @default 9
-             */
-            chain_available_from_phase: number;
+            chain: components["schemas"]["ChainOut"];
         };
         /**
          * CascadeDecision
@@ -1315,6 +1413,38 @@ export interface components {
             wish?: ("granted" | "missed") | null;
         };
         /**
+         * ChainOut
+         * @description What the log may claim about itself: the result of the last real verification.
+         */
+        ChainOut: {
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "verified" | "stale" | "failed" | "never_checked";
+            /** Checked At */
+            checked_at?: string | null;
+            /** Trigger */
+            trigger?: ("nightly" | "on_demand" | "seed") | null;
+            /**
+             * Rows
+             * @default 0
+             */
+            rows: number;
+            /**
+             * Newer Events
+             * @description Entries appended since the check; each links up
+             * @default 0
+             */
+            newer_events: number;
+            /** Head Hash */
+            head_hash?: string | null;
+            /** First Bad Seq */
+            first_bad_seq?: number | null;
+            /** Reason */
+            reason?: string | null;
+        };
+        /**
          * ClockIn
          * @description A new demo time, or reset to the default demo moment.
          */
@@ -1339,6 +1469,24 @@ export interface components {
             now: string;
             /** Demo Mode */
             demo_mode: boolean;
+        };
+        /**
+         * Closed
+         * @description The month is closed.
+         */
+        Closed: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Status */
+            status: string;
+            /**
+             * Closed At
+             * Format: date-time
+             */
+            closed_at: string;
         };
         /**
          * Colleague
@@ -1880,6 +2028,58 @@ export interface components {
             staff_id: string | null;
         };
         /**
+         * MonthReportOut
+         * @description The month-end report (Oversight and Planner).
+         */
+        MonthReportOut: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Status */
+            status: string;
+            /**
+             * Prepared At
+             * Format: date-time
+             */
+            prepared_at: string;
+            /** Closed At */
+            closed_at: string | null;
+            /** Report Hash */
+            report_hash: string;
+            /** People */
+            people: components["schemas"]["PersonMonth"][];
+            /** Total Overtime Hours */
+            total_overtime_hours: number;
+            /** Rest Violations Total */
+            rest_violations_total: number;
+            /** Distributions */
+            distributions: {
+                [key: string]: unknown;
+            }[];
+            /** Decision Trail */
+            decision_trail: components["schemas"]["TrailEntry"][];
+            /** Audit Head Seq */
+            audit_head_seq: number;
+            narrative: components["schemas"]["Narrative"];
+            /** Payroll Released */
+            payroll_released: boolean;
+        };
+        /**
+         * MonthRow
+         * @description One month with a prepared report.
+         */
+        MonthRow: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Status */
+            status: string;
+        };
+        /**
          * MyFairness
          * @description M9: nights, weekends and holidays this year.
          */
@@ -1939,6 +2139,16 @@ export interface components {
             /** Suggestions */
             suggestions: components["schemas"]["Suggestion"][];
             suggestions_engine: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * Narrative
+         * @description Explanatory text. Until Phase 10 it is a labelled placeholder, not generated text.
+         */
+        Narrative: {
+            /** Engine */
+            engine: string;
+            /** Text */
+            text: string;
         };
         /**
          * NextShift
@@ -2252,6 +2462,34 @@ export interface components {
             staff_id: string;
             /** Display Name */
             display_name: string;
+        };
+        /**
+         * PersonMonth
+         * @description One physician's month (names are resolved here; the stored report holds ids only).
+         */
+        PersonMonth: {
+            /** Staff Id */
+            staff_id: string;
+            /** Display Name */
+            display_name: string;
+            /** Contract Hours */
+            contract_hours: number;
+            /** Leave Credit Hours */
+            leave_credit_hours: number;
+            /** Planned Hours */
+            planned_hours: number;
+            /** Worked Hours */
+            worked_hours: number;
+            /** Overtime Hours */
+            overtime_hours: number;
+            /** Rest Violations */
+            rest_violations: number;
+            /** Nights */
+            nights: number;
+            /** Weekends */
+            weekends: number;
+            /** Holidays */
+            holidays: number;
         };
         /**
          * Persona
@@ -2930,6 +3168,25 @@ export interface components {
                 [key: string]: unknown;
             } | null;
             engine: components["schemas"]["EngineLabel"];
+        };
+        /**
+         * TrailEntry
+         * @description One entry of the decision trail.
+         */
+        TrailEntry: {
+            /** Seq */
+            seq: number;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Actor */
+            actor: string;
+            /** Action */
+            action: string;
+            /** Subject Type */
+            subject_type: string;
         };
         /**
          * ValidateIn
@@ -4900,6 +5157,37 @@ export interface operations {
             };
         };
     };
+    audit_verify_audit_verify_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChainOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     master_data_master_data_get: {
         parameters: {
             query?: never;
@@ -5051,6 +5339,138 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ComponentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    months_oversight_months_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonthRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    month_report_oversight_months__month__report_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonthReportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_month_planner_months__month__close_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Closed"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    payroll_oversight_months__month__payroll_get: {
+        parameters: {
+            query?: {
+                format?: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

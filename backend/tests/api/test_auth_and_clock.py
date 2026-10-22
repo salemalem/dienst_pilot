@@ -105,6 +105,13 @@ def test_demo_clock_endpoint_only_in_demo_mode_and_only_for_admins(
     r = on.put("/demo/clock", json={"now": later}, headers=h("it-admin"))
     assert r.status_code == 200 and r.json()["now"].startswith("2026-10-20T06:40")
     assert on.get("/clock").json()["now"].startswith("2026-10-20T06:40")
+    # A clock change belongs to no department: it is on the system chain, not in W10's log.
+    from sqlalchemy import text
+
+    rows = app_factory.conn.execute(
+        text("SELECT action, department_id FROM audit.event WHERE chain_key = 'system'")
+    ).all()
+    assert [(r[0], r[1]) for r in rows] == [("demo.clock_set", None)]
     assert (
         on.put("/demo/clock", json={"reset": True}, headers=h("it-admin"))
         .json()["now"]

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/MonthReportPrepared.v1",
+  "title": "MonthReportPrepared",
+  "description": "The month-end documentation was prepared. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "roster_month": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "roster_month"
+  ],
+  "additionalProperties": false
+}

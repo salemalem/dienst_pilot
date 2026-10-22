@@ -18,6 +18,7 @@ from dienstpilot.app.common import (
     in_department,
     label,
     record,
+    settle_timers,
 )
 from dienstpilot.app.context import CtxDep
 from dienstpilot.app.cover import CHECK, change_violations, ranked, valid_takers
@@ -44,6 +45,8 @@ from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.requests import service as requests
 from dienstpilot.shared.ports import ForecastContext
+from dienstpilot.workflows import reminders
+from dienstpilot.workflows.reminders import window_recipients
 from dienstpilot_validator import Assignment, Violation
 
 router = APIRouter(tags=["planner dashboard"])
@@ -854,7 +857,7 @@ def _window_progress(c: Ctx) -> WindowProgress | None:
 def overview(c: CtxDep, _: PlannerDep) -> Overview:
     """W1: window progress, escalations, coverage of the next 14 days with expected absences."""
     now, today = c.clock.now(), c.clock.today()
-    operations.advance(c.session, now)
+    settle_timers(c)
     dep = department(c)
     days = [today + timedelta(days=i) for i in range(14)]
     shifts = effective(c.session, days[0], days[-1])
@@ -988,12 +991,9 @@ def window_detail(c: CtxDep, _: PlannerDep, month: str) -> WindowDetail:
     """W2: who has answered the window."""
     w, dep = _window(c, month), department(c)
     answered = requests.responses(c.session, w.id)
-    opened = w.opens_at.date()
     people = [
         Respondent(staff_id=p.id, display_name=p.display_name, responded_at=answered.get(p.id))
-        for p in dep.staff.values()
-        if p.role_on(opened) is not None
-        and any(p.rostered_on(w.roster_month + timedelta(days=i)) for i in range(28))
+        for p in window_recipients(w, dep.staff.values())
     ]
     people.sort(key=lambda r: (r.responded_at is not None, r.display_name))
     return WindowDetail(
@@ -1031,6 +1031,7 @@ def close_window(c: CtxDep, _: PlannerDep, month: str) -> WindowDetail:
     if w.status != "open":
         raise HTTPException(status.HTTP_409_CONFLICT, "The window is not open")
     requests.set_window_status(c.session, w.id, "closed")
+    reminders.closed(c.session, w.id, c.clock.now())
     record(c, "window.closed", "request_window", w.id)
     return window_detail(c, _, month)
 
@@ -1107,7 +1108,7 @@ class Inbox(BaseModel):
 def inbox(c: CtxDep, _: PlannerDep) -> Inbox:
     """W6: pending leave with computed impact, escalated swaps and cover, open proposals."""
     dep = department(c)
-    operations.advance(c.session, c.clock.now())
+    settle_timers(c)
     ids = list(dep.staff)
     year = c.clock.today().year
     taken = {
@@ -1364,7 +1365,7 @@ def _cascade_out(c: Ctx, cas: operations.Cascade) -> CascadeOut:
 def live_cascades(c: CtxDep, _: PlannerDep) -> list[CascadeOut]:
     """W7: open and escalated cover searches, and those closed in the last 7 days."""
     now = c.clock.now()
-    operations.advance(c.session, now)
+    settle_timers(c)
     active = operations.cascades(c.session, statuses=["open", "pending_approval"])
     recent = [
         x
@@ -1412,7 +1413,7 @@ def _cascade_or_404(c: Ctx, cascade_id: str) -> operations.Cascade:
 @router.get("/planner/cascades/{cascade_id}")
 def escalation(c: CtxDep, _: PlannerDep, cascade_id: str) -> EscalationOut:
     """W7b: options to close the gap, ranked, with hours and overtime consequences."""
-    operations.advance(c.session, c.clock.now())
+    settle_timers(c)
     cas = _cascade_or_404(c, cascade_id)
     dep = department(c)
     a = planning.assignment(c.session, cas.assignment_id)

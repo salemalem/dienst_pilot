@@ -51,3 +51,27 @@ class AuditBase(DeclarativeBase):
     """Base for the audit context."""
 
     metadata = context_metadata("audit")
+
+
+class EventsBase(DeclarativeBase):
+    """Base for the event outbox and the consumers' dedup table (shared kernel)."""
+
+    metadata = context_metadata("events")
+
+
+class WorkflowBase(DeclarativeBase):
+    """Base for durable workflow instances and their timers (shared kernel)."""
+
+    metadata = context_metadata("workflow")
+
+
+class NotificationsBase(DeclarativeBase):
+    """Base for the notifications context."""
+
+    metadata = context_metadata("notifications")
+
+
+class FairnessBase(DeclarativeBase):
+    """Base for the fairness and reporting context."""
+
+    metadata = context_metadata("fairness")

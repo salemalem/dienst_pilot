@@ -189,7 +189,8 @@
     "change": {
       "added": "hinzugefügt",
       "removed": "entfernt"
-    }
+    },
+    "window_reminder": "Erinnerung: Die Wunschphase für {month} schließt am {closes}. Sie haben noch nicht geantwortet."
   },
   "common": {
     "loading": "Wird geladen …",
@@ -399,7 +400,15 @@
     "openDraft": "Als Entwurf öffnen",
     "noRosterTitle": "Kein gültiger Dienstplan gefunden",
     "noRosterBody": "Mit den harten Regeln und den genehmigten Abwesenheiten gibt es keinen gültigen Plan. Das ist der Grund:",
-    "empty": "Starten Sie eine Berechnung, um Varianten zu sehen."
+    "empty": "Starten Sie eine Berechnung, um Varianten zu sehen.",
+    "failedTitle": "Die Berechnung wurde nicht abgeschlossen",
+    "failedBody": "Es wurde kein Dienstplan gespeichert. Sie können die Berechnung erneut starten.",
+    "failedReason": {
+      "worker_restarted": "Der Berechnungsdienst wurde neu gestartet, während die Berechnung lief.",
+      "job_timeout": "Die Berechnung hat die erlaubte Zeit überschritten.",
+      "other": "Die Berechnung ist mit einem Fehler beendet worden."
+    },
+    "retry": "Berechnung erneut starten"
   },
   "w5": {
     "title": "Dienstplan freigeben",
@@ -674,7 +683,11 @@
     "all": "Alle Ereignisse",
     "eventsTitle": "Ereignisse",
     "chainOk": "Protokoll vollständig und unverändert",
-    "chainLater": "Hash-Kette: ab Phase {phase} verfügbar. Bis dahin zeigt dieses Protokoll keine Prüfmarke.",
+    "chainStale": "Letzte Prüfung des Protokolls liegt zu lange zurück",
+    "chainFailed": "Protokoll verändert: Prüfung fehlgeschlagen ab Eintrag {seq}",
+    "chainNever": "Protokoll noch nicht geprüft",
+    "chainDetail": "Geprüft am {time}, {rows} Einträge.",
+    "chainVerify": "Jetzt prüfen",
     "tableLabel": "Protokoll der Ereignisse",
     "colTime": "Zeitpunkt",
     "colActor": "Wer",
@@ -704,7 +717,9 @@
       "roster_changed": "Veröffentlichter Dienstplan geändert",
       "proposal_created": "Vorschlag angelegt",
       "policy_changed": "Automatische Freigabe geändert",
-      "demo_clock_set": "Demo-Uhr gesetzt"
+      "demo_clock_set": "Demo-Uhr gesetzt",
+      "month_report_prepared": "Monatsbericht vorbereitet",
+      "month_closed": "Monat abgeschlossen"
     },
     "subject": {
       "roster_variant": "Dienstplan",
@@ -812,7 +827,24 @@
     "kpiOvertimeNote": "{over, plural, =0 {bei niemandem} one {bei 1 Person} other {bei # Personen}}",
     "kpiCostNote": "Platzhalter: keine Kostenrechnung im Prototyp",
     "kpiWeekends": "Wochenenddienste im Jahr",
-    "kpiWeekendsNote": "Spanne, Median {median}"
+    "kpiWeekendsNote": "Spanne, Median {median}",
+    "monthEnd": {
+      "title": "Monatsabschluss",
+      "none": "Noch kein Monat abgeschlossen vorbereitet. Die Dokumentation entsteht automatisch, sobald ein Monat vorbei ist.",
+      "month": "Monat",
+      "status": {
+        "prepared": "vorbereitet",
+        "closed": "abgeschlossen"
+      },
+      "preparedAt": "Vorbereitet am {at}. Wartet auf die Bestätigung der Planung.",
+      "closedAt": "Abgeschlossen am {at}. Der Lohnexport ist freigegeben.",
+      "summary": "Überstunden gesamt: {overtime} h. Ruhezeit-Verstöße: {violations}. {people} Personen, {entries} Einträge im Entscheidungsverlauf.",
+      "narrativeLabel": "Platzhalter-Text:",
+      "close": "Monat bestätigen und abschließen",
+      "payroll": "Lohnexport (CSV)",
+      "payrollLocked": "Der Export wird mit dem Abschluss durch die Planung freigegeben.",
+      "hash": "Berichtskennung {hash}"
+    }
   },
   "w13": {
     "title": "KI-Transparenz",

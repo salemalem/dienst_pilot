@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/RosterPublished.v1",
+  "title": "RosterPublished",
+  "description": "A variant was approved and published. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "variant_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "variant_id"
+  ],
+  "additionalProperties": false
+}

@@ -65,7 +65,7 @@ packages = ["dienstpilot", "synthdata", "dienstpilot_validator", "dienstpilot_so
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["statsmodels.*", "mlflow.*", "lightgbm.*", "scipy.*"]
+module = ["statsmodels.*", "mlflow.*", "lightgbm.*", "scipy.*", "jsonschema.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
@@ -114,6 +114,8 @@ forbidden_modules = [
   "dienstpilot.app",
   "dienstpilot.engines",
   "dienstpilot.seeding",
+  "dienstpilot.workflows",
+  "dienstpilot.recording",
 ]
 
 [[tool.importlinter.contracts]]
@@ -132,7 +134,7 @@ forbidden_modules = ["synthdata"]
 name = "The application layer uses contexts only through their public services"
 type = "forbidden"
 allow_indirect_imports = true
-source_modules = ["dienstpilot.app"]
+source_modules = ["dienstpilot.app", "dienstpilot.workflows", "dienstpilot.recording"]
 forbidden_modules = [
   "dienstpilot.identity.models",
   "dienstpilot.organization.models",
@@ -140,6 +142,8 @@ forbidden_modules = [
   "dienstpilot.planning.models",
   "dienstpilot.operations.models",
   "dienstpilot.audit.models",
+  "dienstpilot.fairness.models",
+  "dienstpilot.notifications.models",
 ]
 
 [[tool.importlinter.contracts]]

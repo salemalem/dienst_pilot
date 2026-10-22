@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/MonthClosed.v1",
+  "title": "MonthClosed",
+  "description": "The Planner closed a month; the payroll export is released. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "roster_month": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "roster_month"
+  ],
+  "additionalProperties": false
+}

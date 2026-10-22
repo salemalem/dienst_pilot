@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/SwapDecided.v1",
+  "title": "SwapDecided",
+  "description": "The Planner decided a swap. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "swap_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "decision": {
+      "enum": [
+        "approved",
+        "declined"
+      ]
+    }
+  },
+  "required": [
+    "swap_id",
+    "decision"
+  ],
+  "additionalProperties": false
+}
