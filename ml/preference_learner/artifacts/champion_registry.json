@@ -1,0 +1,6 @@
+{
+ "registered_model": "c4-preference-learner",
+ "alias": "champion",
+ "registry_version": 2,
+ "kind": "raw"
+}
