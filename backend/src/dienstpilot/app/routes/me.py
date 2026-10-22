@@ -45,6 +45,7 @@ from dienstpilot.operations import service as operations
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.requests import service as requests
+from dienstpilot.shared.ports import PreferenceContext
 from dienstpilot_validator import Assignment
 
 router = APIRouter(prefix="/me", tags=["staff app"])
@@ -265,7 +266,11 @@ class Suggestion(BaseModel):
     kind: str
     weekday: int
     shift_type: str
-    evidence: int
+    evidence: int  # events behind it ("Warum?": how often)
+    trials: int  # opportunities behind it
+    rate: float
+    department_rate: float
+    probability: float
 
 
 class MyWishes(BaseModel):
@@ -288,6 +293,31 @@ def _open_window(c: Ctx) -> requests.Window:
     raise HTTPException(status.HTTP_404_NOT_FOUND, "No request window is open")
 
 
+def _suggestions(c: Ctx, me: str) -> list[Suggestion]:
+    """C4 suggestions from the signed-in person's own history, computed on this request only."""
+    own = requests.wishes_of(c.session, me)
+    past = [(p.day, p.shift_type) for p in own if p.kind == "wish_work"]
+    away: list[tuple[date, str]] = []
+    # Every shift they held, once, including those they gave away (opportunities to swap away).
+    held = {
+        a.id: (a.day, a.shift_type)
+        for a in planning.assignments_of(c.session, me, month_start(c.clock.today()))
+    }
+    for s in operations.swaps(c.session, staff_id=me):
+        if s.offered_by != me:
+            continue  # an offer shows dislike whether or not a colleague accepted it
+        a = planning.assignment(c.session, s.assignment_id)
+        if a is not None:
+            away.append((a.day, a.shift_type))
+            held[a.id] = (a.day, a.shift_type)
+    context = PreferenceContext(
+        answered_months=requests.answered_months(c.session, me),
+        unavailable_days=[p.day for p in own if p.kind == "unavailable"],
+        assigned=list(held.values()),
+    )
+    return [Suggestion(**x.__dict__) for x in c.engines.preferences.suggest(past, away, context)]
+
+
 @router.get("/wishes")
 def my_wishes(c: CtxDep, _: Physician) -> MyWishes:
     """M4: the open request window, the person's entries and preference suggestions."""
@@ -298,23 +328,8 @@ def my_wishes(c: CtxDep, _: Physician) -> MyWishes:
     ]
     settings = identity.get_settings(c.session, c.user.id)
     suggestions: list[Suggestion] = []
-    if settings["preference_suggestions"]:
-        past = [
-            (p.day, p.shift_type)
-            for p in requests.wishes_of(c.session, me)
-            if p.kind == "wish_work"
-        ]
-        given = [
-            s
-            for s in operations.swaps(c.session, staff_id=me)
-            if s.offered_by == me and s.accepted_by
-        ]
-        away = []
-        for s in given:
-            a = planning.assignment(c.session, s.assignment_id)
-            if a is not None:
-                away.append((a.day, a.shift_type))
-        suggestions = [Suggestion(**x.__dict__) for x in c.engines.preferences.suggest(past, away)]
+    if settings["preference_suggestions"]:  # switched off: nothing is loaded, computed or stored
+        suggestions = _suggestions(c, me)
     answered = requests.responses(c.session, w.id).get(me)
     return MyWishes(
         roster_month=w.roster_month,

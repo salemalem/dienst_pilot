@@ -108,6 +108,24 @@ def assignments(session: Session, start: date, end: date) -> list[Assignment]:
     ]
 
 
+def assignments_of(session: Session, staff_id: str, until_month: date) -> list[Assignment]:
+    """Return one person's published assignments in roster months up to ``until_month``."""
+    q = (
+        select(m.Assignment, m.RosterRun.roster_month)
+        .join(m.RosterVariant, m.RosterVariant.id == m.Assignment.variant_id)
+        .join(m.RosterRun, m.RosterRun.id == m.RosterVariant.run_id)
+        .where(
+            m.RosterVariant.status == "published",
+            m.Assignment.staff_id == uuid.UUID(staff_id),
+            m.RosterRun.roster_month <= until_month,
+        )
+    )
+    return [
+        Assignment(str(a.id), str(a.staff_id), a.date, a.shift_type, month)
+        for a, month in session.execute(q)
+    ]
+
+
 def assignment(session: Session, assignment_id: str) -> Assignment | None:
     """Return one published assignment."""
     q = (

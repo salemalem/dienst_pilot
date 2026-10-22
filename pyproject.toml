@@ -170,11 +170,11 @@ source_modules = ["dienstpilot_validator", "dienstpilot_solver"]
 forbidden_modules = ["dienstpilot", "synthdata"]
 
 [[tool.importlinter.contracts]]
-name = "The API never imports the training stack (it loads a bundle with numpy and LightGBM only)"
+name = "The API never imports the training stack (it loads bundles with numpy and LightGBM only)"
 type = "forbidden"
 allow_indirect_imports = true
 source_modules = ["dienstpilot"]
-forbidden_modules = ["dienstpilot_ml.training", "mlflow", "statsmodels"]
+forbidden_modules = ["dienstpilot_ml.training", "mlflow", "statsmodels", "scipy"]
 
 [[tool.importlinter.contracts]]
 name = "ML code knows nothing of the backend or the generator"
@@ -186,5 +186,9 @@ forbidden_modules = ["dienstpilot", "synthdata"]
 name = "Serving-side ML modules do not import the training stack"
 type = "forbidden"
 allow_indirect_imports = true
-source_modules = ["dienstpilot_ml.features", "dienstpilot_ml.absence_forecast"]
-forbidden_modules = ["dienstpilot_ml.training", "mlflow", "statsmodels"]
+source_modules = [
+  "dienstpilot_ml.features",
+  "dienstpilot_ml.absence_forecast",
+  "dienstpilot_ml.preference_learner",
+]
+forbidden_modules = ["dienstpilot_ml.training", "mlflow", "statsmodels", "scipy"]

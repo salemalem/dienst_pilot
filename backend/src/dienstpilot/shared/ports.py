@@ -5,7 +5,7 @@ and C3 are built (Phases 7 and 8a); C4–C8 are deterministic stand-ins until th
 """
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, Literal
@@ -121,6 +121,19 @@ class PreferenceSuggestion:
     weekday: int  # 0 = Monday
     shift_type: str
     evidence: int  # how many past events support it
+    trials: int  # how many opportunities there were (shifts held, or days that could be wished for)
+    rate: float  # the model's rate for this person and cell
+    department_rate: float  # the department's rate for the same cell
+    probability: float  # how sure the model is that the person's rate is above the department's
+
+
+@dataclass(frozen=True)
+class PreferenceContext:
+    """One person's own history, the opportunities behind their events (never anybody else's)."""
+
+    answered_months: Sequence[date]  # first day of each roster month whose window they answered
+    unavailable_days: Sequence[date]  # days they marked "kann nicht" in those windows
+    assigned: Sequence[tuple[date, str]]  # shifts they held in published rosters, swapped or not
 
 
 class PreferenceLearner(Engine):
@@ -128,9 +141,15 @@ class PreferenceLearner(Engine):
 
     @abstractmethod
     def suggest(
-        self, wishes: list[tuple[date, str | None]], swapped_away: list[tuple[date, str]]
+        self,
+        wishes: list[tuple[date, str | None]],
+        swapped_away: list[tuple[date, str]],
+        context: PreferenceContext,
     ) -> list[PreferenceSuggestion]:
-        """Suggest from stated wishes (day, shift) and shifts the person gave away."""
+        """Suggest from stated wishes (day, shift) and shifts the person offered for swap.
+
+        Computed only for the person asking, on request; nothing is stored.
+        """
 
 
 @dataclass(frozen=True)

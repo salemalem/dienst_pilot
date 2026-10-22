@@ -5,6 +5,8 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
+from dienstpilot.app.deps import get_engines
+
 from .helpers import future_shift, walk
 
 pytestmark = pytest.mark.db
@@ -116,3 +118,64 @@ def test_colleagues_on_shift_show_no_absence_reason(
     grid = client.get("/roster?month=2026-11", headers=login("lorenz")).json()
     absences = [c["absence"] for row in grid["rows"] for c in row["cells"].values() if c["absence"]]
     assert absences and all(a == {"status": "absent"} for a in absences)
+
+
+INFERRED_KEYS = ("suggestions", "suggestions_engine", "department_rate", "probability")
+
+
+def test_inferred_preferences_appear_only_on_the_persons_own_wishes_endpoint(
+    client: TestClient, login: Any, live: dict[str, str]
+) -> None:
+    """C4 output is the person's own: no other endpoint carries it, for any persona."""
+    paths = _get_paths(client, live["cascade_id"], live["assignment_id"])
+    for persona in PERSONAS:
+        h = login(persona)
+        for path in paths:
+            if path == "/me/wishes":
+                continue
+            r = client.get(path, headers=h)
+            if r.status_code != 200:
+                continue
+            keys = {k for k, _ in walk(r.json()) if k}
+            assert not keys & set(INFERRED_KEYS), (persona, path, keys & set(INFERRED_KEYS))
+
+
+def test_oversight_and_admin_cannot_ask_for_suggestions_and_planner_views_carry_none(
+    client: TestClient, login: Any
+) -> None:
+    for persona in ("vogel", "it-admin"):
+        assert client.get("/me/wishes", headers=login(persona)).status_code == 403
+    # the planner sees the wishes people confirmed, never what the model infers about anybody
+    for path in ("/planner/runs?month=2026-12", "/roster?month=2026-11"):
+        body = client.get(path, headers=login("brandt")).json()
+        assert not {k for k, _ in walk(body) if k} & set(INFERRED_KEYS), path
+
+
+def test_with_suggestions_switched_off_nothing_is_inferred(client: TestClient, login: Any) -> None:
+    """M12 off: the learner is never called, so nothing is computed (and nothing is stored)."""
+    from dienstpilot.engines.registry import default_engines
+
+    calls: list[int] = []
+    engines = default_engines()
+    real = engines.preferences.suggest
+
+    def counting(*args: Any, **kwargs: Any) -> Any:
+        calls.append(1)
+        return real(*args, **kwargs)
+
+    engines.preferences.suggest = counting  # type: ignore[method-assign]
+    client.app.dependency_overrides[get_engines] = lambda: engines  # type: ignore[attr-defined]
+    kaya = login("kaya")
+    assert (
+        client.put("/me/settings", json={"preference_suggestions": False}, headers=kaya).status_code
+        == 200
+    )
+    audit_before = client.get("/audit/events?limit=1", headers=login("vogel")).json()["total"]
+    body = client.get("/me/wishes", headers=kaya).json()
+    assert body["suggestions"] == [] and calls == []
+    assert (
+        client.get("/audit/events?limit=1", headers=login("vogel")).json()["total"] == audit_before
+    )
+    client.put("/me/settings", json={"preference_suggestions": True}, headers=kaya)
+    client.get("/me/wishes", headers=kaya)
+    assert calls == [1]  # on again: computed once, on request
