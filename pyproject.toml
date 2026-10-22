@@ -65,7 +65,7 @@ packages = ["dienstpilot", "synthdata", "dienstpilot_validator", "dienstpilot_so
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["statsmodels.*", "mlflow.*", "lightgbm.*"]
+module = ["statsmodels.*", "mlflow.*", "lightgbm.*", "scipy.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
