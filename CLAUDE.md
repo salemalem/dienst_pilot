@@ -25,8 +25,8 @@ This repository is a **portfolio prototype**. It has to stay demonstrably real: 
 - **Backend:** Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2 + Alembic, PostgreSQL 16 with pgvector, Redis 7 (arq for jobs, Streams for events)
 - **Optimization:** Google OR-Tools CP-SAT
 - **ML:** polars/pandas, scikit-learn, LightGBM, statsmodels; MLflow (tracking + model registry, local SQLite store); dataset identity through the generator manifest hashes (ADR-012; no DVC)
-- **Agents:** LangGraph, Anthropic Python SDK, MCP Python SDK (Streamable HTTP transport); Langfuse (self-hosted) for traces
-- **RAG:** pgvector + Postgres full-text search (hybrid), bge-m3 embeddings served locally
+- **Agents:** LangGraph, Anthropic Python SDK, MCP Python SDK (Streamable HTTP transport). LLM calls are logged to a Postgres usage table (tokens, latency, model, prompt version; no prompt text) and traced with OpenTelemetry. Langfuse is not used: self-hosted it needs Postgres, ClickHouse, Redis and S3 storage, too heavy for one VPS (ADR-018)
+- **RAG:** pgvector + Postgres full-text search (hybrid), bge-m3 embeddings served locally (ONNX Runtime, int8 export)
 - **Planner dashboard:** Next.js (App Router), TypeScript strict, Tailwind, next-intl
 - **Staff mobile app:** Expo (React Native), TypeScript, i18next
 - **Shared:** OpenAPI → generated TypeScript client in `packages/api-client`
@@ -128,6 +128,8 @@ Fill these in as they are built: `make train`, `make eval`, `make screenshots` (
 - `make test`: pytest, then vitest for the packages. Database tests run when `TEST_DATABASE_URL` points to a Postgres the tests may wipe.
 - `make e2e`: Playwright on the demo clock: the planner dashboard (`apps/dashboard/e2e`, dashboard on :3100) and the staff app on Expo web (`apps/mobile/e2e`, exported build on :8083, run once per language). Own database `dienstpilot_e2e` and Redis db 14, API on :8100 with the worker; each run rebuilds the e2e database from the seed and the dev database is untouched.
 - Staff app: `pnpm --filter @dienstpilot/mobile dev` starts Expo web on :8081 (the dev API allows that origin in `DEMO_MODE`); the API URL comes from `EXPO_PUBLIC_API_URL` (default `http://localhost:8000`; Android emulator: `http://10.0.2.2:8000`).
+- `make rag-embed`, `make rag-check`, `make rag-index`: embed the rulebook corpus and the eval questions with the local bge-m3 (needs the ONNX model; the vectors are committed so CI needs none), check that the committed vectors match the corpus, load them into the dev database. `make seed` loads them too. The eval is `uv run python eval/run_rag_eval.py` (part of `make eval`).
+- MCP servers: `uvicorn dienstpilot_mcp.app:asgi --factory --port 8200` (compose service `mcp`, `/roster/mcp` and four more). Secrets: `ANTHROPIC_API_KEY` goes in the git-ignored `.env` (see `.env.example`); settings read it, nothing commits it.
 - `make lint`: ruff, mypy `--strict`, import-linter, eslint, tsc, prettier.
 - `make format`: apply ruff and prettier formatting.
 - `make api-client`: regenerate `packages/api-client` from the backend's OpenAPI schema.

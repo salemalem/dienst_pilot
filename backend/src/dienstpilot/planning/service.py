@@ -50,6 +50,8 @@ class Proposal:
     title: str
     body: str
     status: str
+    kind: str = "change"
+    changes: list[dict[str, Any]] | None = None
 
 
 def published_months(session: Session) -> list[date]:
@@ -177,6 +179,8 @@ def _proposal(p: m.Proposal) -> Proposal:
         p.title,
         p.body,
         p.status,
+        p.kind,
+        None if p.changes is None else list(p.changes),
     )
 
 
@@ -198,6 +202,8 @@ def create_proposal(
     title: str,
     body: str,
     now: datetime,
+    kind: str = "change",
+    changes: list[dict[str, Any]] | None = None,
 ) -> Proposal:
     """Create a proposal. It changes nothing until the Planner acts on it."""
     p = m.Proposal(
@@ -210,6 +216,8 @@ def create_proposal(
         title=title,
         body=body,
         status="open",
+        kind=kind,
+        changes=changes,
     )
     session.add(p)
     session.flush()

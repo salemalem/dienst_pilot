@@ -85,6 +85,7 @@ class Proposal(Base):
     __table_args__ = (
         CheckConstraint("status IN ('open','accepted','dismissed')", name="status"),
         CheckConstraint("source IN ('copilot','planner')", name="source"),
+        CheckConstraint("kind IN ('change','announcement')", name="kind"),
     )
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
     department_id: Mapped[uuid.UUID]
@@ -96,6 +97,9 @@ class Proposal(Base):
     body: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(10))
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # change: suggested roster changes; announcement: a draft text. Nothing applies or sends them.
+    kind: Mapped[str] = mapped_column(String(12), server_default="change")
+    changes: Mapped[list[dict[str, Any]] | None] = mapped_column(JSONB)
 
 
 class AssignmentChange(Base):

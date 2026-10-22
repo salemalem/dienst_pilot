@@ -47,6 +47,7 @@ from dienstpilot.requests import service as requests
 from dienstpilot.shared.ports import ForecastContext
 from dienstpilot.workflows import reminders
 from dienstpilot.workflows.reminders import window_recipients
+from dienstpilot_ml.features.cover import credited_hours
 from dienstpilot_validator import Assignment, Violation
 
 router = APIRouter(tags=["planner dashboard"])
@@ -318,6 +319,142 @@ class AddShift(BaseModel):
     date: date
     shift_type: str
     staff_id: str
+
+
+class CoverCandidates(BaseModel):
+    """Who could take a shift, C2-checked and in C5's order (staff ids; names are for the UI)."""
+
+    assignment_id: str
+    date: date
+    shift_type: str
+    candidates: list[str]
+    check: str = CHECK
+    engine: EngineLabel
+
+
+@router.get("/planner/cover-candidates")
+def cover_candidates(c: CtxDep, _: PlannerDep, assignment_id: str) -> CoverCandidates:
+    """Colleagues who could take a published shift, validated by C2 and ordered by C5."""
+    dep = department(c)
+    a = planning.assignment(c.session, assignment_id)
+    current = (
+        None
+        if a is None
+        else next((x for x in effective(c.session, a.day, a.day) if x.assignment_id == a.id), None)
+    )
+    if a is None or current is None or a.staff_id not in dep.staff:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+    exclude = {current.holder} if current.holder else set()
+    people = valid_takers(c, dep, current, exclude=exclude)
+    order = ranked(c, dep, people, current.day, current.shift_type)
+    return CoverCandidates(
+        assignment_id=assignment_id,
+        date=current.day,
+        shift_type=current.shift_type,
+        candidates=[x.staff_id for x in order],
+        engine=label(c.engines.cover_ranker.info),
+    )
+
+
+class AssignmentChange(BaseModel):
+    """One suggested change to a published roster, as in W4: reassign, remove or add a shift."""
+
+    assignment_id: str | None = None
+    new_staff_id: str | None = Field(None, description="Null with assignment_id: remove")
+    add: AddShift | None = None
+
+
+class WhatIfIn(BaseModel):
+    """Several changes to published rosters, checked together. Nothing is written."""
+
+    changes: list[AssignmentChange] = Field(min_length=1, max_length=20)
+
+
+class PersonEffect(BaseModel):
+    """What the changes do to one physician's credited hours."""
+
+    staff_id: str
+    hours_delta: float
+
+
+class GapOut(BaseModel):
+    """A shift the changes leave without a holder."""
+
+    date: date
+    shift_type: str
+
+
+class WhatIfOut(BaseModel):
+    """The effect of a change set, as C2 sees it."""
+
+    valid: bool
+    introduced: list[ViolationOut]
+    people: list[PersonEffect]
+    removed_without_replacement: list[GapOut]
+    validator: EngineLabel
+
+
+@router.post("/planner/what-if")
+def what_if(c: CtxDep, _: OversightReaderDep, body: WhatIfIn) -> WhatIfOut:
+    """Check changes to published rosters with C2 without writing anything (a what-if).
+
+    The same checks as a real change (W4): future days only, a published month, department staff.
+    """
+    dep = department(c)
+    remove: list[Assignment] = []
+    add: list[Assignment] = []
+    delta: dict[str, float] = {}
+    gaps: list[GapOut] = []
+    before: str | None
+    after: str | None
+    for ch in body.changes:
+        if (ch.assignment_id is None) == (ch.add is None):
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY, "Give either assignment_id or add"
+            )
+        for sid in (ch.new_staff_id, ch.add.staff_id if ch.add else None):
+            if sid is not None:
+                in_department(dep, sid)
+        if ch.add is not None:
+            day, shift_type, before, after = ch.add.date, ch.add.shift_type, None, ch.add.staff_id
+        else:
+            assert ch.assignment_id is not None
+            a = planning.assignment(c.session, ch.assignment_id)
+            current = (
+                None
+                if a is None
+                else next(
+                    (x for x in effective(c.session, a.day, a.day) if x.assignment_id == a.id),
+                    None,
+                )
+            )
+            if a is None or current is None or a.staff_id not in dep.staff:
+                raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+            day, shift_type, before, after = a.day, a.shift_type, current.holder, ch.new_staff_id
+        if planning.published(c.session, month_start(day)) is None:
+            raise HTTPException(status.HTTP_409_CONFLICT, "This month is not published")
+        if day <= c.clock.today():
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Only future days can change")
+        hours = credited_hours(shift_type)
+        if before:
+            remove.append(Assignment(before, day, shift_type))
+            delta[before] = delta.get(before, 0.0) - hours
+        if after:
+            add.append(Assignment(after, day, shift_type))
+            delta[after] = delta.get(after, 0.0) + hours
+        else:
+            gaps.append(GapOut(date=day, shift_type=shift_type))
+    inputs = Inputs(c.session, dep, c.clock.now())
+    introduced = change_violations(c, inputs, remove, add, {a.staff_id for a in (*remove, *add)})
+    return WhatIfOut(
+        valid=not introduced,
+        introduced=violations_out(dep, introduced),
+        people=[
+            PersonEffect(staff_id=k, hours_delta=round(v, 2)) for k, v in sorted(delta.items())
+        ],
+        removed_without_replacement=gaps,
+        validator=label(c.engines.validator.info),
+    )
 
 
 class AssignmentEdit(BaseModel):
@@ -1093,6 +1230,8 @@ class ProposalOut(BaseModel):
     created_at: datetime
     roster_month: date | None
     status: str
+    kind: str = "change"
+    changes: list[dict[str, Any]] | None = None
 
 
 class Inbox(BaseModel):
@@ -1177,6 +1316,8 @@ def inbox(c: CtxDep, _: PlannerDep) -> Inbox:
             created_at=p.created_at,
             roster_month=p.roster_month,
             status=p.status,
+            kind=p.kind,
+            changes=p.changes,
         )
         for p in planning.proposals(c.session, dep.id, "open")
     ]

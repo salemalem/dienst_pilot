@@ -2,7 +2,7 @@ COMPOSE := docker compose -f infra/compose.dev.yml
 SEED ?= 20261020
 SEED_DIR := data/synthetic/v1
 
-.PHONY: install dev down logs seed test e2e screenshots lint format api-client eval tune train labels
+.PHONY: install dev down logs seed test e2e screenshots lint format api-client eval tune train labels rag-embed rag-check rag-index
 
 install: ## Install Python and Node dependencies
 	uv sync
@@ -48,16 +48,16 @@ screenshots: ## Regenerate screenshots/ (DE and EN, each on a fresh seed): image
 	pnpm --filter @dienstpilot/screenshots finalize
 
 lint: ## ruff, mypy, import-linter, eslint, tsc, prettier
-	uv run ruff check backend ml
-	uv run ruff format --check backend ml
+	uv run ruff check backend ml agents mcp_servers
+	uv run ruff format --check backend ml agents mcp_servers
 	uv run mypy
 	uv run lint-imports
 	pnpm lint
 	pnpm format:check
 
 format: ## Apply ruff and prettier formatting
-	uv run ruff format backend ml
-	uv run ruff check --fix backend ml
+	uv run ruff format backend ml agents mcp_servers
+	uv run ruff check --fix backend ml agents mcp_servers
 	pnpm format
 
 CAFFEINATE := $(shell command -v caffeinate >/dev/null 2>&1 && echo "caffeinate -i")
@@ -85,6 +85,18 @@ eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.
 	uv run python eval/run_c5_eval.py --data $(SEED_DIR)
 	-C6_WRITE_LATENCY=1 uv run pytest backend/tests/api/test_leave_hint.py -k endpoint_latency -q
 	uv run python eval/run_c6_eval.py --data $(SEED_DIR)
+	TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+psycopg://dienstpilot:dienstpilot@localhost:5433/dienstpilot_test} uv run python eval/run_rag_eval.py
+	uv run python eval/render_tables.py
+
+rag-embed: ## Re-embed the rulebook corpus and the RAG eval questions with the local bge-m3 (needs the ONNX model; rewrites agents/rag/embeddings/)
+	uv run python -m dienstpilot_agents.rag.index embed
+	uv run python -m dienstpilot_agents.rag.index embed-questions
+
+rag-check: ## Check that the committed vectors belong to the current corpus (no model needed)
+	uv run python -m dienstpilot_agents.rag.index check
+
+rag-index: ## Load the committed vectors into the dev database (make seed does this too)
+	uv run python -m dienstpilot_agents.rag.index load --database-url $${DATABASE_URL:-postgresql+psycopg://dienstpilot:dienstpilot@localhost:5433/dienstpilot}
 
 tune: ## Re-tune the balanced profile on July-December 2024 (eval/results/tuning.json)
 	uv run python eval/tune_profiles.py --data $(SEED_DIR)

@@ -100,6 +100,18 @@ docker compose -f infra/compose.dev.yml exec postgres psql -U dienstpilot -d die
 
    Then **Protokoll → Jetzt prüfen**: the indicator turns into "Protokoll verändert: Prüfung fehlgeschlagen ab Eintrag 10". `make seed` restores the clean state.
 
+## 5c. The rulebook and the MCP servers (developer check)
+
+```bash
+# 1. Sign in as the Planner and search the rulebook (German or English questions)
+TOKEN=$(curl -s -X POST localhost:8000/auth/demo-login -H 'content-type: application/json' -d '{"persona":"brandt"}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["access_token"])')
+curl -s "localhost:8000/rules/search?q=Wie%20lange%20muss%20die%20Ruhezeit%20sein" -H "authorization: Bearer $TOKEN" | python3 -m json.tool | head -30
+```
+
+Every passage has a `citation` ("Arbeitszeitgesetz (ArbZG) § 5 Abs. 1 (Stand 2024-12-31)"); synthetic documents say so in theirs. A question with no source ("Wie hoch ist der Urlaubsanspruch?") answers `found: false`. Without the bge-m3 model on the machine (`BGE_M3_DIR` in `.env`, see `.env.example`) the answer says `"mode": "fts-only"`.
+
+The MCP servers run as compose service `mcp` on port 8200 (`/roster/mcp`, `/planning/mcp`, `/rules/mcp`, `/forecast/mcp`, `/notify/mcp`, Streamable HTTP). Send the same bearer token; the Planner sees every tool, Oversight (Katrin Vogel) only the read tools, staff get 403. No tool publishes, approves or sends anything; `create_proposal` and `draft_announcement` put a proposal in the Planner's inbox (*Anfragen*) and nothing else.
+
 ## 6. Start over, and automated checks
 
 ```bash

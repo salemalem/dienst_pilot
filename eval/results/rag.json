@@ -1,0 +1,184 @@
+{
+ "component": "RAG rulebook (ARCHITECTURE §11)",
+ "settings": {
+  "rrf_k": 60,
+  "candidates_per_list": 50,
+  "top_k": 5,
+  "embedding": "BAAI/bge-m3 (ONNX int8, Xenova/bge-m3)"
+ },
+ "data": {
+  "corpus_sha256": "3f755477e546e2a380669c4c958af3b2973e10686922b0e3c7b5f3ab2ea2c3cd",
+  "chunks": 167,
+  "questions": 60,
+  "questions_sha256": "01733c1d944ef4dcdc228d7b1cb681311de52fc6f3270b4ff35e2d4adb619267",
+  "rule_sha256": "6a410081aeb616bf9ea9b2521ceb07afcc4c8948b2e894611ffb75633581ff46",
+  "vectors_manifest_sha256": "d96a3c76b6fff3fbed9a9254ca2273fe49ab0db8cb7d0c05b0e904c24133fea2",
+  "dev_questions": 19,
+  "test_questions": 41
+ },
+ "no_source_threshold": {
+  "tau": 0.6,
+  "dev_balanced_accuracy_by_tau": {
+   "0.3": 0.5,
+   "0.325": 0.5,
+   "0.35": 0.5,
+   "0.375": 0.5,
+   "0.4": 0.5,
+   "0.425": 0.5,
+   "0.45": 0.5,
+   "0.475": 0.5,
+   "0.5": 0.625,
+   "0.525": 0.75,
+   "0.55": 0.875,
+   "0.575": 0.875,
+   "0.6": 1.0,
+   "0.625": 1.0,
+   "0.65": 0.9,
+   "0.675": 0.8,
+   "0.7": 0.7333
+  }
+ },
+ "test": {
+  "hybrid": {
+   "n_answerable": 37,
+   "recall@1": 0.6486,
+   "recall@3": 0.8108,
+   "recall@5": 0.8649,
+   "mrr": 0.727,
+   "citation_correct@1": 0.6486
+  },
+  "by_language": {
+   "de": {
+    "n_answerable": 18,
+    "recall@1": 0.6667,
+    "recall@3": 0.9444,
+    "recall@5": 0.9444,
+    "mrr": 0.787,
+    "citation_correct@1": 0.6667
+   },
+   "en": {
+    "n_answerable": 19,
+    "recall@1": 0.6316,
+    "recall@3": 0.6842,
+    "recall@5": 0.7895,
+    "mrr": 0.6702,
+    "citation_correct@1": 0.6316
+   }
+  },
+  "no_source": {
+   "n_unanswerable": 4,
+   "unanswerable_rejected": 4,
+   "answerable_wrongly_rejected": 1,
+   "no_source_recall": 1.0,
+   "no_source_precision": 0.8
+  },
+  "modes": {
+   "hybrid": {
+    "n_answerable": 37,
+    "recall@1": 0.6486,
+    "recall@3": 0.8108,
+    "recall@5": 0.8649,
+    "mrr": 0.727,
+    "citation_correct@1": 0.6486
+   },
+   "fts": {
+    "n_answerable": 37,
+    "recall@1": 0.3243,
+    "recall@3": 0.4054,
+    "recall@5": 0.4865,
+    "mrr": 0.3761,
+    "citation_correct@1": 0.3243
+   },
+   "vector": {
+    "n_answerable": 37,
+    "recall@1": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "mrr": 1.0,
+    "citation_correct@1": 1.0
+   }
+  },
+  "misses_at_5": [
+   {
+    "id": "rest-shorten-en",
+    "gold": [
+     "arbzg:§5:2"
+    ],
+    "top": [
+     "rules:Rule1:1",
+     "rules:Rule3:2",
+     "sop-en:SOP-1:2"
+    ]
+   },
+   {
+    "id": "night-time-en",
+    "gold": [
+     "arbzg:§2:3"
+    ],
+    "top": [
+     "rules:Rule2:1",
+     "rules:Rule2:2",
+     "rules:Rule4:1"
+    ]
+   },
+   {
+    "id": "sunday-en",
+    "gold": [
+     "arbzg:§9:1",
+     "arbzg:§10:1"
+    ],
+    "top": [
+     "rules:Rule3:2",
+     "rules:Rule3:1",
+     "bv-en:§4:1"
+    ]
+   },
+   {
+    "id": "replacement-day-en",
+    "gold": [
+     "arbzg:§11:3"
+    ],
+    "top": [
+     "rules:Rule1:2",
+     "rules:Rule1:1",
+     "regeln:Regel1:2"
+    ]
+   },
+   {
+    "id": "fine-de",
+    "gold": [
+     "arbzg:§22:2"
+    ],
+    "top": [
+     "arbzg:§7:2",
+     "arbzg:§15:1",
+     "arbzg:§7:1"
+    ]
+   }
+  ]
+ },
+ "dev": {
+  "hybrid": {
+   "n_answerable": 15,
+   "recall@1": 0.7333,
+   "recall@3": 0.8,
+   "recall@5": 0.8667,
+   "mrr": 0.7833,
+   "citation_correct@1": 0.7333
+  }
+ },
+ "checks": {
+  "hybrid_recall@5_at_least_0.80": true,
+  "hybrid_recall@5_at_least_best_single": false
+ },
+ "caveats": [
+  "Questions were written by the author of the corpus; they are easier than questions from strangers.",
+  "Gold passages include synthetic documents written for this prototype.",
+  "Vectors are from the int8 ONNX export of bge-m3."
+ ],
+ "environment": {
+  "git_commit": "90d6197fcfef3b7b6cfbf5095ad341bd34cdcc98",
+  "python": "3.12.13",
+  "numpy": "2.5.4"
+ }
+}

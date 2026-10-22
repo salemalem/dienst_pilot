@@ -1,0 +1,598 @@
+{
+ "version": 1,
+ "note": "60 labelled questions written for this prototype (30 DE, 30 EN). gold: any listed chunk id answers the question. The dev/test split is by hash (EVAL_RULE.md).",
+ "questions": [
+  {
+   "id": "rest-de",
+   "language": "de",
+   "question": "Wie lange muss die Ruhezeit nach dem Ende der täglichen Arbeitszeit mindestens sein?",
+   "gold": [
+    "arbzg:§5:1",
+    "regeln:Regel1:1",
+    "rules:Rule1:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "rest-en",
+   "language": "en",
+   "question": "How long must the rest period be after daily working hours end?",
+   "gold": [
+    "arbzg:§5:1",
+    "regeln:Regel1:1",
+    "rules:Rule1:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "rest-shorten-de",
+   "language": "de",
+   "question": "Darf die Ruhezeit im Krankenhaus verkürzt werden und wie wird das ausgeglichen?",
+   "gold": [
+    "arbzg:§5:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "rest-shorten-en",
+   "language": "en",
+   "question": "Can the rest period be shortened in a hospital, and how is it compensated?",
+   "gold": [
+    "arbzg:§5:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "daily-hours-de",
+   "language": "de",
+   "question": "Wie viele Stunden darf die werktägliche Arbeitszeit höchstens betragen?",
+   "gold": [
+    "arbzg:§3:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "daily-hours-en",
+   "language": "en",
+   "question": "What is the maximum daily working time?",
+   "gold": [
+    "arbzg:§3:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "breaks-de",
+   "language": "de",
+   "question": "Wie lang müssen die Ruhepausen bei mehr als sechs Stunden Arbeit sein?",
+   "gold": [
+    "arbzg:§4:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "breaks-en",
+   "language": "en",
+   "question": "How long must breaks be when working more than six hours?",
+   "gold": [
+    "arbzg:§4:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "night-time-de",
+   "language": "de",
+   "question": "Von wann bis wann geht die Nachtzeit?",
+   "gold": [
+    "arbzg:§2:3"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "night-time-en",
+   "language": "en",
+   "question": "Between which hours does night time run?",
+   "gold": [
+    "arbzg:§2:3"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "night-check-de",
+   "language": "de",
+   "question": "Haben Nachtarbeitnehmer Anspruch auf eine arbeitsmedizinische Untersuchung?",
+   "gold": [
+    "arbzg:§6:3"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "night-check-en",
+   "language": "en",
+   "question": "Are night workers entitled to an occupational health examination?",
+   "gold": [
+    "arbzg:§6:3"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "sunday-de",
+   "language": "de",
+   "question": "Dürfen Arbeitnehmer an Sonn- und Feiertagen beschäftigt werden?",
+   "gold": [
+    "arbzg:§9:1",
+    "arbzg:§10:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "sunday-en",
+   "language": "en",
+   "question": "May employees work on Sundays and public holidays?",
+   "gold": [
+    "arbzg:§9:1",
+    "arbzg:§10:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "free-sundays-de",
+   "language": "de",
+   "question": "Wie viele Sonntage im Jahr müssen beschäftigungsfrei bleiben?",
+   "gold": [
+    "arbzg:§11:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "free-sundays-en",
+   "language": "en",
+   "question": "How many Sundays a year must remain free of work?",
+   "gold": [
+    "arbzg:§11:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "replacement-day-de",
+   "language": "de",
+   "question": "Wann muss ein Ersatzruhetag nach Sonntagsarbeit gewährt werden?",
+   "gold": [
+    "arbzg:§11:3"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "replacement-day-en",
+   "language": "en",
+   "question": "When must a compensatory rest day be given after Sunday work?",
+   "gold": [
+    "arbzg:§11:3"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "records-de",
+   "language": "de",
+   "question": "Welche Arbeitszeitnachweise muss der Arbeitgeber führen?",
+   "gold": [
+    "arbzg:§16:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "records-en",
+   "language": "en",
+   "question": "What working-time records must the employer keep?",
+   "gold": [
+    "arbzg:§16:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "fine-de",
+   "language": "de",
+   "question": "Wie hoch kann ein Bußgeld bei Verstößen gegen das Arbeitszeitgesetz sein?",
+   "gold": [
+    "arbzg:§22:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "fine-en",
+   "language": "en",
+   "question": "How high can a fine be for violating the Working Hours Act?",
+   "gold": [
+    "arbzg:§22:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "nights-row-de",
+   "language": "de",
+   "question": "Wie viele Nachtdienste in Folge sind in der Abteilung höchstens erlaubt?",
+   "gold": [
+    "regeln:Regel2:1",
+    "rules:Rule2:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "nights-row-en",
+   "language": "en",
+   "question": "How many night shifts in a row are allowed at most in the department?",
+   "gold": [
+    "regeln:Regel2:1",
+    "rules:Rule2:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "weekends-de",
+   "language": "de",
+   "question": "Wie viele Wochenenden pro Monat darf eine Person höchstens Dienst haben?",
+   "gold": [
+    "regeln:Regel3:1",
+    "rules:Rule3:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "weekends-en",
+   "language": "en",
+   "question": "How many weekends per month may a person work at most?",
+   "gold": [
+    "regeln:Regel3:1",
+    "rules:Rule3:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "on-call-de",
+   "language": "de",
+   "question": "Wie viele Bereitschaftsdienste im Krankenhaus sind pro Monat erlaubt?",
+   "gold": [
+    "regeln:Regel3:2",
+    "rules:Rule3:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "on-call-en",
+   "language": "en",
+   "question": "How many in-hospital on-call duties per month are allowed?",
+   "gold": [
+    "regeln:Regel3:2",
+    "rules:Rule3:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "on-call-credit-de",
+   "language": "de",
+   "question": "Mit wie vielen Stunden wird ein Bereitschaftsdienst angerechnet?",
+   "gold": [
+    "regeln:Regel3:3",
+    "rules:Rule3:3"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "on-call-credit-en",
+   "language": "en",
+   "question": "How many hours is an on-call duty credited with?",
+   "gold": [
+    "regeln:Regel3:3",
+    "rules:Rule3:3"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "hours-band-de",
+   "language": "de",
+   "question": "In welchem Band müssen die Monatsstunden gegenüber den Vertragsstunden liegen?",
+   "gold": [
+    "regeln:Regel4:1",
+    "rules:Rule4:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "hours-band-en",
+   "language": "en",
+   "question": "Within what band must monthly hours lie against the contract hours?",
+   "gold": [
+    "regeln:Regel4:1",
+    "rules:Rule4:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "free-day-de",
+   "language": "de",
+   "question": "Gibt es nach einem Bereitschaftsdienst einen dienstfreien Tag?",
+   "gold": [
+    "regeln:Regel1:2",
+    "rules:Rule1:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "free-day-en",
+   "language": "en",
+   "question": "Is there a free day after an on-call duty?",
+   "gold": [
+    "regeln:Regel1:2",
+    "rules:Rule1:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "cover-deadline-de",
+   "language": "de",
+   "question": "Wie lange hat eine angefragte Kollegin Zeit, eine Vertretung zu übernehmen?",
+   "gold": [
+    "sop:SOP-1:3",
+    "sop-en:SOP-1:3",
+    "bv:§5:2",
+    "bv-en:§5:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "cover-deadline-en",
+   "language": "en",
+   "question": "How long does an asked colleague have to accept a cover?",
+   "gold": [
+    "sop:SOP-1:3",
+    "sop-en:SOP-1:3",
+    "bv:§5:2",
+    "bv-en:§5:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "cover-planner-de",
+   "language": "de",
+   "question": "Wann entscheidet die Planung selbst über eine Vertretung?",
+   "gold": [
+    "bv:§5:3",
+    "bv-en:§5:3",
+    "sop:SOP-1:4",
+    "sop-en:SOP-1:4"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "cover-planner-en",
+   "language": "en",
+   "question": "When does the planner decide a cover personally?",
+   "gold": [
+    "bv:§5:3",
+    "bv-en:§5:3",
+    "sop:SOP-1:4",
+    "sop-en:SOP-1:4"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "no-publish-de",
+   "language": "de",
+   "question": "Darf das System einen Dienstplan selbst veröffentlichen?",
+   "gold": [
+    "bv:§2:2",
+    "bv-en:§2:2",
+    "bv:§2:1",
+    "bv-en:§2:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "no-publish-en",
+   "language": "en",
+   "question": "May the system publish a roster by itself?",
+   "gold": [
+    "bv:§2:2",
+    "bv-en:§2:2",
+    "bv:§2:1",
+    "bv-en:§2:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "window-de",
+   "language": "de",
+   "question": "Wie lange dauert die Wunschphase und wann gibt es Erinnerungen?",
+   "gold": [
+    "sop:SOP-3:1",
+    "sop:SOP-3:2",
+    "sop-en:SOP-3:1",
+    "sop-en:SOP-3:2",
+    "bv:§3:1",
+    "bv-en:§3:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "window-en",
+   "language": "en",
+   "question": "How long is the request window and when are reminders sent?",
+   "gold": [
+    "sop:SOP-3:1",
+    "sop:SOP-3:2",
+    "sop-en:SOP-3:1",
+    "sop-en:SOP-3:2",
+    "bv:§3:1",
+    "bv-en:§3:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "swap-de",
+   "language": "de",
+   "question": "Wann wird ein Diensttausch automatisch bestätigt?",
+   "gold": [
+    "sop:SOP-2:3",
+    "sop-en:SOP-2:3",
+    "bv:§4:2",
+    "bv-en:§4:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "swap-en",
+   "language": "en",
+   "question": "When is a shift swap confirmed automatically?",
+   "gold": [
+    "sop:SOP-2:3",
+    "sop-en:SOP-2:3",
+    "bv:§4:2",
+    "bv-en:§4:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "change-published-de",
+   "language": "de",
+   "question": "Was ist nötig, um einen veröffentlichten Plan zu ändern?",
+   "gold": [
+    "bv:§6:1",
+    "bv-en:§6:1",
+    "sop:SOP-5:1",
+    "sop-en:SOP-5:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "change-published-en",
+   "language": "en",
+   "question": "What is needed to change a published roster?",
+   "gold": [
+    "bv:§6:1",
+    "bv-en:§6:1",
+    "sop:SOP-5:1",
+    "sop-en:SOP-5:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "month-end-de",
+   "language": "de",
+   "question": "Wann wird der Lohnexport für einen Monat freigegeben?",
+   "gold": [
+    "sop:SOP-4:2",
+    "sop-en:SOP-4:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "month-end-en",
+   "language": "en",
+   "question": "When is the payroll export of a month released?",
+   "gold": [
+    "sop:SOP-4:2",
+    "sop-en:SOP-4:2"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "sick-data-de",
+   "language": "de",
+   "question": "Wird bei einer Krankmeldung eine Diagnose gespeichert?",
+   "gold": [
+    "bv:§5:1",
+    "bv-en:§5:1",
+    "sop:SOP-1:1",
+    "sop-en:SOP-1:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "sick-data-en",
+   "language": "en",
+   "question": "Is a diagnosis stored when someone reports sick?",
+   "gold": [
+    "bv:§5:1",
+    "bv-en:§5:1",
+    "sop:SOP-1:1",
+    "sop-en:SOP-1:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "log-de",
+   "language": "de",
+   "question": "Wird jede Änderung manipulationssicher protokolliert und wer darf das lesen?",
+   "gold": [
+    "bv:§7:1",
+    "bv-en:§7:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "log-en",
+   "language": "en",
+   "question": "Is every change kept in a tamper-evident log, and who may read it?",
+   "gold": [
+    "bv:§7:1",
+    "bv-en:§7:1"
+   ],
+   "answerable": true
+  },
+  {
+   "id": "none1-de",
+   "language": "de",
+   "question": "Wie hoch ist der Urlaubsanspruch pro Jahr in Tagen?",
+   "gold": [],
+   "answerable": false
+  },
+  {
+   "id": "none1-en",
+   "language": "en",
+   "question": "What is the annual leave entitlement in days?",
+   "gold": [],
+   "answerable": false
+  },
+  {
+   "id": "none2-de",
+   "language": "de",
+   "question": "Wie wird die Überstundenvergütung berechnet?",
+   "gold": [],
+   "answerable": false
+  },
+  {
+   "id": "none2-en",
+   "language": "en",
+   "question": "How is overtime pay calculated?",
+   "gold": [],
+   "answerable": false
+  },
+  {
+   "id": "none3-de",
+   "language": "de",
+   "question": "Welche Gehaltsstufe hat eine Fachärztin nach dem Tarifvertrag?",
+   "gold": [],
+   "answerable": false
+  },
+  {
+   "id": "none3-en",
+   "language": "en",
+   "question": "Which salary grade does a specialist physician have under the collective agreement?",
+   "gold": [],
+   "answerable": false
+  },
+  {
+   "id": "none4-de",
+   "language": "de",
+   "question": "Gibt es einen Parkplatz für Nachtdienste?",
+   "gold": [],
+   "answerable": false
+  },
+  {
+   "id": "none4-en",
+   "language": "en",
+   "question": "Is there a parking space for night shifts?",
+   "gold": [],
+   "answerable": false
+  }
+ ]
+}

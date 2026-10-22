@@ -1,0 +1,6 @@
+{
+ "tau": 0.6,
+ "chosen_on": "dev questions only (agents/rag/EVAL_RULE.md)",
+ "rule_sha256": "6a410081aeb616bf9ea9b2521ceb07afcc4c8948b2e894611ffb75633581ff46",
+ "questions_sha256": "01733c1d944ef4dcdc228d7b1cb681311de52fc6f3270b4ff35e2d4adb619267"
+}

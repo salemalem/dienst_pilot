@@ -32,6 +32,8 @@ from dienstpilot.shared.events import models as _events  # noqa: F401
 from dienstpilot.shared.settings import get_settings
 from dienstpilot.shared.workflows import models as _workflows  # noqa: F401
 from dienstpilot.workflows.arming import arm_defaults
+from dienstpilot_agents.rag.index import chunk_vectors
+from dienstpilot_agents.rag.store import load_index
 
 CONTEXTS: list[tuple[str, Callable[[Connection, Path], dict[str, int]], list[Any]]] = [
     ("organization", organization.load, organization.TABLES),
@@ -110,6 +112,9 @@ def load(root: Path, url: str | None = None) -> dict[str, int]:
         counts["audit/event"] = audit.load_events(
             conn, history_events(root, department_id, names_by_id)
         )
+        # The rulebook index is rebuilt from the committed corpus and vectors (no model needed).
+        chunks, committed = chunk_vectors()
+        counts["rag/chunk"] = load_index(conn, chunks, committed.vectors)
         with Session(bind=conn) as s:
             # The seeded history is chained and verified once, as of the default demo moment.
             audit_service.run_check(s, department_id, get_settings().demo_now, "seed")

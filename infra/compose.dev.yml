@@ -37,11 +37,19 @@ services:
       DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@postgres:5432/dienstpilot
       REDIS_URL: redis://redis:6379/0
       DEMO_MODE: "true"
+      # The local bge-m3 ONNX export for rule search; without it search is full-text only.
+      RAG_MODEL_DIR: /models/bge-m3
+    env_file:
+      - path: ../.env
+        required: false
     command: >
       sh -c "alembic upgrade head &&
              uvicorn dienstpilot.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/backend/src"
     ports: ["8000:8000"]
-    volumes: ["../backend/src:/app/backend/src"]
+    volumes:
+      - "../backend/src:/app/backend/src"
+      - "../agents/src:/app/agents/src"
+      - "${BGE_M3_DIR:-./models/bge-m3}:/models/bge-m3:ro"
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -68,6 +76,19 @@ services:
       DEMO_MODE: "true"
     command: arq dienstpilot.worker.WorkerSettings
     volumes: ["../backend/src:/app/backend/src"]
+    depends_on:
+      api: { condition: service_healthy }
+
+  mcp:
+    # Five MCP servers (roster, planning, rules, forecast, notify) at /<server>/mcp, Streamable
+    # HTTP. Thin wrappers over the API: the caller's bearer token is passed on (ADR-018).
+    build:
+      context: ..
+      dockerfile: mcp_servers/Dockerfile
+    environment:
+      API_URL: http://api:8000
+    ports: ["8200:8200"]
+    volumes: ["../mcp_servers/src:/app/mcp_servers/src"]
     depends_on:
       api: { condition: service_healthy }
 
