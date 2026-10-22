@@ -166,7 +166,11 @@ class RuleSearch(BaseModel):
     query: str
     found: bool
     passages: list[RulePassage]
-    mode: str
+    mode: str = Field(description="What ran: vector, hybrid or fts-only")
+    configured: str = Field(description="The configured retrieval (RAG_RETRIEVAL)")
+    fallback: bool = Field(
+        description="True when the model files are missing and full-text search ran instead"
+    )
 
 
 class DayForecast(BaseModel):

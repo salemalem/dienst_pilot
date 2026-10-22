@@ -3585,7 +3585,7 @@
           "insight"
         ],
         "summary": "Components",
-        "description": "W13: what each component is, how far it is built, and that none can change the roster.",
+        "description": "W13: what each component is, how far it is built, and that none can change the roster.\n\nC1 to C8, then the rulebook retrieval (RAG), which has no component number.",
         "operationId": "components_transparency_components_get",
         "parameters": [
           {
@@ -7777,7 +7777,17 @@
           "mode": {
             "type": "string",
             "title": "Mode",
-            "description": "hybrid (full-text + vectors) or fts-only without the model"
+            "description": "What actually ran: vector, hybrid or fts-only"
+          },
+          "configured": {
+            "type": "string",
+            "title": "Configured",
+            "description": "What is configured (RAG_RETRIEVAL); the champion is vector"
+          },
+          "fallback": {
+            "type": "boolean",
+            "title": "Fallback",
+            "description": "True when the model is missing and full-text ran instead"
           },
           "vector_used": {
             "type": "boolean",
@@ -7790,6 +7800,8 @@
           "found",
           "passages",
           "mode",
+          "configured",
+          "fallback",
           "vector_used"
         ],
         "title": "RuleSearch",

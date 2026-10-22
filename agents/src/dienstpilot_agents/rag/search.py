@@ -122,6 +122,8 @@ def search(
             used = True
         except ModelUnavailableError:
             used = False
+    if mode == "vector" and not used:
+        fts_ids = _fts(conn, query)  # no vectors available: full-text, and the caller is told
     fts_rank = {cid: i + 1 for i, cid in enumerate(fts_ids)}
     vec_rank = {cid: i + 1 for i, (cid, _) in enumerate(vec_hits)}
     cos = dict(vec_hits)

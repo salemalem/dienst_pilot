@@ -502,29 +502,44 @@ def rag_tables(doc: dict) -> str:  # type: ignore[type-arg]
         "| Retrieval | recall@1 | recall@3 | recall@5 | MRR |",
         "|---|---|---|---|---|",
     ]
-    names = {"hybrid": "Hybrid (full-text + vectors, RRF), as built", "fts": "Full-text only", "vector": "Vectors only"}
-    for k in ("hybrid", "fts", "vector"):
+    served = doc["served"]["method"]
+    names = {
+        "hybrid": "Hybrid (full-text + vectors, RRF)",
+        "fts": "Full-text only",
+        "vector": "Vectors only",
+    }
+    for k in ("vector", "hybrid", "fts"):
         m = t["modes"][k]
+        mark = (
+            " **(served)**"
+            if k == served
+            else " (setting `RAG_RETRIEVAL=hybrid`)"
+            if k == "hybrid"
+            else ""
+        )
         lines.append(
-            f"| {names[k]} | {pct(m['recall@1'])} | {pct(m['recall@3'])} | {pct(m['recall@5'])} | {m['mrr']:.3f} |"
+            f"| {names[k]}{mark} | {pct(m['recall@1'])} | {pct(m['recall@3'])} | {pct(m['recall@5'])} | {m['mrr']:.3f} |"
         )
     ns = t["no_source"]
     lines += [
         "",
-        f"By question language (hybrid): German recall@5 {pct(t['by_language']['de']['recall@5'])} "
-        f"(n={t['by_language']['de']['n_answerable']}), English recall@5 {pct(t['by_language']['en']['recall@5'])} "
-        f"(n={t['by_language']['en']['n_answerable']}). Citation correct at 1 (hybrid): "
-        f"{pct(t['hybrid']['citation_correct@1'])}.",
+        f"Served: **{names[served]}**. {doc['served']['basis'][0].upper() + doc['served']['basis'][1:]}.",
         "",
-        f"\"No source\" threshold (cosine, chosen on the dev questions only): {doc['no_source_threshold']['tau']}. "
+        f"By question language ({names[served].lower()}): German recall@5 {pct(t['by_language'][served]['de']['recall@5'])} "
+        f"(n={t['by_language'][served]['de']['n_answerable']}), English recall@5 {pct(t['by_language'][served]['en']['recall@5'])} "
+        f"(n={t['by_language'][served]['en']['n_answerable']}); for the hybrid: German {pct(t['by_language']['hybrid']['de']['recall@5'])}, "
+        f"English {pct(t['by_language']['hybrid']['en']['recall@5'])}. Citation correct at 1 (served): "
+        f"{pct(t['modes'][served]['citation_correct@1'])}.",
+        "",
+        f'"No source" threshold (cosine, chosen on the dev questions only): {doc["no_source_threshold"]["tau"]}. '
         f"On the test questions {ns['unanswerable_rejected']} of {ns['n_unanswerable']} unanswerable questions were "
-        f"answered \"no source found\" and {ns['answerable_wrongly_rejected']} answerable question(s) were wrongly rejected.",
+        f'answered "no source found" and {ns["answerable_wrongly_rejected"]} answerable question(s) were wrongly rejected.',
         "",
         "Pre-registered checks (EVAL_RULE.md): "
         + "; ".join(f"{k}: **{'passed' if v else 'FAILED'}**" for k, v in doc["checks"].items())
         + ".",
         "",
-        "Hybrid misses at 5 on the test questions: "
+        "Misses at 5 of the served method on the test questions: "
         + (", ".join(f"`{m['id']}`" for m in t["misses_at_5"]) or "none")
         + ".",
         RAG_END,

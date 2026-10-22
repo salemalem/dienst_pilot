@@ -147,16 +147,38 @@ def main() -> None:
         }
 
     by_mode = {m: _metrics([r for r in rows if not is_dev(r["id"])]) for m, rows in runs.items()}
-    by_lang = {lang: _metrics([r for r in test if r["language"] == lang]) for lang in ("de", "en")}
+    by_lang = {
+        mode: {
+            lang: _metrics([r for r in rows if not is_dev(r["id"]) and r["language"] == lang])
+            for lang in ("de", "en")
+        }
+        for mode, rows in runs.items()
+    }
     hyb = by_mode["hybrid"]
     other = max(by_mode["fts"]["recall@5"], by_mode["vector"]["recall@5"])
+    singles = {"vector": by_mode["vector"]["recall@5"], "fts": by_mode["fts"]["recall@5"]}
+    if hyb["recall@5"] >= other:
+        served = {"method": "hybrid", "basis": "the pre-registered check passed"}
+    else:
+        best = max(singles, key=lambda k: singles[k])
+        served = {
+            "method": best,
+            "basis": (
+                "the pre-registered check 'hybrid at least as good as the better single method' "
+                f"failed; the single method with the higher test recall@5 ({best}) is served. "
+                "This choice was made after the results were known (EVAL_RULE.md says only that "
+                "the failure is reported); hybrid stays available as RAG_RETRIEVAL=hybrid"
+            ),
+        }
+    served_rows = [r for r in runs[served["method"]] if not is_dev(r["id"])]
     misses = [
         {"id": r["id"], "gold": r["gold"], "top": r["ranked"][:3]}
-        for r in test
+        for r in served_rows
         if r["answerable"] and not any(i in r["gold"] for i in r["ranked"][:5])
     ]
     result = {
         "component": "RAG rulebook (ARCHITECTURE §11)",
+        "served": served,
         "settings": {
             "rrf_k": RRF_K,
             "candidates_per_list": 50,

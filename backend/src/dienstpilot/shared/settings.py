@@ -3,6 +3,7 @@
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 from zoneinfo import ZoneInfo
 
 from pydantic import SecretStr
@@ -35,6 +36,11 @@ class Settings(BaseSettings):
     # Browser origins that may call the API, comma separated. Used only when DEMO_MODE is on
     # (Expo web in development and in the e2e run); without DEMO_MODE the API sends no CORS headers.
     cors_origins: str = "http://localhost:8081,http://localhost:8083"
+    # Rule search (RAG): which retrieval is served. "vector" is the evaluated champion; "hybrid"
+    # (full-text + vectors) stays available for the follow-up (ADR-019). Without the bge-m3 model
+    # files every setting falls back to full-text only, and the response says so.
+    rag_retrieval: Literal["vector", "hybrid", "fts"] = "vector"
+    bge_m3_dir: str | None = None
     # Signs demo-login tokens. The default is for local development only.
     token_secret: str = "dev-only-not-a-secret"
     token_ttl_hours: int = 12

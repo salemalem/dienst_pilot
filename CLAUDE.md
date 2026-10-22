@@ -129,6 +129,14 @@ Fill these in as they are built: `make train`, `make eval`, `make screenshots` (
 - `make e2e`: Playwright on the demo clock: the planner dashboard (`apps/dashboard/e2e`, dashboard on :3100) and the staff app on Expo web (`apps/mobile/e2e`, exported build on :8083, run once per language). Own database `dienstpilot_e2e` and Redis db 14, API on :8100 with the worker; each run rebuilds the e2e database from the seed and the dev database is untouched.
 - Staff app: `pnpm --filter @dienstpilot/mobile dev` starts Expo web on :8081 (the dev API allows that origin in `DEMO_MODE`); the API URL comes from `EXPO_PUBLIC_API_URL` (default `http://localhost:8000`; Android emulator: `http://10.0.2.2:8000`).
 - `make rag-embed`, `make rag-check`, `make rag-index`: embed the rulebook corpus and the eval questions with the local bge-m3 (needs the ONNX model; the vectors are committed so CI needs none), check that the committed vectors match the corpus, load them into the dev database. `make seed` loads them too. The eval is `uv run python eval/run_rag_eval.py` (part of `make eval`).
+- **Rule search model (bge-m3 files).** Rule search embeds the question locally with the int8 ONNX export of bge-m3 (about 570 MB, not in the repository). Get it once and point `BGE_M3_DIR` at it:
+
+  ```bash
+  uv run hf download Xenova/bge-m3 onnx/sentence_transformers_quantized.onnx tokenizer.json --local-dir models/bge-m3
+  echo "BGE_M3_DIR=$PWD/models/bge-m3" >> .env     # absolute path; .env is git-ignored
+  ```
+
+  Lookup order: `BGE_M3_DIR`, `RAG_MODEL_DIR` (the container's mount), `./models/bge-m3` (git-ignored), the Hugging Face cache. The dev compose stack mounts `BGE_M3_DIR` (default `./models/bge-m3`) into the API. **Without the files search falls back to full-text only** and the response says `mode: "fts-only"`, `fallback: true`; everything else, including `make test` and CI, works without them (the committed vectors are used). The served retrieval is vectors alone (`RAG_RETRIEVAL=vector`, the evaluated champion, ADR-019); `hybrid` and `fts` are settings.
 - MCP servers: `uvicorn dienstpilot_mcp.app:asgi --factory --port 8200` (compose service `mcp`, `/roster/mcp` and four more). Secrets: `ANTHROPIC_API_KEY` goes in the git-ignored `.env` (see `.env.example`); settings read it, nothing commits it.
 - `make lint`: ruff, mypy `--strict`, import-linter, eslint, tsc, prettier.
 - `make format`: apply ruff and prettier formatting.

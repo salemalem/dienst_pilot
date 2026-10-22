@@ -420,10 +420,74 @@ function C6Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
   );
 }
 
+type RagMode = { "recall@5": number; mrr: number };
+
+function RagMetrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
+  const t = useTranslations("w13");
+  const served = (m.served as { method?: string } | undefined)?.method;
+  const modes = (m.test as { modes?: Record<string, RagMode> } | undefined)?.modes;
+  const checks = m.checks as Record<string, boolean> | undefined;
+  const ns = (m.test as { no_source?: Record<string, number> } | undefined)?.no_source;
+  const kinds = ["vector", "hybrid", "fts"] as const;
+  const failed = checks?.["hybrid_recall@5_at_least_best_single"] === false;
+  return (
+    <div className="flex flex-col gap-2" data-testid="rag-metrics">
+      <p className="caption m-0 text-ink-muted">
+        {t("evalSource", { source: "eval/results/rag.json", months: "" })}
+      </p>
+      {served ? (
+        <p className="body-strong m-0" data-testid="rag-served">
+          {t("m.ragServed", { method: t(`m.ragMethods.${served as "vector"}`) })}
+        </p>
+      ) : null}
+      <Table label={t("m.label")}>
+        <thead>
+          <tr>
+            <th scope="col">{t("m.ragMethod")}</th>
+            <th scope="col" className="text-right">
+              {t("m.ragRecall")}
+            </th>
+            <th scope="col" className="text-right">
+              {t("m.ragMrr")}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {kinds.map((k) =>
+            modes?.[k] ? (
+              <tr key={k} data-served={k === served}>
+                <td className={k === served ? "body-strong" : undefined}>
+                  {t(`m.ragMethods.${k}`)}
+                </td>
+                <td className="num-time text-right">{fmt.percent(modes[k]["recall@5"])}</td>
+                <td className="num-time text-right">{fmt.number(modes[k].mrr, 2)}</td>
+              </tr>
+            ) : null,
+          )}
+        </tbody>
+      </Table>
+      {failed ? (
+        <p className="caption m-0 text-ink-muted" data-testid="rag-check">
+          {t("m.ragCheckFailed")}
+        </p>
+      ) : null}
+      {ns ? (
+        <p className="caption m-0 text-ink-muted">
+          {t("m.ragNoSource", {
+            found: String(ns.unanswerable_rejected ?? ""),
+            n: String(ns.n_unanswerable ?? ""),
+          })}
+        </p>
+      ) : null}
+      <p className="caption m-0 text-ink-muted">{t("m.ragCaveat")}</p>
+    </div>
+  );
+}
+
 function Card({ c }: { c: Component }): ReactNode {
   const t = useTranslations("w13");
   const fmt = useFmt();
-  const known = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8"].includes(c.component);
+  const known = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "RAG"].includes(c.component);
   const standIn = c.implementation === "stand-in";
   const metrics = c.eval_metric as Metrics | null;
   return (
@@ -462,9 +526,11 @@ function Card({ c }: { c: Component }): ReactNode {
                 ? t("trainedC5")
                 : c.component === "C6"
                   ? t("trainedC6")
-                  : c.kind === "ml"
-                    ? t("notTrained")
-                    : t("notApplicable")}
+                  : c.component === "RAG"
+                    ? t("trainedRAG")
+                    : c.kind === "ml"
+                      ? t("notTrained")
+                      : t("notApplicable")}
         </dd>
         <dt className="text-ink-muted">{t("modelCard")}</dt>
         <dd className="m-0">
@@ -476,7 +542,9 @@ function Card({ c }: { c: Component }): ReactNode {
                 ? t("modelCardC5")
                 : c.component === "C6"
                   ? t("modelCardC6")
-                  : t("modelCardNone")}
+                  : c.component === "RAG"
+                    ? t("modelCardRAG")
+                    : t("modelCardNone")}
         </dd>
         <dt className="text-ink-muted">{t("canChange")}</dt>
         <dd className="body-strong m-0" data-testid="can-change">
@@ -495,6 +563,8 @@ function Card({ c }: { c: Component }): ReactNode {
         <C5Metrics m={metrics} fmt={fmt} />
       ) : metrics && c.component === "C6" ? (
         <C6Metrics m={metrics} fmt={fmt} />
+      ) : metrics && c.component === "RAG" ? (
+        <RagMetrics m={metrics} fmt={fmt} />
       ) : (
         <p
           className="body m-0 rounded-mark border border-dashed border-pencil bg-pencil-wash p-3 text-pencil"
@@ -510,8 +580,32 @@ function Card({ c }: { c: Component }): ReactNode {
 const GROUPS = [
   { key: "rules", kinds: ["optimization", "deterministic"] },
   { key: "ml", kinds: ["ml"] },
+  { key: "retrieval", kinds: ["retrieval"] },
   { key: "llm", kinds: ["llm"] },
 ] as const;
+
+/**
+ * The summary line is computed from the cards on screen. It counts the numbered components (C1 to
+ * C8) only, so "6 of 8" is always about those eight; cards without a number (the rulebook
+ * search) are named after it with their own status, never added to the count.
+ */
+function statusLine(list: Component[], t: ReturnType<typeof useTranslations<"w13">>): string {
+  const numbered = list.filter((c) => /^C\d$/.test(c.component));
+  const extras = list.filter((c) => !/^C\d$/.test(c.component));
+  const line = t("status", {
+    built: numbered.filter((c) => c.implementation === "built").length,
+    total: numbered.length,
+    standIn: numbered.filter((c) => c.implementation === "stand-in").length,
+  });
+  if (extras.length === 0) return line;
+  const names = extras
+    .map(
+      (c) =>
+        `${t(`name.${c.component as "RAG"}`)} (${t(c.implementation === "built" ? "built" : "standIn")})`,
+    )
+    .join(", ");
+  return `${line} · ${t("statusExtra", { extras: names })}`;
+}
 
 /** W13: one card per component with its real status; the portfolio's "how it works" screen. */
 export default function TransparencyPage(): ReactNode {
@@ -519,17 +613,7 @@ export default function TransparencyPage(): ReactNode {
   const q = useQuery((api) => unwrap(api.GET("/transparency/components")), []);
   return (
     <>
-      <PageHeader
-        title={t("headline")}
-        status={
-          q.data
-            ? t("status", {
-                built: q.data.filter((c) => c.implementation === "built").length,
-                standIn: q.data.filter((c) => c.implementation === "stand-in").length,
-              })
-            : undefined
-        }
-      />
+      <PageHeader title={t("headline")} status={q.data ? statusLine(q.data, t) : undefined} />
       <p className="body m-0 max-w-[80ch]">{t("intro")}</p>
       <Async query={q}>
         {(list) => (

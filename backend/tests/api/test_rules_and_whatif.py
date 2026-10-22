@@ -46,7 +46,9 @@ def test_only_planner_and_oversight_search_the_rules(client: TestClient, login: 
 def test_a_question_finds_the_statute_with_a_citation(with_vectors: TestClient, login: Any) -> None:
     q = QUESTIONS["rest-de"]["question"]
     r = with_vectors.get("/rules/search", params={"q": q, "k": 5}, headers=login("brandt")).json()
-    assert r["found"] and r["mode"] == "hybrid" and r["vector_used"]
+    # The served method is the evaluated champion: vectors alone (ADR-019).
+    assert r["found"] and r["mode"] == "vector" and r["configured"] == "vector"
+    assert r["vector_used"] and r["fallback"] is False
     ids = [p["id"] for p in r["passages"]]
     assert set(ids) & set(QUESTIONS["rest-de"]["gold"])
     top = next(p for p in r["passages"] if p["id"] == "arbzg:§5:1")
@@ -75,6 +77,7 @@ def test_without_the_model_search_is_full_text_only_and_says_so(
     client.app.dependency_overrides[get_embedder] = lambda: None  # type: ignore[attr-defined]
     r = client.get("/rules/search?q=Ruhezeit Stunden", headers=login("brandt")).json()
     assert r["mode"] == "fts-only" and r["vector_used"] is False
+    assert r["configured"] == "vector" and r["fallback"] is True and r["passages"]
 
 
 def test_one_passage_by_id(client: TestClient, login: Any) -> None:
@@ -216,3 +219,30 @@ def test_proposals_carry_a_kind_and_changes_and_nothing_applies_them(
         == 422
     )
     assert timedelta  # keep the import used
+
+
+def test_the_served_method_is_the_one_the_evaluation_named_and_hybrid_is_a_setting(
+    app_factory: Any, login: Any
+) -> None:
+    from dienstpilot.shared.settings import Settings, get_settings
+
+    result = json.loads((REPO / "eval/results/rag.json").read_text())
+    assert result["served"]["method"] == Settings().rag_retrieval == "vector"
+    qs = [q["question"] for q in QUESTIONS.values()]
+    emb = vectors.load("questions", qs).embedder()
+    for method in ("hybrid", "fts"):
+        c = app_factory(Settings(rag_retrieval=method))
+        c.app.dependency_overrides[get_embedder] = lambda: emb  # type: ignore[attr-defined]
+        c.app.dependency_overrides[get_settings] = lambda m=method: Settings(rag_retrieval=m)  # type: ignore[attr-defined]
+        r = c.get(
+            "/rules/search",
+            params={"q": QUESTIONS["rest-de"]["question"]},
+            headers=_login(c, "brandt"),
+        ).json()
+        assert r["configured"] == method
+        assert r["mode"] == ("hybrid" if method == "hybrid" else "fts-only")
+
+
+def _login(c: TestClient, persona: str) -> dict[str, str]:
+    t = c.post("/auth/demo-login", json={"persona": persona}).json()["access_token"]
+    return {"Authorization": f"Bearer {t}"}

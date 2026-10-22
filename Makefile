@@ -1,4 +1,5 @@
-COMPOSE := docker compose -f infra/compose.dev.yml
+# .env (git-ignored) feeds the compose variables too, for example BGE_M3_DIR
+COMPOSE := docker compose $(if $(wildcard .env),--env-file .env) -f infra/compose.dev.yml
 SEED ?= 20261020
 SEED_DIR := data/synthetic/v1
 

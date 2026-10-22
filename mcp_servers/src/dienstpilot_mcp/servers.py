@@ -249,6 +249,8 @@ def build(b: Backend) -> dict[str, list[ToolSpec]]:
                 for p in r["passages"]
             ],
             mode=r["mode"],
+            configured=r["configured"],
+            fallback=r["fallback"],
         )
 
     async def get_rule(rule_id: str) -> m.RulePassage:

@@ -848,7 +848,7 @@
   },
   "w13": {
     "title": "KI-Transparenz",
-    "status": "{built, plural, one {# Komponente gebaut} other {# Komponenten gebaut}}, {standIn, plural, one {# Platzhalter} other {# Platzhalter}}",
+    "status": "{built} von {total} Komponenten gebaut, {standIn, plural, one {# Platzhalter} other {# Platzhalter}}",
     "intro": "Acht Komponenten arbeiten im Dienstplan. Keine kann den Dienstplan ändern: Freigeben und veröffentlichen kann nur die Planung. Gebaut sind die Komponenten, deren Messwerte aus eval/results stammen; alle anderen sind als Platzhalter gekennzeichnet, bis ihre Skripte laufen.",
     "name": {
       "C1": "Dienstplan-Optimierer",
@@ -858,13 +858,15 @@
       "C5": "Vertretungs-Ranking",
       "C6": "Urlaubs-Surrogat",
       "C7": "Wunsch-Parser (Sprache)",
-      "C8": "Copilot (Sprache)"
+      "C8": "Copilot (Sprache)",
+      "RAG": "Regelwerk-Suche"
     },
     "kinds": {
       "optimization": "Optimierung",
       "deterministic": "Deterministische Regeln",
       "ml": "Maschinelles Lernen",
-      "llm": "Sprachmodell"
+      "llm": "Sprachmodell",
+      "retrieval": "Suche mit Quellenangabe"
     },
     "kind": "Art",
     "version": "Version",
@@ -965,7 +967,19 @@
         "poisson_glm": "Poisson-GLM (Baseline)",
         "nb_glm": "Negativ-binomiales GLM (Baseline)",
         "lightgbm": "LightGBM (Herausforderer)"
-      }
+      },
+      "ragServed": "Eingesetzt: {method}. Vorab festgelegte Prüfung und Auswahl: siehe Modellkarte.",
+      "ragMethods": {
+        "vector": "Nur Vektoren",
+        "hybrid": "Hybrid (Volltext und Vektoren)",
+        "fts": "Nur Volltext"
+      },
+      "ragMethod": "Suchverfahren",
+      "ragRecall": "Treffer unter den ersten 5",
+      "ragMrr": "Mittlerer Rang (MRR)",
+      "ragCheckFailed": "Die vorab festgelegte Prüfung „Hybrid mindestens so gut wie das beste Einzelverfahren“ ist durchgefallen. Eingesetzt wird deshalb das bessere Einzelverfahren; Hybrid bleibt per Einstellung (RAG_RETRIEVAL) für die nächste Runde verfügbar. Die Auswahl wurde nach Kenntnis der Ergebnisse getroffen.",
+      "ragNoSource": "Fragen ohne Quelle: {found} von {n} korrekt als „keine Quelle gefunden“ erkannt.",
+      "ragCaveat": "60 Fragen, vom Autor des Textbestands geschrieben, davon 41 zum Test; sie sind leichter als Fragen Fremder. Ohne die Modelldateien fällt die Suche auf Volltext zurück und sagt das."
     },
     "group": {
       "rules": {
@@ -979,6 +993,10 @@
       "llm": {
         "title": "Sprachmodelle",
         "tagline": "Lesen und erklären Sprache. Ein Satz wird nie zu einer Dienstzuteilung."
+      },
+      "retrieval": {
+        "title": "Suche",
+        "tagline": "Findet Regeltexte mit Fundstelle; keine Quelle gefunden heißt: keine Antwort."
       }
     },
     "headline": "8 Komponenten. Keine kann den Dienstplan ändern.",
@@ -990,8 +1008,14 @@
       "C5": "Ordnet mögliche Vertretungen nach ihrer bisherigen Belastung; bei gleicher Belastung nach der geschätzten Zusagewahrscheinlichkeit. Diese Wahrscheinlichkeiten sieht niemand.",
       "C6": "Schätzt sofort, ob ein Urlaub abdeckbar ist; die genaue Prüfung macht C1.",
       "C7": "Liest Freitext zu Wünschen und macht daraus eine Vorschau, die Sie bestätigen.",
-      "C8": "Beantwortet Fragen zum Plan, zitiert die Regelquelle und legt nur Vorschläge an."
-    }
+      "C8": "Beantwortet Fragen zum Plan, zitiert die Regelquelle und legt nur Vorschläge an.",
+      "RAG": "Findet Stellen im Arbeitszeitgesetz und in den Abteilungsdokumenten zu einer Frage und nennt immer die Fundstelle. Findet sie nichts, sagt sie das. Sie sucht nur; sie antwortet und entscheidet nicht."
+    },
+    "trainedRAG": "Nicht trainiert: Vektoren eines vortrainierten Modells (bge-m3), lokal berechnet",
+    "modelCardRAG": "docs/model-cards/rag-rulebook.md",
+    "statusExtra": "Zusätzlich, ohne Nummer: {extras}",
+    "built": "gebaut",
+    "standIn": "Platzhalter"
   },
   "qualification": {
     "any": "ohne besondere Qualifikation",

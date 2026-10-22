@@ -848,7 +848,7 @@
   },
   "w13": {
     "title": "AI transparency",
-    "status": "{built, plural, one {# component built} other {# components built}}, {standIn, plural, one {# stand-in} other {# stand-ins}}",
+    "status": "{built} of {total} components built, {standIn, plural, one {# stand-in} other {# stand-ins}}",
     "intro": "Eight components work in the roster. None can change the roster: only the Planner approves and publishes. The components whose figures come from eval/results are built; all others are marked as stand-ins until their scripts run.",
     "name": {
       "C1": "Roster optimizer",
@@ -858,13 +858,15 @@
       "C5": "Cover ranker",
       "C6": "Leave surrogate",
       "C7": "Wish parser (language)",
-      "C8": "Copilot (language)"
+      "C8": "Copilot (language)",
+      "RAG": "Rulebook search"
     },
     "kinds": {
       "optimization": "Optimization",
       "deterministic": "Deterministic rules",
       "ml": "Machine learning",
-      "llm": "Language model"
+      "llm": "Language model",
+      "retrieval": "Search with citations"
     },
     "kind": "Kind",
     "version": "Version",
@@ -965,7 +967,19 @@
         "poisson_glm": "Poisson GLM (baseline)",
         "nb_glm": "Negative-binomial GLM (baseline)",
         "lightgbm": "LightGBM (challenger)"
-      }
+      },
+      "ragServed": "Served: {method}. Pre-registered check and the choice: see the model card.",
+      "ragMethods": {
+        "vector": "Vectors only",
+        "hybrid": "Hybrid (full-text and vectors)",
+        "fts": "Full-text only"
+      },
+      "ragMethod": "Retrieval",
+      "ragRecall": "Hit in the top 5",
+      "ragMrr": "Mean reciprocal rank (MRR)",
+      "ragCheckFailed": "The pre-registered check \"hybrid at least as good as the better single method\" failed. The better single method is therefore served; hybrid stays available as a setting (RAG_RETRIEVAL) for the next round. The choice was made after the results were known.",
+      "ragNoSource": "Questions without a source: {found} of {n} correctly answered \"no source found\".",
+      "ragCaveat": "60 questions written by the corpus author, 41 of them for the test; easier than questions from strangers. Without the model files, search falls back to full-text and says so."
     },
     "group": {
       "rules": {
@@ -979,6 +993,10 @@
       "llm": {
         "title": "Language models",
         "tagline": "Read and explain language. A sentence never becomes an assignment."
+      },
+      "retrieval": {
+        "title": "Retrieval",
+        "tagline": "Finds rule text with its source; no source found means no answer."
       }
     },
     "headline": "8 components. None can change the roster.",
@@ -990,8 +1008,14 @@
       "C5": "Orders possible cover by their recent load; within the same load, by how likely they are to accept. Nobody sees these likelihoods.",
       "C6": "Estimates at once whether leave is coverable; the exact check is done by C1.",
       "C7": "Reads free text about wishes and turns it into a preview you confirm.",
-      "C8": "Answers questions about the plan, cites the rule source and only creates proposals."
-    }
+      "C8": "Answers questions about the plan, cites the rule source and only creates proposals.",
+      "RAG": "Finds passages in the Working Hours Act and the department's documents for a question and always names the source. If it finds nothing, it says so. It only retrieves; it does not answer or decide."
+    },
+    "trainedRAG": "Not trained: vectors of a pre-trained model (bge-m3), computed locally",
+    "modelCardRAG": "docs/model-cards/rag-rulebook.md",
+    "statusExtra": "Also, without a number: {extras}",
+    "built": "built",
+    "standIn": "stand-in"
   },
   "qualification": {
     "any": "no particular qualification",
