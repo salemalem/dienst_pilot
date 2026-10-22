@@ -44,3 +44,6 @@ apps/mobile/dist-e2e/
 
 # Phase 6: review folder (side-by-side comparisons, not committed)
 review/
+
+# C3 MLflow store (local tracking and registry; reproducible with make train)
+ml/mlflow/

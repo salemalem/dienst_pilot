@@ -83,7 +83,7 @@ Not yet tried by the author: the native (Expo Go, simulator) routes. The web rou
 3. "Als Entwurf öffnen" on the recommended one (**Dienstplan-Editor**).
 4. **Break a rule:** drag a late shift (S) onto a colleague's day so the next morning's early shift (F) follows within 11 hours. A red message names the rule and the fix. "Rückgängig" undoes it. Keyboard: arrow keys, Space picks up and drops.
 5. "Freigeben und veröffentlichen" → confirm. Toast: "Dezember 2026 veröffentlicht".
-6. *Protokoll* lists who did what; *KI-Transparenz* shows which components are built (C1, C2) and which are stand-ins (C3–C8).
+6. *Protokoll* lists who did what; *KI-Transparenz* shows which components are built (C1, C2, C3) and which are stand-ins (C4–C8).
 7. **Vogel** (Oversight): *Aufsicht* is read-only; *Fairness und Compliance* shows no names.
 
 ## 6. Start over, and automated checks

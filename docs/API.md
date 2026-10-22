@@ -9,7 +9,7 @@ The HTTP API behind the staff app and the planner dashboard. It runs against the
   - Tokens expire 12 hours after they are issued on the demo clock, so after moving the clock forward you sign in again.
 - **Engines:** responses that use an intelligence component carry `engine: {component, implementation, version, note}`.
   - **C1 (optimizer) and C2 (validator)** are built (`implementation: "built"`, `engine/solver/`, `engine/validator/`).
-  - **C3–C8** are deterministic stand-ins (`implementation: "stand-in"`).
+  - **C3** is built: the champion of the C3 model registry, served from a committed bundle (ADR-012). **C4–C8** are deterministic stand-ins (`implementation: "stand-in"`).
 - **Background jobs:** solver runs and the M5 trade-off check run in the arq worker (compose service `worker`). The endpoint answers with an id at once; the client polls (ADR-009).
 - **Rule violations** come back as i18n keys with parameters and a fix: `{rule, key: "violation.min_rest", staff_id, display_name, date, params, fix_key: "fix.min_rest", fix_params}` (`packages/i18n`). A write that would break a rule answers **422** with `{"detail": {"code": "rule_violation", "message", "violations": [...]}}`.
 

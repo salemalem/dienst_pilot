@@ -1,4 +1,4 @@
-"""Deterministic stand-ins for C3–C8.
+"""Deterministic stand-ins for C4–C8.
 
 They have the shape of the real components but none of their method: no trained model, no LLM.
 Every response that uses one says so.
@@ -10,8 +10,6 @@ from datetime import date, timedelta
 from typing import Literal
 
 from dienstpilot.shared.ports import (
-    AbsenceForecast,
-    AbsenceForecaster,
     Copilot,
     CopilotAnswer,
     CopilotFacts,
@@ -27,48 +25,6 @@ from dienstpilot.shared.ports import (
 )
 
 STANDIN_VERSION = "standin-0.1"
-
-
-class ForecastStandIn(AbsenceForecaster):
-    """C3 stand-in: mean daily absences of past years per weekday and month.
-
-    The band is the 10th–90th percentile. Department level only (ADR-003).
-    """
-
-    info = EngineInfo(
-        "C3",
-        "stand-in",
-        STANDIN_VERSION,
-        "Historical mean absences per weekday and month (2021-2025); model in phase 8.",
-        8,
-    )
-
-    def forecast(self, days: list[date], history: list[tuple[date, date]]) -> list[AbsenceForecast]:
-        """Forecast from past absence intervals."""
-        absent: Counter[date] = Counter()
-        for a, b in history:
-            d = a
-            while d <= b:
-                absent[d] += 1
-                d += timedelta(days=1)
-        samples: dict[tuple[int, int], list[int]] = {}
-        d = date(2021, 1, 1)
-        while d <= date(2025, 12, 31):
-            samples.setdefault((d.month, d.weekday()), []).append(absent.get(d, 0))
-            d += timedelta(days=1)
-        out = []
-        for day in days:
-            values = sorted(samples.get((day.month, day.weekday()), [0]))
-            n = len(values)
-            out.append(
-                AbsenceForecast(
-                    day,
-                    round(sum(values) / n, 2),
-                    float(values[int(0.1 * (n - 1))]),
-                    float(values[int(0.9 * (n - 1))]),
-                )
-            )
-        return out
 
 
 class PreferenceStandIn(PreferenceLearner):

@@ -2,7 +2,7 @@ COMPOSE := docker compose -f infra/compose.dev.yml
 SEED ?= 20261020
 SEED_DIR := data/synthetic/v1
 
-.PHONY: install dev down logs seed test e2e screenshots lint format api-client eval tune
+.PHONY: install dev down logs seed test e2e screenshots lint format api-client eval tune train
 
 install: ## Install Python and Node dependencies
 	uv sync
@@ -48,22 +48,27 @@ screenshots: ## Regenerate screenshots/ (DE and EN, each on a fresh seed): image
 	pnpm --filter @dienstpilot/screenshots finalize
 
 lint: ## ruff, mypy, import-linter, eslint, tsc, prettier
-	uv run ruff check backend
-	uv run ruff format --check backend
+	uv run ruff check backend ml
+	uv run ruff format --check backend ml
 	uv run mypy
 	uv run lint-imports
 	pnpm lint
 	pnpm format:check
 
 format: ## Apply ruff and prettier formatting
-	uv run ruff format backend
-	uv run ruff check --fix backend
+	uv run ruff format backend ml
+	uv run ruff check --fix backend ml
 	pnpm format
 
-eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.1 table
+train: ## C3: rolling-origin CV on 2021-2024, fit the four candidates, log and register them in the local MLflow (ml/mlflow)
+	uv run python -m dienstpilot_ml.training --data $(SEED_DIR)
+
+eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.1 table, C3 (runs make train first)
 	uv run python eval/run_validator_eval.py --data $(SEED_DIR)
 	uv run python eval/run_benchmark.py --data $(SEED_DIR)
 	uv run python eval/render_tables.py
+	$(MAKE) train
+	uv run python eval/run_c3_eval.py --data $(SEED_DIR)
 
 tune: ## Re-tune the balanced profile on July-December 2024 (eval/results/tuning.json)
 	uv run python eval/tune_profiles.py --data $(SEED_DIR)

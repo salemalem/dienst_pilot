@@ -439,10 +439,12 @@ def test_transparency_lists_eight_components_none_can_change_the_roster(
 ) -> None:
     comps = client.get("/transparency/components", headers=login("kaya")).json()
     assert [c["component"] for c in comps] == [f"C{i}" for i in range(1, 9)]
-    assert {c["component"] for c in comps if c["implementation"] == "built"} == {"C1", "C2"}
+    assert {c["component"] for c in comps if c["implementation"] == "built"} == {"C1", "C2", "C3"}
     assert {c["component"] for c in comps if c["implementation"] == "stand-in"} == {
-        f"C{i}" for i in range(3, 9)
+        f"C{i}" for i in range(4, 9)
     }
+    c3 = next(c for c in comps if c["component"] == "C3")
+    assert c3["eval_metric"]["test_2025"][c3["eval_metric"]["champion"]["kind"]]["mae"] > 0
     assert not any(c["can_change_roster"] for c in comps)
 
 
@@ -468,3 +470,15 @@ def test_settings_round_trip(client: TestClient, login: Any) -> None:
     s = client.put("/me/settings", json={"language": "en", "theme": "dark"}, headers=h).json()
     assert s["language"] == "en" and s["theme"] == "dark"
     assert client.get("/me/settings", headers=h).json()["theme"] == "dark"
+
+
+def test_w1_coverage_band_comes_from_the_built_c3_forecaster(
+    client: TestClient, login: Any
+) -> None:
+    o = client.get("/planner/overview", headers=login("brandt")).json()
+    assert o["forecast_engine"]["component"] == "C3"
+    assert o["forecast_engine"]["implementation"] == "built"
+    assert len(o["coverage"]) == 14
+    for day in o["coverage"]:
+        assert 0 <= day["expected_low"] <= day["expected_absences"] <= day["expected_high"]
+        assert day["expected_absences"] > 0

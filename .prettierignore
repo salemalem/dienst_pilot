@@ -16,3 +16,7 @@ packages/api-client/openapi.json
 eval/results/
 apps/mobile/dist-e2e
 screenshots/
+
+# C3 serving bundle: hashed byte for byte (eval/results/c3.json), never reformatted
+ml/absence_forecast/artifacts/
+ml/mlflow/

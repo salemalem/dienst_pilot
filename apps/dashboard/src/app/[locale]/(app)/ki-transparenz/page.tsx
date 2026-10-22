@@ -102,6 +102,68 @@ function C2Metrics({ m }: { m: Metrics }): ReactNode {
   );
 }
 
+type Test = { mae: number; poisson_deviance: number; coverage_80: number };
+
+function C3Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
+  const t = useTranslations("w13");
+  const test = m.test_2025 as Record<string, Test> | undefined;
+  const champion =
+    (m.champion as { kind?: string; promoted_challenger?: boolean } | undefined) ?? {};
+  const kinds = ["seasonal_naive", "poisson_glm", "nb_glm", "lightgbm"] as const;
+  const kind = champion.kind as (typeof kinds)[number] | undefined;
+  const recovery = (m.truth_recovery as { models?: Record<string, { h14?: Metrics }> } | undefined)
+    ?.models;
+  const corr = num(recovery?.[kind ?? ""]?.h14, "corr_28d_smoothed_with_true");
+  return (
+    <div className="flex flex-col gap-2" data-testid="c3-metrics">
+      <p className="caption m-0 text-ink-muted">
+        {t("evalSource", { source: "eval/results/c3.json", months: "" })}
+      </p>
+      {kind ? (
+        <p className="body-strong m-0" data-testid="c3-served">
+          {t("m.c3Served", { model: t(`m.c3Models.${kind}`) })}
+        </p>
+      ) : null}
+      <Table label={t("m.label")}>
+        <thead>
+          <tr>
+            <th scope="col">{t("m.c3Model")}</th>
+            <th scope="col" className="text-right">
+              {t("m.c3Mae")}
+            </th>
+            <th scope="col" className="text-right">
+              {t("m.c3Deviance")}
+            </th>
+            <th scope="col" className="text-right">
+              {t("m.c3Coverage")}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {kinds.map((k) =>
+            test?.[k] ? (
+              <tr key={k} data-served={k === kind}>
+                <td className={k === kind ? "body-strong" : undefined}>{t(`m.c3Models.${k}`)}</td>
+                <td className="num-time text-right">{fmt.number(test[k].mae, 2)}</td>
+                <td className="num-time text-right">{fmt.number(test[k].poisson_deviance, 2)}</td>
+                <td className="num-time text-right">{fmt.percent(test[k].coverage_80)}</td>
+              </tr>
+            ) : null,
+          )}
+        </tbody>
+      </Table>
+      <p className="caption m-0 text-ink-muted" data-testid="c3-promotion">
+        {champion.promoted_challenger ? t("m.c3Promoted") : t("m.c3NotPromoted")}
+      </p>
+      {corr !== null ? (
+        <p className="caption m-0 text-ink-muted">
+          {t("m.c3Truth", { corr: fmt.number(corr, 2) })}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function Card({ c }: { c: Component }): ReactNode {
   const t = useTranslations("w13");
   const fmt = useFmt();
@@ -135,9 +197,15 @@ function Card({ c }: { c: Component }): ReactNode {
         <dt className="text-ink-muted">{t("version")}</dt>
         <dd className="num-time m-0">{c.version}</dd>
         <dt className="text-ink-muted">{t("lastTrained")}</dt>
-        <dd className="m-0">{c.kind === "ml" ? t("notTrained") : t("notApplicable")}</dd>
+        <dd className="m-0">
+          {c.component === "C3"
+            ? t("trainedC3")
+            : c.kind === "ml"
+              ? t("notTrained")
+              : t("notApplicable")}
+        </dd>
         <dt className="text-ink-muted">{t("modelCard")}</dt>
-        <dd className="m-0">{t("modelCardNone")}</dd>
+        <dd className="m-0">{c.component === "C3" ? t("modelCardC3") : t("modelCardNone")}</dd>
         <dt className="text-ink-muted">{t("canChange")}</dt>
         <dd className="body-strong m-0" data-testid="can-change">
           {c.can_change_roster ? t("yes") : t("no")}
@@ -147,6 +215,8 @@ function Card({ c }: { c: Component }): ReactNode {
         <C1Metrics m={metrics} fmt={fmt} />
       ) : metrics && c.component === "C2" ? (
         <C2Metrics m={metrics} />
+      ) : metrics && c.component === "C3" ? (
+        <C3Metrics m={metrics} fmt={fmt} />
       ) : (
         <p
           className="body m-0 rounded-mark border border-dashed border-pencil bg-pencil-wash p-3 text-pencil"

@@ -1,0 +1,6 @@
+{
+ "registered_model": "c3-absence-forecaster",
+ "alias": "champion",
+ "registry_version": 1,
+ "kind": "seasonal_naive"
+}

@@ -3,10 +3,10 @@
 from dataclasses import dataclass
 
 from dienstpilot.engines.built import CpSatOptimizer, RuleValidator
+from dienstpilot.engines.c3 import C3Forecaster
 from dienstpilot.engines.standins import (
     CopilotStandIn,
     CoverRankStandIn,
-    ForecastStandIn,
     IntakeStandIn,
     LeaveFeasibilityStandIn,
     PreferenceStandIn,
@@ -55,11 +55,11 @@ class Engines:
 
 
 def default_engines() -> Engines:
-    """Return the current set: C1 and C2 built, stand-ins for C3–C8."""
+    """Return the current set: C1, C2 and C3 built, stand-ins for C4–C8."""
     return Engines(
         CpSatOptimizer(),
         RuleValidator(),
-        ForecastStandIn(),
+        C3Forecaster(),
         PreferenceStandIn(),
         CoverRankStandIn(),
         LeaveFeasibilityStandIn(),

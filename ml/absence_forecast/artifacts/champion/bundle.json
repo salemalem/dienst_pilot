@@ -1,0 +1,56 @@
+{
+ "buckets": [
+  [
+   1,
+   7
+  ],
+  [
+   8,
+   21
+  ],
+  [
+   22,
+   42
+  ]
+ ],
+ "conformal": {
+  "level": 0.8,
+  "quantiles": [
+   0.9237755128757118,
+   0.9322756733040302,
+   0.9237755128757118
+  ],
+  "scale_offset": 0.5
+ },
+ "feature_names": [
+  "horizon",
+  "dow",
+  "month",
+  "doy_sin1",
+  "doy_cos1",
+  "doy_sin2",
+  "doy_cos2",
+  "is_holiday",
+  "is_school_holiday",
+  "level_7",
+  "level_28",
+  "level_91",
+  "count_origin",
+  "last_year_7d",
+  "last_year_29d",
+  "night_load_7"
+ ],
+ "format": 1,
+ "kind": "seasonal_naive",
+ "meta": {
+  "c3_version": "0.1.0",
+  "data_manifest_sha256": "1b5910d6eda6df7b8a7ea9f1c075be3fd226a53821359fd8b3c0c2451c29acff",
+  "seed": 20261020,
+  "train_until": "2024-12-31"
+ },
+ "mu_floor": 0.05,
+ "params": {
+  "window": 14,
+  "years": 2
+ }
+}
