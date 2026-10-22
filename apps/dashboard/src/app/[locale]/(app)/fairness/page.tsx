@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 
 import { Bars, DotStrip } from "@/components/charts";
 import { EngineBadge } from "@/components/EngineBadge";
+import { MonthEnd } from "@/components/MonthEnd";
 import { MonthSwitch } from "@/components/MonthSwitch";
 import { Async, Loading, PageHeader, Section, Table } from "@/components/ui";
 import { useFmt } from "@/lib/fmt";
@@ -308,6 +309,7 @@ export default function FairnessPage(): ReactNode {
           }
         </Async>
       </Section>
+      {planner ? <MonthEnd /> : null}
     </>
   );
 }

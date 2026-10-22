@@ -189,7 +189,8 @@
     "change": {
       "added": "added",
       "removed": "removed"
-    }
+    },
+    "window_reminder": "Reminder: the request window for {month} closes on {closes}. You have not answered yet."
   },
   "common": {
     "loading": "Loading …",
@@ -399,7 +400,15 @@
     "openDraft": "Open as draft",
     "noRosterTitle": "No valid roster found",
     "noRosterBody": "With the hard rules and the approved absences there is no valid plan. This is why:",
-    "empty": "Start a run to see variants."
+    "empty": "Start a run to see variants.",
+    "failedTitle": "The calculation did not finish",
+    "failedBody": "No roster was saved. You can start the calculation again.",
+    "failedReason": {
+      "worker_restarted": "The calculation service restarted while the calculation was running.",
+      "job_timeout": "The calculation exceeded the time it is allowed.",
+      "other": "The calculation ended with an error."
+    },
+    "retry": "Start the calculation again"
   },
   "w5": {
     "title": "Approve roster",
@@ -674,7 +683,11 @@
     "all": "All events",
     "eventsTitle": "Events",
     "chainOk": "Log complete and unaltered",
-    "chainLater": "Hash chain: available from phase {phase}. Until then this log shows no verification mark.",
+    "chainStale": "The last check of the log is too old",
+    "chainFailed": "Log altered: verification failed from entry {seq}",
+    "chainNever": "Log not checked yet",
+    "chainDetail": "Checked on {time}, {rows} entries.",
+    "chainVerify": "Check now",
     "tableLabel": "Log of events",
     "colTime": "Time",
     "colActor": "Who",
@@ -704,7 +717,9 @@
       "roster_changed": "Published roster changed",
       "proposal_created": "Proposal created",
       "policy_changed": "Auto-approval changed",
-      "demo_clock_set": "Demo clock set"
+      "demo_clock_set": "Demo clock set",
+      "month_report_prepared": "Month report prepared",
+      "month_closed": "Month closed"
     },
     "subject": {
       "roster_variant": "Roster",
@@ -812,7 +827,24 @@
     "kpiOvertimeNote": "{over, plural, =0 {nobody} one {1 person} other {# people}}",
     "kpiCostNote": "Placeholder: no cost calculation in the prototype",
     "kpiWeekends": "Weekend shifts per year",
-    "kpiWeekendsNote": "Range, median {median}"
+    "kpiWeekendsNote": "Range, median {median}",
+    "monthEnd": {
+      "title": "Month end",
+      "none": "No month has been prepared yet. The documentation is prepared automatically once a month is over.",
+      "month": "Month",
+      "status": {
+        "prepared": "prepared",
+        "closed": "closed"
+      },
+      "preparedAt": "Prepared on {at}. Waiting for the planner's confirmation.",
+      "closedAt": "Closed on {at}. The payroll export is released.",
+      "summary": "Total overtime: {overtime} h. Rest-period violations: {violations}. {people} people, {entries} entries in the decision trail.",
+      "narrativeLabel": "Placeholder text:",
+      "close": "Confirm and close the month",
+      "payroll": "Payroll export (CSV)",
+      "payrollLocked": "The export is released when the planner closes the month.",
+      "hash": "Report ID {hash}"
+    }
   },
   "w13": {
     "title": "AI transparency",

@@ -18,5 +18,6 @@ export const AUDIT_ACTIONS = [
   "roster.changed",
   "proposal.created",
   "policy.changed",
-  "demo.clock_set",
+  "month.report_prepared",
+  "month.closed",
 ] as const;

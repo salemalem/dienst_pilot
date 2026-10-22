@@ -38,6 +38,10 @@ export default function AuditPage(): ReactNode {
       ),
     [action, since, until, offset],
   );
+  const verify = useAction(async () => {
+    await unwrap(api.POST("/audit/verify"));
+    q.reload();
+  });
   const exportLog = useAction(async () => {
     const data = await unwrap(api.GET("/audit/export", { params: { query: {} } }));
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -123,8 +127,9 @@ export default function AuditPage(): ReactNode {
             title={t("eventsTitle")}
             aside={
               <ChainIndicator
-                verified={(d as { chain_verified?: boolean | null }).chain_verified ?? null}
-                fromPhase={d.chain_available_from_phase}
+                chain={d.chain}
+                onVerify={() => void verify.run()}
+                verifying={verify.pending}
               />
             }
           >
