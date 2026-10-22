@@ -11,8 +11,15 @@ from dataclasses import dataclass, replace
 from datetime import date, timedelta
 from typing import Any
 
-from dienstpilot_solver.model import Commitment, Problem, Result
+from dienstpilot_solver.model import PROFILES, Commitment, Config, Problem, Result
 
+CHECK_PROFILE = "balanced"  # the benchmark's recommended profile (eval/run_benchmark.py)
+# M5: one balanced variant per question, shorter time (synthdata ASSUMPTIONS §18).
+CHECK_CONFIG = Config(
+    deterministic_time=5.0,
+    variants=1,
+    profiles=tuple(p for p in PROFILES if p.name == CHECK_PROFILE),
+)
 TRADE_OFF_OVERTIME_HOURS = 8.0
 TRADE_OFF_PEAK_BURDEN = 2  # weighted points (nights, weekends, holidays incl. the year so far)
 
