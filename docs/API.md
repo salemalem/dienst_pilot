@@ -45,7 +45,7 @@ Every query is limited to the signed-in user's department.
 | Publishing (W5) | The request window of the month must be closed (409 otherwise): a run while it is open is a **trial run** (`trial: true` on the run, W3 labels it). The whole month must pass C2; records the Planner's `Approval` and an audit event; the other drafts of the month become `discarded`; a published month answers 409 |
 | Rest-period compliance (M10, W8, W12) | `rest_compliance` per person from C2, `rest_violations_total` per report |
 
-Cover cascades give each colleague 15 minutes on the demo clock. When a request times out, the next colleague is asked the next time the cascade is read. Durable timers come with the workflows in Phase 9.
+Cover cascades give each colleague 15 minutes on the demo clock. The deadline is a durable timer (ADR-017): when it passes, the next colleague is asked at that instant, whether the clock ran or was moved forward with `PUT /demo/clock`, which fires every timer that has become due, in order, before it answers. Moving the clock back un-fires nothing. The same timers send in-app reminders for an open request window (7 and 2 days before it closes, only to people who have not answered) and run the nightly audit check.
 
 The three situations of PROCESS.md §4 run against this API as scripted demo scenarios (`backend/tests/api/test_demo_scenarios.py`, synthdata ASSUMPTIONS §19).
 
@@ -55,7 +55,7 @@ The three situations of PROCESS.md §4 run against this API as scripted demo sce
 
 ## Writes and the audit trail
 
-Every write records an audit event (`GET /audit/events`). The seed loader also turns the seeded history into events: publications, leave decisions, swaps, sick reports and cover. The hash chain comes in Phase 9 (`chain_verified: null`).
+Every write records an audit event (`GET /audit/events`) and, where it has one, publishes the domain event to the outbox in the same transaction (`dienstpilot.recording`, ADR-016). The seed loader also turns the seeded history into events: publications, leave decisions, swaps, sick reports and cover. All events are in a hash chain (one per department, one `system` chain for events without a department such as a clock change): each event has `seq`, `hash` and the chain's state is in `chain` of the response: `state` is `verified`, `stale` (last check older than 36 hours of demo time), `failed` (with `first_bad_seq` and `reason`) or `never_checked`. `POST /audit/verify` (Planner, Oversight) verifies now. A nightly timer (02:00 demo time) verifies too.
 
 | Write | Who | Approval (PROCESS §2) |
 |---|---|---|
@@ -69,7 +69,9 @@ Every write records an audit event (`GET /audit/events`). The seed loader also t
 | `PATCH /planner/roster/assignments` | Planner | Draft: direct. Published: reason, C2-valid, everyone affected is notified |
 | `POST /planner/variants/{id}/publish` | Planner | The Planner's approval (C2-valid month) |
 | `PUT /planner/policy` | Planner | — |
-| `POST /planner/windows/{month}/reminders`, `/close` | Planner | — |
+| `POST /planner/windows/{month}/reminders`, `/close` | Planner | — (closing cancels the automatic reminders) |
+| `POST /planner/months/{month}/close` | Planner | Confirms the prepared month-end documentation: locks it and releases the payroll export |
+| `POST /audit/verify` | Planner, Oversight | — (verifies the hash chain now) |
 | `POST /copilot/proposals` | Planner | A proposal changes nothing; the Planner accepts or dismisses it |
 | `POST /admin/rule-sets` | Administrator | A new version starts in the future; old rosters keep theirs |
 | `PUT /me/settings` | Everyone except Oversight | — |
@@ -91,7 +93,7 @@ Every write records an audit event (`GET /audit/events`). The seed loader also t
 | M8 Vertretungsanfrage / Cover request | `GET /me/cover-requests` (countdown, hours impact), `POST /me/cover-requests/{offer_id}` (`Übernehmen` / `Ablehnen`) |
 | M9 Fairness-Bilanz | `GET /me/fairness?year=` (own counts against anonymous department statistics) |
 | M10 Stunden / Hours | `GET /me/hours?month=` (contract, planned, worked, overtime, rest compliance from C2) |
-| M11 Mitteilungen / Notifications | `GET /me/notifications` (roster published or changed with the reason, swaps, leave, cover requests) |
+| M11 Mitteilungen / Notifications | `GET /me/notifications` (roster published or changed with the reason, swaps, leave, cover requests, request-window reminders) |
 | M12 Einstellungen / Settings | `GET /me/settings`, `PUT /me/settings` |
 
 ### Planner dashboard
@@ -100,7 +102,7 @@ Every write records an audit event (`GET /audit/events`). The seed loader also t
 |---|---|
 | W1 Übersicht / Overview | `GET /planner/overview` (window progress, escalations, coverage of the next 14 days with the C3 band, recent changes) |
 | W2 Wunschphase / Request window | `GET /planner/windows/{month}`, `POST /planner/windows/{month}/reminders`, `POST /planner/windows/{month}/close` |
-| W3 Varianten / Variants | `POST /planner/runs` (202 with a run id), `GET /planner/runs/{run_id}` (status, `trial`, variants with metrics, the recommended one, or why no valid roster exists), `GET /planner/runs?month=` |
+| W3 Varianten / Variants | `POST /planner/runs` (202 with a run id; a run a dead worker left behind is `failed` with `error: worker_restarted` or `job_timeout`, and starting a new run is the retry), `GET /planner/runs/{run_id}` (status, `trial`, variants with metrics, the recommended one, or why no valid roster exists), `GET /planner/runs?month=` |
 | W4 Dienstplan-Editor / Roster editor | `GET /roster?month=` (grid with assignment ids, absences, wish marks, coverage per shift and qualification, C2-checked gap suggestions for a published month; a draft has none). A reassignment creates a new assignment id, so an undo looks the id up again in the refreshed grid, `GET /roster?month=&variant_id=` (a draft), `PATCH /planner/roster/assignments`, `POST /planner/validate` (all violations of a month or draft) |
 | W5 Freigabe / Approval | `POST /planner/variants/{variant_id}/publish` |
 | W6 Anfragen / Requests inbox | `GET /planner/requests`, `POST /planner/leave/{request_id}/decision`, `POST /planner/swaps/{swap_id}/decision`, `POST /planner/proposals/{proposal_id}/decision` |
@@ -108,9 +110,9 @@ Every write records an audit event (`GET /audit/events`). The seed loader also t
 | W7b Eskalation | `GET /planner/cascades/{cascade_id}` (ranked options with hours and overtime consequences), `POST /planner/cascades/{cascade_id}/decision` |
 | W8 Fairness und Compliance | `GET /fairness?year=`, `GET /compliance/hours?month=`, `GET /compliance/overtime-trend` |
 | W9 Copilot panel | `POST /copilot/ask` (C8 stand-in), `POST /copilot/proposals` (no publish or approve endpoint exists) |
-| W10 Protokoll / Audit trail | `GET /audit/events` (filters: action, staff, since, until) |
+| W10 Protokoll / Audit trail | `GET /audit/events` (filters: action, staff, since, until; `chain` says what the log may claim), `POST /audit/verify` |
 | W11 Regeln und Stammdaten | `GET /master-data`, `POST /admin/rule-sets`, `GET/PUT /planner/policy` (auto-approval) |
-| W12 Aufsicht / Oversight | `GET /oversight/summary?month=`, `GET /fairness`, `GET /compliance/hours`, `GET /audit/export` |
+| W12 Aufsicht / Oversight | `GET /oversight/summary?month=`, `GET /fairness`, `GET /compliance/hours`, `GET /audit/export` (with seq and hashes), month end: `GET /oversight/months`, `GET /oversight/months/{month}/report`, `GET /oversight/months/{month}/payroll?format=json\|csv` (409 until the Planner has closed the month) |
 | W13 KI-Transparenz | `GET /transparency/components` (C1 and C2 with the summaries in `eval/results/c1.json` and `c2.json`) |
 
 The Staff+ department roster uses `GET /roster?month=` as well: the same grid, without absence categories, wish marks or gap suggestions.

@@ -111,7 +111,8 @@ Persona: Dr. Thomas Brandt. Layout: left navigation, main canvas, collapsible co
 - **W3 and W5.** A variant card never carries a publish action (the design system forbids one on an AI surface). Each card opens the draft in W4; the Planner's approval (W5) is the dialog behind "Freigeben und veröffentlichen" in W4. It needs the request window closed: a run while the window is open is a **trial run**, labelled on the cards and in the banner.
 - **W4.** A drag moves a shift to a colleague on the same day (reassignment; keyboard: Space picks up, arrows choose the person, Space drops, Enter opens the cell). Gap suggestions come from the API for published months only; a draft shows its gaps in the coverage row and as rule messages.
 - **W8 and W12 for Oversight.** Fairness is only anonymous statistics (no names on W8). Hours per person (payroll, working-time records) are on W12.
-- **W10.** The chain indicator says that the hash chain arrives in Phase 9 until `chain_verified` is true; it never shows a tick it cannot back.
+- **W10.** The chain indicator shows the tick and "Protokoll vollständig und unverändert" only when the last verification passed and is recent (36 hours of demo time); otherwise it says that the check is too old, that none has run, or where the chain is broken. "Jetzt prüfen" runs the verifier on demand. It never shows a tick it cannot back.
+- **W12 month end.** A section "Monatsabschluss": the prepared month-end documentation, the Planner's one-click confirmation and the payroll export (CSV) that stays locked until then. The explanatory text is marked as a placeholder until the copilot exists.
 - **W13.** Cards are grouped by kind. Metrics come from `eval/results` through the API (C1, C2); the other components show a marked placeholder, and no model card exists yet.
 
 ## 5. Shift types (use these exact times)
