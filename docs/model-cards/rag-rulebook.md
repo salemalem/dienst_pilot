@@ -23,11 +23,15 @@ Give the planner copilot (C8, Phase 10c) and the rule search endpoint (`GET /rul
 
 Every synthetic document says so in its front matter and body, and every citation of one carries "[synthetisch]" / "[synthetic]". There is no real collective-agreement text.
 
+## What is served
+
+**Vectors alone** (`RAG_RETRIEVAL=vector`, the default). The pre-registered check "hybrid at least as good as the better single method" failed, so, as for C3 to C6 where a challenger that fails its rule does not replace what did better, the better single method is served and labelled as such (here the single method beat the hybrid that the architecture asked for). Hybrid is kept behind the setting for the follow-up. This choice was made **after** the results were known: `EVAL_RULE.md` only said the failure would be reported, not what would be served; this card and `eval/results/rag.json` (`served`) say so. Without the bge-m3 files on the machine search falls back to full-text only and says so (`mode: "fts-only"`, `fallback: true`); W13 shows the served method and the table below.
+
 ## Method
 
 - **Chunks:** one paragraph (Absatz) of one section (§ or the section of a synthetic document), 167 in all, with ids such as `arbzg:§5:1`.
 - **Embeddings:** BAAI/bge-m3 as the int8 ONNX export (`Xenova/bge-m3`), run locally with ONNX Runtime (no torch), one text per run (with this export a padded batch changes the vectors, cosine about 0.98 against the unpadded ones, which a first run exposed). 1024 dimensions, committed in `agents/rag/embeddings/` with a manifest, so CI needs no model: a test recomputes the corpus hash, and a local-only test checks that the model reproduces the committed vectors (cosine at least 0.999).
-- **Retrieval:** Postgres full-text (German and English configurations, OR of the words) and pgvector cosine (HNSW), 50 candidates each, reciprocal rank fusion with constant 60, top 5. Without the model the endpoint falls back to full-text only and says `mode: "fts-only"`. No reranker is built.
+- **Retrieval:** pgvector cosine (HNSW), top 5, is served. The hybrid is Postgres full-text (German and English configurations, OR of the words) and vectors, 50 candidates each, reciprocal rank fusion with constant 60; it was evaluated with these fixed settings and stays available as a setting. Without the model the endpoint falls back to full-text only and says so. No reranker is built.
 - **"No source found":** the best vector cosine below a threshold chosen on the dev questions only.
 - **Questions:** 60 written for this prototype (30 DE, 30 EN; 52 answerable with gold chunk ids, 8 without a source), `eval/rag_questions.json`. Split by hash into dev (19) and test (41). `agents/rag/EVAL_RULE.md` was committed before any retrieval was scored.
 
@@ -42,22 +46,24 @@ Test questions (answerable ones only for recall and MRR):
 
 | Retrieval | recall@1 | recall@3 | recall@5 | MRR |
 |---|---|---|---|---|
-| Hybrid (full-text + vectors, RRF), as built | 64.9 % | 81.1 % | 86.5 % | 0.727 |
+| Vectors only **(served)** | 100.0 % | 100.0 % | 100.0 % | 1.000 |
+| Hybrid (full-text + vectors, RRF) (setting `RAG_RETRIEVAL=hybrid`) | 64.9 % | 81.1 % | 86.5 % | 0.727 |
 | Full-text only | 32.4 % | 40.5 % | 48.6 % | 0.376 |
-| Vectors only | 100.0 % | 100.0 % | 100.0 % | 1.000 |
 
-By question language (hybrid): German recall@5 94.4 % (n=18), English recall@5 79.0 % (n=19). Citation correct at 1 (hybrid): 64.9 %.
+Served: **Vectors only**. The pre-registered check 'hybrid at least as good as the better single method' failed; the single method with the higher test recall@5 (vector) is served. This choice was made after the results were known (EVAL_RULE.md says only that the failure is reported); hybrid stays available as RAG_RETRIEVAL=hybrid.
+
+By question language (vectors only): German recall@5 100.0 % (n=18), English recall@5 100.0 % (n=19); for the hybrid: German 94.4 %, English 79.0 %. Citation correct at 1 (served): 100.0 %.
 
 "No source" threshold (cosine, chosen on the dev questions only): 0.6. On the test questions 4 of 4 unanswerable questions were answered "no source found" and 1 answerable question(s) were wrongly rejected.
 
 Pre-registered checks (EVAL_RULE.md): hybrid_recall@5_at_least_0.80: **passed**; hybrid_recall@5_at_least_best_single: **FAILED**.
 
-Hybrid misses at 5 on the test questions: `rest-shorten-en`, `night-time-en`, `sunday-en`, `replacement-day-en`, `fine-de`.
+Misses at 5 of the served method on the test questions: none.
 <!-- rag:end -->
 
 ## What the results say, and what they do not
 
-- The hybrid retrieval the architecture asked for is **worse** than vectors alone on these questions. Full-text search is weak here because half of the questions are English and the statute is German, and equal-weight fusion lets its noise displace right answers. The pre-registered check "hybrid at least as good as the better single method" failed, and the rule said to report it rather than tune it away. Nothing was tuned after seeing the test results. A better fusion (weights, or full-text only for same-language questions) would need a new pre-registered rule and new questions.
+- The hybrid retrieval the architecture asked for is **worse** than vectors alone on these questions (which is why vectors alone is served). Full-text search is weak here because half of the questions are English and the statute is German, and equal-weight fusion lets its noise displace right answers. The pre-registered check "hybrid at least as good as the better single method" failed, and the rule said to report it rather than tune it away. Nothing was tuned after seeing the test results; only the choice of what to serve followed them. A better fusion (weights, or full-text only for same-language questions) would need a new pre-registered rule and new questions.
 - A first run embedded in padded batches; fixing that was a defect fix (the vectors changed, the conclusions did not).
 - The questions were written by the author of the corpus, so they are easier than real ones, and eight unanswerable questions are too few to estimate a rejection rate. The threshold is a single number.
 - Gold sets contain passages of synthetic documents, which are written to answer exactly these questions.

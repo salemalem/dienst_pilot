@@ -434,11 +434,11 @@ def test_copilot_answers_with_rule_citation_and_creates_only_proposals(
     assert not any("copilot" in path and ("publish" in path or "approve" in path) for path in paths)
 
 
-def test_transparency_lists_eight_components_none_can_change_the_roster(
+def test_transparency_lists_eight_components_and_the_rulebook_none_can_change_the_roster(
     client: TestClient, login: Any
 ) -> None:
     comps = client.get("/transparency/components", headers=login("kaya")).json()
-    assert [c["component"] for c in comps] == [f"C{i}" for i in range(1, 9)]
+    assert [c["component"] for c in comps] == [f"C{i}" for i in range(1, 9)] + ["RAG"]
     assert {c["component"] for c in comps if c["implementation"] == "built"} == {
         "C1",
         "C2",
@@ -446,7 +446,10 @@ def test_transparency_lists_eight_components_none_can_change_the_roster(
         "C4",
         "C5",
         "C6",
+        "RAG",
     }
+    rag = next(c for c in comps if c["component"] == "RAG")
+    assert rag["eval_metric"]["served"]["method"] == "vector" and "vector" in rag["version"]
     assert {c["component"] for c in comps if c["implementation"] == "stand-in"} == {
         f"C{i}" for i in range(7, 9)
     }

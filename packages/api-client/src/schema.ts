@@ -1154,6 +1154,8 @@ export interface paths {
         /**
          * Components
          * @description W13: what each component is, how far it is built, and that none can change the roster.
+         *
+         *     C1 to C8, then the rulebook retrieval (RAG), which has no component number.
          */
         get: operations["components_transparency_components_get"];
         put?: never;
@@ -2973,9 +2975,19 @@ export interface components {
             passages: components["schemas"]["Passage"][];
             /**
              * Mode
-             * @description hybrid (full-text + vectors) or fts-only without the model
+             * @description What actually ran: vector, hybrid or fts-only
              */
             mode: string;
+            /**
+             * Configured
+             * @description What is configured (RAG_RETRIEVAL); the champion is vector
+             */
+            configured: string;
+            /**
+             * Fallback
+             * @description True when the model is missing and full-text ran instead
+             */
+            fallback: boolean;
             /** Vector Used */
             vector_used: boolean;
         };

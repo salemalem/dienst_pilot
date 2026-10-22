@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
 from dienstpilot.app.common import EngineLabel, department, label, record, settle_timers
@@ -24,6 +24,7 @@ from dienstpilot.audit import service as audit
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.shared.ports import CopilotFacts
+from dienstpilot.shared.settings import Settings, get_settings
 
 router = APIRouter(tags=["insight"])
 EVAL_RESULTS = Path(__file__).resolve().parents[5] / "eval" / "results"
@@ -487,8 +488,13 @@ KINDS = {
 
 
 @router.get("/transparency/components")
-def components(c: CtxDep) -> list[ComponentOut]:
-    """W13: what each component is, how far it is built, and that none can change the roster."""
+def components(
+    c: CtxDep, settings: Annotated[Settings, Depends(get_settings)]
+) -> list[ComponentOut]:
+    """W13: what each component is, how far it is built, and that none can change the roster.
+
+    C1 to C8, then the rulebook retrieval (RAG), which has no component number.
+    """
     out = []
     for info in c.engines.infos():
         metric = None
@@ -504,6 +510,20 @@ def components(c: CtxDep) -> list[ComponentOut]:
                 note=info.note,
                 planned_phase=info.planned_phase,
                 eval_metric=metric,
+            )
+        )
+    rag = EVAL_RESULTS / "rag.json"
+    if rag.exists():
+        result = json.loads(rag.read_text(encoding="utf-8"))
+        out.append(
+            ComponentOut(
+                component="RAG",
+                kind="retrieval",
+                implementation="built",
+                version=f"bge-m3 (ONNX int8), {settings.rag_retrieval}",
+                note="Rulebook retrieval with citations; the evaluated champion is served.",
+                planned_phase=None,
+                eval_metric=result,
             )
         )
     return out

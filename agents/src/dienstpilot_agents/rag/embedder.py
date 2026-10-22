@@ -18,6 +18,7 @@ from dienstpilot_agents.rag.corpus import text_hash
 DIMENSIONS = 1024
 MODEL_NAME = "BAAI/bge-m3 (ONNX int8, Xenova/bge-m3)"
 MODEL_FILE = "onnx/sentence_transformers_quantized.onnx"
+REPO_MODELS = str(Path(__file__).resolve().parents[4] / "models" / "bge-m3")
 DEFAULT_GLOB = "~/.cache/huggingface/hub/models--Xenova--bge-m3/snapshots/*"
 MAX_TOKENS = 512
 
@@ -34,13 +35,17 @@ class ModelUnavailableError(RuntimeError):
 
 
 def find_model_dir(path: str | None = None) -> Path:
-    """Return the model directory (``RAG_MODEL_DIR``, else the Hugging Face cache)."""
-    pattern = path or os.environ.get("RAG_MODEL_DIR") or DEFAULT_GLOB
-    matches = sorted(glob.glob(os.path.expanduser(pattern)))
-    for m in matches:
-        if (Path(m) / MODEL_FILE).exists() and (Path(m) / "tokenizer.json").exists():
-            return Path(m)
-    raise ModelUnavailableError(f"bge-m3 ONNX files not found ({pattern})")
+    """Return the model directory.
+
+    Looked up in this order: ``path`` (the ``BGE_M3_DIR`` setting), ``RAG_MODEL_DIR`` (the
+    container's mount), ``models/bge-m3`` in the repository, the Hugging Face cache.
+    """
+    patterns = [p for p in (path, os.environ.get("RAG_MODEL_DIR"), REPO_MODELS, DEFAULT_GLOB) if p]
+    for pattern in patterns:
+        for m in sorted(glob.glob(os.path.expanduser(pattern))):
+            if (Path(m) / MODEL_FILE).exists() and (Path(m) / "tokenizer.json").exists():
+                return Path(m)
+    raise ModelUnavailableError(f"bge-m3 ONNX files not found (looked in {patterns})")
 
 
 def model_digest(model_dir: Path) -> str:

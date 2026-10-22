@@ -19,7 +19,7 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | C5 | Cover Acceptance Ranker (`ml/`) | ML, classification + policy | Built & evaluated on synthetic data (`eval/results/c5.json`). The served model is the base-rate baseline: the LightGBM learner did not meet the promotion rule, so inside a burden bucket the order follows hours against contract (model card) |
 | C6 | Leave Feasibility Surrogate (`ml/`) | ML, simulation-trained classification | Built & evaluated on synthetic data (`eval/results/c6.json`). The served model is the logistic-regression baseline: the LightGBM learner did not meet the promotion rule. Advisory hint only; the solver's answer is the one shown (model card) |
 | — | MCP servers (`mcp_servers/`: roster, planning, rules, forecast, notify) | Application | Built & tested on synthetic data (backend and mcp tests; thin wrappers over the REST API, ADR-018) |
-| — | Rulebook retrieval, RAG (`agents/`, `agents/rag/`) | Retrieval | Built & evaluated on synthetic data (`eval/results/rag.json`, 60 questions written for the prototype). Hybrid retrieval did not beat vectors alone, the pre-registered check failed (model card `rag-rulebook.md`) |
+| — | Rulebook retrieval, RAG (`agents/`, `agents/rag/`) | Retrieval | Built & evaluated on synthetic data (`eval/results/rag.json`, 60 questions written for the prototype). Hybrid retrieval did not beat vectors alone (pre-registered check failed), so vectors alone are served; hybrid is a setting (model card `rag-rulebook.md`) |
 | C7 | Request Intake Agent | LLM, structured output | Designed |
 | C8 | Planner Copilot | LLM agent, MCP tools, RAG | Designed |
 | — | Staff app and planner dashboard | UI prototype | Designed |
@@ -312,7 +312,7 @@ Each MCP server is a small module with its own ASGI app (the dev stack runs the 
 |---|---|---|
 | `roster` | `get_roster`, `get_assignments_for`, `get_burden_ledger`, `get_coverage` | read-only |
 | `planning` | `run_what_if(changes)`, `validate(changes)`, `create_proposal(changes, reason)` | proposals land in the Planner inbox; no publish tool exists |
-| `rules` | `search_rules(query)`, `get_rule(id)` | hybrid retrieval with citations (§11) |
+| `rules` | `search_rules(query)`, `get_rule(id)` | retrieval with citations (§11; vectors served) |
 | `forecast` | `get_absence_forecast(range)`, `get_cover_candidates(shift_id)` | wraps C3 and C5 |
 | `notify` | `draft_announcement(audience, text)` | drafts only; sending requires a human click |
 
@@ -322,9 +322,9 @@ The agent service is an MCP client. The same servers can be connected to other M
 
 **Corpus.** The official ArbZG text, a synthetic example works agreement (Betriebsvereinbarung), synthetic department SOPs and a rule summary written from the seeded rule set. No collective-agreement text: it is copyrighted, and the summary says so. Each document carries a version and a retrieval date; synthetic ones are labelled in the document and in every citation.
 
-**Pipeline.** Structure-aware chunking along legal paragraphs (§, Absatz) so a citation always points at a real unit of text; bge-m3 multilingual embeddings served locally (the int8 ONNX export on ONNX Runtime), so documents never leave the server; hybrid retrieval (Postgres full-text + pgvector) with reciprocal rank fusion (no reranker is built); answers must cite § and version, and the copilot says it cannot find a source rather than answer without one.
+**Pipeline.** Structure-aware chunking along legal paragraphs (§, Absatz) so a citation always points at a real unit of text; bge-m3 multilingual embeddings served locally (the int8 ONNX export on ONNX Runtime), so documents never leave the server; hybrid retrieval (Postgres full-text + pgvector with reciprocal rank fusion) was built and evaluated, but vectors alone beat it, so vectors alone are served and hybrid is a setting (`RAG_RETRIEVAL`; no reranker is built); answers must cite § and version, and the copilot says it cannot find a source rather than answer without one.
 
-**Evaluation.** Recall@k and citation correctness on a labelled question set (DE and EN), `eval/results/rag.json`, with a rule written before the run (`agents/rag/EVAL_RULE.md`). Result: vectors alone beat the hybrid fusion on these questions (model card). Faithfulness grading of answers comes with C8.
+**Evaluation.** Recall@k and citation correctness on a labelled question set (DE and EN), `eval/results/rag.json`, with a rule written before the run (`agents/rag/EVAL_RULE.md`). Result: vectors alone beat the hybrid fusion on these questions and are what is served (model card, W13). Faithfulness grading of answers comes with C8.
 
 ## 12. Loose coupling: how updates stay safe
 

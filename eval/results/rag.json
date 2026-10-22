@@ -1,5 +1,9 @@
 {
  "component": "RAG rulebook (ARCHITECTURE §11)",
+ "served": {
+  "method": "vector",
+  "basis": "the pre-registered check 'hybrid at least as good as the better single method' failed; the single method with the higher test recall@5 (vector) is served. This choice was made after the results were known (EVAL_RULE.md says only that the failure is reported); hybrid stays available as RAG_RETRIEVAL=hybrid"
+ },
  "settings": {
   "rrf_k": 60,
   "candidates_per_list": 50,
@@ -48,21 +52,59 @@
    "citation_correct@1": 0.6486
   },
   "by_language": {
-   "de": {
-    "n_answerable": 18,
-    "recall@1": 0.6667,
-    "recall@3": 0.9444,
-    "recall@5": 0.9444,
-    "mrr": 0.787,
-    "citation_correct@1": 0.6667
+   "hybrid": {
+    "de": {
+     "n_answerable": 18,
+     "recall@1": 0.6667,
+     "recall@3": 0.9444,
+     "recall@5": 0.9444,
+     "mrr": 0.787,
+     "citation_correct@1": 0.6667
+    },
+    "en": {
+     "n_answerable": 19,
+     "recall@1": 0.6316,
+     "recall@3": 0.6842,
+     "recall@5": 0.7895,
+     "mrr": 0.6702,
+     "citation_correct@1": 0.6316
+    }
    },
-   "en": {
-    "n_answerable": 19,
-    "recall@1": 0.6316,
-    "recall@3": 0.6842,
-    "recall@5": 0.7895,
-    "mrr": 0.6702,
-    "citation_correct@1": 0.6316
+   "fts": {
+    "de": {
+     "n_answerable": 18,
+     "recall@1": 0.0556,
+     "recall@3": 0.1667,
+     "recall@5": 0.3333,
+     "mrr": 0.1435,
+     "citation_correct@1": 0.0556
+    },
+    "en": {
+     "n_answerable": 19,
+     "recall@1": 0.5789,
+     "recall@3": 0.6316,
+     "recall@5": 0.6316,
+     "mrr": 0.5965,
+     "citation_correct@1": 0.5789
+    }
+   },
+   "vector": {
+    "de": {
+     "n_answerable": 18,
+     "recall@1": 1.0,
+     "recall@3": 1.0,
+     "recall@5": 1.0,
+     "mrr": 1.0,
+     "citation_correct@1": 1.0
+    },
+    "en": {
+     "n_answerable": 19,
+     "recall@1": 1.0,
+     "recall@3": 1.0,
+     "recall@5": 1.0,
+     "mrr": 1.0,
+     "citation_correct@1": 1.0
+    }
    }
   },
   "no_source": {
@@ -98,64 +140,7 @@
     "citation_correct@1": 1.0
    }
   },
-  "misses_at_5": [
-   {
-    "id": "rest-shorten-en",
-    "gold": [
-     "arbzg:§5:2"
-    ],
-    "top": [
-     "rules:Rule1:1",
-     "rules:Rule3:2",
-     "sop-en:SOP-1:2"
-    ]
-   },
-   {
-    "id": "night-time-en",
-    "gold": [
-     "arbzg:§2:3"
-    ],
-    "top": [
-     "rules:Rule2:1",
-     "rules:Rule2:2",
-     "rules:Rule4:1"
-    ]
-   },
-   {
-    "id": "sunday-en",
-    "gold": [
-     "arbzg:§9:1",
-     "arbzg:§10:1"
-    ],
-    "top": [
-     "rules:Rule3:2",
-     "rules:Rule3:1",
-     "bv-en:§4:1"
-    ]
-   },
-   {
-    "id": "replacement-day-en",
-    "gold": [
-     "arbzg:§11:3"
-    ],
-    "top": [
-     "rules:Rule1:2",
-     "rules:Rule1:1",
-     "regeln:Regel1:2"
-    ]
-   },
-   {
-    "id": "fine-de",
-    "gold": [
-     "arbzg:§22:2"
-    ],
-    "top": [
-     "arbzg:§7:2",
-     "arbzg:§15:1",
-     "arbzg:§7:1"
-    ]
-   }
-  ]
+  "misses_at_5": []
  },
  "dev": {
   "hybrid": {
@@ -177,7 +162,7 @@
   "Vectors are from the int8 ONNX export of bge-m3."
  ],
  "environment": {
-  "git_commit": "90d6197fcfef3b7b6cfbf5095ad341bd34cdcc98",
+  "git_commit": "f424145c78df8b784f16424af3376292065aaef8",
   "python": "3.12.13",
   "numpy": "2.5.4"
  }
