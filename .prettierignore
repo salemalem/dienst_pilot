@@ -23,3 +23,6 @@ ml/absence_forecast/artifacts/
 ml/preference_learner/artifacts/
 ml/mlflow/
 ml/cover_ranker/artifacts/
+# C6 serving bundle (hashed byte for byte, eval/results/c6.json) and the label files written by eval/run_c6_labels.py
+ml/leave_surrogate/artifacts/
+ml/leave_surrogate/labels/

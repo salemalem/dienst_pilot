@@ -1,0 +1,13 @@
+{
+ "config": "CHECK_CONFIG (workers=8) against labels solved with workers=2",
+ "details": [
+  {
+   "exact": "coverable_with_trade_off",
+   "id": "test|2025-08-01|77",
+   "stored": "coverable"
+  }
+ ],
+ "differ": 1,
+ "n": 200,
+ "share": 0.005
+}
