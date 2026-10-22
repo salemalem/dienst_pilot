@@ -1,6 +1,6 @@
-"""Render the §17.1 table in docs/ARCHITECTURE.md and the C3 and C4 tables in the model cards.
+"""Render the §17.1 table in docs/ARCHITECTURE.md and the C3 to C6 tables in the model cards.
 
-Sources: eval/results/benchmark.json, c3.json, c4.json and c5.json.
+Sources: eval/results/benchmark.json, c3.json, c4.json, c5.json and c6.json.
 
 Usage: uv run python eval/render_tables.py [--check]   (--check fails if the doc is out of date)
 """
@@ -18,6 +18,15 @@ C4_CARD = ROOT / "docs" / "model-cards" / "c4-preference-learner.md"
 C4_START, C4_END = "<!-- c4:start -->", "<!-- c4:end -->"
 C5_CARD = ROOT / "docs" / "model-cards" / "c5-cover-ranker.md"
 C5_START, C5_END = "<!-- c5:start -->", "<!-- c5:end -->"
+C6_CARD = ROOT / "docs" / "model-cards" / "c6-leave-feasibility.md"
+C6_START, C6_END = "<!-- c6:start -->", "<!-- c6:end -->"
+C6_MODELS = {
+    "stand_in": "Previous rule: approved leave per day against the limit (baseline B1)",
+    "logistic": "Logistic regression (baseline B2)",
+    "lightgbm": "LightGBM (learner)",
+    "stand_in_counting_pending_sensitivity": "B1 also counting pending requests (sensitivity, not eligible)",
+}
+POOLED = "pooled, including simulated stress states"
 C5_MODELS = {
     "base_rate": "Base rate (baseline B1)",
     "logistic": "Logistic regression (baseline B2)",
@@ -324,6 +333,155 @@ def c5_tables(doc: dict) -> str:  # type: ignore[type-arg]
     return "\n".join(lines)
 
 
+def c6_tables(doc: dict) -> str:  # type: ignore[type-arg]
+    """Return the markdown tables of the C6 model card (natural states first, then stress, pooled)."""
+    cv, test, champ, v = doc["cv_2022_2024"], doc["test_2025"], doc["champion"], doc["versions"]
+    mark = {True: "passed", False: "failed"}
+
+    def pct(x: float | None) -> str:
+        return "n/a" if x is None else f"{x * 100:.1f} %"
+
+    summ = doc["labels"]["summary"]
+    label_rows = []
+    for split in ("train", "test"):
+        for stratum in ("natural", "stress"):
+            c = summ[split]["by_stratum"][stratum]
+            label_rows.append(
+                f"| {split} ({'2021 to 2024' if split == 'train' else '2025'}) | {stratum} "
+                f"| {c.get('coverable', 0)} | {c.get('coverable_with_trade_off', 0)} "
+                f"| {c.get('not_coverable', 0)} |"
+            )
+    fid = doc["labels"]["fidelity_check"]
+    fidelity = (
+        f"{fid['differ']} of {fid['n']} labels differ when re-solved with the product's exact settings"
+        if "n" in fid
+        else fid["note"]
+    )
+    cvrows = [
+        f"| {C6_MODELS[k]}{' **(served)**' if k == champ['kind'] else ''} "
+        f"| {pct(cv[k]['oof_precision'])} | {pct(cv[k]['oof_recall'])} |"
+        for k in ("stand_in", "logistic", "lightgbm")
+    ]
+
+    def row(k: str, cell: str) -> str:
+        c = test[k][cell]
+        return (
+            f"| {C6_MODELS[k]}{' **(served)**' if k == champ['kind'] else ''} | {c['n']} "
+            f"| {c['yes']} | {c['false_yes']} ({c['false_yes_trade_off']} trade-off, "
+            f"{c['false_yes_not_coverable']} not coverable) | {pct(c['precision'])} | {pct(c['recall'])} |"
+        )
+
+    head = [
+        "| Model | Requests | Hints \"coverable\" | False yes | Precision of a yes | Recall |",
+        "|---|---|---|---|---|---|",
+    ]
+    cells = {
+        "natural": "Natural states (what each method achieves on realistic states)",
+        "stress": "Simulated stress states only",
+        "pooled": "Pooled, including simulated stress states (the mix promotion is judged on)",
+    }
+    blocks: list[str] = []
+    for cell, title in cells.items():
+        blocks += [f"**{title}**", "", *head, *[row(k, cell) for k in C6_MODELS if k in test], ""]
+    ch = doc["promotion"]["checks"]
+    p, r, la = (
+        ch["precision_higher_by_margin_and_ci_excludes_zero"],
+        ch["recall_at_least_stand_in"],
+        ch["hint_latency_p95_under_limit"],
+    )
+    checks = [
+        f"| 1. Precision of a yes higher by at least one point, bootstrap 95 % interval excludes zero "
+        f"| {mark[p['passed']]} | {pct(p['learner'])} vs {pct(p['best_baseline'])}: "
+        f"{p['difference'] * 100:+.1f} points, interval [{p['difference_95ci'][0] * 100:+.1f}, "
+        f"{p['difference_95ci'][1] * 100:+.1f}] |",
+        f"| 2. Recall at least the stand-in's | {mark[r['passed']]} | {pct(r['learner'])} vs {pct(r['stand_in'])} |",
+        f"| 3. Hint latency p95 under {la['limit_ms']:.0f} ms | {mark[la['passed']]} "
+        f"| {la['learner_p95_ms']:.2f} ms |",
+    ]
+    lat = doc["latency_full_hint_path"]
+    lat_rows = [
+        f"| {C6_MODELS[k]} | {lat[k]['p50_ms']:.2f} | {lat[k]['p95_ms']:.2f} | {lat[k]['max_ms']:.2f} |"
+        for k in ("stand_in", "logistic", "lightgbm")
+    ]
+    ep = doc["latency_endpoint_end_to_end"]
+    endpoint = (
+        f"`POST /me/leave/check` end to end (not gated): median {ep['p50_ms']:.1f} ms, p95 {ep['p95_ms']:.1f} ms "
+        f"over {ep['calls']} calls."
+        if "p95_ms" in ep
+        else f"`POST /me/leave/check` end to end: {ep['note']}."
+    )
+    ag = doc["agreement_with_solver_2025"]
+    ag_rows = []
+    for name, label_ in (
+        ("natural", "Natural states"),
+        ("stress", "Simulated stress states only"),
+        ("pooled including simulated stress states", "Pooled, including simulated stress states"),
+    ):
+        a = ag[name]
+        ag_rows.append(
+            f"| {label_} | {a['n']} | {a['agree']} | {a['disagree']} | {a['abstain']} "
+            f"| {pct(a['agreement_rate'])} | {a['hints']['coverable']} / {a['hints']['tight']} / {a['hints']['not_coverable']} |"
+        )
+    t = doc["target"]
+    lines = [
+        C6_START,
+        "*Generated by `eval/render_tables.py` from `eval/results/c6.json`. Do not edit by hand.*",
+        "",
+        f"Labels: dataset manifest `{v['data']['labels_dataset_manifest_sha256'][:12]}`, solver "
+        f"{doc['labels']['versions']['solver']}, validator {doc['labels']['versions']['validator']}. "
+        f"Code: C6 sources `{v['code']['c6_sources_sha256'][:12]}`, promotion rule "
+        f"`{v['code']['promotion_rule_sha256'][:12]}`, served bundle `{champ['bundle_sha256'][:12]}` "
+        f"(registry version {champ['registry_version']}).",
+        "",
+        f"Target: **{t['kind']}**. {t['definition']}. Coverable with a trade-off is "
+        f"{t['training_trade_off_rows']} of the training rows ({t['training_trade_off_share'] * 100:.1f} %); "
+        f"the rule makes the target binary under 5 % or under 100 rows.",
+        "",
+        "Labels (the product's M5 decision on simulated requests; stress states are counterfactual):",
+        "",
+        "| Split | States | Coverable | Coverable with a trade-off | Not coverable |",
+        "|---|---|---|---|---|",
+        *label_rows,
+        "",
+        f"Label fidelity: {fidelity}.",
+        "",
+        "Cross-validation (rolling origin by year, 2022 to 2024, pooled out-of-fold; the threshold of "
+        "each model keeps recall at least the stand-in's):",
+        "",
+        "| Model | Precision of a yes | Recall |",
+        "|---|---|---|",
+        *cvrows,
+        "",
+        f"Best baseline by cross-validation: `{champ['best_baseline_by_cv']}`. "
+        f"Learner promoted: **{'yes' if champ['promoted_learner'] else 'no'}**.",
+        "",
+        "Held-out 2025, scored once (natural states first):",
+        "",
+        *blocks,
+        "Promotion checks on the pooled 2025 mix:",
+        "",
+        "| Check (PROMOTION_RULE.md) | Result | Value |",
+        "|---|---|---|",
+        *checks,
+        "",
+        "Latency of the full hint path (facts, features, prediction; milliseconds, this machine, not reproducible):",
+        "",
+        "| Model | Median | p95 | Max |",
+        "|---|---|---|---|",
+        *lat_rows,
+        "",
+        endpoint,
+        "",
+        "Agreement of the served hint with the solver on the 2025 requests (a \"tight\" hint abstains):",
+        "",
+        "| States | Requests | Agree | Disagree | Abstain | Agreement | Hints coverable / tight / not coverable |",
+        "|---|---|---|---|---|---|---|",
+        *ag_rows,
+        C6_END,
+    ]
+    return "\n".join(lines)
+
+
 def main(argv: list[str]) -> int:
     """Write or check the table."""
     doc = json.loads((ROOT / "eval" / "results" / "benchmark.json").read_text(encoding="utf-8"))
@@ -342,8 +500,18 @@ def main(argv: list[str]) -> int:
     card5 = C5_CARD.read_text(encoding="utf-8")
     s5, e5 = card5.index(C5_START), card5.index(C5_END) + len(C5_END)
     new_card5 = card5[:s5] + c5_tables(c5) + card5[e5:]
+    c6 = json.loads((ROOT / "eval" / "results" / "c6.json").read_text(encoding="utf-8"))
+    card6 = C6_CARD.read_text(encoding="utf-8")
+    s6, e6 = card6.index(C6_START), card6.index(C6_END) + len(C6_END)
+    new_card6 = card6[:s6] + c6_tables(c6) + card6[e6:]
     if "--check" in argv:
-        if new != text or new_card != card or new_card4 != card4 or new_card5 != card5:
+        if (
+            new != text
+            or new_card != card
+            or new_card4 != card4
+            or new_card5 != card5
+            or new_card6 != card6
+        ):
             print("docs/ARCHITECTURE.md §17.1 or a model card is out of date; run eval/render_tables.py")
             return 1
         return 0
@@ -351,7 +519,8 @@ def main(argv: list[str]) -> int:
     CARD.write_text(new_card, encoding="utf-8")
     C4_CARD.write_text(new_card4, encoding="utf-8")
     C5_CARD.write_text(new_card5, encoding="utf-8")
-    print("rendered §17.1 and the C3, C4 and C5 model card tables")
+    C6_CARD.write_text(new_card6, encoding="utf-8")
+    print("rendered §17.1 and the C3, C4, C5 and C6 model card tables")
     return 0
 
 

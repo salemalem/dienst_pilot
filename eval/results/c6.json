@@ -1,0 +1,513 @@
+{
+ "agreement_with_solver_2025": {
+  "natural": {
+   "abstain": 30,
+   "agree": 464,
+   "agreement_rate": 0.9206349206349206,
+   "disagree": 10,
+   "hints": {
+    "coverable": 474,
+    "not_coverable": 0,
+    "tight": 30
+   },
+   "n": 504
+  },
+  "pooled including simulated stress states": {
+   "abstain": 183,
+   "agree": 799,
+   "agreement_rate": 0.8022088353413654,
+   "disagree": 14,
+   "hints": {
+    "coverable": 659,
+    "not_coverable": 154,
+    "tight": 183
+   },
+   "n": 996
+  },
+  "stress": {
+   "abstain": 153,
+   "agree": 335,
+   "agreement_rate": 0.6808943089430894,
+   "disagree": 4,
+   "hints": {
+    "coverable": 185,
+    "not_coverable": 154,
+    "tight": 153
+   },
+   "n": 492
+  }
+ },
+ "champion": {
+  "best_baseline_by_cv": "logistic",
+  "bundle_sha256": "d3f2080a2f53b865f79dc7dc0bb1197eb3bd75d33d11cd739575028ca29229f7",
+  "kind": "logistic",
+  "promoted_learner": false,
+  "registry_version": 5
+ },
+ "component": "C6",
+ "cv_2022_2024": {
+  "lightgbm": {
+   "best_baseline": {
+    "kind": "logistic"
+   },
+   "features": [
+    "slack_min",
+    "slack_mean",
+    "qual_slack_facharzt_min",
+    "qual_slack_nachtdienstfaehig_min",
+    "qual_slack_oberarzt_min",
+    "approved_max",
+    "approved_mean",
+    "pending_max",
+    "pending_mean",
+    "overlapping_colleagues",
+    "holidays",
+    "school_days",
+    "weekend_days",
+    "length_days",
+    "notice_days",
+    "month",
+    "has_facharzt",
+    "has_nachtdienstfaehig",
+    "has_oberarzt"
+   ],
+   "grid_mean_log_loss": {
+    "{\"min_child_samples\": 20, \"n_estimators\": 100, \"num_leaves\": 4}": 0.08874756638537934,
+    "{\"min_child_samples\": 20, \"n_estimators\": 100, \"num_leaves\": 8}": 0.09092658890972383,
+    "{\"min_child_samples\": 20, \"n_estimators\": 200, \"num_leaves\": 4}": 0.09398665100829191,
+    "{\"min_child_samples\": 20, \"n_estimators\": 200, \"num_leaves\": 8}": 0.10770799051672177,
+    "{\"min_child_samples\": 40, \"n_estimators\": 100, \"num_leaves\": 4}": 0.08643540113354342,
+    "{\"min_child_samples\": 40, \"n_estimators\": 100, \"num_leaves\": 8}": 0.08859740654460414,
+    "{\"min_child_samples\": 40, \"n_estimators\": 200, \"num_leaves\": 4}": 0.09099089289259055,
+    "{\"min_child_samples\": 40, \"n_estimators\": 200, \"num_leaves\": 8}": 0.10706931070824566
+   },
+   "grid_point": {
+    "min_child_samples": 40,
+    "n_estimators": 100,
+    "num_leaves": 4
+   },
+   "mean_log_loss": 0.08643540113354342,
+   "min_recall_from_stand_in": 0.8425287356321839,
+   "n": 2232,
+   "oof_auc": 0.9882335763012803,
+   "oof_precision": 0.9927631578947368,
+   "oof_recall": 0.8672413793103448,
+   "requests_in_training": 2976,
+   "roles": [
+    "assistenzarzt",
+    "facharzt",
+    "oberarzt",
+    "chefaerztin"
+   ],
+   "share_coverable": 0.7879704301075269,
+   "target": "binary: 1 = the solver says plain coverable",
+   "threshold": 0.9662754776083637,
+   "trade_off_rows": 28,
+   "trade_off_share": 0.009408602150537635
+  },
+  "logistic": {
+   "best_baseline": {
+    "kind": "logistic"
+   },
+   "features": [
+    "slack_min",
+    "slack_mean",
+    "qual_slack_facharzt_min",
+    "qual_slack_nachtdienstfaehig_min",
+    "qual_slack_oberarzt_min",
+    "approved_max",
+    "approved_mean",
+    "pending_max",
+    "pending_mean",
+    "overlapping_colleagues",
+    "holidays",
+    "school_days",
+    "weekend_days",
+    "length_days",
+    "notice_days",
+    "month",
+    "has_facharzt",
+    "has_nachtdienstfaehig",
+    "has_oberarzt"
+   ],
+   "mean_log_loss": 0.12207007848058994,
+   "min_recall_from_stand_in": 0.8425287356321839,
+   "n": 2232,
+   "oof_auc": 0.9850633118400149,
+   "oof_precision": 0.9934683213585892,
+   "oof_recall": 0.8741379310344828,
+   "requests_in_training": 2976,
+   "roles": [
+    "assistenzarzt",
+    "facharzt",
+    "oberarzt",
+    "chefaerztin"
+   ],
+   "share_coverable": 0.7879704301075269,
+   "target": "binary: 1 = the solver says plain coverable",
+   "threshold": 0.9717148604553707,
+   "trade_off_rows": 28,
+   "trade_off_share": 0.009408602150537635
+  },
+  "stand_in": {
+   "best_baseline": {
+    "kind": "logistic"
+   },
+   "features": [
+    "slack_min",
+    "slack_mean",
+    "qual_slack_facharzt_min",
+    "qual_slack_nachtdienstfaehig_min",
+    "qual_slack_oberarzt_min",
+    "approved_max",
+    "approved_mean",
+    "pending_max",
+    "pending_mean",
+    "overlapping_colleagues",
+    "holidays",
+    "school_days",
+    "weekend_days",
+    "length_days",
+    "notice_days",
+    "month",
+    "has_facharzt",
+    "has_nachtdienstfaehig",
+    "has_oberarzt"
+   ],
+   "min_recall_from_stand_in": 0.8425287356321839,
+   "n": 2232,
+   "oof_precision": 0.9054972205064855,
+   "oof_recall": 0.8425287356321839,
+   "requests_in_training": 2976,
+   "roles": [
+    "assistenzarzt",
+    "facharzt",
+    "oberarzt",
+    "chefaerztin"
+   ],
+   "share_coverable": 0.7879704301075269,
+   "target": "binary: 1 = the solver says plain coverable",
+   "trade_off_rows": 28,
+   "trade_off_share": 0.009408602150537635
+  }
+ },
+ "labels": {
+  "fidelity_check": {
+   "config": "CHECK_CONFIG (workers=8) against labels solved with workers=2",
+   "details": [
+    {
+     "exact": "coverable_with_trade_off",
+     "id": "test|2025-08-01|77",
+     "stored": "coverable"
+    }
+   ],
+   "differ": 1,
+   "n": 200,
+   "share": 0.005
+  },
+  "files_sha256": {
+   "sample.jsonl": "a03d5b8ab617857f841c16a49da03f00189293efcd0587d5e92b6ecfda1fd45c",
+   "test.jsonl": "569c648f6cb247039b3db2e948557329c6f3661f4eda74f403ec1e459f838b93",
+   "train.jsonl": "5bf956867667ef96d63755e1587c7aa283e5e7d3923ad9de2f1c756d7ed452fe"
+  },
+  "protocol": "ml/leave_surrogate/PROMOTION_RULE.md",
+  "stress_note": "Stress states are counterfactual pile-ups; the planner's own rule caps real states at 6 concurrent, so natural states almost never contain a 'no'.",
+  "summary": {
+   "test": {
+    "by_stratum": {
+     "natural": {
+      "coverable": 488,
+      "coverable_with_trade_off": 15,
+      "not_coverable": 1
+     },
+     "stress": {
+      "coverable": 291,
+      "coverable_with_trade_off": 15,
+      "not_coverable": 186
+     }
+    },
+    "mean_solve_seconds": 3.49,
+    "mean_solves": 1.91,
+    "n": 996,
+    "outcomes": {
+     "coverable": 779,
+     "coverable_with_trade_off": 30,
+     "not_coverable": 187
+    }
+   },
+   "train": {
+    "by_stratum": {
+     "natural": {
+      "coverable": 1475,
+      "coverable_with_trade_off": 11,
+      "not_coverable": 2
+     },
+     "stress": {
+      "coverable": 870,
+      "coverable_with_trade_off": 17,
+      "not_coverable": 601
+     }
+    },
+    "mean_solve_seconds": 3.31,
+    "mean_solves": 1.83,
+    "n": 2976,
+    "outcomes": {
+     "coverable": 2345,
+     "coverable_with_trade_off": 28,
+     "not_coverable": 603
+    }
+   }
+  },
+  "versions": {
+   "labels": "c6-labels-1",
+   "solver": "c1-1.0.1",
+   "validator": "c2-1.0.0"
+  }
+ },
+ "latency_endpoint_end_to_end": {
+  "calls": 40,
+  "max_ms": 64.64887499896577,
+  "p50_ms": 10.003042003518203,
+  "p95_ms": 17.642741699091857,
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "warmup_calls": 5,
+  "what": "POST /me/leave/check through the test client, no network, solver not run, Postgres on the same machine"
+ },
+ "latency_full_hint_path": {
+  "lightgbm": {
+   "calls": 1000,
+   "max_ms": 2.8729999976349063,
+   "p50_ms": 0.5010204986319877,
+   "p95_ms": 0.8642330063594272,
+   "warmup_calls": 50,
+   "what": "build_facts + features + prediction, one process, one thread"
+  },
+  "logistic": {
+   "calls": 1000,
+   "max_ms": 0.8539160044165328,
+   "p50_ms": 0.4365210043033585,
+   "p95_ms": 0.7718937486060895,
+   "warmup_calls": 50,
+   "what": "build_facts + features + prediction, one process, one thread"
+  },
+  "stand_in": {
+   "calls": 1000,
+   "max_ms": 0.9099169983528554,
+   "p50_ms": 0.4228749967296608,
+   "p95_ms": 0.7619211559358519,
+   "warmup_calls": 50,
+   "what": "build_facts + features + prediction, one process, one thread"
+  }
+ },
+ "limitations": [
+  "Labels are the solver's answers for simulated requests on synthetic data; stress states are counterfactual. Precision depends on the share of stress states (fixed at 50 %).",
+  "Latency is wall-clock on the machine that ran the evaluation and is not reproducible."
+ ],
+ "promotion": {
+  "checks": {
+   "hint_latency_p95_under_limit": {
+    "learner_p95_ms": 0.8642330063594272,
+    "limit_ms": 50.0,
+    "passed": true
+   },
+   "precision_higher_by_margin_and_ci_excludes_zero": {
+    "best_baseline": 0.9817905918057663,
+    "difference": 0.010196587681413183,
+    "difference_95ci": [
+     -0.00550351733620826,
+     0.034588270683572064
+    ],
+    "learner": 0.9919871794871795,
+    "passed": false,
+    "required_difference": 0.01,
+    "resamples": 2000
+   },
+   "recall_at_least_stand_in": {
+    "learner": 0.7946084724005135,
+    "passed": false,
+    "stand_in": 0.8575096277278562
+   }
+  },
+  "rule_file": "ml/leave_surrogate/PROMOTION_RULE.md"
+ },
+ "reporting_note": "Every report leads with the natural states, then the stress states, then the pooled mix, which is labelled: including simulated stress states. (JSON keys are sorted; this list is the order of display.)",
+ "reporting_order": [
+  "natural",
+  "stress",
+  "pooled"
+ ],
+ "results_sha256": "78caee72ff2e6c98bdb8a49cbed424fede85c91df20677a938ec5301180e1729",
+ "target": {
+  "definition": "1 = the solver says plain coverable; 0 = coverable with a trade-off or not coverable",
+  "kind": "binary",
+  "rule": "binary if coverable_with_trade_off is under 5 % of training rows or under 100 rows",
+  "training_trade_off_rows": 28,
+  "training_trade_off_share": 0.009408602150537635
+ },
+ "task": "Will the solver answer plain 'coverable' for this leave request? (instant hint)",
+ "test_2025": {
+  "lightgbm": {
+   "natural": {
+    "coverable_by_solver": 488,
+    "false_yes": 3,
+    "false_yes_not_coverable": 0,
+    "false_yes_trade_off": 3,
+    "n": 504,
+    "precision": 0.9933628318584071,
+    "recall": 0.9200819672131147,
+    "true_yes": 449,
+    "yes": 452
+   },
+   "pooled": {
+    "coverable_by_solver": 779,
+    "false_yes": 5,
+    "false_yes_not_coverable": 0,
+    "false_yes_trade_off": 5,
+    "n": 996,
+    "precision": 0.9919871794871795,
+    "recall": 0.7946084724005135,
+    "true_yes": 619,
+    "yes": 624
+   },
+   "pooled_label": "pooled including simulated stress states",
+   "stress": {
+    "coverable_by_solver": 291,
+    "false_yes": 2,
+    "false_yes_not_coverable": 0,
+    "false_yes_trade_off": 2,
+    "n": 492,
+    "precision": 0.9883720930232558,
+    "recall": 0.584192439862543,
+    "true_yes": 170,
+    "yes": 172
+   }
+  },
+  "logistic": {
+   "natural": {
+    "coverable_by_solver": 488,
+    "false_yes": 10,
+    "false_yes_not_coverable": 0,
+    "false_yes_trade_off": 10,
+    "n": 504,
+    "precision": 0.9789029535864979,
+    "recall": 0.9508196721311475,
+    "true_yes": 464,
+    "yes": 474
+   },
+   "pooled": {
+    "coverable_by_solver": 779,
+    "false_yes": 12,
+    "false_yes_not_coverable": 0,
+    "false_yes_trade_off": 12,
+    "n": 996,
+    "precision": 0.9817905918057663,
+    "recall": 0.8305519897304237,
+    "true_yes": 647,
+    "yes": 659
+   },
+   "pooled_label": "pooled including simulated stress states",
+   "stress": {
+    "coverable_by_solver": 291,
+    "false_yes": 2,
+    "false_yes_not_coverable": 0,
+    "false_yes_trade_off": 2,
+    "n": 492,
+    "precision": 0.9891891891891892,
+    "recall": 0.6288659793814433,
+    "true_yes": 183,
+    "yes": 185
+   }
+  },
+  "stand_in": {
+   "natural": {
+    "coverable_by_solver": 488,
+    "false_yes": 10,
+    "false_yes_not_coverable": 0,
+    "false_yes_trade_off": 10,
+    "n": 504,
+    "precision": 0.978021978021978,
+    "recall": 0.9118852459016393,
+    "true_yes": 445,
+    "yes": 455
+   },
+   "pooled": {
+    "coverable_by_solver": 779,
+    "false_yes": 62,
+    "false_yes_not_coverable": 45,
+    "false_yes_trade_off": 17,
+    "n": 996,
+    "precision": 0.915068493150685,
+    "recall": 0.8575096277278562,
+    "true_yes": 668,
+    "yes": 730
+   },
+   "pooled_label": "pooled including simulated stress states",
+   "stress": {
+    "coverable_by_solver": 291,
+    "false_yes": 52,
+    "false_yes_not_coverable": 45,
+    "false_yes_trade_off": 7,
+    "n": 492,
+    "precision": 0.8109090909090909,
+    "recall": 0.7663230240549829,
+    "true_yes": 223,
+    "yes": 275
+   }
+  },
+  "stand_in_counting_pending_sensitivity": {
+   "natural": {
+    "coverable_by_solver": 488,
+    "false_yes": 10,
+    "false_yes_not_coverable": 0,
+    "false_yes_trade_off": 10,
+    "n": 504,
+    "precision": 0.978021978021978,
+    "recall": 0.9118852459016393,
+    "true_yes": 445,
+    "yes": 455
+   },
+   "pooled": {
+    "coverable_by_solver": 779,
+    "false_yes": 33,
+    "false_yes_not_coverable": 16,
+    "false_yes_trade_off": 17,
+    "n": 996,
+    "precision": 0.9513274336283186,
+    "recall": 0.82798459563543,
+    "true_yes": 645,
+    "yes": 678
+   },
+   "pooled_label": "pooled including simulated stress states",
+   "stress": {
+    "coverable_by_solver": 291,
+    "false_yes": 23,
+    "false_yes_not_coverable": 16,
+    "false_yes_trade_off": 7,
+    "n": 492,
+    "precision": 0.8968609865470852,
+    "recall": 0.6872852233676976,
+    "true_yes": 200,
+    "yes": 223
+   }
+  }
+ },
+ "test_auc_pooled": {
+  "lightgbm": 0.982247120555125,
+  "logistic": 0.9799340996077921
+ },
+ "versions": {
+  "code": {
+   "c6_sources_sha256": "ba212060c4a630dce318de2d661c2f7659f662025b1dcfac52dcd3f9502d60da",
+   "git_commit_evaluated_on": "f0c8f52002ec807c480991fe5f17a1d866abeff9",
+   "mlflow": "3.17.1",
+   "numpy": "2.5.4",
+   "promotion_rule_sha256": "01530bc3ad36731ec68ffd12127a4b0bdf8af0da47c5ce0868d148ab3256d9fc",
+   "python": "3.12.13",
+   "scipy": "1.17.1",
+   "working_tree_dirty": true
+  },
+  "data": {
+   "labels_dataset_manifest_sha256": "1b5910d6eda6df7b8a7ea9f1c075be3fd226a53821359fd8b3c0c2451c29acff"
+  }
+ }
+}
