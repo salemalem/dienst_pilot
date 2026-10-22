@@ -22,3 +22,4 @@ ml/absence_forecast/artifacts/
 # C4 serving bundle: hashed byte for byte (eval/results/c4.json), never reformatted
 ml/preference_learner/artifacts/
 ml/mlflow/
+ml/cover_ranker/artifacts/

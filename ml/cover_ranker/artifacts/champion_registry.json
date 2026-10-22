@@ -1,0 +1,6 @@
+{
+ "registered_model": "c5-cover-ranker",
+ "alias": "champion",
+ "registry_version": 10,
+ "kind": "base_rate"
+}
