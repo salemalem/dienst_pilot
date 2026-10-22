@@ -1121,14 +1121,14 @@
     "understood": "Wir haben verstanden:",
     "parseWhy": "Ihr Text wird nur nach bekannten Wörtern und Daten gelesen; nichts darin wird als Anweisung ausgeführt.",
     "parseApply": "Übernehmen",
-    "parsedDays": "Sie können nicht an: {days}",
-    "parsedPrefer": "Lieber: {shifts}",
-    "parsedAvoid": "Lieber nicht: {shifts}",
+    "parsedPrefer": "Lieber, allgemein: {shifts}",
+    "parsedAvoid": "Lieber nicht, allgemein: {shifts}",
     "parsedWeekends": "Möglichst keine Wochenenden",
     "save": "Wünsche speichern",
     "saved": "Gespeichert. Wünsche sind keine Zusage.",
     "parseWhyAi": "Ihr Text wurde von einem Sprachmodell gelesen. Nichts darin wird als Anweisung ausgeführt, Gründe werden weder erfragt noch gespeichert, und es wird erst etwas übernommen, wenn Sie es bestätigen.",
-    "parsedSoft": "Lieber nicht: {items}"
+    "parsedSoft": "Lieber nicht: {shift} am {day}",
+    "parsedHard": "Kann nicht: {day}"
   },
   "m7": {
     "title": "Krank melden",

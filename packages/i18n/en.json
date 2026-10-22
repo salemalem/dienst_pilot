@@ -1121,14 +1121,14 @@
     "understood": "Here's what we understood:",
     "parseWhy": "Your text is only read for known words and dates; nothing in it is carried out as an instruction.",
     "parseApply": "Apply",
-    "parsedDays": "You can't work on: {days}",
-    "parsedPrefer": "Rather: {shifts}",
-    "parsedAvoid": "Rather not: {shifts}",
+    "parsedPrefer": "Rather, in general: {shifts}",
+    "parsedAvoid": "Rather not, in general: {shifts}",
     "parsedWeekends": "Preferably no weekends",
     "save": "Save wishes",
     "saved": "Saved. Wishes are not a promise.",
     "parseWhyAi": "Your text was read by a language model. Nothing in it is run as an instruction, reasons are neither asked for nor stored, and nothing is taken over until you confirm it.",
-    "parsedSoft": "Rather not: {items}"
+    "parsedSoft": "Rather not: {shift} on {day}",
+    "parsedHard": "Can't: {day}"
   },
   "m7": {
     "title": "Report sick",

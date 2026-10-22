@@ -114,3 +114,19 @@ test(`M1 switches the language and the choice sticks across a reload (${LANG} ru
   await expect(page.getByTestId("sign-in")).toHaveAccessibleName("Mit Klinik-Konto anmelden");
   await expect(page.locator("html")).toHaveAttribute("lang", "de");
 });
+
+test(`M4 in ${LANG}: the confirmation preview labels a hard entry "can't" before anything is saved`, async ({
+  page,
+}) => {
+  await signInDefault(page);
+  await page.goto("/wishes");
+  await page
+    .getByTestId("free-text")
+    .fill(LANG === "de" ? "Am 14.12. kann ich nicht." : "I can't work on 14.12.");
+  await page.getByTestId("parse").click();
+  const hard = page.getByTestId("parsed-hard-2026-12-14");
+  await expect(hard).toBeVisible();
+  await expect(hard).toContainText(LANG === "de" ? /^Kann nicht:/ : /^Can't:/);
+  // Nothing is saved yet: the apply button is the only way, and the preview says what it is.
+  await expect(page.getByTestId("parse-apply")).toBeVisible();
+});

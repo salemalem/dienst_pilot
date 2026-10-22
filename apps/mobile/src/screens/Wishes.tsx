@@ -333,25 +333,20 @@ export function WishesScreen(): ReactNode {
                 >
                   <Txt variant="bodyStrong">{t("m4.understood")}</Txt>
                   {parsed.ai_generated ? <AiLabel replayed={parsed.replayed} /> : null}
-                  {parsed.unavailable.length > 0 ? (
-                    <Txt>
-                      {t("m4.parsedDays", {
-                        days: parsed.unavailable.map((d) => fmt.dayMonth(d)).join(", "),
-                      })}
+                  {/* Every entry says what kind it is, so a slip is caught before saving. */}
+                  {parsed.unavailable.map((d) => (
+                    <Txt key={`hard-${d}`} testID={`parsed-hard-${d}`}>
+                      {t("m4.parsedHard", { day: fmt.dayMonth(d) })}
                     </Txt>
-                  ) : null}
-                  {parsed.avoid_shift_days.length > 0 ? (
-                    <Txt testID="parsed-soft">
+                  ))}
+                  {parsed.avoid_shift_days.map((x) => (
+                    <Txt key={`soft-${x.date}-${x.shift_type}`} testID={`parsed-soft-${x.date}`}>
                       {t("m4.parsedSoft", {
-                        items: parsed.avoid_shift_days
-                          .map(
-                            (x) =>
-                              `${t(`shift.${x.shift_type as "frueh"}.name`)} ${fmt.dayMonth(x.date)}`,
-                          )
-                          .join(", "),
+                        shift: t(`shift.${x.shift_type as "frueh"}.name`),
+                        day: fmt.dayMonth(x.date),
                       })}
                     </Txt>
-                  ) : null}
+                  ))}
                   {parsed.prefer_shifts.length > 0 ? (
                     <Txt>
                       {t("m4.parsedPrefer", {
