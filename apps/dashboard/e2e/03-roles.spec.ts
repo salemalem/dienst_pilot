@@ -53,12 +53,12 @@ test("Administrator: rules, master data and the demo clock", async ({ page }) =>
 test("W13: every component with its real status; none can change the roster", async ({ page }) => {
   await asPersona(page, "brandt");
   await page.goto("/de/ki-transparenz");
-  for (const c of ["C1", "C2"])
+  for (const c of ["C1", "C2", "C3"])
     await expect(page.getByTestId(`component-${c}`)).toHaveAttribute(
       "data-implementation",
       "built",
     );
-  for (const c of ["C3", "C4", "C5", "C6", "C7", "C8"]) {
+  for (const c of ["C4", "C5", "C6", "C7", "C8"]) {
     await expect(page.getByTestId(`component-${c}`)).toHaveAttribute(
       "data-implementation",
       "stand-in",
@@ -70,4 +70,7 @@ test("W13: every component with its real status; none can change the roster", as
   await expect(page.getByTestId("can-change").filter({ hasText: "Nein" })).toHaveCount(8);
   await expect(page.getByTestId("c1-metrics")).toContainText("Wünsche erfüllt");
   await expect(page.getByTestId("c2-metrics")).toContainText("71/71");
+  await expect(page.getByTestId("c3-served")).toContainText("Saisonal-naiv");
+  await expect(page.getByTestId("c3-metrics")).toContainText("Poisson-Devianz");
+  await expect(page.getByTestId("c3-promotion")).toContainText("nicht befördert");
 });

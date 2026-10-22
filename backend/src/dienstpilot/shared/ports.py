@@ -1,10 +1,11 @@
 """Interfaces for everything outside the domain: the clock and the eight intelligence components.
 
-Domain and application code depend on these protocols, never on an implementation. C1 and C2
-are built (Phase 7); C3–C8 are deterministic stand-ins until their phases.
+Domain and application code depend on these protocols, never on an implementation. C1, C2
+and C3 are built (Phases 7 and 8a); C4–C8 are deterministic stand-ins until their phases.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, Literal
@@ -88,12 +89,28 @@ class AbsenceForecast:
     high: float
 
 
+@dataclass(frozen=True)
+class ForecastContext:
+    """What the forecaster needs besides the absence history (all department level)."""
+
+    as_of: date  # today on the demo clock, never the system time; forecasts start tomorrow
+    night_shifts: Mapping[date, int]  # published night shifts per day, at least the last 7 days
+    holidays: frozenset[date]  # public holidays on the days to forecast
+    school_holidays: frozenset[date]  # school-holiday days on the days to forecast
+
+
 class AbsenceForecaster(Engine):
     """C3: expected absences per department and day."""
 
     @abstractmethod
-    def forecast(self, days: list[date], history: list[tuple[date, date]]) -> list[AbsenceForecast]:
-        """Forecast from past absence intervals (start, end) of the department."""
+    def forecast(
+        self, days: list[date], history: list[tuple[date, date]], context: ForecastContext
+    ) -> list[AbsenceForecast]:
+        """Forecast the days (1 to 42 days after ``context.as_of`` - 1) from past absences.
+
+        ``history`` holds the (start, end) intervals of the department's past absences.
+        Days up to ``as_of`` - 1 are treated as observed.
+        """
 
 
 @dataclass(frozen=True)

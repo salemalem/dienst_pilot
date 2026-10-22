@@ -6,7 +6,7 @@ return plain data; writes are explicit.
 
 import uuid
 from dataclasses import dataclass
-from datetime import date, time
+from datetime import date, time, timedelta
 from typing import Any
 
 from sqlalchemy import select
@@ -178,6 +178,20 @@ def holidays(session: Session, start: date, end: date) -> dict[date, tuple[str, 
     """Return public holidays (name DE, name EN) between start and end."""
     q = select(m.Holiday).where(m.Holiday.date >= start, m.Holiday.date <= end)
     return {h.date: (h.name_de, h.name_en) for h in session.scalars(q)}
+
+
+def school_holiday_days(session: Session, start: date, end: date) -> frozenset[date]:
+    """Return the days between start and end that fall into a school-holiday period."""
+    q = select(m.SchoolHoliday).where(
+        m.SchoolHoliday.end_date >= start, m.SchoolHoliday.start_date <= end
+    )
+    days: set[date] = set()
+    for p in session.scalars(q):
+        d = max(p.start_date, start)
+        while d <= min(p.end_date, end):
+            days.add(d)
+            d += timedelta(days=1)
+    return frozenset(days)
 
 
 def qualifications(session: Session) -> list[tuple[str, str, str]]:

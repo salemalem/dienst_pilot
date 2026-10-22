@@ -285,7 +285,7 @@
     },
     "coverage": {
       "title": "Coverage, next 14 days",
-      "note": "Dashed bands: expected absences per day, stand-in forecast, department level only.",
+      "note": "Dashed bands: expected absences per day with an 80 % interval, forecast of C3, department level only.",
       "date": "Day",
       "staffing": "Staffing",
       "short": "{count} short",
@@ -840,6 +840,8 @@
     "notApplicable": "Not applicable (no learning component)",
     "modelCard": "Model card",
     "modelCardNone": "Not available yet",
+    "trainedC3": "Trained on synthetic data, 2021 to 2024",
+    "modelCardC3": "docs/model-cards/c3-absence-forecaster.md",
     "canChange": "Can change the roster",
     "yes": "Yes",
     "no": "No",
@@ -857,7 +859,21 @@
       "spread": "Burden spread (mean)",
       "seconds": "Median {seconds} s per variant",
       "agreePublished": "Agreement with the independent checker, published months",
-      "agreeRandom": "Agreement on random changes"
+      "agreeRandom": "Agreement on random changes",
+      "c3Served": "Served model: {model}. Held-out test: 2025, never used for training or selection.",
+      "c3Model": "Model",
+      "c3Mae": "Mean absolute error (people per day)",
+      "c3Deviance": "Poisson deviance",
+      "c3Coverage": "Coverage of the 80 % interval",
+      "c3Promoted": "The LightGBM challenger was promoted by the rule written before the run.",
+      "c3NotPromoted": "The LightGBM challenger was not promoted: it did not beat the best baseline by the rule written before the run. The baseline stays in service.",
+      "c3Truth": "Agreement with the true seasonal pattern (correlation of the 28-day smoothed forecast, made 14 days ahead, with the generator's true expectation): {corr}",
+      "c3Models": {
+        "seasonal_naive": "Seasonal naive (baseline)",
+        "poisson_glm": "Poisson GLM (baseline)",
+        "nb_glm": "Negative-binomial GLM (baseline)",
+        "lightgbm": "LightGBM (challenger)"
+      }
     },
     "group": {
       "rules": {

@@ -285,7 +285,7 @@
     },
     "coverage": {
       "title": "Besetzung, nächste 14 Tage",
-      "note": "Gestrichelte Bänder: erwartete Ausfälle pro Tag, Platzhalter-Prognose, nur auf Abteilungsebene.",
+      "note": "Gestrichelte Bänder: erwartete Ausfälle pro Tag mit 80-%-Intervall, Prognose von C3, nur auf Abteilungsebene.",
       "date": "Tag",
       "staffing": "Besetzung",
       "short": "{count} fehlt",
@@ -839,6 +839,8 @@
     "notTrained": "Nicht trainiert (Platzhalter)",
     "notApplicable": "Entfällt (keine Lernkomponente)",
     "modelCard": "Modellkarte",
+    "trainedC3": "Mit synthetischen Daten 2021 bis 2024 trainiert",
+    "modelCardC3": "docs/model-cards/c3-absence-forecaster.md",
     "modelCardNone": "Noch nicht vorhanden",
     "canChange": "Kann den Dienstplan ändern",
     "yes": "Ja",
@@ -857,7 +859,21 @@
       "spread": "Belastungsspanne (Mittel)",
       "seconds": "Median {seconds} s je Variante",
       "agreePublished": "Übereinstimmung mit dem unabhängigen Prüfer, veröffentlichte Monate",
-      "agreeRandom": "Übereinstimmung bei zufälligen Änderungen"
+      "agreeRandom": "Übereinstimmung bei zufälligen Änderungen",
+      "c3Served": "Eingesetztes Modell: {model}. Zurückgehaltener Test: 2025, nie für Training oder Auswahl verwendet.",
+      "c3Model": "Modell",
+      "c3Mae": "Mittlerer absoluter Fehler (Personen pro Tag)",
+      "c3Deviance": "Poisson-Devianz",
+      "c3Coverage": "Abdeckung des 80-%-Intervalls",
+      "c3Promoted": "Der LightGBM-Herausforderer wurde nach der vor dem Lauf festgelegten Regel befördert.",
+      "c3NotPromoted": "Der LightGBM-Herausforderer wurde nicht befördert: Er hat die beste Baseline nach der vor dem Lauf festgelegten Regel nicht geschlagen. Die Baseline bleibt im Einsatz.",
+      "c3Truth": "Übereinstimmung mit dem wahren Saisonmuster (Korrelation der über 28 Tage geglätteten, 14 Tage im Voraus erstellten Prognose mit der wahren Erwartung des Generators): {corr}",
+      "c3Models": {
+        "seasonal_naive": "Saisonal-naiv (Baseline)",
+        "poisson_glm": "Poisson-GLM (Baseline)",
+        "nb_glm": "Negativ-binomiales GLM (Baseline)",
+        "lightgbm": "LightGBM (Herausforderer)"
+      }
     },
     "group": {
       "rules": {

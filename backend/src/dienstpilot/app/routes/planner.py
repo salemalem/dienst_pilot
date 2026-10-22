@@ -42,6 +42,7 @@ from dienstpilot.operations import service as operations
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.requests import service as requests
+from dienstpilot.shared.ports import ForecastContext
 from dienstpilot_validator import Assignment, Violation
 
 router = APIRouter(tags=["planner dashboard"])
@@ -856,11 +857,19 @@ def overview(c: CtxDep, _: PlannerDep) -> Overview:
     demand = organization.demand(c.session, days[0], days[-1])
     history = [
         (a.start_date, a.end_date)
-        for a in operations.absences(
-            c.session, list(dep.staff), date(2021, 1, 1), date(2025, 12, 31)
-        )
+        for a in operations.absences(c.session, list(dep.staff), date(2021, 1, 1), today)
     ]
-    forecast = {f.day: f for f in c.engines.forecaster.forecast(days, history)}
+    night_shifts: dict[date, int] = {}
+    for n in planning.assignments(c.session, today - timedelta(days=7), today):
+        if n.shift_type == "nacht":
+            night_shifts[n.day] = night_shifts.get(n.day, 0) + 1
+    context = ForecastContext(
+        as_of=today,  # the demo clock, never the system time
+        night_shifts=night_shifts,
+        holidays=frozenset(organization.holidays(c.session, days[0], days[-1])),
+        school_holidays=organization.school_holiday_days(c.session, days[0], days[-1]),
+    )
+    forecast = {f.day: f for f in c.engines.forecaster.forecast(days, history, context)}
     coverage = []
     for d in days:
         short = 0
