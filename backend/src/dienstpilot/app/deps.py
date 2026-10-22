@@ -37,7 +37,10 @@ def get_engines() -> Engines:
     return default_engines()
 
 
-SessionDep = Annotated[Session, Depends(get_session)]
+# scope="function": the session commits after the handler and BEFORE the response is sent. With the
+# default scope the commit ran after the response, so a client's next request could read the old
+# state (a read-after-write race that showed up as flaky e2e tests).
+SessionDep = Annotated[Session, Depends(get_session, scope="function")]
 ClockDep = Annotated[Clock, Depends(get_clock)]
 EnginesDep = Annotated[Engines, Depends(get_engines)]
 
