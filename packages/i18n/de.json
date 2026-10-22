@@ -848,7 +848,7 @@
   },
   "w13": {
     "title": "KI-Transparenz",
-    "status": "{built, plural, one {# Komponente gebaut} other {# Komponenten gebaut}}, {standIn, plural, one {# Platzhalter} other {# Platzhalter}}",
+    "status": "{built} von {total} Komponenten gebaut, {standIn, plural, one {# Platzhalter} other {# Platzhalter}}",
     "intro": "Acht Komponenten arbeiten im Dienstplan. Keine kann den Dienstplan ändern: Freigeben und veröffentlichen kann nur die Planung. Gebaut sind die Komponenten, deren Messwerte aus eval/results stammen; alle anderen sind als Platzhalter gekennzeichnet, bis ihre Skripte laufen.",
     "name": {
       "C1": "Dienstplan-Optimierer",
@@ -1012,7 +1012,10 @@
       "RAG": "Findet Stellen im Arbeitszeitgesetz und in den Abteilungsdokumenten zu einer Frage und nennt immer die Fundstelle. Findet sie nichts, sagt sie das. Sie sucht nur; sie antwortet und entscheidet nicht."
     },
     "trainedRAG": "Nicht trainiert: Vektoren eines vortrainierten Modells (bge-m3), lokal berechnet",
-    "modelCardRAG": "docs/model-cards/rag-rulebook.md"
+    "modelCardRAG": "docs/model-cards/rag-rulebook.md",
+    "statusExtra": "Zusätzlich, ohne Nummer: {extras}",
+    "built": "gebaut",
+    "standIn": "Platzhalter"
   },
   "qualification": {
     "any": "ohne besondere Qualifikation",

@@ -848,7 +848,7 @@
   },
   "w13": {
     "title": "AI transparency",
-    "status": "{built, plural, one {# component built} other {# components built}}, {standIn, plural, one {# stand-in} other {# stand-ins}}",
+    "status": "{built} of {total} components built, {standIn, plural, one {# stand-in} other {# stand-ins}}",
     "intro": "Eight components work in the roster. None can change the roster: only the Planner approves and publishes. The components whose figures come from eval/results are built; all others are marked as stand-ins until their scripts run.",
     "name": {
       "C1": "Roster optimizer",
@@ -1012,7 +1012,10 @@
       "RAG": "Finds passages in the Working Hours Act and the department's documents for a question and always names the source. If it finds nothing, it says so. It only retrieves; it does not answer or decide."
     },
     "trainedRAG": "Not trained: vectors of a pre-trained model (bge-m3), computed locally",
-    "modelCardRAG": "docs/model-cards/rag-rulebook.md"
+    "modelCardRAG": "docs/model-cards/rag-rulebook.md",
+    "statusExtra": "Also, without a number: {extras}",
+    "built": "built",
+    "standIn": "stand-in"
   },
   "qualification": {
     "any": "no particular qualification",

@@ -138,6 +138,7 @@ async def test_rules_search_through_mcp_has_citations(client: TestClient) -> Non
     async with mcp(client) as app, connect(app, "rules", token(client, "vogel")) as c:
         r = await c.call_tool("search_rules", {"query": q})
         one = await c.call_tool("get_rule", {"rule_id": "arbzg:§5:1"})
+    assert (r.structured_content["mode"], r.structured_content["fallback"]) == ("vector", False)  # type: ignore[index]
     assert r.structured_content["found"] is True  # type: ignore[index]
     assert any(p["id"] == "arbzg:§5:1" for p in r.structured_content["passages"])  # type: ignore[index]
     assert one.structured_content["citation"].startswith("Arbeitszeitgesetz")  # type: ignore[index]
@@ -174,3 +175,14 @@ async def test_proposals_are_the_only_write_and_the_roster_is_untouched(
         ("announcement", "copilot", "open"),
     }
     assert snapshot() == before
+
+
+async def test_search_rules_reports_the_fallback_when_the_model_is_missing(
+    client: TestClient,
+) -> None:
+    client.app.dependency_overrides[get_embedder] = lambda: None  # type: ignore[attr-defined]
+    async with mcp(client) as app, connect(app, "rules", token(client, "brandt")) as c:
+        r = await c.call_tool("search_rules", {"query": "Ruhezeit Stunden"})
+    sc = r.structured_content
+    assert (sc["mode"], sc["configured"], sc["fallback"]) == ("fts-only", "vector", True)  # type: ignore[index]
+    assert sc["passages"], "full-text still finds passages"  # type: ignore[index]

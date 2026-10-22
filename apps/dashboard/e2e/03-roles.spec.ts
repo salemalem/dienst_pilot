@@ -68,6 +68,22 @@ test("W13: every component with its real status; none can change the roster", as
     ).toBeVisible();
   }
   await expect(page.getByTestId("can-change").filter({ hasText: "Nein" })).toHaveCount(9);
+  // The summary line is computed from the cards on screen: the eight numbered components only,
+  // with the unnumbered rulebook card named after the count, never added to it.
+  const numbered = await page.locator('[data-testid^="component-C"]').count();
+  const built = await page
+    .locator('[data-testid^="component-C"][data-implementation="built"]')
+    .count();
+  const standIns = await page
+    .locator('[data-testid^="component-C"][data-implementation="stand-in"]')
+    .count();
+  expect(numbered).toBe(8);
+  await expect(
+    page.getByText(
+      `${String(built)} von ${String(numbered)} Komponenten gebaut, ${String(standIns)} Platzhalter`,
+    ),
+  ).toBeVisible();
+  await expect(page.getByText("Zusätzlich, ohne Nummer: Regelwerk-Suche (gebaut)")).toBeVisible();
   await expect(page.getByTestId("rag-served")).toContainText("Nur Vektoren");
   await expect(page.getByTestId("rag-check")).toContainText("durchgefallen");
   await expect(page.getByTestId("c1-metrics")).toContainText("Wünsche erfüllt");

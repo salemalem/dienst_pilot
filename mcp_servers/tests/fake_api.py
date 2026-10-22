@@ -167,8 +167,10 @@ async def rules(request: Request) -> JSONResponse:
                     "cosine": 0.7,
                 }
             ],
-            "mode": "hybrid",
-            "vector_used": True,
+            "mode": "fts-only" if request.query_params.get("q") == "nomodel" else "vector",
+            "configured": "vector",
+            "fallback": request.query_params.get("q") == "nomodel",
+            "vector_used": request.query_params.get("q") != "nomodel",
         }
     )
 

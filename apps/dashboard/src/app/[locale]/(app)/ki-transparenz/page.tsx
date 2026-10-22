@@ -584,28 +584,36 @@ const GROUPS = [
   { key: "llm", kinds: ["llm"] },
 ] as const;
 
+/**
+ * The summary line is computed from the cards on screen. It counts the numbered components (C1 to
+ * C8) only, so "6 of 8" is always about those eight; cards without a number (the rulebook
+ * search) are named after it with their own status, never added to the count.
+ */
+function statusLine(list: Component[], t: ReturnType<typeof useTranslations<"w13">>): string {
+  const numbered = list.filter((c) => /^C\d$/.test(c.component));
+  const extras = list.filter((c) => !/^C\d$/.test(c.component));
+  const line = t("status", {
+    built: numbered.filter((c) => c.implementation === "built").length,
+    total: numbered.length,
+    standIn: numbered.filter((c) => c.implementation === "stand-in").length,
+  });
+  if (extras.length === 0) return line;
+  const names = extras
+    .map(
+      (c) =>
+        `${t(`name.${c.component as "RAG"}`)} (${t(c.implementation === "built" ? "built" : "standIn")})`,
+    )
+    .join(", ");
+  return `${line} · ${t("statusExtra", { extras: names })}`;
+}
+
 /** W13: one card per component with its real status; the portfolio's "how it works" screen. */
 export default function TransparencyPage(): ReactNode {
   const t = useTranslations("w13");
   const q = useQuery((api) => unwrap(api.GET("/transparency/components")), []);
   return (
     <>
-      <PageHeader
-        title={t("headline")}
-        status={
-          q.data
-            ? t("status", {
-                // The eight numbered components; the rulebook search has a card but no number.
-                built: q.data.filter(
-                  (c) => /^C\d$/.test(c.component) && c.implementation === "built",
-                ).length,
-                standIn: q.data.filter(
-                  (c) => /^C\d$/.test(c.component) && c.implementation === "stand-in",
-                ).length,
-              })
-            : undefined
-        }
-      />
+      <PageHeader title={t("headline")} status={q.data ? statusLine(q.data, t) : undefined} />
       <p className="body m-0 max-w-[80ch]">{t("intro")}</p>
       <Async query={q}>
         {(list) => (

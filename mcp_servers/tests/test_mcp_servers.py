@@ -134,6 +134,21 @@ async def test_what_if_and_rules_results_are_typed_and_without_names() -> None:
         ) as c:
             s = await c.call_tool("search_rules", {"query": "Ruhezeit Stunden"})
         assert s.structured_content["passages"][0]["citation"].startswith("ArbZG § 5")  # type: ignore[index]
+        sc = s.structured_content
+        assert (sc["mode"], sc["configured"], sc["fallback"]) == ("vector", "vector", False)  # type: ignore[index]
+
+
+async def test_search_rules_tells_the_agent_when_it_is_in_full_text_fallback() -> None:
+    async with running() as app:
+        async with Client(
+            streamable_http_client("http://mcp/rules/mcp", http_client=http(app, "tok-planner"))
+        ) as c:
+            s = await c.call_tool("search_rules", {"query": "nomodel"})
+            listed = {t.name: t for t in (await c.list_tools()).tools}
+        sc = s.structured_content
+        assert (sc["mode"], sc["configured"], sc["fallback"]) == ("fts-only", "vector", True)  # type: ignore[index]
+        props = listed["search_rules"].output_schema["properties"]  # type: ignore[index]
+        assert {"mode", "configured", "fallback"} <= set(props)
 
 
 async def test_the_only_writes_are_proposals_and_the_api_decides_who_may() -> None:
