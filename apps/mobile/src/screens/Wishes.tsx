@@ -1,5 +1,5 @@
 import { unwrap, type components } from "@dienstpilot/api-client";
-import { daysInMonth, weekdayIndex } from "@dienstpilot/i18n";
+import { daysInMonth, formatPercent, weekdayIndex } from "@dienstpilot/i18n";
 import { spacing } from "@dienstpilot/design-tokens";
 import { Check, Star, X } from "lucide-react-native";
 import { useEffect, useState, type ReactNode } from "react";
@@ -26,6 +26,7 @@ export function WishesScreen(): ReactNode {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const fmt = useFmt();
+  const pct = (v: number): string => formatPercent(v, i18n.language === "en" ? "en" : "de", 1);
   const { api, settings } = useSession();
   const q = useQuery((a) => unwrap(a.GET("/me/wishes")), []);
   const [entries, setEntries] = useState<Entry[] | null>(null);
@@ -226,7 +227,17 @@ export function WishesScreen(): ReactNode {
                 <Suggestion
                   key={`${h.kind}-${String(h.weekday)}-${h.shift_type}`}
                   engine={q.data?.suggestions_engine}
-                  reasons={[t("m4.hintWhy", { n: h.evidence })]}
+                  reasons={[
+                    t(h.kind === "avoid" ? "m4.hintWhyAvoid" : "m4.hintWhyPrefer", {
+                      shift: t(`shift.${h.shift_type as "frueh"}.name`),
+                      weekday: fmt.weekday(weekdayNames[h.weekday] ?? "2026-10-19"),
+                      n: h.evidence,
+                      trials: h.trials,
+                      own: pct(h.evidence / Math.max(h.trials, 1)),
+                      dept: pct(h.department_rate),
+                    }),
+                    t("m4.hintWhyModel", { model: q.data?.suggestions_engine.version ?? "" }),
+                  ]}
                   testID="hint"
                   actions={
                     <>
@@ -254,7 +265,6 @@ export function WishesScreen(): ReactNode {
                     {t(h.kind === "avoid" ? "m4.hintAvoid" : "m4.hintPrefer", {
                       shift: t(`shift.${h.shift_type as "frueh"}.name`),
                       weekday: fmt.weekday(weekdayNames[h.weekday] ?? "2026-10-19"),
-                      n: h.evidence,
                     })}
                   </Txt>
                 </Suggestion>

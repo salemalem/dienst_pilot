@@ -2787,6 +2787,14 @@ export interface components {
             shift_type: string;
             /** Evidence */
             evidence: number;
+            /** Trials */
+            trials: number;
+            /** Rate */
+            rate: number;
+            /** Department Rate */
+            department_rate: number;
+            /** Probability */
+            probability: number;
         };
         /**
          * SwapAudience

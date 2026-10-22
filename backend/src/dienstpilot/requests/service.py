@@ -78,6 +78,17 @@ def responses(session: Session, window_id: str) -> dict[str, datetime]:
     return {str(r.staff_id): r.submitted_at for r in session.scalars(q)}
 
 
+def answered_months(session: Session, staff_id: str) -> list[date]:
+    """Return the roster months of the request windows a person answered."""
+    q = (
+        select(m.RequestWindow.roster_month)
+        .join(m.WindowResponse, m.WindowResponse.window_id == m.RequestWindow.id)
+        .where(m.WindowResponse.staff_id == uuid.UUID(staff_id))
+        .order_by(m.RequestWindow.roster_month)
+    )
+    return list(session.scalars(q))
+
+
 def preferences(
     session: Session, window_id: str, staff_id: str | None = None
 ) -> list[PreferenceEntry]:

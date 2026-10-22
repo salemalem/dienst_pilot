@@ -10,11 +10,11 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | — | Process design (roles, approvals, monthly cycle) | Domain design | Done, with clinical input |
 | — | System architecture (this document) | Design | Done |
 | — | Synthetic data generator (`synthdata/`) | Simulation | Prototype |
-| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C4–C8), job worker | Application | Prototype |
+| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C5–C8), job worker | Application | Prototype |
 | C1 | Roster Optimizer (`engine/solver/`) | Constraint optimization | Built & evaluated on synthetic data (`eval/results/benchmark.json`) |
 | C2 | Rule and Compliance Validator (`engine/validator/`) | Deterministic | Built & evaluated on synthetic data (`eval/results/c2.json`) |
 | C3 | Absence Forecaster (`ml/`) | ML, time series | Built & evaluated on synthetic data (`eval/results/c3.json`). The served model is the seasonal-naive baseline: the LightGBM challenger did not meet the promotion rule (model card) |
-| C4 | Preference Learner | ML, Bayesian | Designed |
+| C4 | Preference Learner (`ml/`) | ML, Bayesian | Built & evaluated on synthetic data (`eval/results/c4.json`). The served model is the raw per-person-rates baseline: the hierarchical learner did not meet the promotion rule (model card) |
 | C5 | Cover Acceptance Ranker | ML, classification + policy | Designed |
 | C6 | Leave Feasibility Surrogate | ML, simulation-trained | Designed |
 | C7 | Request Intake Agent | LLM, structured output | Designed |
@@ -203,7 +203,9 @@ A pure function `validate(roster, ruleset) → list[Violation]`, implemented ind
 
 **Evaluation.** Held-out log-likelihood against a pooled baseline; on synthetic data, rank correlation between learned and true latent preferences.
 
-**Guardrail.** Suggestions only. Nothing reaches the solver until the person confirms it; the feature can be switched off per person.
+**Guardrail.** Suggestions only. Nothing reaches the solver until the person confirms it; the feature can be switched off per person. When it is off, nothing is computed for that person. Inferred preferences are visible to the person only: computed on their own request from their own history, never stored, never returned to the Planner or Oversight. The committed bundle holds department-level rates only.
+
+**Status.** Built and evaluated on synthetic data under `ml/preference_learner/PROMOTION_RULE.md` (committed before any fitting): the result file `eval/results/c4.json` and the model card `docs/model-cards/c4-preference-learner.md` say which model is served and why (ADR-013).
 
 ### C5: Cover Acceptance Ranker (Vertretungsvorschlag)
 
@@ -351,6 +353,8 @@ The agent service is an MCP client. The same servers can be connected to other M
   - ADR-003 Aggregate-only absence forecasting
   - ADR-004 Agents create proposals; no approve or publish tools
   - ADR-005 Self-hosted embeddings for the rulebook
+  - ADR-012 C3 serving, the promotion rule, and dataset identity without DVC
+  - ADR-013 C4 serving, the person-only privacy boundary, and the same promotion convention
 
 ## 15. Security and compliance
 
@@ -397,7 +401,7 @@ C1 is the recommended variant (profile `balanced`), its weights tuned on 2024-07
 Limitations: Each month is compared independently from the same as-worked history (the manual roster and its in-month changes); C1's months are not chained into a year. In-month violations exist only for the baseline and follow from a simulation parameter (manual_rule_check_rate, synthdata ASSUMPTIONS.md §13); they are not a finding about real planners. Synthetic data of a fictional department; no real hospital.
 <!-- benchmark:end -->
 
-Model metrics (C3–C6) and agent eval results (C7, C8) are reported in their model cards and in `eval/results/`. C3 is built: `eval/results/c3.json` and `docs/model-cards/c3-absence-forecaster.md` (table rendered from the result by `eval/render_tables.py`).
+Model metrics (C3–C6) and agent eval results (C7, C8) are reported in their model cards and in `eval/results/`. C3 and C4 are built: `eval/results/c3.json` and `docs/model-cards/c3-absence-forecaster.md`, `eval/results/c4.json` and `docs/model-cards/c4-preference-learner.md` (tables rendered from the results by `eval/render_tables.py`).
 
 ### 17.2 Pilot design (next step, not started)
 

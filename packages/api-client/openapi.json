@@ -7275,6 +7275,22 @@
           "evidence": {
             "type": "integer",
             "title": "Evidence"
+          },
+          "trials": {
+            "type": "integer",
+            "title": "Trials"
+          },
+          "rate": {
+            "type": "number",
+            "title": "Rate"
+          },
+          "department_rate": {
+            "type": "number",
+            "title": "Department Rate"
+          },
+          "probability": {
+            "type": "number",
+            "title": "Probability"
           }
         },
         "type": "object",
@@ -7282,7 +7298,11 @@
           "kind",
           "weekday",
           "shift_type",
-          "evidence"
+          "evidence",
+          "trials",
+          "rate",
+          "department_rate",
+          "probability"
         ],
         "title": "Suggestion",
         "description": "A preference suggestion the person can confirm (C4)."

@@ -5,7 +5,6 @@ Every response that uses one says so.
 """
 
 import re
-from collections import Counter
 from datetime import date, timedelta
 from typing import Literal
 
@@ -20,39 +19,9 @@ from dienstpilot.shared.ports import (
     LeaveFeasibility,
     LeaveHint,
     ParsedPreferences,
-    PreferenceLearner,
-    PreferenceSuggestion,
 )
 
 STANDIN_VERSION = "standin-0.1"
-
-
-class PreferenceStandIn(PreferenceLearner):
-    """C4 stand-in: counts how often a weekday and shift was wished for or swapped away."""
-
-    info = EngineInfo(
-        "C4",
-        "stand-in",
-        STANDIN_VERSION,
-        "Counts of stated wishes and swapped-away shifts; Bayesian model in phase 8.",
-        8,
-    )
-
-    def suggest(
-        self, wishes: list[tuple[date, str | None]], swapped_away: list[tuple[date, str]]
-    ) -> list[PreferenceSuggestion]:
-        """Suggest at most three preferences with enough evidence."""
-        prefer = Counter((d.weekday(), s) for d, s in wishes if s)
-        avoid = Counter((d.weekday(), s) for d, s in swapped_away)
-        out = [
-            PreferenceSuggestion("avoid", wd, s, n) for (wd, s), n in avoid.most_common() if n >= 2
-        ]
-        out += [
-            PreferenceSuggestion("prefer", wd, s, n)
-            for (wd, s), n in prefer.most_common()
-            if n >= 3
-        ]
-        return sorted(out, key=lambda x: (-x.evidence, x.kind, x.weekday, x.shift_type))[:3]
 
 
 class CoverRankStandIn(CoverRanker):

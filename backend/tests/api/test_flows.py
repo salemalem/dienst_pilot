@@ -439,12 +439,21 @@ def test_transparency_lists_eight_components_none_can_change_the_roster(
 ) -> None:
     comps = client.get("/transparency/components", headers=login("kaya")).json()
     assert [c["component"] for c in comps] == [f"C{i}" for i in range(1, 9)]
-    assert {c["component"] for c in comps if c["implementation"] == "built"} == {"C1", "C2", "C3"}
+    assert {c["component"] for c in comps if c["implementation"] == "built"} == {
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+    }
     assert {c["component"] for c in comps if c["implementation"] == "stand-in"} == {
-        f"C{i}" for i in range(4, 9)
+        f"C{i}" for i in range(5, 9)
     }
     c3 = next(c for c in comps if c["component"] == "C3")
     assert c3["eval_metric"]["test_2025"][c3["eval_metric"]["champion"]["kind"]]["mae"] > 0
+    c4 = next(c for c in comps if c["component"] == "C4")
+    assert (
+        c4["eval_metric"]["test_2025"][c4["eval_metric"]["champion"]["kind"]]["wish"]["mean_ll"] < 0
+    )
     assert not any(c["can_change_roster"] for c in comps)
 
 
