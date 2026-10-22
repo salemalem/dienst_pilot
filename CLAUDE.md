@@ -24,7 +24,7 @@ This repository is a **portfolio prototype**. It has to stay demonstrably real: 
 
 - **Backend:** Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2 + Alembic, PostgreSQL 16 with pgvector, Redis 7 (arq for jobs, Streams for events)
 - **Optimization:** Google OR-Tools CP-SAT
-- **ML:** polars/pandas, scikit-learn, LightGBM, statsmodels; MLflow (tracking + model registry); DVC for datasets
+- **ML:** polars/pandas, scikit-learn, LightGBM, statsmodels; MLflow (tracking + model registry, local SQLite store); dataset identity through the generator manifest hashes (ADR-012; no DVC)
 - **Agents:** LangGraph, Anthropic Python SDK, MCP Python SDK (Streamable HTTP transport); Langfuse (self-hosted) for traces
 - **RAG:** pgvector + Postgres full-text search (hybrid), bge-m3 embeddings served locally
 - **Planner dashboard:** Next.js (App Router), TypeScript strict, Tailwind, next-intl
@@ -54,7 +54,7 @@ dienstpilot/
 ├── engine/
 │   ├── solver/              C1 roster optimizer (CP-SAT)
 │   └── validator/           C2 independent rule checker
-├── ml/
+├── ml/                      one package (`ml/src/dienstpilot_ml/`) with the subpackages below; PROMOTION_RULE.md and the served bundle sit in `ml/absence_forecast/`
 │   ├── features/            one feature module shared by training and serving
 │   ├── absence_forecast/    C3
 │   ├── preference_learner/  C4
@@ -121,6 +121,8 @@ Tests pass; type checks clean; import-linter contracts hold; docs updated (statu
 
 Fill these in as they are built: `make train`, `make eval`, `make screenshots` (Phase 6, after the staff app).
 
+- `make train`: C3 (`ml/`): rolling-origin CV on 2021 to 2024, fits the seasonal-naive, Poisson-GLM, negative-binomial-GLM and LightGBM candidates deterministically, logs and registers them in the local MLflow store `ml/mlflow/` (git-ignored). Promotion happens in `make eval`.
+
 - `make dev`: installs dependencies, starts Postgres 16 + pgvector, Redis, the API and the job worker in Docker (`infra/compose.dev.yml`, API on :8000), then the dashboard (:3000) and the Expo app on web (:8081). `make down` stops Docker.
 - `make seed`: rebuilds the database from the synthetic seed. Generates `data/synthetic/v1/` if the seed or generator version changed (`SEED=20261020` by default), resets the schema with Alembic, then loads the Parquet. The Docker Postgres listens on host port 5433.
 - `make test`: pytest, then vitest for the packages. Database tests run when `TEST_DATABASE_URL` points to a Postgres the tests may wipe.
@@ -129,7 +131,7 @@ Fill these in as they are built: `make train`, `make eval`, `make screenshots` (
 - `make lint`: ruff, mypy `--strict`, import-linter, eslint, tsc, prettier.
 - `make format`: apply ruff and prettier formatting.
 - `make api-client`: regenerate `packages/api-client` from the backend's OpenAPI schema.
-- `make eval`: validator eval (`eval/results/c2.json`), the full benchmark on 2025 (`benchmark.json`, `c1.json`, about 10 minutes) and the ARCHITECTURE §17.1 table. CI runs the one-month smoke benchmark and checks that its results hash matches the committed one.
+- `make eval`: validator eval (`eval/results/c2.json`), the full benchmark on 2025 (`benchmark.json`, `c1.json`, about 10 minutes), the ARCHITECTURE §17.1 table, and C3 (`make train`, then `eval/run_c3_eval.py`: scores 2025 once, applies `ml/absence_forecast/PROMOTION_RULE.md`, exports the champion bundle to `ml/absence_forecast/artifacts/champion/`, writes `c3.json`). CI runs the one-month smoke benchmark and checks that its results hash matches the committed one.
 - `make screenshots`: rebuilds both apps, then captures the UI_SPEC §6 list in DE and EN (each language on a fresh seed, demo clock per scene) into `screenshots/<lang>/<theme>/`, with a contact sheet per language and `screenshots/INDEX.md`; PNGs are re-encoded losslessly (sharp). `pnpm --filter @dienstpilot/screenshots compare` writes reference-versus-app side-by-sides to `review/` (git-ignored).
 - `make tune`: re-tune the balanced profile on July to December 2024 (`eval/results/tuning.json`); copy the winner into `PROFILES` (a test checks they agree).
 

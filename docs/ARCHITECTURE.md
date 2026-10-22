@@ -10,10 +10,10 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | — | Process design (roles, approvals, monthly cycle) | Domain design | Done, with clinical input |
 | — | System architecture (this document) | Design | Done |
 | — | Synthetic data generator (`synthdata/`) | Simulation | Prototype |
-| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C3–C8), job worker | Application | Prototype |
+| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C4–C8), job worker | Application | Prototype |
 | C1 | Roster Optimizer (`engine/solver/`) | Constraint optimization | Built & evaluated on synthetic data (`eval/results/benchmark.json`) |
 | C2 | Rule and Compliance Validator (`engine/validator/`) | Deterministic | Built & evaluated on synthetic data (`eval/results/c2.json`) |
-| C3 | Absence Forecaster | ML, time series | Designed |
+| C3 | Absence Forecaster (`ml/`) | ML, time series | Built & evaluated on synthetic data (`eval/results/c3.json`). The served model is the seasonal-naive baseline: the LightGBM challenger did not meet the promotion rule (model card) |
 | C4 | Preference Learner | ML, Bayesian | Designed |
 | C5 | Cover Acceptance Ranker | ML, classification + policy | Designed |
 | C6 | Leave Feasibility Surrogate | ML, simulation-trained | Designed |
@@ -103,7 +103,7 @@ Contexts never read each other's tables. Cross-context reads use public query se
 
 ## 8. Data architecture
 
-**Store.** One PostgreSQL 16 instance with one schema per context, plus pgvector for retrieval. Redis holds job queues (arq) and event streams. Datasets and model artefacts live in object storage, versioned with DVC and MLflow.
+**Store.** One PostgreSQL 16 instance with one schema per context, plus pgvector for retrieval. Redis holds job queues (arq) and event streams. Datasets are identified by the generator's `manifest.json` (seed, generator version, a SHA-256 per file), and eval results record the hashes of the files they read (ADR-012; DVC is not used). Model artefacts are tracked and registered with MLflow.
 
 **Core entities.** `Staff`, `Contract` (hours band, start/end), `Qualification`, `ShiftType` (start, end, hours, burden weight), `ShiftDemand` (date × shift type × qualification → required count), `RuleSet` (versioned, `effective_from`), `RequestWindow`, `Preference`, `LeaveRequest`, `RosterRun` (inputs + versions), `RosterVariant`, `Assignment`, `Approval`, `SwapOffer`, `Absence`, `CoverCascade`, `CoverOffer`, `Proposal`, `BurdenLedgerEntry`, `AuditEvent`, `ModelVersion`.
 
@@ -190,6 +190,8 @@ A pure function `validate(roster, ruleset) → list[Violation]`, implemented ind
 **Features.** Day of week, month, holidays, school holidays, seasonal respiratory-illness index (in a real deployment, public aggregate surveillance data), department headcount, aggregate night-shift load in prior days.
 
 **Evaluation.** Rolling-origin time-series cross-validation (never random splits); MAE and Poisson deviance against baselines; empirical coverage of the 80 % interval.
+
+**As built (Phase 8a).** Direct multi-horizon model on department × day counts, horizon as a feature. Features (one definition in `ml/src/dienstpilot_ml/features/absence.py`): weekday, month, day-of-year harmonics, public and school holidays, absence levels over the last 7, 28 and 91 days, the same weeks of the previous year, night shifts of the last 7 days. Two inputs of the design were not used: the respiratory-illness index (it exists only in the generator's ground truth, which training must not read) and department headcount (28 positions are always filled, so it is constant). Intervals are split-conformal (80 %, scaled residuals per horizon bucket, calibrated on the out-of-fold forecasts of 2024). Training uses 2021 to 2024 with six expanding rolling-origin folds; 2025 is the held-out test. The promotion rule was committed before the first fit. The served model is whatever holds the registry alias `champion` (a committed bundle); `eval/results/c3.json` says which model that is and why. Ports and adapter: `AbsenceForecaster` takes a `ForecastContext` whose `as_of` is the demo clock.
 
 **Guardrail.** Aggregate only. Individual absence prediction is out of scope by design: it would be health-data profiling, it would not survive works-council review, and it is not needed to plan reserves (ADR-003).
 
@@ -330,10 +332,10 @@ The agent service is an MCP client. The same servers can be connected to other M
 
 ## 13. ML engineering (MLOps)
 
-- **Data:** synthetic datasets versioned with DVC; features defined once in `ml/features/` and imported by both training and serving to prevent train/serve skew.
+- **Data:** synthetic datasets identified by the manifest hashes the generator writes (training re-checks every file it reads against them; results record them); no DVC (ADR-012). Features are defined once in `ml/src/dienstpilot_ml/features/` and imported by both training and serving to prevent train/serve skew.
 - **Splits:** strictly temporal (train on earlier months, evaluate on later ones); no random splits on time-dependent data.
-- **Tracking:** every run logged to MLflow with parameters, metrics, data version and code commit.
-- **Promotion gate:** a model is promoted only if it beats its baseline on the held-out period and passes fairness and calibration checks; the result is written to `eval/results/`.
+- **Tracking:** every run logged to a local MLflow (SQLite store, `make train`) with parameters, metrics, the data manifest hash and the code commit. The API never imports MLflow: it loads a committed bundle written at promotion.
+- **Promotion gate:** the rule is written down and committed before the run (C3: `ml/absence_forecast/PROMOTION_RULE.md`). A model is promoted to the registry alias `champion` only if it beats its best baseline on the held-out period by that rule and passes the calibration checks; the result is written to `eval/results/`. Otherwise the baseline stays champion.
 - **Model cards:** one per model in `docs/model-cards/` (intended use, out-of-scope uses, data, metrics, limitations, fairness considerations).
 - **Monitoring:** feature drift (population stability index), calibration drift for C5, solver-agreement rate for C6, business KPIs; retraining after each monthly cycle.
 
@@ -395,7 +397,7 @@ C1 is the recommended variant (profile `balanced`), its weights tuned on 2024-07
 Limitations: Each month is compared independently from the same as-worked history (the manual roster and its in-month changes); C1's months are not chained into a year. In-month violations exist only for the baseline and follow from a simulation parameter (manual_rule_check_rate, synthdata ASSUMPTIONS.md §13); they are not a finding about real planners. Synthetic data of a fictional department; no real hospital.
 <!-- benchmark:end -->
 
-Model metrics (C3–C6) and agent eval results (C7, C8) are reported in their model cards and in `eval/results/`.
+Model metrics (C3–C6) and agent eval results (C7, C8) are reported in their model cards and in `eval/results/`. C3 is built: `eval/results/c3.json` and `docs/model-cards/c3-absence-forecaster.md` (table rendered from the result by `eval/render_tables.py`).
 
 ### 17.2 Pilot design (next step, not started)
 
