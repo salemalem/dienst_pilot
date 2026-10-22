@@ -12,8 +12,6 @@ from dienstpilot.shared.ports import (
     Copilot,
     CopilotAnswer,
     CopilotFacts,
-    CoverCandidate,
-    CoverRanker,
     EngineInfo,
     IntakeParser,
     LeaveFeasibility,
@@ -22,22 +20,6 @@ from dienstpilot.shared.ports import (
 )
 
 STANDIN_VERSION = "standin-0.1"
-
-
-class CoverRankStandIn(CoverRanker):
-    """C5 stand-in: least cover burden first, then lowest hours against contract. No P(accept)."""
-
-    info = EngineInfo(
-        "C5",
-        "stand-in",
-        STANDIN_VERSION,
-        "Orders by covers in the last 90 days, then hours vs contract; classifier in phase 8.",
-        8,
-    )
-
-    def rank(self, candidates: list[CoverCandidate]) -> list[CoverCandidate]:
-        """Return candidates in asking order."""
-        return sorted(candidates, key=lambda c: (c.covers_last_90_days, c.hours_ratio, c.staff_id))
 
 
 class LeaveFeasibilityStandIn(LeaveFeasibility):
