@@ -1,0 +1,63 @@
+name: Screenshots
+
+# Manual only: run from the Actions tab, then download the "screenshots" artifact.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    name: make screenshots (DE and EN, from a clean seed)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: dienstpilot
+          POSTGRES_PASSWORD: dienstpilot
+          POSTGRES_DB: dienstpilot
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U dienstpilot -d dienstpilot"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      E2E_DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@localhost:5432/dienstpilot
+      E2E_REDIS_URL: redis://localhost:6379/14
+      DIENSTPILOT_SEED_DIR: data/synthetic/v1
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0 (no floating major tag)
+        with:
+          version: "0.11.26"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: uv sync --frozen
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:packages
+      - name: Install the browser
+        working-directory: scripts/screenshots
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Export the staff app
+        run: pnpm --filter @dienstpilot/mobile build:e2e
+      - name: Capture German, then English (each on a fresh seed), then finalize
+        run: |
+          rm -rf screenshots/de screenshots/en screenshots/manifest.json screenshots/INDEX.md
+          E2E_LANG=de pnpm --filter @dienstpilot/screenshots capture
+          E2E_LANG=en SCREENSHOTS_SKIP_BUILD=1 pnpm --filter @dienstpilot/screenshots capture
+          pnpm --filter @dienstpilot/screenshots finalize
+      - uses: actions/upload-artifact@v7
+        with:
+          name: screenshots
+          path: screenshots/
+          if-no-files-found: error

@@ -115,23 +115,23 @@ function Card({ c }: { c: Component }): ReactNode {
       data-implementation={c.implementation}
       aria-label={c.component}
     >
-      <div className="flex flex-wrap items-center gap-3">
-        <h3 className="heading m-0">
-          {c.component} · {known ? t(`name.${c.component as "C1"}`) : c.component}
-        </h3>
-        <EngineBadge
-          engine={{
-            component: c.component,
-            implementation: c.implementation,
-            version: c.version,
-            note: c.note,
-          }}
-        />
+      <div className="flex items-center justify-between gap-3">
+        <span className="caption text-ink-muted">{c.component}</span>
+        <span className="caption rounded-mark border border-rule-strong px-2">
+          {t(`kinds.${c.kind as "ml"}`)}
+        </span>
       </div>
-      <p className="body m-0">{c.note}</p>
+      <h3 className="heading m-0">{known ? t(`name.${c.component as "C1"}`) : c.component}</h3>
+      <EngineBadge
+        engine={{
+          component: c.component,
+          implementation: c.implementation,
+          version: c.version,
+          note: c.note,
+        }}
+      />
+      <p className="body m-0">{known ? t(`about.${c.component as "C1"}`) : c.note}</p>
       <dl className="body m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
-        <dt className="text-ink-muted">{t("kind")}</dt>
-        <dd className="m-0">{t(`kinds.${c.kind as "ml"}`)}</dd>
         <dt className="text-ink-muted">{t("version")}</dt>
         <dd className="num-time m-0">{c.version}</dd>
         <dt className="text-ink-muted">{t("lastTrained")}</dt>
@@ -172,7 +172,7 @@ export default function TransparencyPage(): ReactNode {
   return (
     <>
       <PageHeader
-        title={t("title")}
+        title={t("headline")}
         status={
           q.data
             ? t("status", {
@@ -185,31 +185,30 @@ export default function TransparencyPage(): ReactNode {
       <p className="body m-0 max-w-[80ch]">{t("intro")}</p>
       <Async query={q}>
         {(list) => (
-          <div className="flex flex-col gap-8">
-            {GROUPS.map((g) => {
-              const members = list.filter((c) => (g.kinds as readonly string[]).includes(c.kind));
-              if (members.length === 0) return null;
-              return (
-                <section
-                  key={g.key}
-                  aria-labelledby={`group-${g.key}`}
-                  className="flex flex-col gap-3"
-                >
-                  <div>
-                    <h2 id={`group-${g.key}`} className="heading m-0">
+          <>
+            <div className="grid border border-rule bg-sheet [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
+              {GROUPS.map((g) => {
+                const members = list.filter((c) => (g.kinds as readonly string[]).includes(c.kind));
+                if (members.length === 0) return null;
+                return (
+                  <section
+                    key={g.key}
+                    className="flex flex-col gap-1 border-r border-rule p-4 last:border-r-0"
+                  >
+                    <h2 className="label m-0 text-ink-muted">
                       {t(`group.${g.key}.title`)} · {members.map((c) => c.component).join(", ")}
                     </h2>
-                    <p className="body m-0 text-ink-muted">{t(`group.${g.key}.tagline`)}</p>
-                  </div>
-                  <div className="grid items-start gap-6 [grid-template-columns:repeat(auto-fit,minmax(380px,1fr))]">
-                    {members.map((c) => (
-                      <Card key={c.component} c={c} />
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
+                    <p className="body m-0">{t(`group.${g.key}.tagline`)}</p>
+                  </section>
+                );
+              })}
+            </div>
+            <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
+              {list.map((c) => (
+                <Card key={c.component} c={c} />
+              ))}
+            </div>
+          </>
         )}
       </Async>
     </>

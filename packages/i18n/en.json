@@ -142,7 +142,8 @@
     "sentTitle": "Leave requested",
     "sentBody": "The planner decides. The answer appears under Notifications.",
     "toToday": "Back to Today",
-    "statusOpen": "Open, waiting for the planner"
+    "statusOpen": "Open, waiting for the planner",
+    "change": "Change dates"
   },
   "m6": {
     "offerExchange": "Offer exchange",
@@ -170,7 +171,8 @@
     "noOffers": "No offer is waiting for you right now.",
     "take": "Take the shift",
     "exchangeFor": "Exchange against:",
-    "takeAgainst": "Take it and give {date} {shift}"
+    "takeAgainst": "Take it and give {date} {shift}",
+    "change": "Pick another shift"
   },
   "notification": {
     "roster_changed": "Your roster on {date} was changed. Reason: {reason}",
@@ -326,7 +328,11 @@
     "colStatus": "Status",
     "answered": "Answered on {date}",
     "notAnswered": "Not yet",
-    "remindNote": "The reminder only goes to the {count, plural, one {1 person} other {# people}} without an answer."
+    "remindNote": "The reminder only goes to the {count, plural, one {1 person} other {# people}} without an answer.",
+    "subline": "Request window {month}",
+    "waitingTitle": "Not yet answered",
+    "answeredTitle": "Answered",
+    "colAnswered": "On"
   },
   "rules": {
     "coverage": "Staffing",
@@ -588,7 +594,36 @@
     "noConsequence": "No hours consequence for the department.",
     "rank": "Position {rank} in the ranking.",
     "checked": "The validator (C2) checked this option.",
-    "decided": "Decided"
+    "decided": "Decided",
+    "headline": "The {shift} on {date} is still open: your decision",
+    "absent": "absent: {name}",
+    "suggestionTitle": "Suggestion: options in this order",
+    "optionsQuestion": "How should the {shift} be staffed?",
+    "optionN": "Option {n} · {kind}",
+    "consequenceLabel": "Consequence:",
+    "whyOrder": "Why this order",
+    "aiNote": "The AI only suggests. Choose an option.",
+    "runOption": "Carry out option",
+    "shiftName": {
+      "frueh": "early shift",
+      "spaet": "late shift",
+      "nacht": "night shift",
+      "bereitschaft": "on-call duty",
+      "ruf": "on-call from home",
+      "frei": "leave"
+    },
+    "kind": {
+      "confirm_cover": "Takeover",
+      "assign": "Assign",
+      "locum": "External cover",
+      "unfilled": "Unfilled"
+    },
+    "noConsequenceFor": {
+      "confirm_cover": "Hours and overtime are shown above.",
+      "assign": "Hours and overtime are shown above.",
+      "locum": "No overtime for the team; cost and handover are arranged by the planner.",
+      "unfilled": "The shift stays unstaffed; the team stays within its hours."
+    }
   },
   "w8": {
     "title": "Fairness and compliance",
@@ -669,6 +704,19 @@
       "proposal_created": "Proposal created",
       "policy_changed": "Auto-approval changed",
       "demo_clock_set": "Demo clock set"
+    },
+    "subject": {
+      "roster_variant": "Roster",
+      "roster_run": "Run",
+      "request_window": "Request window",
+      "leave_request": "Leave request",
+      "swap": "Swap",
+      "swap_offer": "Swap",
+      "cover_cascade": "Cover",
+      "policy": "Auto-approval",
+      "proposal": "Proposal",
+      "absence": "Absence",
+      "clock": "Demo clock"
     }
   },
   "w11": {
@@ -730,7 +778,17 @@
     "colPerson": "Person",
     "colRole": "Role",
     "colWeekly": "Weekly hours",
-    "colQuals": "Qualifications"
+    "colQuals": "Qualifications",
+    "headline": "Rule version {version} is in force",
+    "headlineSub": "Effective since {date} · Changes are made by the administration, approved by hospital management",
+    "tabs": "Sections",
+    "tab": {
+      "rules": "Rules",
+      "shifts": "Shift types",
+      "demand": "Demand",
+      "quals": "Qualifications",
+      "contracts": "Contracts"
+    }
   },
   "w12": {
     "title": "Oversight",
@@ -743,7 +801,17 @@
     "costTitle": "Cost",
     "costNone": "Placeholder: this prototype has no cost calculation yet. No figure is made up.",
     "auditTitle": "Audit trail (latest events)",
-    "export": "Export log"
+    "export": "Export log",
+    "headlineOk": "{month}: all rules met",
+    "headlineBad": "{month}: {count, plural, one {1 rest-period violation} other {# rest-period violations}}",
+    "sublineOversight": "Department of Internal Medicine · as of {date} · You see figures and the log; you cannot change shifts here.",
+    "kpiRest": "Rest periods",
+    "kpiRestNote": "for {people} people in the month",
+    "kpiOvertime": "Overtime",
+    "kpiOvertimeNote": "{over, plural, =0 {nobody} one {1 person} other {# people}}",
+    "kpiCostNote": "Placeholder: no cost calculation in the prototype",
+    "kpiWeekends": "Weekend shifts per year",
+    "kpiWeekendsNote": "Range, median {median}"
   },
   "w13": {
     "title": "AI transparency",
@@ -804,6 +872,17 @@
         "title": "Language models",
         "tagline": "Read and explain language. A sentence never becomes an assignment."
       }
+    },
+    "headline": "8 components. None can change the roster.",
+    "about": {
+      "C1": "Computes valid rosters and several variants; the rules are hard constraints.",
+      "C2": "Checks every roster independently against the rules and lets nothing through that breaks one.",
+      "C3": "Estimates expected absences per day for the whole department, never for individuals.",
+      "C4": "Suggests wishes you have often stated before.",
+      "C5": "Orders possible cover by their recent load.",
+      "C6": "Estimates at once whether leave is coverable; the exact check is done by C1.",
+      "C7": "Reads free text about wishes and turns it into a preview you confirm.",
+      "C8": "Answers questions about the plan, cites the rule source and only creates proposals."
     }
   },
   "qualification": {
@@ -816,7 +895,7 @@
     "today": "Today",
     "roster": "Roster",
     "notifications": "Notifications",
-    "settings": "Settings"
+    "settings": "More"
   },
   "demo": {
     "title": "Demo menu",
@@ -950,7 +1029,12 @@
       "nights": "{n, plural, one {night} other {nights}}",
       "weekends": "{n, plural, one {weekend} other {weekends}}",
       "holidays": "{n, plural, one {holiday} other {holidays}}"
-    }
+    },
+    "exactly": "exactly at the average",
+    "shortBelow": "{n} below the average",
+    "shortAbove": "{n} above the average",
+    "you": "You {n}",
+    "legend": "Dot: you. Tick: department average. Line: lowest to highest value."
   },
   "m10": {
     "title": "Hours",
@@ -961,7 +1045,11 @@
     "leaveCredit": "Leave (credited)",
     "rest": "Rest periods",
     "restOk": "All rest periods of at least {hours} hours were met.",
-    "restViolations": "{count, plural, one {One rest period} other {# rest periods}} under {hours} hours."
+    "restViolations": "{count, plural, one {One rest period} other {# rest periods}} under {hours} hours.",
+    "eyebrow": "{month}, as of {date}",
+    "restAllOk": "All rest periods met",
+    "footnote": "The hours go to the HR department with the month-end closing.",
+    "overtime": "Overtime"
   },
   "m11": {
     "title": "Notifications",
@@ -988,6 +1076,13 @@
     "wishes": "Wishes",
     "fairness": "Fairness balance",
     "hours": "Hours",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "syncHint": "Published shifts appear in your phone's calendar.",
+    "suggestionsHint": "Suggestions from your earlier wishes, marked in pencil. They are never applied without your consent."
+  },
+  "more": {
+    "fairness": "Fairness balance",
+    "hours": "Hours",
+    "settings": "Settings"
   }
 }

@@ -277,7 +277,7 @@ export function PageHeader({
 }): ReactNode {
   return (
     <header className="flex flex-wrap items-start gap-x-6 gap-y-3">
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <div className="flex min-w-[24rem] flex-1 flex-col gap-1">
         <h1 className="display m-0" tabIndex={-1} data-page-title>
           {title}
         </h1>
@@ -364,7 +364,7 @@ export function Section({
 
 export function Table({ children, label }: { children: ReactNode; label: string }): ReactNode {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={label}>
       <table
         aria-label={label}
         className="body w-full border-collapse text-left [&_td]:border-b [&_td]:border-rule [&_td]:px-3 [&_td]:py-2 [&_th]:border-b [&_th]:border-rule-strong [&_th]:px-3 [&_th]:py-2 [&_th]:font-semibold [&_th]:text-ink-muted"

@@ -41,3 +41,6 @@ playwright-report/
 
 # Staff app e2e build
 apps/mobile/dist-e2e/
+
+# Phase 6: review folder (side-by-side comparisons, not committed)
+review/

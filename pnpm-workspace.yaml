@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "scripts/screenshots"
 
 # Expo/Metro needs a flat node_modules in a pnpm workspace.
 nodeLinker: hoisted

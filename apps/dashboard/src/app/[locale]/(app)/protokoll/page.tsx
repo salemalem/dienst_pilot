@@ -1,7 +1,7 @@
 "use client";
 
 import { unwrap } from "@dienstpilot/api-client";
-import { Download, ListFilter } from "lucide-react";
+import { Download } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 
@@ -64,8 +64,9 @@ export default function AuditPage(): ReactNode {
           </Button>
         }
       />
-      <Section title={t("filterTitle")} aside={<ListFilter {...ICON} />}>
-        <div className="flex flex-wrap items-end gap-4">
+      <div className="flex flex-wrap items-end gap-4" role="search" aria-label={t("filterTitle")}>
+        {" "}
+        <>
           <Field label={t("filterAction")}>
             {(p) => (
               <select
@@ -114,8 +115,8 @@ export default function AuditPage(): ReactNode {
               />
             )}
           </Field>
-        </div>
-      </Section>
+        </>
+      </div>
       <Async query={q}>
         {(d) => (
           <Section

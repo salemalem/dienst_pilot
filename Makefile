@@ -2,7 +2,7 @@ COMPOSE := docker compose -f infra/compose.dev.yml
 SEED ?= 20261020
 SEED_DIR := data/synthetic/v1
 
-.PHONY: install dev down logs seed test e2e lint format api-client eval tune
+.PHONY: install dev down logs seed test e2e screenshots lint format api-client eval tune
 
 install: ## Install Python and Node dependencies
 	uv sync
@@ -36,6 +36,16 @@ e2e: ## Playwright e2e on the demo clock: dashboard (:3100) and staff app on Exp
 	pnpm build:packages
 	pnpm --filter @dienstpilot/dashboard e2e
 	pnpm --filter @dienstpilot/mobile e2e
+
+screenshots: ## Regenerate screenshots/ (DE and EN, each on a fresh seed): images, contact sheets, INDEX.md
+	$(COMPOSE) up -d --wait postgres redis
+	$(COMPOSE) exec -T postgres psql -U dienstpilot -c "CREATE DATABASE dienstpilot_e2e" 2>/dev/null || true
+	pnpm build:packages
+	pnpm --filter @dienstpilot/mobile build:e2e
+	rm -rf screenshots/de screenshots/en screenshots/manifest.json screenshots/INDEX.md
+	E2E_LANG=de pnpm --filter @dienstpilot/screenshots capture
+	E2E_LANG=en SCREENSHOTS_SKIP_BUILD=1 pnpm --filter @dienstpilot/screenshots capture
+	pnpm --filter @dienstpilot/screenshots finalize
 
 lint: ## ruff, mypy, import-linter, eslint, tsc, prettier
 	uv run ruff check backend

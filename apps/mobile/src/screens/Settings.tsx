@@ -7,8 +7,9 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
 import { DemoMenu } from "../components/DemoMenu";
-import { Button, Card, Segmented, ToggleRow, Txt } from "../components/ui";
+import { MoreStrip } from "../components/MoreStrip";
 import { Screen } from "../components/Screen";
+import { Button, Card, Segmented, ToggleRow, Txt } from "../components/ui";
 import { setLanguage } from "../i18n";
 import { useFmt } from "../lib/fmt";
 import { useQuery } from "../lib/hooks";
@@ -24,10 +25,36 @@ export function SettingsScreen(): ReactNode {
   const { pref, setPref, themeId, clockNow } = useTheme();
   const clock = useQuery((a) => unwrap(a.GET("/clock")), []);
   const lang = (i18n.language === "en" ? "en" : "de") as Locale;
+  const now = clockNow ?? clock.data?.now ?? null;
   return (
-    <Screen title={t("m12.title")} status={me?.display_name} testID="screen-settings">
-      <Card>
-        <Txt variant="heading">{t("m12.language")}</Txt>
+    <Screen
+      title={me?.display_name ?? t("m12.title")}
+      eyebrow={t("m12.title")}
+      strip={<MoreStrip active="settings" />}
+      testID="screen-settings"
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: spacing[3],
+        }}
+      >
+        <Txt muted style={{ flex: 1 }}>
+          {t("app.department")}
+        </Txt>
+        <Button
+          label={t("m12.signOut")}
+          onPress={() => {
+            signOut();
+            router.replace("/sign-in");
+          }}
+          testID="sign-out"
+        />
+      </View>
+      <View style={{ gap: spacing[2] }}>
+        <Txt variant="label">{t("m12.language")}</Txt>
         <Segmented
           label={t("m12.language")}
           value={lang}
@@ -38,9 +65,9 @@ export function SettingsScreen(): ReactNode {
           }}
           testID="settings-language"
         />
-      </Card>
-      <Card>
-        <Txt variant="heading">{t("m12.theme")}</Txt>
+      </View>
+      <View style={{ gap: spacing[2] }}>
+        <Txt variant="label">{t("m12.theme")}</Txt>
         <Segmented<ThemePref>
           label={t("m12.theme")}
           value={pref}
@@ -55,17 +82,14 @@ export function SettingsScreen(): ReactNode {
         <Txt variant="caption" muted testID="theme-note">
           {pref === "auto"
             ? t("m12.themeAutoNote", {
-                time:
-                  (clockNow ?? clock.data?.now)
-                    ? fmt.time((clockNow ?? clock.data?.now) as string)
-                    : "",
+                time: now ? fmt.time(now) : "",
                 theme: t(`m12.now.${themeId}`),
               })
             : t("m12.themeFixedNote")}
         </Txt>
-      </Card>
+      </View>
       {settings ? (
-        <Card>
+        <Card style={{ gap: 0 }}>
           <ToggleRow
             label={t("m12.notifications")}
             value={settings.notifications}
@@ -74,54 +98,21 @@ export function SettingsScreen(): ReactNode {
           />
           <ToggleRow
             label={t("m12.sync")}
+            hint={t("m12.syncHint")}
             value={settings.calendar_sync}
             onChange={(v) => void saveSettings({ calendar_sync: v })}
             testID="toggle-sync"
           />
           <ToggleRow
             label={t("m12.suggestions")}
+            hint={t("m12.suggestionsHint")}
             value={settings.preference_suggestions}
             onChange={(v) => void saveSettings({ preference_suggestions: v })}
             testID="toggle-suggestions"
           />
         </Card>
       ) : null}
-      <Card>
-        <Txt variant="heading">{t("m12.mine")}</Txt>
-        <View style={{ gap: spacing[2] }}>
-          <Button
-            label={t("m12.wishes")}
-            onPress={() => {
-              router.push("/wishes");
-            }}
-            testID="go-wishes"
-          />
-          <Button
-            label={t("m12.fairness")}
-            onPress={() => {
-              router.push("/fairness");
-            }}
-            testID="go-fairness"
-          />
-          <Button
-            label={t("m12.hours")}
-            onPress={() => {
-              router.push("/hours");
-            }}
-            testID="go-hours"
-          />
-        </View>
-      </Card>
       <DemoMenu />
-      <Button
-        label={t("m12.signOut")}
-        kind="quiet"
-        onPress={() => {
-          signOut();
-          router.replace("/sign-in");
-        }}
-        testID="sign-out"
-      />
     </Screen>
   );
 }

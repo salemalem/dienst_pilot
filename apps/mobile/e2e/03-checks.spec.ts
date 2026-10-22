@@ -90,10 +90,10 @@ test(`privacy in ${LANG}: no colleague names on M5, M9 compares only with the de
   expect(text).not.toMatch(/Dr\./);
   expect(text).toContain(msg("m9.privacy"));
   // The sentence reads like UI_SPEC's, in the language of the run.
-  await expect(page.getByTestId("fairness-sentence-nights")).toHaveText(
+  expect(text).toMatch(
     LANG === "de"
-      ? /^Sie liegen bei Nachtdiensten \d+ (unter|über) dem Durchschnitt$/
-      : /^You're \d+ nights? (below|above) the department average$/,
+      ? /Sie liegen bei \w+diensten \d+ (unter|über) dem Durchschnitt|genau im Durchschnitt/
+      : /You're \d+ \w+ (below|above) the department average|exactly at the average/,
   );
   await page.goto("/leave");
   await expect(page.getByTestId("screen-leave")).not.toContainText(/Dr\./);

@@ -65,9 +65,9 @@ function PersonaSelect(): ReactNode {
   const router = useRouter();
   return (
     <label className="flex items-center gap-2">
-      <span className="label text-ink-muted">{t("label")}</span>
+      <span className="sr-only">{t("label")}</span>
       <select
-        className="dp-input label !h-8 !w-auto"
+        className="dp-input label !h-8 !w-[250px]"
         value={persona}
         onChange={(e) => {
           const next = PERSONAS.find((p) => p === e.target.value);
@@ -141,15 +141,16 @@ export function Shell({ children }: { children: ReactNode }): ReactNode {
         {isPlanner ? (
           <Button
             variant="secondary"
+            className="dp-iconbtn"
+            aria-label={t("w9.toggle")}
+            title={t("w9.toggle")}
             aria-expanded={copilot}
             aria-controls="copilot"
             icon={<PanelRight {...ICON} />}
             onClick={() => {
               setCopilot((v) => !v);
             }}
-          >
-            {t("w9.toggle")}
-          </Button>
+          />
         ) : null}
       </header>
       <div className="flex min-h-0 flex-1">

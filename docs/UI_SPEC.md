@@ -129,7 +129,7 @@ Numbers are formatted per locale in the UI (9,75 h in German, 9.75 h in English)
 
 ## 6. Screenshot list for the portfolio
 
-Capture each in DE and EN, light theme; capture M2, M8 and W1 additionally in dark theme.
+Capture each in DE and EN, light theme; capture M2, M8 and W1 additionally in dark theme. `make screenshots` produces exactly this list (see `screenshots/INDEX.md`).
 
 1. M2 Today (Dr. Kaya)
 2. M5 Leave request (Situation A)
@@ -140,6 +140,9 @@ Capture each in DE and EN, light theme; capture M2, M8 and W1 additionally in da
 7. W3 Variant comparison
 8. W4 Roster editor with a rule message visible
 9. W7 Live cover cascade
-10. W9 Copilot answering with a rule citation
-11. W13 AI transparency
-12. W10 Audit trail
+10. W7b Escalation to the Planner (all eligible candidates timed out, auto-approval policy still on)
+11. W9 Copilot answering with a rule citation
+12. W11 Rules and master data (Administrator, rule version 2026-1)
+13. W12 Oversight, read-only (Katrin Vogel)
+14. W13 AI transparency
+15. W10 Audit trail

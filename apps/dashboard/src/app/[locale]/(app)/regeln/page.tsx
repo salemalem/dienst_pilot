@@ -267,6 +267,8 @@ function DemoClock(): ReactNode {
   );
 }
 
+const TABS = ["rules", "shifts", "demand", "quals", "contracts"] as const;
+
 /** W11: master data and versioned rule sets; the Planner's auto-approval policy; the demo clock (Administrator). */
 export default function RulesPage(): ReactNode {
   const t = useTranslations("w11");
@@ -289,168 +291,215 @@ export default function RulesPage(): ReactNode {
     },
   );
   const de = locale === "de";
+  const [tab, setTab] = useState<(typeof TABS)[number]>("rules");
+  const clockNow = useQuery((a) => unwrap(a.GET("/clock")), []);
 
   return (
     <>
-      <PageHeader title={t("title")} status={admin ? t("statusAdmin") : t("statusPlanner")} />
-      {admin ? (
-        <Section title={t("clockTitle")}>
-          <DemoClock />
-        </Section>
-      ) : null}
-      {policy.data ? (
-        <Section title={t("policyTitle")}>
-          <p className="body m-0 text-ink-muted">{t("policyNote")}</p>
-          <Switch
-            label={t("policySwaps")}
-            checked={policy.data.auto_approve_swaps}
-            disabled={savePolicy.pending}
-            onChange={(v) =>
-              void savePolicy.run({
-                auto_approve_swaps: v,
-                auto_approve_cover: policy.data?.auto_approve_cover ?? false,
-              })
-            }
-          />
-          <Switch
-            label={t("policyCover")}
-            checked={policy.data.auto_approve_cover}
-            disabled={savePolicy.pending}
-            onChange={(v) =>
-              void savePolicy.run({
-                auto_approve_swaps: policy.data?.auto_approve_swaps ?? false,
-                auto_approve_cover: v,
-              })
-            }
-          />
-          {savePolicy.error ? <ErrorState error={savePolicy.error} /> : null}
-        </Section>
-      ) : null}
       <Async query={q}>
         {(d) => {
           const sets = [...d.rule_sets].sort((a, b) =>
             b.effective_from.localeCompare(a.effective_from),
           );
           const latest = sets[0];
+          const today = clockNow.data?.now.slice(0, 10) ?? "9999-12-31";
+          // The rule version in force on the demo date: the newest one that has started.
+          const active = sets.find((x) => x.effective_from <= today) ?? sets[0];
           return (
             <>
-              <Section title={t("ruleSetsTitle")}>
-                <div className="flex flex-col gap-6" data-testid="rule-sets">
-                  {sets.map((s) => (
-                    <div key={s.version} className="flex flex-col gap-2 border-b border-rule pb-4">
-                      <div className="flex flex-wrap items-baseline gap-3">
-                        <h3 className="heading m-0">
-                          {t("ruleSetVersion", { version: s.version })}
-                        </h3>
-                        <span className="label text-ink-muted">
-                          {t("effective", { date: fmt.date(s.effective_from) })}
-                        </span>
-                      </div>
-                      <p className="body m-0">{de ? s.change_note_de : s.change_note_en}</p>
-                      <RuleValues rules={s.rules as Record<string, unknown>} />
+              <PageHeader
+                title={t("headline", { version: active?.version ?? "" })}
+                status={
+                  active ? t("headlineSub", { date: fmt.date(active.effective_from) }) : undefined
+                }
+              />
+              <div
+                role="tablist"
+                aria-label={t("tabs")}
+                className="flex flex-wrap gap-1 border border-rule-strong bg-sheet p-0.5 w-fit"
+              >
+                {TABS.map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === k}
+                    onClick={() => {
+                      setTab(k);
+                    }}
+                    data-testid={`tab-${k}`}
+                    className={`label h-9 cursor-pointer rounded px-3 ${tab === k ? "bg-action text-on-action" : "bg-transparent text-ink"}`}
+                  >
+                    {t(`tab.${k}`)}
+                  </button>
+                ))}
+              </div>
+              {tab === "rules" ? (
+                <>
+                  {admin ? (
+                    <Section title={t("clockTitle")}>
+                      <DemoClock />
+                    </Section>
+                  ) : null}
+                  {policy.data ? (
+                    <Section title={t("policyTitle")}>
+                      <p className="body m-0 text-ink-muted">{t("policyNote")}</p>
+                      <Switch
+                        label={t("policySwaps")}
+                        checked={policy.data.auto_approve_swaps}
+                        disabled={savePolicy.pending}
+                        onChange={(v) =>
+                          void savePolicy.run({
+                            auto_approve_swaps: v,
+                            auto_approve_cover: policy.data?.auto_approve_cover ?? false,
+                          })
+                        }
+                      />
+                      <Switch
+                        label={t("policyCover")}
+                        checked={policy.data.auto_approve_cover}
+                        disabled={savePolicy.pending}
+                        onChange={(v) =>
+                          void savePolicy.run({
+                            auto_approve_swaps: policy.data?.auto_approve_swaps ?? false,
+                            auto_approve_cover: v,
+                          })
+                        }
+                      />
+                      {savePolicy.error ? <ErrorState error={savePolicy.error} /> : null}
+                    </Section>
+                  ) : null}
+
+                  <Section title={t("ruleSetsTitle")}>
+                    <div className="flex flex-col gap-6" data-testid="rule-sets">
+                      {sets.map((s) => (
+                        <div
+                          key={s.version}
+                          className="flex flex-col gap-2 border-b border-rule pb-4"
+                        >
+                          <div className="flex flex-wrap items-baseline gap-3">
+                            <h3 className="heading m-0">
+                              {t("ruleSetVersion", { version: s.version })}
+                            </h3>
+                            <span className="label text-ink-muted">
+                              {t("effective", { date: fmt.date(s.effective_from) })}
+                            </span>
+                          </div>
+                          <p className="body m-0">{de ? s.change_note_de : s.change_note_en}</p>
+                          <RuleValues rules={s.rules as Record<string, unknown>} />
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </Section>
-              {admin && latest ? (
-                <Section title={t("newTitle")}>
-                  <NewRuleSet latest={latest} onDone={q.reload} />
+                  </Section>
+                  {admin && latest ? (
+                    <Section title={t("newTitle")}>
+                      <NewRuleSet latest={latest} onDone={q.reload} />
+                    </Section>
+                  ) : null}
+                </>
+              ) : null}
+              {tab === "shifts" ? (
+                <Section title={t("shiftTypesTitle")}>
+                  <Table label={t("shiftTypesTitle")}>
+                    <thead>
+                      <tr>
+                        <th scope="col">{t("colShift")}</th>
+                        <th scope="col">{t("colTimes")}</th>
+                        <th scope="col" className="text-right">
+                          {t("colNet")}
+                        </th>
+                        <th scope="col" className="text-right">
+                          {t("colBurden")}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {d.shift_types.map((s) => (
+                        <tr key={s.code}>
+                          <td>
+                            <strong>{de ? s.letter_de : s.letter_en}</strong> {names.name(s.code)}
+                          </td>
+                          <td className="num-time">
+                            {s.start_time
+                              ? `${s.start_time}–${s.end_time ?? ""}${s.ends_next_day ? t("nextDay") : ""}`
+                              : t("allDay")}
+                          </td>
+                          <td className="num-time text-right">{fmt.number(s.net_hours, 2)} h</td>
+                          <td className="num-time text-right">{fmt.number(s.burden_weight, 1)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
                 </Section>
               ) : null}
-              <Section title={t("shiftTypesTitle")}>
-                <Table label={t("shiftTypesTitle")}>
-                  <thead>
-                    <tr>
-                      <th scope="col">{t("colShift")}</th>
-                      <th scope="col">{t("colTimes")}</th>
-                      <th scope="col" className="text-right">
-                        {t("colNet")}
-                      </th>
-                      <th scope="col" className="text-right">
-                        {t("colBurden")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {d.shift_types.map((s) => (
-                      <tr key={s.code}>
-                        <td>
-                          <strong>{de ? s.letter_de : s.letter_en}</strong> {names.name(s.code)}
-                        </td>
-                        <td className="num-time">
-                          {s.start_time
-                            ? `${s.start_time}–${s.end_time ?? ""}${s.ends_next_day ? t("nextDay") : ""}`
-                            : t("allDay")}
-                        </td>
-                        <td className="num-time text-right">{fmt.number(s.net_hours, 2)} h</td>
-                        <td className="num-time text-right">{fmt.number(s.burden_weight, 1)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Section>
-              <Section title={t("qualTitle")}>
-                <ul className="body m-0 list-disc pl-5">
-                  {d.qualifications.map(([code, nameDe, nameEn]) => (
-                    <li key={code}>
-                      <strong>{code}</strong>: {de ? nameDe : nameEn}
-                    </li>
-                  ))}
-                </ul>
-              </Section>
-              <Section title={t("demandTitle")}>
-                {d.demand_examples[0] ? (
-                  <>
-                    <p className="caption m-0 text-ink-muted">
-                      {t("demandNote", { date: fmt.date(d.demand_examples[0].date) })}
-                    </p>
-                    <Table label={t("demandTitle")}>
-                      <thead>
-                        <tr>
-                          <th scope="col">{t("colShift")}</th>
-                          <th scope="col">{t("colQual")}</th>
-                          <th scope="col" className="text-right">
-                            {t("colRequired")}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {d.demand_examples[0].rows.map(([shift, qual, n]) => (
-                          <tr key={`${shift}-${qual}`}>
-                            <td>{names.name(String(shift))}</td>
-                            <td>{qual}</td>
-                            <td className="num-time text-right">{n}</td>
+              {tab === "demand" ? (
+                <Section title={t("demandTitle")}>
+                  {d.demand_examples[0] ? (
+                    <>
+                      <p className="caption m-0 text-ink-muted">
+                        {t("demandNote", { date: fmt.date(d.demand_examples[0].date) })}
+                      </p>
+                      <Table label={t("demandTitle")}>
+                        <thead>
+                          <tr>
+                            <th scope="col">{t("colShift")}</th>
+                            <th scope="col">{t("colQual")}</th>
+                            <th scope="col" className="text-right">
+                              {t("colRequired")}
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </>
-                ) : null}
-              </Section>
-              <Section title={t("contractsTitle", { count: d.contracts.length })}>
-                <Table label={t("contractsTitle", { count: d.contracts.length })}>
-                  <thead>
-                    <tr>
-                      <th scope="col">{t("colPerson")}</th>
-                      <th scope="col">{t("colRole")}</th>
-                      <th scope="col" className="text-right">
-                        {t("colWeekly")}
-                      </th>
-                      <th scope="col">{t("colQuals")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {d.contracts.map((c) => (
-                      <tr key={c.staff_id}>
-                        <td>{c.display_name}</td>
-                        <td>{de ? c.title_de : c.title_en}</td>
-                        <td className="num-time text-right">{fmt.number(c.weekly_hours, 1)} h</td>
-                        <td>{c.qualifications.join(", ") || "–"}</td>
-                      </tr>
+                        </thead>
+                        <tbody>
+                          {d.demand_examples[0].rows.map(([shift, qual, n]) => (
+                            <tr key={`${shift}-${qual}`}>
+                              <td>{names.name(String(shift))}</td>
+                              <td>{qual}</td>
+                              <td className="num-time text-right">{n}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    </>
+                  ) : null}
+                </Section>
+              ) : null}
+              {tab === "quals" ? (
+                <Section title={t("qualTitle")}>
+                  <ul className="body m-0 list-disc pl-5">
+                    {d.qualifications.map(([code, nameDe, nameEn]) => (
+                      <li key={code}>
+                        <strong>{code}</strong>: {de ? nameDe : nameEn}
+                      </li>
                     ))}
-                  </tbody>
-                </Table>
-              </Section>
+                  </ul>
+                </Section>
+              ) : null}
+              {tab === "contracts" ? (
+                <Section title={t("contractsTitle", { count: d.contracts.length })}>
+                  <Table label={t("contractsTitle", { count: d.contracts.length })}>
+                    <thead>
+                      <tr>
+                        <th scope="col">{t("colPerson")}</th>
+                        <th scope="col">{t("colRole")}</th>
+                        <th scope="col" className="text-right">
+                          {t("colWeekly")}
+                        </th>
+                        <th scope="col">{t("colQuals")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {d.contracts.map((c) => (
+                        <tr key={c.staff_id}>
+                          <td>{c.display_name}</td>
+                          <td>{de ? c.title_de : c.title_en}</td>
+                          <td className="num-time text-right">{fmt.number(c.weekly_hours, 1)} h</td>
+                          <td>{c.qualifications.join(", ") || "–"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Section>
+              ) : null}
             </>
           );
         }}

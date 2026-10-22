@@ -44,7 +44,7 @@ export function LocaleSwitch(): ReactNode {
     <Segmented
       label={t("locale.label")}
       value={active}
-      options={locales.map((l) => ({ value: l, label: l.toUpperCase() }))}
+      options={locales.map((l) => ({ value: l, label: t(`locale.${l}`) }))}
       onChange={setLanguage}
       testID="locale"
     />

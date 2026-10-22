@@ -96,112 +96,149 @@ export default function FairnessPage(): ReactNode {
             ))}
         </div>
       ) : null}
-      <Section
-        title={t("fairnessTitle", { year: y })}
-        aside={
-          <span className="flex items-center gap-2">
-            <button
-              type="button"
-              className="dp-btn dp-btn--secondary label"
-              onClick={() => {
-                setYear(y - 1);
-              }}
-            >
-              {y - 1}
-            </button>
-            <span className="body-strong">{y}</span>
-            <button
-              type="button"
-              className="dp-btn dp-btn--secondary label"
-              disabled={now !== null && y >= Number(now.slice(0, 4))}
-              onClick={() => {
-                setYear(y + 1);
-              }}
-            >
-              {y + 1}
-            </button>
-          </span>
-        }
-      >
-        <Async query={fairness}>
-          {(f) =>
-            f ? (
-              <>
-                <p className="caption m-0 text-ink-muted">
-                  {f.people
-                    ? t("asOf", { date: fmt.date(f.as_of) })
-                    : t("anonymous", { date: fmt.date(f.as_of) })}
-                </p>
-                <div className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
-                  {f.distributions.map((d) => {
-                    const name = METRICS.includes(d.metric as "nights")
-                      ? t(`metric.${d.metric as "nights"}`)
-                      : d.metric;
-                    return (
-                      <div
-                        key={d.metric}
-                        className="flex flex-col gap-2"
-                        data-testid={`dist-${d.metric}`}
-                      >
-                        <h3 className="heading m-0">{name}</h3>
-                        <DotStrip
-                          values={d.values}
-                          min={d.minimum}
-                          max={d.maximum}
-                          median={d.median}
-                          mean={d.mean}
-                          label={t("distLabel", {
-                            name,
-                            people: d.people,
-                            min: d.minimum,
-                            median: fmt.number(d.median, 1),
-                            max: d.maximum,
-                          })}
-                        />
-                        <p className="num-small m-0 text-ink-muted">
-                          {t("distFacts", {
-                            people: d.people,
-                            mean: fmt.number(d.mean, 1),
-                            median: fmt.number(d.median, 1),
-                            min: d.minimum,
-                            max: d.maximum,
-                          })}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-                {f.people ? (
-                  <Table label={t("peopleLabel")}>
-                    <thead>
-                      <tr>
-                        <th scope="col">{t("colPerson")}</th>
-                        {METRICS.map((k) => (
-                          <th key={k} scope="col" className="text-right">
-                            {t(`metric.${k}`)}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[...f.people]
-                        .sort((a, b) => b.weekends - a.weekends)
-                        .map((p) => (
-                          <tr key={p.staff_id}>
-                            <td>{p.display_name}</td>
-                            <td className="num-time text-right">{p.nights}</td>
-                            <td className="num-time text-right">{p.weekends}</td>
-                            <td className="num-time text-right">{p.holidays}</td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </Table>
-                ) : null}
-              </>
-            ) : null
+      <div className="grid items-start gap-6 [grid-template-columns:minmax(0,3fr)_minmax(300px,2fr)]">
+        <Section
+          title={t("fairnessTitle", { year: y })}
+          aside={
+            <span className="flex items-center gap-2">
+              <button
+                type="button"
+                className="dp-btn dp-btn--secondary label"
+                onClick={() => {
+                  setYear(y - 1);
+                }}
+              >
+                {y - 1}
+              </button>
+              <span className="body-strong">{y}</span>
+              <button
+                type="button"
+                className="dp-btn dp-btn--secondary label"
+                disabled={now !== null && y >= Number(now.slice(0, 4))}
+                onClick={() => {
+                  setYear(y + 1);
+                }}
+              >
+                {y + 1}
+              </button>
+            </span>
           }
-        </Async>
-      </Section>
+        >
+          <Async query={fairness}>
+            {(f) =>
+              f ? (
+                <>
+                  <p className="caption m-0 text-ink-muted">
+                    {f.people
+                      ? t("asOf", { date: fmt.date(f.as_of) })
+                      : t("anonymous", { date: fmt.date(f.as_of) })}
+                  </p>
+                  <div className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
+                    {f.distributions.map((d) => {
+                      const name = METRICS.includes(d.metric as "nights")
+                        ? t(`metric.${d.metric as "nights"}`)
+                        : d.metric;
+                      return (
+                        <div
+                          key={d.metric}
+                          className="flex flex-col gap-2"
+                          data-testid={`dist-${d.metric}`}
+                        >
+                          <h3 className="heading m-0">{name}</h3>
+                          <DotStrip
+                            values={d.values}
+                            min={d.minimum}
+                            max={d.maximum}
+                            median={d.median}
+                            mean={d.mean}
+                            label={t("distLabel", {
+                              name,
+                              people: d.people,
+                              min: d.minimum,
+                              median: fmt.number(d.median, 1),
+                              max: d.maximum,
+                            })}
+                          />
+                          <p className="num-small m-0 text-ink-muted">
+                            {t("distFacts", {
+                              people: d.people,
+                              mean: fmt.number(d.mean, 1),
+                              median: fmt.number(d.median, 1),
+                              min: d.minimum,
+                              max: d.maximum,
+                            })}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {f.people ? (
+                    <Table label={t("peopleLabel")}>
+                      <thead>
+                        <tr>
+                          <th scope="col">{t("colPerson")}</th>
+                          {METRICS.map((k) => (
+                            <th key={k} scope="col" className="text-right">
+                              {t(`metric.${k}`)}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...f.people]
+                          .sort((a, b) => b.weekends - a.weekends)
+                          .map((p) => (
+                            <tr key={p.staff_id}>
+                              <td>{p.display_name}</td>
+                              <td className="num-time text-right">{p.nights}</td>
+                              <td className="num-time text-right">{p.weekends}</td>
+                              <td className="num-time text-right">{p.holidays}</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </Table>
+                  ) : null}
+                </>
+              ) : null
+            }
+          </Async>
+        </Section>
+        <Section title={t("trendTitle")}>
+          <Async query={trend}>
+            {(items) => (
+              <>
+                <Bars
+                  items={items.map((i) => ({
+                    key: i.roster_month,
+                    label: fmt.monthShort(i.roster_month),
+                    value: i.overtime_hours,
+                    text: fmt.number(i.overtime_hours, 0),
+                  }))}
+                  label={t("trendLabel")}
+                />
+                <Table label={t("trendLabel")}>
+                  <thead>
+                    <tr>
+                      <th scope="col">{t("colMonth")}</th>
+                      <th scope="col" className="text-right">
+                        {t("colOvertime")}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((i) => (
+                      <tr key={i.roster_month}>
+                        <td>{fmt.month(i.roster_month)}</td>
+                        <td className="num-time text-right">{fmt.number(i.overtime_hours, 1)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </>
+            )}
+          </Async>
+        </Section>
+      </div>
       <Section
         title={t("complianceTitle", { month: fmt.month(m) })}
         aside={<MonthSwitch month={m} onChange={setMonth} />}
@@ -269,41 +306,6 @@ export default function FairnessPage(): ReactNode {
               </>
             ) : null
           }
-        </Async>
-      </Section>
-      <Section title={t("trendTitle")}>
-        <Async query={trend}>
-          {(items) => (
-            <>
-              <Bars
-                items={items.map((i) => ({
-                  key: i.roster_month,
-                  label: fmt.monthShort(i.roster_month),
-                  value: i.overtime_hours,
-                  text: fmt.number(i.overtime_hours, 0),
-                }))}
-                label={t("trendLabel")}
-              />
-              <Table label={t("trendLabel")}>
-                <thead>
-                  <tr>
-                    <th scope="col">{t("colMonth")}</th>
-                    <th scope="col" className="text-right">
-                      {t("colOvertime")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((i) => (
-                    <tr key={i.roster_month}>
-                      <td>{fmt.month(i.roster_month)}</td>
-                      <td className="num-time text-right">{fmt.number(i.overtime_hours, 1)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </>
-          )}
         </Async>
       </Section>
     </>

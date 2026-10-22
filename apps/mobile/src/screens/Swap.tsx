@@ -163,45 +163,71 @@ export function SwapScreen(): ReactNode {
         </>
       }
     >
-      <Async query={mine}>
-        {(list) => (
-          <View style={{ gap: spacing[2] }}>
-            {list.length === 0 ? <Txt muted>{t("m6.noShifts")}</Txt> : null}
-            {list.map((s) => {
-              const on = picked?.assignment_id === s.assignment_id;
-              return (
-                <Pressable
-                  key={s.assignment_id}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: on, checked: on }}
-                  aria-checked={on}
-                  accessibilityLabel={`${fmt.weekday(s.date)} ${fmt.date(s.date)}, ${t(`shift.${s.shift_type as "frueh"}.name`)}`}
-                  onPress={() => {
-                    setPicked(s);
-                  }}
-                  testID={`shift-${s.date}-${s.shift_type}`}
-                  style={{
-                    minHeight: TOUCH_MIN,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: spacing[3],
-                    gap: spacing[2],
-                    backgroundColor: on ? theme.actionWash : theme.sheet,
-                    borderWidth: on ? 2 : 1,
-                    borderColor: on ? theme.action : theme.rule,
-                  }}
-                >
-                  <ShiftLabel code={s.shift_type} />
-                  <Txt variant="bodyStrong">
-                    {fmt.weekday(s.date)} {fmt.dayMonth(s.date)}
-                  </Txt>
-                </Pressable>
-              );
-            })}
+      {picked ? (
+        <Card testID="swap-picked">
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: spacing[3],
+            }}
+          >
+            <View style={{ gap: spacing[1], flex: 1 }}>
+              <ShiftLabel code={picked.shift_type} />
+              <Txt variant="bodyStrong">
+                {fmt.weekday(picked.date)} {fmt.date(picked.date)}
+              </Txt>
+            </View>
+            <Button
+              label={t("m6.change")}
+              onPress={() => {
+                setPicked(null);
+              }}
+              testID="swap-change"
+            />
           </View>
-        )}
-      </Async>
+        </Card>
+      ) : (
+        <Async query={mine}>
+          {(list) => (
+            <View style={{ gap: spacing[2] }}>
+              {list.length === 0 ? <Txt muted>{t("m6.noShifts")}</Txt> : null}
+              {list.map((s) => {
+                return (
+                  <Pressable
+                    key={s.assignment_id}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: false, checked: false }}
+                    aria-checked={false}
+                    accessibilityLabel={`${fmt.weekday(s.date)} ${fmt.date(s.date)}, ${t(`shift.${s.shift_type as "frueh"}.name`)}`}
+                    onPress={() => {
+                      setPicked(s);
+                    }}
+                    testID={`shift-${s.date}-${s.shift_type}`}
+                    style={{
+                      minHeight: TOUCH_MIN,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: spacing[3],
+                      gap: spacing[2],
+                      backgroundColor: theme.sheet,
+                      borderWidth: 1,
+                      borderColor: theme.rule,
+                    }}
+                  >
+                    <ShiftLabel code={s.shift_type} />
+                    <Txt variant="bodyStrong">
+                      {fmt.weekday(s.date)} {fmt.dayMonth(s.date)}
+                    </Txt>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
+        </Async>
+      )}
       {picked && audience.data ? (
         <Card testID="swap-audience">
           <Txt testID="audience-text">

@@ -1,0 +1,133 @@
+[
+  {
+    "id": "W1",
+    "slug": "overview",
+    "caption": "Planner overview: request window, open decisions, 14-day coverage with the C3 band, recent changes",
+    "themes": [
+      "light",
+      "dark"
+    ]
+  },
+  {
+    "id": "M2",
+    "slug": "today",
+    "caption": "Today (Dr. Kaya): next shift, open tasks, quick actions",
+    "themes": [
+      "light",
+      "dark"
+    ]
+  },
+  {
+    "id": "M9",
+    "slug": "fairness",
+    "caption": "Fairness balance: own figures against the department average only",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "W13",
+    "slug": "ai-transparency",
+    "caption": "AI transparency: one card per component C1 to C8, with real status and metrics",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "W11",
+    "slug": "rules-master-data",
+    "caption": "Rules and master data (Administrator) with rule version 2026-1",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "W12",
+    "slug": "oversight",
+    "caption": "Oversight (Katrin Vogel): read-only compliance, overtime and anonymous fairness",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "W3",
+    "slug": "variants",
+    "caption": "Variant comparison from a real solver run (a trial run while the request window is open)",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "W4",
+    "slug": "roster-editor",
+    "caption": "Roster editor with a rule message visible (11-hour rest period) and its fix",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "W9",
+    "slug": "copilot",
+    "caption": "Copilot answering with a rule citation (a stand-in, labelled as such)",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "M5",
+    "slug": "leave-request",
+    "caption": "Request leave (Situation A): 14 to 27 July 2027, coverable, no trade-off, no colleague names",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "M6",
+    "slug": "exchange-offer",
+    "caption": "Exchange offer (Situation B): Dr. Mehta's Saturday early shift, offered only as an exchange",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "M7",
+    "slug": "sick-report",
+    "caption": "Sick report (Situation C) at 06:40: one tap, no diagnosis, cover is being organised",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "M8",
+    "slug": "cover-request",
+    "caption": "Cover request at 06:43 (Dr. Alvarez): countdown, hours impact, take or decline",
+    "themes": [
+      "light",
+      "dark"
+    ]
+  },
+  {
+    "id": "W7",
+    "slug": "live-cascade",
+    "caption": "Live cover cascade: the gap closed at 06:43 by Dr. Alvarez",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "W7b",
+    "slug": "escalation",
+    "caption": "Escalation: nobody on the list answered in time, the Planner sees the options (auto-approval stays on)",
+    "themes": [
+      "light"
+    ]
+  },
+  {
+    "id": "W10",
+    "slug": "audit-trail",
+    "caption": "Audit trail: who requested, proposed, approved and when",
+    "themes": [
+      "light"
+    ]
+  }
+]

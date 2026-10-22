@@ -18,6 +18,10 @@ type Event = components["schemas"]["AuditEventOut"];
 export function AuditTable({ events }: { events: Event[] }): ReactNode {
   const t = useTranslations("w10");
   const fmt = useFmt();
+  const subject = (type: string): string =>
+    t.has(`subject.${type}` as "subject.roster_variant")
+      ? t(`subject.${type}` as "subject.roster_variant")
+      : type;
   const label = (a: string): string =>
     (AUDIT_ACTIONS as readonly string[]).includes(a)
       ? t(`action.${actionKey(a) as "run_requested"}`)
@@ -48,7 +52,7 @@ export function AuditTable({ events }: { events: Event[] }): ReactNode {
                 </span>
               ) : null}
             </td>
-            <td>{e.staff_name ?? e.subject_type}</td>
+            <td>{e.staff_name ?? subject(e.subject_type)}</td>
           </tr>
         ))}
       </tbody>

@@ -34,12 +34,14 @@ export function LeaveScreen(): ReactNode {
   const [end, setEnd] = useState<string | null>(null);
   const [hint, setHint] = useState<components["schemas"]["LeaveCheck"] | null>(null);
   const [check, setCheck] = useState<Check | null>(null);
+  const [editing, setEditing] = useState(false);
   const [created, setCreated] = useState<components["schemas"]["LeaveOut"] | null>(null);
   const month = picked ?? start?.slice(0, 7) ?? today.data?.now.slice(0, 7) ?? null;
 
   const tap = (date: string): void => {
     setHint(null);
     setCheck(null);
+    if (start !== null && end === null && date >= start) setEditing(false);
     if (start === null || end !== null || date < start) {
       setStart(date);
       setEnd(null);
@@ -158,7 +160,22 @@ export function LeaveScreen(): ReactNode {
         </>
       }
     >
-      {month ? (
+      {start && end && !editing ? (
+        <Card testID="leave-range">
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: spacing[3],
+            }}
+          >
+            <Txt variant="heading">{`${fmt.range(start, end)} ${end.slice(0, 4)}`}</Txt>
+            <Button label={t("m5.change")} onPress={() => setEditing(true)} testID="leave-change" />
+          </View>
+        </Card>
+      ) : null}
+      {month && !(start && end && !editing) ? (
         <Card>
           <MonthCalendar
             month={month}
