@@ -1,13 +1,22 @@
 """Public interface of the fairness context: the burden of nights, weekends and holidays.
 
-Pure functions over assignments; the application layer supplies them. Phase 9 adds the
-persisted burden ledger.
+Pure functions over assignments (the application layer supplies them) and, from Phase 9, the
+persisted month-end reports.
 """
 
+import hashlib
+import json
+import uuid
 from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from statistics import mean, median
+from typing import Any
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from dienstpilot.fairness import models as m
 
 WORKING = {"frueh", "spaet", "nacht", "bereitschaft"}
 CATEGORIES = ("nights", "weekends", "holidays")
@@ -72,3 +81,101 @@ def distribution(counts: dict[str, Burden], people: Iterable[str], category: str
         values[-1],
         tuple(values),
     )
+
+
+# --- month-end reports (persisted) ------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class MonthReportView:
+    """A stored month-end report."""
+
+    roster_month: date
+    status: str  # prepared | closed
+    prepared_at: datetime
+    closed_at: datetime | None
+    closed_by: str | None
+    report_hash: str
+    payload: dict[str, Any]
+
+
+def _view(r: m.MonthReport) -> MonthReportView:
+    return MonthReportView(
+        r.roster_month,
+        r.status,
+        r.prepared_at,
+        r.closed_at,
+        None if r.closed_by is None else str(r.closed_by),
+        r.report_hash,
+        dict(r.payload),
+    )
+
+
+def payload_hash(payload: dict[str, Any]) -> str:
+    """Return the SHA-256 of a report's canonical JSON."""
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(raw.encode()).hexdigest()
+
+
+def month_report(session: Session, department_id: str, month: date) -> MonthReportView | None:
+    """Return the stored report of a month, if it was prepared."""
+    r = session.get(m.MonthReport, (uuid.UUID(department_id), month))
+    return None if r is None else _view(r)
+
+
+def closed_months(session: Session, department_id: str) -> list[date]:
+    """Return the months the Planner has closed, oldest first."""
+    return list(
+        session.scalars(
+            select(m.MonthReport.roster_month)
+            .where(
+                m.MonthReport.department_id == uuid.UUID(department_id),
+                m.MonthReport.status == "closed",
+            )
+            .order_by(m.MonthReport.roster_month)
+        )
+    )
+
+
+def save_prepared(
+    session: Session, department_id: str, month: date, payload: dict[str, Any], at: datetime
+) -> MonthReportView:
+    """Store the prepared report (once; a stored report is never replaced)."""
+    key = (uuid.UUID(department_id), month)
+    r = session.get(m.MonthReport, key)
+    if r is None:
+        r = m.MonthReport(
+            department_id=key[0],
+            roster_month=month,
+            status="prepared",
+            prepared_at=at,
+            report_hash=payload_hash(payload),
+            payload=payload,
+        )
+        session.add(r)
+        session.flush()
+    return _view(r)
+
+
+def close_month(
+    session: Session, department_id: str, month: date, by: str, at: datetime
+) -> MonthReportView:
+    """Lock a prepared report: it becomes final and the payroll export is released."""
+    r = session.get(m.MonthReport, (uuid.UUID(department_id), month), with_for_update=True)
+    if r is None:
+        raise KeyError(month.isoformat())
+    if r.status == "closed":
+        raise ValueError("the month is already closed")
+    r.status, r.closed_at, r.closed_by = "closed", at, uuid.UUID(by)
+    session.flush()
+    return _view(r)
+
+
+def month_reports(session: Session, department_id: str) -> list[tuple[date, str]]:
+    """Return (month, status) of every stored report, newest first."""
+    rows = session.execute(
+        select(m.MonthReport.roster_month, m.MonthReport.status)
+        .where(m.MonthReport.department_id == uuid.UUID(department_id))
+        .order_by(m.MonthReport.roster_month.desc())
+    )
+    return [(month, status) for month, status in rows]

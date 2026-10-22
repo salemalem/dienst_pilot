@@ -10,6 +10,7 @@ dependencies = [
   "dienstpilot-solver",
   "dienstpilot-validator",
   "fastapi>=0.153.0",
+  "jsonschema==4.26.0",
   "polars>=1.30.0",
   "psycopg[binary]>=3.3.6",
   "pydantic>=2.14.1",

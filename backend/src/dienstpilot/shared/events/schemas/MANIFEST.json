@@ -1,0 +1,21 @@
+{
+  "CoverAccepted.v1.json": "9a702a3ab61a863d0f419a392dc546f026be83b3070af3e1e5eb995feadb4d27",
+  "CoverDecided.v1.json": "064af8b2a1a4481b613720a3a2b2285e83cbd4e461c13b4d379a96169bfd92cc",
+  "CoverEscalated.v1.json": "818367fb193edd5e5300042df12f55570b90b089b98a7b08ba8b4023927ecd10",
+  "CoverRequested.v1.json": "84261134bd498a5bef11fbd4170f6e9ace6f25432f2c1b4926fabbf369ff5fd6",
+  "LeaveDecided.v1.json": "042a2ae2be542ec8a4e4d1cfc9ee242815c2f86b79cf3794d8d970ee837b97e3",
+  "LeaveRequested.v1.json": "03513ee1ca748f86ad4d38d243abe9e8f4e2a9bb4cf3eeecef8a5b2a0387802d",
+  "MonthClosed.v1.json": "be92b009a8df3bc17d6e228d118c1f5ecce9b7db121c101a09f801e464f446d6",
+  "MonthReportPrepared.v1.json": "771ad959a4eb3a0c39a001e543f6c89446fa2948f567133ae6b57403fe2ac943",
+  "PreferencesSubmitted.v1.json": "cc6bf053bfaf3b64d3029ff24bf84ff94d6f88feabe231a9b169fb72900fc5fc",
+  "RosterChanged.v1.json": "6f142ab356d455e474147a08b8ce2084860994a6d6e1949384fdcb148081a91a",
+  "RosterGenerated.v1.json": "de6fdd41fc5a7ab512188892846cadc0360f42951bc9bfeefb196c873e21c8e9",
+  "RosterPublished.v1.json": "79131e501ccfbe1420482d2ab32d5ae1395b86fa1ea0dc9f5132b49f597f40e9",
+  "SicknessReported.v1.json": "bba13bf8699749e3525f20caed5eda350a858de3cef36884929b9e9bb48ef38e",
+  "SwapAccepted.v1.json": "e9122b8df2a1f64336245ecf1e9256b872b67ca1aab805a3191e061731fa0de5",
+  "SwapAutoApproved.v1.json": "fae667fc63735dcb4183c404f80646b8d14033fff4ebd63496600f21c9fc54db",
+  "SwapDecided.v1.json": "454f168a1c379f04e89b09bdc89539a011fd80813e929102b7485dcdf4ff2490",
+  "SwapEscalated.v1.json": "adf25722e03336a7383d19782f60fe2caf2fc38f51d9f0a4c0d5352a804a2fa9",
+  "SwapOffered.v1.json": "d2f1ad32c8462802c71245621c32af629d4e2f20fec5cb56fadff6556bf292f5",
+  "WindowClosed.v1.json": "0a164aceb2ecbcbf3d4136ae4a62f273342392e02d5f8ec79b464743ec5dcf7a"
+}

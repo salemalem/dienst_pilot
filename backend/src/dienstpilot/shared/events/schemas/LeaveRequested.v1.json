@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/LeaveRequested.v1",
+  "title": "LeaveRequested",
+  "description": "A leave request was submitted. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "leave_request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "staff_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "leave_request_id",
+    "staff_id",
+    "start_date",
+    "end_date"
+  ],
+  "additionalProperties": false
+}

@@ -374,6 +374,30 @@ def _variant_info(v: m.RosterVariant) -> VariantInfo:
     )
 
 
+WORKER_RESTARTED = "worker_restarted"  # error codes of runs that did not finish (W3 shows text)
+JOB_TIMEOUT = "job_timeout"
+
+
+def fail_interrupted(
+    session: Session, now: datetime, *, keep: set[str], error: str = WORKER_RESTARTED
+) -> list[str]:
+    """Mark runs a dead worker left behind as failed; return their ids.
+
+    ``running`` runs have no worker any more. ``queued`` runs listed in ``keep`` (their job is
+    still on the queue) are left alone; the Planner can start a new run for the others.
+    """
+    failed = []
+    for r in session.scalars(
+        select(m.RosterRun).where(m.RosterRun.status.in_(("queued", "running"))).with_for_update()
+    ):
+        if r.status == "queued" and str(r.id) in keep:
+            continue
+        r.status, r.finished_at, r.error = "failed", now, error
+        failed.append(str(r.id))
+    session.flush()
+    return failed
+
+
 def run(session: Session, run_id: str) -> Run | None:
     """Return a run with its variants."""
     r = session.get(m.RosterRun, uuid.UUID(run_id))

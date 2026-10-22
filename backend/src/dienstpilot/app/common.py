@@ -8,10 +8,11 @@ from fastapi import HTTPException, status
 from pydantic import BaseModel
 
 from dienstpilot.app.deps import Ctx
-from dienstpilot.audit import service as audit
 from dienstpilot.organization import service as organization
 from dienstpilot.organization.service import StaffMember
+from dienstpilot.recording import record as record_event
 from dienstpilot.shared.ports import EngineInfo
+from dienstpilot.workflows.runtime import settle
 
 
 class EngineLabel(BaseModel):
@@ -74,7 +75,7 @@ def record(
     payload: dict[str, Any] | None = None,
 ) -> None:
     """Record an audit event for a write by the signed-in user."""
-    audit.record(
+    record_event(
         ctx.session,
         occurred_at=ctx.clock.now(),
         department_id=ctx.user.department_id,
@@ -91,3 +92,12 @@ def record(
 def jsonable(payload: dict[str, Any]) -> dict[str, Any]:
     """Return a JSON-safe copy (dates as ISO strings)."""
     return {k: (v.isoformat() if isinstance(v, date) else v) for k, v in payload.items()}
+
+
+def settle_timers(ctx: Ctx) -> None:
+    """Fire every timer that is due on the demo clock (cover deadlines, reminders, nightly check).
+
+    Called first in handlers that read or change what timers change; replaces the lazy deadline
+    checks of the API layer.
+    """
+    settle(ctx.session, ctx.clock, ctx.engines)

@@ -8,7 +8,7 @@ from typing import Annotated, Any, Literal
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from dienstpilot.app.common import EngineLabel, department, label, record
+from dienstpilot.app.common import EngineLabel, department, label, record, settle_timers
 from dienstpilot.app.context import CtxDep
 from dienstpilot.app.deps import AdminDep, MasterDataReaderDep, OversightReaderDep, PlannerDep
 from dienstpilot.app.privacy import audit_payload_for
@@ -141,6 +141,21 @@ class AuditEventOut(BaseModel):
     subject_id: str | None
     staff_name: str | None
     payload: dict[str, Any]
+    seq: int
+    hash: str
+
+
+class ChainOut(BaseModel):
+    """What the log may claim about itself: the result of the last real verification."""
+
+    state: Literal["verified", "stale", "failed", "never_checked"]
+    checked_at: datetime | None = None
+    trigger: Literal["nightly", "on_demand", "seed"] | None = None
+    rows: int = 0
+    newer_events: int = Field(0, description="Entries appended since the check; each links up")
+    head_hash: str | None = None
+    first_bad_seq: int | None = None
+    reason: str | None = None
 
 
 class AuditPage(BaseModel):
@@ -148,8 +163,7 @@ class AuditPage(BaseModel):
 
     total: int
     events: list[AuditEventOut]
-    chain_verified: None = Field(None, description="The hash chain arrives in Phase 9")
-    chain_available_from_phase: int = 9
+    chain: ChainOut
 
 
 @router.get("/audit/events")
@@ -167,6 +181,7 @@ def audit_events(
 
     Same privacy rules as everywhere: no absence category for anyone but the Planner.
     """
+    settle_timers(c)
     dep = department(c)
     total, events = audit.list_events(
         c.session,
@@ -190,10 +205,34 @@ def audit_events(
                 subject_id=e.subject_id,
                 staff_name=dep.name(e.staff_id),
                 payload=audit_payload_for(c.user, e.action, e.payload),
+                seq=e.seq,
+                hash=e.hash,
             )
             for e in events
         ],
+        chain=_chain_out(audit.chain_status(c.session, c.user.department_id, c.clock.now())),
     )
+
+
+def _chain_out(st: audit.ChainStatus) -> ChainOut:
+    return ChainOut(
+        state=st.state,
+        checked_at=st.checked_at,
+        trigger=st.trigger,
+        rows=st.rows,
+        newer_events=st.newer_events,
+        head_hash=st.head_hash,
+        first_bad_seq=st.first_bad_seq,
+        reason=st.reason,
+    )
+
+
+@router.post("/audit/verify")
+def audit_verify(c: CtxDep, _: OversightReaderDep) -> ChainOut:
+    """W10: verify the whole hash chain now (Planner or Oversight) and return the result."""
+    settle_timers(c)
+    audit.run_check(c.session, c.user.department_id, c.clock.now(), "on_demand")
+    return _chain_out(audit.chain_status(c.session, c.user.department_id, c.clock.now()))
 
 
 # --- W11 Regeln und Stammdaten ----------------------------------------------------------------
@@ -399,14 +438,14 @@ def audit_export(
 ) -> AuditPage:
     """W12: export of the audit trail (same privacy rules), up to 5 000 events."""
     pages: list[AuditEventOut] = []
-    total = 0
+    last: AuditPage | None = None
     for offset in range(0, 5000, 500):
-        page = audit_events(c, user, since=since, until=until, limit=500, offset=offset)
-        total = page.total
-        pages += page.events
-        if len(page.events) < 500:
+        last = audit_events(c, user, since=since, until=until, limit=500, offset=offset)
+        pages += last.events
+        if len(last.events) < 500:
             break
-    return AuditPage(total=total, events=pages)
+    assert last is not None
+    return AuditPage(total=last.total, events=pages, chain=last.chain)
 
 
 # --- W13 KI-Transparenz -----------------------------------------------------------------------

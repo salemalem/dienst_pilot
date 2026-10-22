@@ -11,7 +11,14 @@ from typing import Annotated, Any, Literal
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from dienstpilot.app.common import Department, EngineLabel, department, label, record
+from dienstpilot.app.common import (
+    Department,
+    EngineLabel,
+    department,
+    label,
+    record,
+    settle_timers,
+)
 from dienstpilot.app.context import CtxDep
 from dienstpilot.app.cover import (
     CHECK,
@@ -42,10 +49,12 @@ from dienstpilot.app.roster import (
 from dienstpilot.fairness import service as fairness
 from dienstpilot.identity import service as identity
 from dienstpilot.identity.service import UserView
+from dienstpilot.notifications import service as notifications_service
 from dienstpilot.operations import service as operations
 from dienstpilot.organization import service as organization
 from dienstpilot.planning import service as planning
 from dienstpilot.requests import service as requests
+from dienstpilot.shared.events.outbox import publish
 from dienstpilot.shared.ports import PreferenceContext
 from dienstpilot_validator import Assignment
 
@@ -139,7 +148,7 @@ def _open_window_task(c: Ctx) -> WindowTask | None:
 
 
 def _cover_tasks(c: Ctx) -> list[CoverTask]:
-    operations.advance(c.session, c.clock.now())
+    settle_timers(c)
     out = []
     for offer, assignment_id in operations.pending_offers_for(c.session, _staff_id(c)):
         a = planning.assignment(c.session, assignment_id)
@@ -1002,7 +1011,7 @@ def respond_cover(c: CtxDep, _: Physician, offer_id: str, body: RespondIn) -> Re
     decides (W7b).
     """
     me = _staff_id(c)
-    operations.advance(c.session, c.clock.now())
+    settle_timers(c)
     try:
         reason = _cover_escalation(c, offer_id, me) if body.accept else None
         cas = operations.respond(c.session, offer_id, me, body.accept, c.clock.now(), reason)
@@ -1013,6 +1022,14 @@ def respond_cover(c: CtxDep, _: Physician, offer_id: str, body: RespondIn) -> Re
     record(c, "cover.accepted" if body.accept else "cover.declined", "cover_cascade", cas.id, me)
     if body.accept and cas.approval == "policy":
         _record_policy(c, "cover.decided", "cover_cascade", cas.id, me)
+    elif cas.status == "pending_approval" and cas.escalation_reason:
+        publish(
+            c.session,
+            "CoverEscalated",
+            {"cascade_id": cas.id, "reason": cas.escalation_reason},
+            occurred_at=c.clock.now(),
+            department_id=c.user.department_id,
+        )
     return RespondOut(status=cas.status, escalation_reason=cas.escalation_reason)
 
 
@@ -1222,6 +1239,8 @@ def notifications(c: CtxDep, _: Physician) -> list[Notification]:
                     },
                 )
             )
+    for n in notifications_service.for_staff(c.session, me, now):
+        out.append(Notification(kind=n.kind, at=n.at, data={k: str(v) for k, v in n.data.items()}))
     for task in _cover_tasks(c):
         out.append(
             Notification(

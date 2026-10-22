@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/SicknessReported.v1",
+  "title": "SicknessReported",
+  "description": "A physician reported sick (dates only, no category). Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "absence_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "staff_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "absence_id",
+    "staff_id",
+    "start_date",
+    "end_date"
+  ],
+  "additionalProperties": false
+}

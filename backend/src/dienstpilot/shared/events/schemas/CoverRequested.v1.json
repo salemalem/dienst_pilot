@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/CoverRequested.v1",
+  "title": "CoverRequested",
+  "description": "A cover search started for a shift. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "cascade_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "staff_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "cascade_id",
+    "staff_id"
+  ],
+  "additionalProperties": false
+}

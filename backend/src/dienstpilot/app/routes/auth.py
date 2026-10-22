@@ -7,13 +7,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from dienstpilot.app.context import CtxDep
-from dienstpilot.app.deps import AdminDep, ClockDep, SessionDep, get_clock
+from dienstpilot.app.deps import AdminDep, ClockDep, EnginesDep, SessionDep, get_clock
 from dienstpilot.audit import service as audit
 from dienstpilot.identity import service as identity
 from dienstpilot.identity.tokens import Claims, expiry, issue
 from dienstpilot.shared.clock import RedisClock
 from dienstpilot.shared.ports import Clock
 from dienstpilot.shared.settings import Settings, get_settings
+from dienstpilot.workflows.runtime import settle
 
 router = APIRouter(tags=["auth"])
 
@@ -113,8 +114,13 @@ def set_clock(
     session: SessionDep,
     clock: Annotated[Clock, Depends(get_clock)],
     settings: Annotated[Settings, Depends(get_settings)],
+    engines: EnginesDep,
 ) -> ClockOut:
-    """Move the demo clock (Administrator, DEMO_MODE only). Stored in Redis."""
+    """Move the demo clock (Administrator, DEMO_MODE only). Stored in Redis.
+
+    Moving it forward fires every timer that has become due, in order, before the call returns
+    (ADR-017); moving it back un-fires nothing.
+    """
     if not isinstance(clock, RedisClock):
         raise HTTPException(status.HTTP_409_CONFLICT, "This clock cannot be moved")
     if body.reset:
@@ -125,10 +131,11 @@ def set_clock(
         )
     else:
         clock.set(body.now)
+    settle(session, clock, engines)
     audit.record(
         session,
         occurred_at=clock.now(),
-        department_id=admin.department_id,
+        department_id=None,  # a clock change belongs to no department: the system chain
         actor_user_id=admin.id,
         actor_label=admin.display_name,
         action="demo.clock_set",

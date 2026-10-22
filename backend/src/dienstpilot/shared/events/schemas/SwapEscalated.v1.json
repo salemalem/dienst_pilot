@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/SwapEscalated.v1",
+  "title": "SwapEscalated",
+  "description": "A taken swap waits for the Planner. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "swap_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "swap_id",
+    "reason"
+  ],
+  "additionalProperties": false
+}

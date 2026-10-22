@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/CoverEscalated.v1",
+  "title": "CoverEscalated",
+  "description": "A cover search needs the Planner. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "cascade_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "cascade_id",
+    "reason"
+  ],
+  "additionalProperties": false
+}

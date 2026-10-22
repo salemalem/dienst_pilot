@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/RosterChanged.v1",
+  "title": "RosterChanged",
+  "description": "A published roster was changed by the Planner. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "change_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "change_id"
+  ],
+  "additionalProperties": false
+}

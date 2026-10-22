@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/SwapAutoApproved.v1",
+  "title": "SwapAutoApproved",
+  "description": "A swap was approved by the Planner's policy. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "swap_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "swap_id"
+  ],
+  "additionalProperties": false
+}

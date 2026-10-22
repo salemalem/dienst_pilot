@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/RosterGenerated.v1",
+  "title": "RosterGenerated",
+  "description": "A solver run finished. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "roster_month": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "enum": [
+        "done",
+        "infeasible",
+        "failed"
+      ]
+    }
+  },
+  "required": [
+    "run_id",
+    "roster_month",
+    "status"
+  ],
+  "additionalProperties": false
+}

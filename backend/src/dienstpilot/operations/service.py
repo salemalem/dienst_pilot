@@ -14,8 +14,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from dienstpilot.operations import models as m
+from dienstpilot.shared.workflows import engine as workflow
+from dienstpilot.shared.workflows import machines
 
 ANSWER_WINDOW = timedelta(minutes=15)
+COVER_TIMEOUT = "cover.timeout"  # the timer kind: one per asked colleague, due at the deadline
 VALIDATOR_UNAVAILABLE = "validator_unavailable"  # kept for rows written before Phase 7
 LIST_EXHAUSTED = "list_exhausted"
 # Why a swap or cover waits for the Planner (PROCESS §2).
@@ -195,6 +198,7 @@ def offer_swap(session: Session, assignment_id: str, offered_by: str, now: datet
     )
     session.add(s)
     session.flush()
+    workflow.start(session, machines.SWAP_APPROVAL, str(s.id), now)
     return _swap(s)
 
 
@@ -218,10 +222,13 @@ def take_swap(
     s.accepted_by, s.accepted_at = uuid.UUID(taker), now
     if counter_assignment_id is not None:
         s.counter_assignment_id = uuid.UUID(counter_assignment_id)
+    workflow.ensure(session, machines.SWAP_APPROVAL, str(s.id), "offered", now)
     if escalation_reason is None:
         s.status, s.approval, s.decided_at = "approved", "policy", now
+        workflow.move(session, machines.SWAP_APPROVAL, str(s.id), "auto_approved", now)
     else:
         s.status, s.escalation_reason = "pending_approval", escalation_reason
+        workflow.move(session, machines.SWAP_APPROVAL, str(s.id), "escalated", now)
     session.flush()
     return _swap(s)
 
@@ -238,6 +245,10 @@ def decide_swap(
     s.status = "approved" if approve else "declined"
     s.approval, s.decided_by, s.decided_at = "planner", uuid.UUID(by), now
     s.decision_reason = None if approve else reason
+    workflow.ensure(session, machines.SWAP_APPROVAL, str(s.id), "escalated", now)
+    workflow.move(
+        session, machines.SWAP_APPROVAL, str(s.id), "approved" if approve else "declined", now
+    )
     session.flush()
     return _swap(s)
 
@@ -271,28 +282,55 @@ def _cascade(session: Session, c: m.CoverCascade) -> Cascade:
     )
 
 
-def _ask(session: Session, c: m.CoverCascade, at: datetime) -> None:
-    """Ask the next colleague in the queue, or hand the cascade to the Planner if none is left."""
+def _department(session: Session, c: m.CoverCascade) -> str | None:
+    inst = workflow.get(session, machines.SICK_CASCADE, str(c.id))
+    return None if inst is None else inst.data.get("department_id")
+
+
+def _move(session: Session, c: m.CoverCascade, to: str, at: datetime) -> None:
+    """Move the cascade's workflow (created first if the row predates the engine)."""
+    before = "escalated" if to == "unfilled" else "asking"
+    workflow.ensure(session, machines.SICK_CASCADE, str(c.id), before, at)
+    workflow.move(session, machines.SICK_CASCADE, str(c.id), to, at)
+
+
+def _ask(session: Session, c: m.CoverCascade, at: datetime) -> bool:
+    """Ask the next colleague in the queue, or hand the cascade to the Planner if none is left.
+
+    Asking sets a timer for the 15-minute deadline (demo time); the workflow moves to
+    ``asking``, or to ``escalated`` when the list is exhausted. Returns whether someone was asked.
+    """
     queue = list(c.candidate_queue or [])
     if not queue:
         c.status, c.escalation_reason = "pending_approval", LIST_EXHAUSTED
-        return
+        _move(session, c, "escalated", at)
+        return False
     nxt, rest = queue[0], queue[1:]
     rank = 1 + len(
         list(session.scalars(select(m.CoverOffer.id).where(m.CoverOffer.cascade_id == c.id)))
     )
-    session.add(
-        m.CoverOffer(
-            id=_uid("cover-offer", c.id, rank),
-            cascade_id=c.id,
-            staff_id=uuid.UUID(nxt),
-            rank=rank,
-            asked_at=at,
-            deadline_at=at + ANSWER_WINDOW,
-            response="pending",
-        )
+    offer = m.CoverOffer(
+        id=_uid("cover-offer", c.id, rank),
+        cascade_id=c.id,
+        staff_id=uuid.UUID(nxt),
+        rank=rank,
+        asked_at=at,
+        deadline_at=at + ANSWER_WINDOW,
+        response="pending",
     )
+    session.add(offer)
     c.candidate_queue = rest
+    session.flush()
+    _move(session, c, "asking", at)
+    workflow.arm(
+        session,
+        COVER_TIMEOUT,
+        str(offer.id),
+        at + ANSWER_WINDOW,
+        department_id=_department(session, c),
+        payload={"cascade_id": str(c.id)},
+    )
+    return True
 
 
 def open_cascade(
@@ -301,8 +339,13 @@ def open_cascade(
     absence_id: str,
     ranked_candidates: list[str],
     now: datetime,
+    department_id: str | None = None,
 ) -> Cascade:
-    """Start a cover search with colleagues in the order the ranking chose."""
+    """Start a cover search with colleagues in the order the ranking chose.
+
+    A ``sick_cascade`` workflow instance is created with it (state ``finding_candidates``, then
+    ``asking`` or ``escalated``).
+    """
     c = m.CoverCascade(
         id=_uid("cascade", assignment_id, absence_id),
         assignment_id=uuid.UUID(assignment_id),
@@ -313,31 +356,35 @@ def open_cascade(
     )
     session.add(c)
     session.flush()
+    workflow.start(session, machines.SICK_CASCADE, str(c.id), now, {"department_id": department_id})
     _ask(session, c, now)
     session.flush()
     return _cascade(session, c)
 
 
-def advance(session: Session, now: datetime) -> list[tuple[str, str]]:
-    """Move every open cascade past expired requests. Returns (cascade id, staff id) timed out."""
-    timed_out = []
-    for c in session.scalars(select(m.CoverCascade).where(m.CoverCascade.status == "open")):
-        while True:
-            pending = session.scalar(
-                select(m.CoverOffer).where(
-                    m.CoverOffer.cascade_id == c.id, m.CoverOffer.response == "pending"
-                )
-            )
-            if pending is None or pending.deadline_at is None or pending.deadline_at > now:
-                break
-            pending.response = "no_response"
-            timed_out.append((str(c.id), str(pending.staff_id)))
-            _ask(session, c, pending.deadline_at)
-            session.flush()
-            if c.status != "open":
-                break
+def timeout_offer(session: Session, offer_id: str, cascade_id: str) -> tuple[str, bool] | None:
+    """Mark an unanswered request as ``no_response`` and ask the next colleague.
+
+    Called by the timer that fires at the offer's deadline. Both rows are locked, so a colleague
+    who answers at the same moment, or a second firing, cannot cause a second request: whoever
+    gets the lock first wins and the other sees an offer that is no longer pending. Returns
+    (staff id timed out, whether the next colleague was asked), or None when there was nothing
+    to do.
+    """
+    o = session.scalars(
+        select(m.CoverOffer).where(m.CoverOffer.id == uuid.UUID(offer_id)).with_for_update()
+    ).first()
+    if o is None or o.response != "pending" or o.deadline_at is None:
+        return None
+    c = session.scalars(
+        select(m.CoverCascade).where(m.CoverCascade.id == o.cascade_id).with_for_update()
+    ).one()
+    if str(c.id) != cascade_id or c.status != "open":
+        return None
+    o.response = "no_response"
+    asked = _ask(session, c, o.deadline_at)
     session.flush()
-    return timed_out
+    return str(o.staff_id), asked
 
 
 def respond(
@@ -353,23 +400,29 @@ def respond(
     An acceptance closes the cascade under the policy when ``escalation_reason`` is None;
     otherwise it waits for the Planner.
     """
-    o = session.get(m.CoverOffer, uuid.UUID(offer_id))
+    o = session.scalars(
+        select(m.CoverOffer).where(m.CoverOffer.id == uuid.UUID(offer_id)).with_for_update()
+    ).first()
     if o is None or str(o.staff_id) != staff_id:
         raise KeyError(offer_id)
     if o.response != "pending" or (o.deadline_at is not None and o.deadline_at <= now):
         raise ValueError("this request is no longer open")
-    c = session.get(m.CoverCascade, o.cascade_id)
-    assert c is not None
+    c = session.scalars(
+        select(m.CoverCascade).where(m.CoverCascade.id == o.cascade_id).with_for_update()
+    ).one()
     o.response, o.responded_at = ("accepted" if accept else "declined"), now
+    workflow.cancel(session, COVER_TIMEOUT, str(o.id), now)
     if accept and escalation_reason is None:
         c.covered_by, c.status, c.outcome, c.closed_at = o.staff_id, "closed", "covered", now
         c.approval = "policy"
+        _move(session, c, "filled", now)
     elif accept:
         c.covered_by, c.status, c.escalation_reason = (
             o.staff_id,
             "pending_approval",
             escalation_reason,
         )
+        _move(session, c, "escalated", now)
     else:
         _ask(session, c, now)
     session.flush()
@@ -380,7 +433,9 @@ def decide_cascade(
     session: Session, cascade_id: str, outcome: str, covered_by: str | None, now: datetime
 ) -> Cascade:
     """Close a cascade as the Planner decides: confirm, assign (overtime), locum or unfilled."""
-    c = session.get(m.CoverCascade, uuid.UUID(cascade_id))
+    c = session.scalars(
+        select(m.CoverCascade).where(m.CoverCascade.id == uuid.UUID(cascade_id)).with_for_update()
+    ).first()
     if c is None:
         raise KeyError(cascade_id)
     if c.status != "pending_approval":
@@ -388,6 +443,7 @@ def decide_cascade(
     if outcome not in ("covered", "escalated_overtime", "locum", "unfilled"):
         raise ValueError(outcome)
     c.outcome, c.status, c.closed_at, c.approval = outcome, "closed", now, "planner"
+    _move(session, c, "unfilled" if outcome == "unfilled" else "filled", now)
     c.covered_by = (
         uuid.UUID(covered_by) if covered_by else (c.covered_by if outcome == "covered" else None)
     )

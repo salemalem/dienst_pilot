@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/WindowClosed.v1",
+  "title": "WindowClosed",
+  "description": "A request window was closed. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "window_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "window_id"
+  ],
+  "additionalProperties": false
+}

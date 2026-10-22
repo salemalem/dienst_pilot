@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dienstpilot.example/events/LeaveDecided.v1",
+  "title": "LeaveDecided",
+  "description": "The Planner decided a leave request. Payload carries ids only.",
+  "type": "object",
+  "properties": {
+    "leave_request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "staff_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "decision": {
+      "enum": [
+        "approved",
+        "declined"
+      ]
+    }
+  },
+  "required": [
+    "leave_request_id",
+    "staff_id",
+    "decision"
+  ],
+  "additionalProperties": false
+}
