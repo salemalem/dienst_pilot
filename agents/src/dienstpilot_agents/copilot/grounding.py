@@ -186,8 +186,11 @@ class Pool:
         self.add(values_in(data))
 
     def knows(self, value: float) -> bool:
-        """Return whether a number is in the pool (tolerant to float noise)."""
-        return any(isinstance(v, float) and abs(v - value) < 1e-9 for v in self._values)
+        """Return whether a number is in the pool (float noise and sign ignored).
+
+        "0,5 hours too short" is backed by a result of -0.5.
+        """
+        return any(isinstance(v, float) and abs(abs(v) - abs(value)) < 1e-9 for v in self._values)
 
     def ungrounded(self, text: str) -> list[Value]:
         """Return the numbers and dates in ``text`` that nothing in the pool backs."""

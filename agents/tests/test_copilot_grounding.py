@@ -58,3 +58,9 @@ def test_a_day_and_month_with_dots_is_a_date_not_a_decimal() -> None:
     p = pool()
     assert p.ungrounded("Am 12.11. und am 3.11.") == []
     assert p.ungrounded("Am 13.11. ist es so.") == [("md", 11, 13)]
+
+
+def test_the_sign_of_a_number_does_not_matter() -> None:
+    p = Pool("Frage", None)
+    p.add_result({"params": {"hours": -0.5, "required": 11.0}})
+    assert p.ungrounded("Ruhezeit -0,5 statt 11,0 Stunden, also 0,5 Stunden zu wenig.") == []
