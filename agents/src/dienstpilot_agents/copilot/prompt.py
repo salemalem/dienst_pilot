@@ -4,7 +4,7 @@
 from dienstpilot_agents.copilot.tools import CALCULATE, FINAL_ANSWER
 from dienstpilot_agents.llm.types import LlmRequest, SystemBlock, Tool
 
-PROMPT_VERSION = "c8-2"
+PROMPT_VERSION = "c8-3"
 MAX_TOKENS = 1200
 MAX_TURNS = 8
 
@@ -32,7 +32,7 @@ Privacy
 Never mention or ask about illness, diagnoses or personal reasons. If the data shows someone as absent, that is all you may say.
 
 Finish
-Reply in the user's language, in at most three short sentences, plain text, no markdown. End by calling final_answer once, alone, with `answer` and the fields that apply (value for a single requested figure: a number, an ISO date or an alias; valid and violations for a what-if; citations and no_source for rules; refused when you cannot do what was asked)."""
+Reply in the user's language, in at most three short sentences, plain text, no markdown. End by calling final_answer once, alone, with `answer` and the fields that apply (value for the single requested figure: the number, the ISO date, or an alias only if the question asks who; valid and violations for a what-if; citations and no_source for rules; refused when you cannot do what was asked)."""
 
 
 def tools_for(mcp_tools: list[Tool]) -> tuple[Tool, ...]:

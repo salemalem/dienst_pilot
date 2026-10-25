@@ -53,7 +53,7 @@ FINAL_ANSWER = Tool(
             },
             "value": {
                 "anyOf": [{"type": "number"}, {"type": "string"}, {"type": "null"}],
-                "description": "The single figure asked for: a number, an ISO date (YYYY-MM-DD) or a person alias; null when no single figure is asked for.",
+                "description": "The single figure that answers the question: a number (a count, hours, a mean), an ISO date (YYYY-MM-DD), or a person alias only when the question asks WHO. A question about a person (\"how many ... has P3\") is answered with the number, never with the alias. null when no single figure is asked for.",
             },
             "valid": {
                 "anyOf": [{"type": "boolean"}, {"type": "null"}],

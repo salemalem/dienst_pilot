@@ -1,0 +1,196 @@
+{
+ "task": "n12",
+ "label": "latency",
+ "prompt_version": "c8-2",
+ "question": "Wie viele Personen haben in diesem Jahr bisher mehr als 20 Nachtdienste?",
+ "final": {
+  "answer": "Laut Nachtdienst-Konto (Stand 2026-10-20) haben 7 Personen mehr als 20 Nachtdienste: P15 (37), P17 (34), P16 (27), P18 (29), P39 (24), P1 (24) und P29 (22).",
+  "value": "7",
+  "refused": false
+ },
+ "value_id": "7",
+ "served": "Laut Nachtdienst-Konto (Stand 2026-10-20) haben 7 Personen mehr als 20 Nachtdienste: Dr. Greta Kaiser (37), Dr. Niklas Stein (34), Dr. Lea Lorenz (27), Dr. Nadia Kaiser (29), Dr. Erik Peters (24), Dr. Sofía Alvarez (24) und Dr. Kemal Dietrich (22).",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "get_burden_ledger",
+   "args": {
+    "year": 2026
+   },
+   "is_error": false,
+   "result_chars": 1626
+  },
+  {
+   "name": "calculate",
+   "args": {
+    "operation": "count_greater_than",
+    "values": [
+     12,
+     14,
+     9,
+     18,
+     0,
+     24,
+     19,
+     37,
+     19,
+     12,
+     18,
+     22,
+     27,
+     16,
+     5,
+     16,
+     29,
+     34,
+     8,
+     24,
+     5,
+     17,
+     8
+    ],
+    "threshold": 20
+   },
+   "is_error": false,
+   "result_chars": 45
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "67af50a3a150086782c6cbc8fe436a3cd44b85007e4be003431b2e15c049b673",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Ich rufe das Nachtdienst-Konto für dieses Jahr ab."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01RPHUapwhniVag4nF1YJUkV",
+     "name": "get_burden_ledger",
+     "input": {
+      "year": 2026
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01RPHUapwhniVag4nF1YJUkV",
+     "content": "{\"year\":2026,\"as_of\":\"2026-10-20\",\"distributions\":[{\"metric\":\"nights\",\"people\":23,\"mean\":17.09,\"median\":17.0,\"minimum\":0,\"maximum\":37},{\"metric\":\"weekends\",\"people\":23,\"mean\":9.78,\"median\":9.0,\"minimum\":2,\"maximum\":19},{\"metric\":\"holidays\",\"people\":23,\"mean\":1.09,\"median\":1.0,\"minimum\":0,\"maximum\":3}],\"people\":[{\"staff_id\":\"P28\",\"nights\":12,\"weekends\":19,\"holidays\":2},{\"staff_id\":\"P4\",\"nights\":14,\"weekends\":4,\"holidays\":3},{\"staff_id\":\"P43\",\"nights\":9,\"weekends\":2,\"holidays\":1},{\"staff_id\":\"P6\",\"nights\":18,\"weekends\":10,\"holidays\":1},{\"staff_id\":\"P31\",\"nights\":0,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P39\",\"nights\":24,\"weekends\":3,\"holidays\":2},{\"staff_id\":\"P25\",\"nights\":19,\"weekends\":19,\"holidays\":1},{\"staff_id\":\"P15\",\"nights\":37,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P27\",\"nights\":19,\"weekends\":7,\"holidays\":1},{\"staff_id\":\"P22\",\"nights\":12,\"weekends\":14,\"holidays\":2},{\"staff_id\":\"P14\",\"nights\":18,\"weekends\":11,\"holidays\":0},{\"staff_id\":\"P29\",\"nights\":22,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P16\",\"nights\":27,\"weekends\":9,\"holidays\":2},{\"staff_id\":\"P41\",\"nights\":16,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P3\",\"nights\":5,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P30\",\"nights\":16,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P18\",\"nights\":29,\"weekends\":15,\"holidays\":1},{\"staff_id\":\"P17\",\"nights\":34,\"weekends\":4,\"holidays\":0},{\"staff_id\":\"P37\",\"nights\":8,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P1\",\"nights\":24,\"weekends\":8,\"holidays\":2},{\"staff_id\":\"P34\",\"nights\":5,\"weekends\":14,\"holidays\":3},{\"staff_id\":\"P20\",\"nights\":17,\"weekends\":10,\"holidays\":0},{\"staff_id\":\"P10\",\"nights\":8,\"weekends\":17,\"holidays\":2}]}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 83,
+    "cache_write_tokens": 0,
+    "cache_read_tokens": 5517
+   },
+   "latency_s": 1.206459207998705,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: de.\nQuestion:\nWie viele Personen haben in diesem Jahr bisher mehr als 20 Nachtdienste?"
+  },
+  {
+   "request_key": "96bdaf9454df1470dbf92c2dc906f1bc4255fb1149c6e58c6dd76add2eefafa8",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "People with nights > 20: P39 (24), P15 (37), P18 (29), P17 (34), P1 (24), P16 (27), P29 (22). Let me count them."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01RD1nCDTbyWTBnKzAr97d8U",
+     "name": "calculate",
+     "input": {
+      "operation": "count_greater_than",
+      "values": [
+       12,
+       14,
+       9,
+       18,
+       0,
+       24,
+       19,
+       37,
+       19,
+       12,
+       18,
+       22,
+       27,
+       16,
+       5,
+       16,
+       29,
+       34,
+       8,
+       24,
+       5,
+       17,
+       8
+      ],
+      "threshold": 20
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01RD1nCDTbyWTBnKzAr97d8U",
+     "content": "{\"operation\":\"count_greater_than\",\"result\":7}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 223,
+    "cache_write_tokens": 940,
+    "cache_read_tokens": 5517
+   },
+   "latency_s": 1.4300039999998262,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"year\":2026,\"as_of\":\"2026-10-20\",\"distributions\":[{\"metric\":\"nights\",\"people\":23,\"mean\":17.09,\"median\":17.0,\"minimum\":0,\"maximum\":37},{\"metric\":\"weekends\",\"people\":23,\"mean\":9.78,\"median\":9.0,\"minimum\":2,\"maximum\":19},{\"metric\":\"holidays\",\"people\":23,\"mean\":1.09,\"median\":1.0,\"minimum\":0,\"maximum\":3}],\"people\":[{\"staff_id\":\"P28\",\"nights\":12,\"weekends\":19,\"holidays\":2},{\"staff_id\":\"P4\",\"nights\":14,\"weekends\":4,\"holidays\":3},{\"staff_id\":\"P43\",\"nights\":9,\"weekends\":2,\"holidays\":1},{\"staff_id\":\"P6\",\"nights\":18,\"weekends\":10,\"holidays\":1},{\"staff_id\":\"P31\",\"nights\":0,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P39\",\"nights\":24,\"weekends\":3,\"holidays\":2},{\"staff_id\":\"P25\",\"nights\":19,\"weekends\":19,\"holidays\":1},{\"staff_id\":\"P15\",\"nights\":37,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P27\",\"nights\":19,\"weekends\":7,\"holidays\":1},{\"staff_id\":\"P22\",\"nights\":12,\"weekends\":14,\"holidays\":2},{\"staff_id\":\"P14\",\"nights\":18,\"weekends\":11,\"holidays\":0},{\"staff_id\":\"P29\",\"nights\":22,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P16\",\"nights\":27,\"weekends\":9,\"holidays\":2},{\"staff_id\":\"P41\",\"nights\":16,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P3\",\"nights\":5,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P30\",\"nights\":16,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P18\",\"nights\":29,\"weekends\":15,\"holidays\":1},{\"staff_id\":\"P17\",\"nights\":34,\"weekends\":4,\"holidays\":0},{\"staff_id\":\"P37\",\"nights\":8,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P1\",\"nights\":24,\"weekends\":8,\"holidays\":2},{\"staff_id\":\"P34\",\"nights\":5,\"weekends\":14,\"holidays\":3},{\"staff_id\":\"P20\",\"nights\":17,\"weekends\":10,\"holidays\":0},{\"staff_id\":\"P10\",\"nights\":8,\"weekends\":17,\"holidays\":2}]}"
+  },
+  {
+   "request_key": "a41c97469dae2a4dcb3702401198082477964c2fdbb07a7a2eb54e4598df158e",
+   "blocks": [
+    {
+     "type": "tool_use",
+     "id": "toolu_01NvBiZDu5YC1687LpQ4YsnW",
+     "name": "final_answer",
+     "input": {
+      "answer": "Laut Nachtdienst-Konto (Stand 2026-10-20) haben 7 Personen mehr als 20 Nachtdienste: P15 (37), P17 (34), P16 (27), P18 (29), P39 (24), P1 (24) und P29 (22).",
+      "value": "7",
+      "refused": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 183,
+    "cache_write_tokens": 244,
+    "cache_read_tokens": 6457
+   },
+   "latency_s": 1.4122319590005645,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"operation\":\"count_greater_than\",\"result\":7}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 8,
+  "output_tokens": 489,
+  "cache_write_tokens": 1184,
+  "cache_read_tokens": 17491
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 4.6,
+  "prompt_sha": "007bc02af21920c92c214a01c7aad4b4fbdc4d24d055fcb67354e7c58596eb36",
+  "model": "claude-haiku-5-5"
+ }
+}
