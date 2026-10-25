@@ -1,6 +1,6 @@
 {
- "prompt_version": "c8-2",
- "prompt_sha256": "007bc02af21920c92c214a01c7aad4b4fbdc4d24d055fcb67354e7c58596eb36",
+ "prompt_version": "c8-3",
+ "prompt_sha256": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
  "model": "claude-haiku-5-5",
  "tasks_sha256": "afd99d22fdaa8bb7ac5e261f4a7b12fe62df4fd5d3b9ff2f7db36a32bb9ad655",
  "split_sha256": "cf07638b779807333e1db39198ca06f0a0488c5e949b395a3926fb16d69d749c",

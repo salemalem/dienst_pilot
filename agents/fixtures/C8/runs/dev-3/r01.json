@@ -1,0 +1,114 @@
+{
+ "task": "r01",
+ "label": "dev-3",
+ "prompt_version": "c8-3",
+ "question": "Wie viele Nachtdienste in Folge darf ich einer Person höchstens zuteilen?",
+ "final": {
+  "answer": "Höchstens 3 Nachtdienste in Folge pro Person (Regel 2 Abs. 1, Regelversion 2026-1 der Abteilung; in Version 2021-1 waren es noch 4).",
+  "citations": [
+   "regeln:Regel2:1"
+  ],
+  "no_source": false,
+  "value": "3"
+ },
+ "value_id": "3",
+ "served": "Höchstens 3 Nachtdienste in Folge pro Person (Regel 2 Abs. 1, Regelversion 2026-1 der Abteilung; in Version 2021-1 waren es noch 4).",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "Nachtdienste in Folge maximal aufeinanderfolgende Nachtschichten",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 1981
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "095d446cbce21e6ced3f1dae8bf2ccbfe48f292698cd7639b0b42e444edbbd86",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Ich suche die Regel zu aufeinanderfolgenden Nachtdiensten im Regelwerk."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01VsegqGPZCWAnZebfNnLZpw",
+     "name": "search_rules",
+     "input": {
+      "query": "Nachtdienste in Folge maximal aufeinanderfolgende Nachtschichten",
+      "k": 5
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01VsegqGPZCWAnZebfNnLZpw",
+     "content": "{\"query\":\"Nachtdienste in Folge maximal aufeinanderfolgende Nachtschichten\",\"found\":true,\"passages\":[{\"id\":\"regeln:Regel2:1\",\"citation\":\"Regelwerk der Abteilung (Annahmen des Prototyps) Regel 2 Abs. 1 (Regelversion 2026-1) [synthetisch]\",\"text\":\"Höchstens 3 Nachtdienste in Folge (Regel max_consecutive_nights). In der Regelversion 2021-1 waren es noch 4.\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.7346},{\"id\":\"rules:Rule2:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 2 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At most 3 night shifts in a row (rule max_consecutive_nights). In rule version 2021-1 it was still 4.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.6622},{\"id\":\"arbzg:§2:5\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 2 Abs. 5 (Stand 2024-12-31)\",\"text\":\"Nachtarbeitnehmer im Sinne dieses Gesetzes sind Arbeitnehmer, die 1. auf Grund ihrer Arbeitszeitgestaltung normalerweise Nachtarbeit in Wechselschicht zu leisten haben oder 2. Nachtarbeit an mindestens 48 Tagen im Kalenderjahr leisten.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5556},{\"id\":\"arbzg:§6:2\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 2 (Stand 2024-12-31)\",\"text\":\"Die werktägliche Arbeitszeit der Nachtarbeitnehmer darf acht Stunden nicht überschreiten. Sie kann auf bis zu zehn Stunden nur verlängert werden, wenn abweichend von § 3 innerhalb von einem Kalendermonat oder innerhalb von vier Wochen im Durchschnitt acht Stunden werktäglich nicht überschritten werden. Für Zeiträume, in denen Nachtarbeitnehmer im Sinne des § 2 Abs. 5 Nr. 2 nicht zur Nachtarbeit herangezogen werden, findet § 3 Satz 2 Anwendung.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5518},{\"id\":\"arbzg:§2:4\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 2 Abs. 4 (Stand 2024-12-31)\",\"text\":\"Nachtarbeit im Sinne dieses Gesetzes ist jede Arbeit, die mehr als zwei Stunden der Nachtzeit umfaßt.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5404}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 138,
+    "cache_write_tokens": 138,
+    "cache_read_tokens": 5436
+   },
+   "latency_s": 1.3254803750005522,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: de.\nQuestion:\nWie viele Nachtdienste in Folge darf ich einer Person höchstens zuteilen?"
+  },
+  {
+   "request_key": "ebdc3980792b4333fbf70c116c3541c8ec3d544f708d0d4f8c2c3a44d9bfe8a7",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Die Abteilungsregel gilt (Regelversion 2026-1), und die Regel nennt die Grenze."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_012L8Jsda9ZUH7oKCZPVmsSs",
+     "name": "final_answer",
+     "input": {
+      "answer": "Höchstens 3 Nachtdienste in Folge pro Person (Regel 2 Abs. 1, Regelversion 2026-1 der Abteilung; in Version 2021-1 waren es noch 4).",
+      "citations": [
+       "regeln:Regel2:1"
+      ],
+      "no_source": false,
+      "value": "3"
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 238,
+    "cache_write_tokens": 1183,
+    "cache_read_tokens": 5574
+   },
+   "latency_s": 1.4869874590003747,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"query\":\"Nachtdienste in Folge maximal aufeinanderfolgende Nachtschichten\",\"found\":true,\"passages\":[{\"id\":\"regeln:Regel2:1\",\"citation\":\"Regelwerk der Abteilung (Annahmen des Prototyps) Regel 2 Abs. 1 (Regelversion 2026-1) [synthetisch]\",\"text\":\"Höchstens 3 Nachtdienste in Folge (Regel max_consecutive_nights). In der Regelversion 2021-1 waren es noch 4.\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.7346},{\"id\":\"rules:Rule2:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 2 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At most 3 night shifts in a row (rule max_consecutive_nights). In rule version 2021-1 it was still 4.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.6622},{\"id\":\"arbzg:§2:5\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 2 Abs. 5 (Stand 2024-12-31)\",\"text\":\"Nachtarbeitnehmer im Sinne dieses Gesetzes sind Arbeitnehmer, die 1. auf Grund ihrer Arbeitszeitgestaltung normalerweise Nachtarbeit in Wechselschicht zu leisten haben oder 2. Nachtarbeit an mindestens 48 Tagen im Kalenderjahr leisten.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5556},{\"id\":\"arbzg:§6:2\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 2 (Stand 2024-12-31)\",\"text\":\"Die werktägliche Arbeitszeit der Nachtarbeitnehmer darf acht Stunden nicht überschreiten. Sie kann auf bis zu zehn Stunden nur verlängert werden, wenn abweichend von § 3 innerhalb von einem Kalendermonat oder innerhalb von vier Wochen im Durchschnitt acht Stunden werktäglich nicht überschritten werden. Für Zeiträume, in denen Nachtarbeitnehmer im Sinne des § 2 Abs. 5 Nr. 2 nicht zur Nachtarbeit herangezogen werden, findet § 3 Satz 2 Anwendung.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5518},{\"id\":\"arbzg:§2:4\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 2 Abs. 4 (Stand 2024-12-31)\",\"text\":\"Nachtarbeit im Sinne dieses Gesetzes ist jede Arbeit, die mehr als zwei Stunden der Nachtzeit umfaßt.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5404}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 376,
+  "cache_write_tokens": 1321,
+  "cache_read_tokens": 11010
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 3.09,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5"
+ }
+}
