@@ -96,6 +96,10 @@ class World:
         """Run read-only SQL: the ground truth never goes through the API."""
         return list(self.conn.execute(text(query), params).all())
 
+    def sql_exec(self, query: str, **params: Any) -> None:
+        """Run SQL that writes (planting test data inside the rolled-back transaction)."""
+        self.conn.execute(text(query), params)
+
     def token(self, persona: str) -> str:
         """Return a bearer token for a demo persona."""
         if persona not in self._tokens:
