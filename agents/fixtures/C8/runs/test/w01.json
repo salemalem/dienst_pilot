@@ -1,0 +1,165 @@
+{
+ "task": "w01",
+ "label": "test",
+ "prompt_version": "c8-3",
+ "question": "Was passiert, wenn Dr. Jonas Weber den Nachtdienst am 12.11.2026 an Dr. Lea Lorenz abgibt? Ist das regelkonform?",
+ "final": {
+  "answer": "Die Übergabe des Nachtdienstes am 12.11.2026 von P22 an P16 ist nicht regelkonform. Der Validator meldet zwei Verstöße: P16 ist an diesem Tag für den Nachtdienst nicht verfügbar (Abwesenheit im Kalender), und P22 fiele im November auf 78 % der Vertragsstunden (131,0 von 168,0 Stunden), unter die Untergrenze von 80 %. Die Schicht wäre damit besetzt, aber nicht regelkonform.",
+  "valid": false,
+  "violations": [
+   "unavailable",
+   "contract_hours_band"
+  ],
+  "refused": false
+ },
+ "value_id": null,
+ "served": "Die Übergabe des Nachtdienstes am 12.11.2026 von Dr. Jonas Weber an Dr. Lea Lorenz ist nicht regelkonform. Der Validator meldet zwei Verstöße: Dr. Lea Lorenz ist an diesem Tag für den Nachtdienst nicht verfügbar (Abwesenheit im Kalender), und Dr. Jonas Weber fiele im November auf 78 % der Vertragsstunden (131,0 von 168,0 Stunden), unter die Untergrenze von 80 %. Die Schicht wäre damit besetzt, aber nicht regelkonform.",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "get_assignments_for",
+   "args": {
+    "staff_id": "P22",
+    "month": "2026-11"
+   },
+   "is_error": false,
+   "result_chars": 2027
+  },
+  {
+   "name": "run_what_if",
+   "args": {
+    "changes": [
+     {
+      "assignment_id": "ea646507-7eb8-5677-acca-96cfc31f8242",
+      "new_staff_id": "P16"
+     }
+    ]
+   },
+   "is_error": false,
+   "result_chars": 436
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "d30b93348ef7e0c1083c30687d75c1dd6c8d50547a69ff3bbe3d8c3f326703fa",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Ich muss zuerst den Nachtdienst von P22 am 12.11.2026 finden."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01U7GHFTsMMpyx4EmzJdnuFQ",
+     "name": "get_assignments_for",
+     "input": {
+      "staff_id": "P22",
+      "month": "2026-11"
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01U7GHFTsMMpyx4EmzJdnuFQ",
+     "content": "{\"staff_id\":\"P22\",\"roster_month\":\"2026-11-01\",\"totals\":{\"shifts\":14,\"days_worked\":14,\"weekend_shifts\":2,\"by_shift_type\":{\"bereitschaft\":2,\"frueh\":3,\"nacht\":5,\"spaet\":4}},\"days\":[{\"date\":\"2026-11-03\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"351f92c4-f1b6-5af7-9b65-9b08a471c018\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-04\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"fdfcc6a2-1a77-5877-877a-36b2dd3e1adc\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-05\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"9e8cd055-4a86-5340-aded-9198fac5d31b\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-08\",\"shifts\":[\"bereitschaft\"],\"assignment_ids\":[\"4f8f7529-8a07-5da1-9ea0-2c241bb983b7\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-10\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"9791863a-353d-5ae1-9ce3-859c651563cd\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-11\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"2af41f0b-3923-5b7e-989a-bb93db451bc7\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-12\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"ea646507-7eb8-5677-acca-96cfc31f8242\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-13\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"4b3d6f46-e63d-5478-b00f-3bad95ad0d2c\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-16\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"91744de6-317a-59e8-953f-7934a5635eca\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-17\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"6a635b85-a692-56d9-9e75-70f42e316ccf\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-18\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"b59807d6-bf02-5a2c-a383-f88149ffef66\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-21\",\"shifts\":[\"bereitschaft\"],\"assignment_ids\":[\"a0c955af-6962-57c6-8ee8-f84c622aa437\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-25\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"395a77a7-fd08-5fee-a74a-8a1ac5cdd81c\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-27\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"7be00a7e-fd1d-5e30-b1bd-95eadb379947\"],\"absent\":false,\"on_leave\":false}]}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 113,
+    "cache_write_tokens": 152,
+    "cache_read_tokens": 5436
+   },
+   "latency_s": 1.0695538750005653,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: de.\nQuestion:\nWas passiert, wenn P22 den Nachtdienst am 12.11.2026 an P16 abgibt? Ist das regelkonform?"
+  },
+  {
+   "request_key": "06f2ffc15c3439e3f821aeb6936e0209e7c01e1afd9ae87199f82250a43d8e17",
+   "blocks": [
+    {
+     "type": "tool_use",
+     "id": "toolu_01CKnCdBpqwicgzFXohhXFo7",
+     "name": "run_what_if",
+     "input": {
+      "changes": [
+       {
+        "assignment_id": "ea646507-7eb8-5677-acca-96cfc31f8242",
+        "new_staff_id": "P16"
+       }
+      ]
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01CKnCdBpqwicgzFXohhXFo7",
+     "content": "{\"valid\":false,\"introduced\":[{\"rule\":\"contract_hours_band\",\"staff_id\":\"P22\",\"date\":\"2026-11-01\",\"params\":{\"percent\":78,\"low\":80,\"high\":110,\"hours\":131.0,\"contract_hours\":168.0}},{\"rule\":\"unavailable\",\"staff_id\":\"P16\",\"date\":\"2026-11-12\",\"params\":{\"reason\":\"<<<DATA-AF193190B8>>>\\nleave\\n<<<END-AF193190B8>>>\",\"shifts\":[\"nacht\"],\"date\":\"2026-11-12\"}}],\"hours_delta\":{\"P16\":9.75,\"P22\":-9.75},\"uncovered\":[],\"validator_version\":\"c2-1.0.0\"}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 98,
+    "cache_write_tokens": 1249,
+    "cache_read_tokens": 5588
+   },
+   "latency_s": 0.8959210000011808,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"staff_id\":\"P22\",\"roster_month\":\"2026-11-01\",\"totals\":{\"shifts\":14,\"days_worked\":14,\"weekend_shifts\":2,\"by_shift_type\":{\"bereitschaft\":2,\"frueh\":3,\"nacht\":5,\"spaet\":4}},\"days\":[{\"date\":\"2026-11-03\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"351f92c4-f1b6-5af7-9b65-9b08a471c018\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-04\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"fdfcc6a2-1a77-5877-877a-36b2dd3e1adc\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-05\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"9e8cd055-4a86-5340-aded-9198fac5d31b\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-08\",\"shifts\":[\"bereitschaft\"],\"assignment_ids\":[\"4f8f7529-8a07-5da1-9ea0-2c241bb983b7\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-10\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"9791863a-353d-5ae1-9ce3-859c651563cd\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-11\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"2af41f0b-3923-5b7e-989a-bb93db451bc7\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-12\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"ea646507-7eb8-5677-acca-96cfc31f8242\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-13\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"4b3d6f46-e63d-5478-b00f-3bad95ad0d2c\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-16\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"91744de6-317a-59e8-953f-7934a5635eca\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-17\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"6a635b85-a692-56d9-9e75-70f42e316ccf\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-18\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"b59807d6-bf02-5a2c-a383-f88149ffef66\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-21\",\"shifts\":[\"bereitschaft\"],\"assignment_ids\":[\"a0c955af-6962-57c6-8ee8-f84c622aa437\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-25\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"395a77a7-fd08-5fee-a74a-8a1ac5cdd81c\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-27\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"7be00a7e-fd1d-5e30-b1bd-95eadb379947\"],\"absent\":false,\"on_leave\":false}]}"
+  },
+  {
+   "request_key": "73490229287e36de1db66082fd6e7927cd78ab9e9b92c42b4305dc7ce5c722fd",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Die Prüfung ergibt: Die Übergabe ist nicht regelkonform. Zwei Verstöße werden gemeldet: P16 ist am 12.11.2026 für den Nachtdienst nicht verfügbar (Abwesenheit laut Daten, Grund nicht genannt), und für P22 fällt die Stundenzahl im Monat auf 78 % des Vertrags (131,0 von 168,0 Stunden), unter das Band von 80 %. Die Schicht wäre rechnerisch abgedeckt, es gäbe keine unbesetzte Schicht."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01D9BRrJxH7YydccxfPzhgFf",
+     "name": "final_answer",
+     "input": {
+      "answer": "Die Übergabe des Nachtdienstes am 12.11.2026 von P22 an P16 ist nicht regelkonform. Der Validator meldet zwei Verstöße: P16 ist an diesem Tag für den Nachtdienst nicht verfügbar (Abwesenheit im Kalender), und P22 fiele im November auf 78 % der Vertragsstunden (131,0 von 168,0 Stunden), unter die Untergrenze von 80 %. Die Schicht wäre damit besetzt, aber nicht regelkonform.",
+      "valid": false,
+      "violations": [
+       "unavailable",
+       "contract_hours_band"
+      ],
+      "refused": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 517,
+    "cache_write_tokens": 337,
+    "cache_read_tokens": 6837
+   },
+   "latency_s": 2.749932709000859,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"valid\":false,\"introduced\":[{\"rule\":\"contract_hours_band\",\"staff_id\":\"P22\",\"date\":\"2026-11-01\",\"params\":{\"percent\":78,\"low\":80,\"high\":110,\"hours\":131.0,\"contract_hours\":168.0}},{\"rule\":\"unavailable\",\"staff_id\":\"P16\",\"date\":\"2026-11-12\",\"params\":{\"reason\":\"<<<DATA-AF193190B8>>>\\nleave\\n<<<END-AF193190B8>>>\",\"shifts\":[\"nacht\"],\"date\":\"2026-11-12\"}}],\"hours_delta\":{\"P16\":9.75,\"P22\":-9.75},\"uncovered\":[],\"validator_version\":\"c2-1.0.0\"}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 8,
+  "output_tokens": 728,
+  "cache_write_tokens": 1738,
+  "cache_read_tokens": 17861
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 5.24,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5",
+  "expected_alias_new_staff": "P16"
+ }
+}

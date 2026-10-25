@@ -1,0 +1,104 @@
+{
+ "task": "n10",
+ "label": "test",
+ "prompt_version": "c8-3",
+ "question": "Wie viele Nachtdienste hat die Person im Fairness-Ledger mit den meisten Nachtdiensten in diesem Jahr bisher?",
+ "final": {
+  "answer": "Die Person mit den meisten Nachtdiensten im Fairness-Ledger 2026 (Stand 2026-10-20) hat 37 Nachtdienste. Namen sind für die Oversight-Rolle nicht einsehbar; das Ledger zeigt nur die Verteilung (Mittelwert 17,09, Median 17).",
+  "value": "37"
+ },
+ "value_id": "37",
+ "served": "Die Person mit den meisten Nachtdiensten im Fairness-Ledger 2026 (Stand 2026-10-20) hat 37 Nachtdienste. Namen sind für die Oversight-Rolle nicht einsehbar; das Ledger zeigt nur die Verteilung (Mittelwert 17,09, Median 17).",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "get_burden_ledger",
+   "args": {
+    "year": 2026
+   },
+   "is_error": false,
+   "result_chars": 317
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "5af45fafc2c15542e7e41b077b603bf1940413098fa92b6dcef35ade987f17a1",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Ich rufe das Fairness-Ledger für 2026 ab."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01Xi3aVFjFSV1uUA9KVjJFjN",
+     "name": "get_burden_ledger",
+     "input": {
+      "year": 2026
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01Xi3aVFjFSV1uUA9KVjJFjN",
+     "content": "{\"year\":2026,\"as_of\":\"2026-10-20\",\"distributions\":[{\"metric\":\"nights\",\"people\":23,\"mean\":17.09,\"median\":17.0,\"minimum\":0,\"maximum\":37},{\"metric\":\"weekends\",\"people\":23,\"mean\":9.78,\"median\":9.0,\"minimum\":2,\"maximum\":19},{\"metric\":\"holidays\",\"people\":23,\"mean\":1.09,\"median\":1.0,\"minimum\":0,\"maximum\":3}],\"people\":null}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 78,
+    "cache_write_tokens": 158,
+    "cache_read_tokens": 3859
+   },
+   "latency_s": 1.027986041000986,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: oversight. Language: de.\nQuestion:\nWie viele Nachtdienste hat die Person im Fairness-Ledger mit den meisten Nachtdiensten in diesem Jahr bisher?"
+  },
+  {
+   "request_key": "4c7588e8e1b121c07f741e25492c9a5439e0a144be72693bd6d58537dc6dc219",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Das Ledger liefert für Nachtdienste nur Verteilungswerte; das Maximum ist 37. Die Frage nach der Person mit den meisten Nachtdiensten ist für Oversight nicht als Name verfügbar, aber die Zahl selbst ist im Ledger enthalten."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_014net5cbsxaMvLFQv365r15",
+     "name": "final_answer",
+     "input": {
+      "answer": "Die Person mit den meisten Nachtdiensten im Fairness-Ledger 2026 (Stand 2026-10-20) hat 37 Nachtdienste. Namen sind für die Oversight-Rolle nicht einsehbar; das Ledger zeigt nur die Verteilung (Mittelwert 17,09, Median 17).",
+      "value": "37"
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 289,
+    "cache_write_tokens": 244,
+    "cache_read_tokens": 4017
+   },
+   "latency_s": 1.9585299999998824,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"year\":2026,\"as_of\":\"2026-10-20\",\"distributions\":[{\"metric\":\"nights\",\"people\":23,\"mean\":17.09,\"median\":17.0,\"minimum\":0,\"maximum\":37},{\"metric\":\"weekends\",\"people\":23,\"mean\":9.78,\"median\":9.0,\"minimum\":2,\"maximum\":19},{\"metric\":\"holidays\",\"people\":23,\"mean\":1.09,\"median\":1.0,\"minimum\":0,\"maximum\":3}],\"people\":null}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 367,
+  "cache_write_tokens": 402,
+  "cache_read_tokens": 7876
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 3.43,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5"
+ }
+}

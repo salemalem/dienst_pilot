@@ -1,0 +1,116 @@
+{
+ "task": "r02",
+ "label": "test",
+ "prompt_version": "c8-3",
+ "question": "Is a rest period of nine hours between two shifts acceptable?",
+ "final": {
+  "answer": "No. A nine-hour rest between two shifts is not acceptable: the department rule (Rule 1) and ArbZG § 5(1) require at least 11 hours of uninterrupted rest between duties.",
+  "citations": [
+   "rules:Rule1:1",
+   "arbzg:§5:1"
+  ],
+  "no_source": false,
+  "value": null
+ },
+ "value_id": null,
+ "served": "No. A nine-hour rest between two shifts is not acceptable: the department rule (Rule 1) and ArbZG § 5(1) require at least 11 hours of uninterrupted rest between duties.",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "minimum rest period between two shifts hours",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 2896
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "fc28e26a932e200553d824e83e2054430ba8533442b774f65b62cfb015f50d3b",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "This is a rule question, so I need to search the rulebook first."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01PYtHD3pZUWbpijaCyfPTr2",
+     "name": "search_rules",
+     "input": {
+      "query": "minimum rest period between two shifts hours",
+      "k": 5
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01PYtHD3pZUWbpijaCyfPTr2",
+     "content": "{\"query\":\"minimum rest period between two shifts hours\",\"found\":true,\"passages\":[{\"id\":\"rules:Rule1:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 1 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At least 11 hours of uninterrupted rest lie between two duties (rule min_rest_hours, modelled on § 5 ArbZG).\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.7202},{\"id\":\"regeln:Regel1:1\",\"citation\":\"Regelwerk der Abteilung (Annahmen des Prototyps) Regel 1 Abs. 1 (Regelversion 2026-1) [synthetisch]\",\"text\":\"Zwischen zwei Diensten liegen mindestens 11 Stunden ununterbrochene Ruhezeit (Regel min_rest_hours, angelehnt an § 5 ArbZG).\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.6706},{\"id\":\"arbzg:§4:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 4 Abs. 1 (Stand 2024-12-31)\",\"text\":\"Die Arbeit ist durch im voraus feststehende Ruhepausen von mindestens 30 Minuten bei einer Arbeitszeit von mehr als sechs bis zu neun Stunden und 45 Minuten bei einer Arbeitszeit von mehr als neun Stunden insgesamt zu unterbrechen. Die Ruhepausen nach Satz 1 können in Zeitabschnitte von jeweils mindestens 15 Minuten aufgeteilt werden. Länger als sechs Stunden hintereinander dürfen Arbeitnehmer nicht ohne Ruhepause beschäftigt werden.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6091},{\"id\":\"arbzg:§7:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 7 Abs. 1 (Stand 2024-12-31)\",\"text\":\"In einem Tarifvertrag oder auf Grund eines Tarifvertrags in einer Betriebs- oder Dienstvereinbarung kann zugelassen werden, 1. abweichend von § 3 a) die Arbeitszeit über zehn Stunden werktäglich zu verlängern, wenn in die Arbeitszeit regelmäßig und in erheblichem Umfang Arbeitsbereitschaft oder Bereitschaftsdienst fällt, b) einen anderen Ausgleichszeitraum festzulegen, c) (weggefallen) 2. abweichend von § 4 Satz 2 die Gesamtdauer der Ruhepausen in Schichtbetrieben und Verkehrsbetrieben auf Kurzpausen von angemessener Dauer aufzuteilen, 3. abweichend von § 5 Abs. 1 die Ruhezeit um bis zu zwei Stunden zu kürzen, wenn die Art der Arbeit dies erfordert und die Kürzung der Ruhezeit innerhalb eines festzulegenden Ausgleichszeitraums ausgeglichen wird, 4. abweichend von § 6 Abs. 2 a) die Arbeitszeit über zehn Stunden werktäglich hinaus zu verlängern, wenn in die Arbeitszeit regelmäßig und in erheblichem Umfang Arbeitsbereitschaft oder Bereitschaftsdienst fällt, b) einen anderen Ausgleichszeitraum festzulegen, 5. den Beginn des siebenstündigen Nachtzeitraums des § 2 Abs. 3 auf die Zeit zwischen 22 und 24 Uhr festzulegen.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6015},{\"id\":\"arbzg:§5:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 5 Abs. 1 (Stand 2024-12-31)\",\"text\":\"Die Arbeitnehmer müssen nach Beendigung der täglichen Arbeitszeit eine ununterbrochene Ruhezeit von mindestens elf Stunden haben.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6013}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 101,
+    "cache_write_tokens": 125,
+    "cache_read_tokens": 5436
+   },
+   "latency_s": 1.9637999999995372,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: en.\nQuestion:\nIs a rest period of nine hours between two shifts acceptable?"
+  },
+  {
+   "request_key": "f32f39d5ab8ecc020f739a97d29da74d016800f6977e621decf84a4f8d0de471",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Rule 1 of the department rulebook and ArbZG § 5(1) both require at least 11 hours of uninterrupted rest between duties. A nine-hour rest is therefore below the minimum and not acceptable. (§ 7(3) allows a reduction of up to two hours only under a collective agreement and with compensation, which would still leave nine hours below the limit unless that framework applies; I have not checked that, so I am not relying on it.)"
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01CxgV3BZw2sgudypCFcTnyf",
+     "name": "final_answer",
+     "input": {
+      "answer": "No. A nine-hour rest between two shifts is not acceptable: the department rule (Rule 1) and ArbZG § 5(1) require at least 11 hours of uninterrupted rest between duties.",
+      "citations": [
+       "rules:Rule1:1",
+       "arbzg:§5:1"
+      ],
+      "no_source": false,
+      "value": null
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 346,
+    "cache_write_tokens": 1604,
+    "cache_read_tokens": 5561
+   },
+   "latency_s": 2.0359027499998774,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"query\":\"minimum rest period between two shifts hours\",\"found\":true,\"passages\":[{\"id\":\"rules:Rule1:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 1 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At least 11 hours of uninterrupted rest lie between two duties (rule min_rest_hours, modelled on § 5 ArbZG).\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.7202},{\"id\":\"regeln:Regel1:1\",\"citation\":\"Regelwerk der Abteilung (Annahmen des Prototyps) Regel 1 Abs. 1 (Regelversion 2026-1) [synthetisch]\",\"text\":\"Zwischen zwei Diensten liegen mindestens 11 Stunden ununterbrochene Ruhezeit (Regel min_rest_hours, angelehnt an § 5 ArbZG).\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.6706},{\"id\":\"arbzg:§4:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 4 Abs. 1 (Stand 2024-12-31)\",\"text\":\"Die Arbeit ist durch im voraus feststehende Ruhepausen von mindestens 30 Minuten bei einer Arbeitszeit von mehr als sechs bis zu neun Stunden und 45 Minuten bei einer Arbeitszeit von mehr als neun Stunden insgesamt zu unterbrechen. Die Ruhepausen nach Satz 1 können in Zeitabschnitte von jeweils mindestens 15 Minuten aufgeteilt werden. Länger als sechs Stunden hintereinander dürfen Arbeitnehmer nicht ohne Ruhepause beschäftigt werden.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6091},{\"id\":\"arbzg:§7:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 7 Abs. 1 (Stand 2024-12-31)\",\"text\":\"In einem Tarifvertrag oder auf Grund eines Tarifvertrags in einer Betriebs- oder Dienstvereinbarung kann zugelassen werden, 1. abweichend von § 3 a) die Arbeitszeit über zehn Stunden werktäglich zu verlängern, wenn in die Arbeitszeit regelmäßig und in erheblichem Umfang Arbeitsbereitschaft oder Bereitschaftsdienst fällt, b) einen anderen Ausgleichszeitraum festzulegen, c) (weggefallen) 2. abweichend von § 4 Satz 2 die Gesamtdauer der Ruhepausen in Schichtbetrieben und Verkehrsbetrieben auf Kurzpausen von angemessener Dauer aufzuteilen, 3. abweichend von § 5 Abs. 1 die Ruhezeit um bis zu zwei Stunden zu kürzen, wenn die Art der Arbeit dies erfordert und die Kürzung der Ruhezeit innerhalb eines festzulegenden Ausgleichszeitraums ausgeglichen wird, 4. abweichend von § 6 Abs. 2 a) die Arbeitszeit über zehn Stunden werktäglich hinaus zu verlängern, wenn in die Arbeitszeit regelmäßig und in erheblichem Umfang Arbeitsbereitschaft oder Bereitschaftsdienst fällt, b) einen anderen Ausgleichszeitraum festzulegen, 5. den Beginn des siebenstündigen Nachtzeitraums des § 2 Abs. 3 auf die Zeit zwischen 22 und 24 Uhr festzulegen.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6015},{\"id\":\"arbzg:§5:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 5 Abs. 1 (Stand 2024-12-31)\",\"text\":\"Die Arbeitnehmer müssen nach Beendigung der täglichen Arbeitszeit eine ununterbrochene Ruhezeit von mindestens elf Stunden haben.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6013}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 447,
+  "cache_write_tokens": 1729,
+  "cache_read_tokens": 10997
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 4.37,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5"
+ }
+}

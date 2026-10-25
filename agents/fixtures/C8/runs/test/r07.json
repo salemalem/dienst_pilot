@@ -1,0 +1,180 @@
+{
+ "task": "r07",
+ "label": "test",
+ "prompt_version": "c8-3",
+ "question": "Wie hoch ist der Zuschlag für Nachtarbeit in Prozent?",
+ "final": {
+  "answer": "Das Arbeitszeitgesetz nennt keinen festen Prozentsatz. § 6 Abs. 5 ArbZG verlangt, soweit keine tariflichen Ausgleichsregelungen bestehen, einen \"angemessenen Zuschlag\" auf das Bruttoarbeitsentgelt oder eine angemessene Zahl bezahlter freier Tage. Die Höhe ist daher in der Rulebook nicht als Prozentzahl belegt.",
+  "citations": [
+   "arbzg:§6:5"
+  ],
+  "no_source": false
+ },
+ "value_id": null,
+ "served": "Das Arbeitszeitgesetz nennt keinen festen Prozentsatz. § 6 Abs. 5 ArbZG verlangt, soweit keine tariflichen Ausgleichsregelungen bestehen, einen \"angemessenen Zuschlag\" auf das Bruttoarbeitsentgelt oder eine angemessene Zahl bezahlter freier Tage. Die Höhe ist daher in der Rulebook nicht als Prozentzahl belegt.",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "Zuschlag Nachtarbeit Prozent",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 123
+  },
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "Nachtarbeit Zuschlag",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 2606
+  },
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "night work premium percentage",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 124
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "b3a116c4df906dea166c37219dd2e8a25bb5305b5c38ec454bdc1006b9e4b5ca",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Ich suche die Regel zum Nachtarbeitszuschlag in der Rulebook."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01V4fdwTJA6neNZn1ohWAnvb",
+     "name": "search_rules",
+     "input": {
+      "query": "Zuschlag Nachtarbeit Prozent",
+      "k": 5
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01V4fdwTJA6neNZn1ohWAnvb",
+     "content": "{\"query\":\"Zuschlag Nachtarbeit Prozent\",\"found\":false,\"passages\":[],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 119,
+    "cache_write_tokens": 134,
+    "cache_read_tokens": 5436
+   },
+   "latency_s": 1.229599333999431,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: de.\nQuestion:\nWie hoch ist der Zuschlag für Nachtarbeit in Prozent?"
+  },
+  {
+   "request_key": "76c9ad2abbf9e4b8c7d67119cd568af2275fc81465ae15e9f83e8901bda0228b",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Die Suche hat nichts gefunden. Ich versuche eine zweite Formulierung."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01AH88y6smpSwXokLWNgwRRS",
+     "name": "search_rules",
+     "input": {
+      "query": "Nachtarbeit Zuschlag",
+      "k": 5
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01PGYoSX3DEiYhwnVW89NmYD",
+     "name": "search_rules",
+     "input": {
+      "query": "night work premium percentage",
+      "k": 5
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01AH88y6smpSwXokLWNgwRRS",
+     "content": "{\"query\":\"Nachtarbeit Zuschlag\",\"found\":true,\"passages\":[{\"id\":\"arbzg:§6:5\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 5 (Stand 2024-12-31)\",\"text\":\"Soweit keine tarifvertraglichen Ausgleichsregelungen bestehen, hat der Arbeitgeber dem Nachtarbeitnehmer für die während der Nachtzeit geleisteten Arbeitsstunden eine angemessene Zahl bezahlter freier Tage oder einen angemessenen Zuschlag auf das ihm hierfür zustehende Bruttoarbeitsentgelt zu gewähren.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6414},{\"id\":\"arbzg:§6:6\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 6 (Stand 2024-12-31)\",\"text\":\"Es ist sicherzustellen, daß Nachtarbeitnehmer den gleichen Zugang zur betrieblichen Weiterbildung und zu aufstiegsfördernden Maßnahmen haben wie die übrigen Arbeitnehmer.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5401},{\"id\":\"rules:Rule2:2\",\"citation\":\"Department rulebook (prototype assumptions) Rule 2 Abs. 2 (rule version 2026-1) [synthetic]\",\"text\":\"Night shifts and on-call duty need the qualification nachtdienstfaehig. In on-call duty at least one person must be a specialist (Facharzt).\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5382},{\"id\":\"rules:Rule2:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 2 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At most 3 night shifts in a row (rule max_consecutive_nights). In rule version 2021-1 it was still 4.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5362},{\"id\":\"arbzg:§6:4\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 4 (Stand 2024-12-31)\",\"text\":\"Der Arbeitgeber hat den Nachtarbeitnehmer auf dessen Verlangen auf einen für ihn geeigneten Tagesarbeitsplatz umzusetzen, wenn a) nach arbeitsmedizinischer Feststellung die weitere Verrichtung von Nachtarbeit den Arbeitnehmer in seiner Gesundheit gefährdet oder b) im Haushalt des Arbeitnehmers ein Kind unter zwölf Jahren lebt, das nicht von einer anderen im Haushalt lebenden Person betreut werden kann, oder c) der Arbeitnehmer einen schwerpflegebedürftigen Angehörigen zu versorgen hat, der nicht von einem anderen im Haushalt lebenden Angehörigen versorgt werden kann, sofern dem nicht dringende betriebliche Erfordernisse entgegenstehen. Stehen der Umsetzung des Nachtarbeitnehmers auf einen für ihn geeigneten Tagesarbeitsplatz nach Auffassung des Arbeitgebers dringende betriebliche Erfordernisse entgegen, so ist der Betriebs- oder Personalrat zu hören. Der Betriebs- oder Personalrat kann dem Arbeitgeber Vorschläge für eine Umsetzung unterbreiten.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5324}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    },
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01PGYoSX3DEiYhwnVW89NmYD",
+     "content": "{\"query\":\"night work premium percentage\",\"found\":false,\"passages\":[],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 187,
+    "cache_write_tokens": 181,
+    "cache_read_tokens": 5570
+   },
+   "latency_s": 1.30919349999931,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"query\":\"Zuschlag Nachtarbeit Prozent\",\"found\":false,\"passages\":[],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}"
+  },
+  {
+   "request_key": "ec4801cde6d6140c6e0677c837cf51aa1607c09bb8e46f4772fa154452943555",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Die Rulebook nennt keinen Prozentsatz: § 6 Abs. 5 ArbZG verlangt nur einen \"angemessenen Zuschlag\" (oder bezahlte freie Tage), soweit kein Tarifvertrag gilt. Eine feste Prozentzahl steht dort nicht."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01RtQMJo2B91BnRbUtHtQpY9",
+     "name": "final_answer",
+     "input": {
+      "answer": "Das Arbeitszeitgesetz nennt keinen festen Prozentsatz. § 6 Abs. 5 ArbZG verlangt, soweit keine tariflichen Ausgleichsregelungen bestehen, einen \"angemessenen Zuschlag\" auf das Bruttoarbeitsentgelt oder eine angemessene Zahl bezahlter freier Tage. Die Höhe ist daher in der Rulebook nicht als Prozentzahl belegt.",
+      "citations": [
+       "arbzg:§6:5"
+      ],
+      "no_source": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 378,
+    "cache_write_tokens": 1583,
+    "cache_read_tokens": 5751
+   },
+   "latency_s": 2.109805583999332,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"query\":\"Nachtarbeit Zuschlag\",\"found\":true,\"passages\":[{\"id\":\"arbzg:§6:5\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 5 (Stand 2024-12-31)\",\"text\":\"Soweit keine tarifvertraglichen Ausgleichsregelungen bestehen, hat der Arbeitgeber dem Nachtarbeitnehmer für die während der Nachtzeit geleisteten Arbeitsstunden eine angemessene Zahl bezahlter freier Tage oder einen angemessenen Zuschlag auf das ihm hierfür zustehende Bruttoarbeitsentgelt zu gewähren.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6414},{\"id\":\"arbzg:§6:6\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 6 (Stand 2024-12-31)\",\"text\":\"Es ist sicherzustellen, daß Nachtarbeitnehmer den gleichen Zugang zur betrieblichen Weiterbildung und zu aufstiegsfördernden Maßnahmen haben wie die übrigen Arbeitnehmer.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5401},{\"id\":\"rules:Rule2:2\",\"citation\":\"Department rulebook (prototype assumptions) Rule 2 Abs. 2 (rule version 2026-1) [synthetic]\",\"text\":\"Night shifts and on-call duty need the qualification nachtdienstfaehig. In on-call duty at least one person must be a specialist (Facharzt).\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5382},{\"id\":\"rules:Rule2:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 2 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At most 3 night shifts in a row (rule max_consecutive_nights). In rule version 2021-1 it was still 4.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5362},{\"id\":\"arbzg:§6:4\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 4 (Stand 2024-12-31)\",\"text\":\"Der Arbeitgeber hat den Nachtarbeitnehmer auf dessen Verlangen auf einen für ihn geeigneten Tagesarbeitsplatz umzusetzen, wenn a) nach arbeitsmedizinischer Feststellung die weitere Verrichtung von Nachtarbeit den Arbeitnehmer in seiner Gesundheit gefährdet oder b) im Haushalt des Arbeitnehmers ein Kind unter zwölf Jahren lebt, das nicht von einer anderen im Haushalt lebenden Person betreut werden kann, oder c) der Arbeitnehmer einen schwerpflegebedürftigen Angehörigen zu versorgen hat, der nicht von einem anderen im Haushalt lebenden Angehörigen versorgt werden kann, sofern dem nicht dringende betriebliche Erfordernisse entgegenstehen. Stehen der Umsetzung des Nachtarbeitnehmers auf einen für ihn geeigneten Tagesarbeitsplatz nach Auffassung des Arbeitgebers dringende betriebliche Erfordernisse entgegen, so ist der Betriebs- oder Personalrat zu hören. Der Betriebs- oder Personalrat kann dem Arbeitgeber Vorschläge für eine Umsetzung unterbreiten.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5324}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}\n{\"query\":\"night work premium percentage\",\"found\":false,\"passages\":[],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 8,
+  "output_tokens": 684,
+  "cache_write_tokens": 1898,
+  "cache_read_tokens": 16757
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 5.01,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5"
+ }
+}
