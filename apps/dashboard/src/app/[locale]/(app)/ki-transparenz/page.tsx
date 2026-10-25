@@ -748,7 +748,9 @@ function Card({ c }: { c: Component }): ReactNode {
                     ? t("modelCardRAG")
                     : c.component === "C7"
                       ? t("modelCardC7")
-                      : t("modelCardNone")}
+                      : c.component === "C8"
+                        ? t("modelCardC8")
+                        : t("modelCardNone")}
         </dd>
         <dt className="text-ink-muted">{t("canChange")}</dt>
         <dd className="body-strong m-0" data-testid="can-change">

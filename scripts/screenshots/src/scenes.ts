@@ -314,6 +314,31 @@ export const SCENES: Scene[] = [
     },
   },
   {
+    id: "W9b",
+    slug: "copilot-whatif",
+    caption:
+      "Copilot answering a what-if with the AI agent (a recorded real answer, labelled as such), the validator's verdict and its sources",
+    kind: "dashboard",
+    capture: true,
+    ref: "W9 Copilot-Panel",
+    run: async (b, theme) => {
+      const variant = await recommended(await login("brandt"), "2026-12");
+      const p = await dashboardPage(
+        b,
+        "brandt",
+        theme,
+        `/dienstplan?month=2026-12&variant=${variant}`,
+      );
+      await expect(p.getByTestId("roster-grid")).toBeVisible();
+      await p.getByRole("button", { name: msg("w9.toggle"), exact: true }).click();
+      const panel = p.getByRole("complementary", { name: msg("w9.title") });
+      await panel.getByRole("button", { name: msg("w9.sampleWhatIf") }).click();
+      await expect(panel.getByTestId("copilot-whatif")).toBeVisible();
+      await expect(panel).toContainText(msg("ai.recorded"));
+      return p;
+    },
+  },
+  {
     id: "W5",
     slug: "approval",
     caption: "Approval dialog: what staff will see, then the Planner publishes",

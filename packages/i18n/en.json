@@ -1057,7 +1057,8 @@
     "trainedC7": "Not trained: a pre-trained language model with a fixed prompt",
     "modelCardC7": "docs/model-cards/c7-request-intake.md",
     "statusPartial": "{built} of {total} components built, {partial, plural, one {# partly} other {# partly}}, {standIn, plural, one {# stand-in} other {# stand-ins}}",
-    "partial": "partly"
+    "partial": "partly",
+    "modelCardC8": "docs/model-cards/c8-planner-copilot.md"
   },
   "qualification": {
     "any": "no particular qualification",

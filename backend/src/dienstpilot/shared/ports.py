@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from dienstpilot_validator import Assignment as RosterAssignment
     from dienstpilot_validator import MonthInput, Violation
 
-Implementation = Literal["stand-in", "built"]
+Implementation = Literal["stand-in", "built", "partial"]
 
 
 class Clock(ABC):
