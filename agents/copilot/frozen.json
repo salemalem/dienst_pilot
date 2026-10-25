@@ -1,0 +1,9 @@
+{
+ "prompt_version": "c8-2",
+ "prompt_sha256": "007bc02af21920c92c214a01c7aad4b4fbdc4d24d055fcb67354e7c58596eb36",
+ "model": "claude-haiku-5-5",
+ "tasks_sha256": "afd99d22fdaa8bb7ac5e261f4a7b12fe62df4fd5d3b9ff2f7db36a32bb9ad655",
+ "split_sha256": "cf07638b779807333e1db39198ca06f0a0488c5e949b395a3926fb16d69d749c",
+ "gates_sha256": "d4ff92bf83625272719bd9a762eb41388ffa5b9861a71598cd3f9f5fd730b43f",
+ "note": "Written by `run_c8_eval.py freeze` before the latency and test runs."
+}
