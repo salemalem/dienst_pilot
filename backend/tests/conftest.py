@@ -8,6 +8,10 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[2]
 
+# No test may call the model: whatever key the developer's git-ignored .env holds, tests run
+# without one (a copilot job in a test once built the live engine from it and made a paid call).
+os.environ["ANTHROPIC_API_KEY"] = ""
+
 
 @pytest.fixture(scope="session")
 def seed_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:

@@ -1,0 +1,106 @@
+{
+ "task": "n14",
+ "label": "test",
+ "prompt_version": "c8-3",
+ "question": "Wie viele Feiertage hat Dr. Anna Lehmann in diesem Jahr bisher gearbeitet?",
+ "final": {
+  "answer": "P28 hat in diesem Jahr laut Belastungsnachweis (Stand 2026-10-20) bisher 2 Feiertage gearbeitet.",
+  "value": "2",
+  "refused": false
+ },
+ "value_id": "2",
+ "served": "Dr. Anna Lehmann hat in diesem Jahr laut Belastungsnachweis (Stand 2026-10-20) bisher 2 Feiertage gearbeitet.",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "get_burden_ledger",
+   "args": {
+    "year": 2026
+   },
+   "is_error": false,
+   "result_chars": 1626
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "891d8a871721e6d86886daa1139b44ffb0a056d367750a236e15fb3c071e43b8",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Ich rufe das Feiertags-Kontingent aus dem Belastungsnachweis für 2026 ab."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01SbNyM7YAQhydAHkqWzrPUW",
+     "name": "get_burden_ledger",
+     "input": {
+      "year": 2026
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01SbNyM7YAQhydAHkqWzrPUW",
+     "content": "{\"year\":2026,\"as_of\":\"2026-10-20\",\"distributions\":[{\"metric\":\"nights\",\"people\":23,\"mean\":17.09,\"median\":17.0,\"minimum\":0,\"maximum\":37},{\"metric\":\"weekends\",\"people\":23,\"mean\":9.78,\"median\":9.0,\"minimum\":2,\"maximum\":19},{\"metric\":\"holidays\",\"people\":23,\"mean\":1.09,\"median\":1.0,\"minimum\":0,\"maximum\":3}],\"people\":[{\"staff_id\":\"P28\",\"nights\":12,\"weekends\":19,\"holidays\":2},{\"staff_id\":\"P4\",\"nights\":14,\"weekends\":4,\"holidays\":3},{\"staff_id\":\"P43\",\"nights\":9,\"weekends\":2,\"holidays\":1},{\"staff_id\":\"P6\",\"nights\":18,\"weekends\":10,\"holidays\":1},{\"staff_id\":\"P31\",\"nights\":0,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P39\",\"nights\":24,\"weekends\":3,\"holidays\":2},{\"staff_id\":\"P25\",\"nights\":19,\"weekends\":19,\"holidays\":1},{\"staff_id\":\"P15\",\"nights\":37,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P27\",\"nights\":19,\"weekends\":7,\"holidays\":1},{\"staff_id\":\"P22\",\"nights\":12,\"weekends\":14,\"holidays\":2},{\"staff_id\":\"P14\",\"nights\":18,\"weekends\":11,\"holidays\":0},{\"staff_id\":\"P29\",\"nights\":22,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P16\",\"nights\":27,\"weekends\":9,\"holidays\":2},{\"staff_id\":\"P41\",\"nights\":16,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P3\",\"nights\":5,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P30\",\"nights\":16,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P18\",\"nights\":29,\"weekends\":15,\"holidays\":1},{\"staff_id\":\"P17\",\"nights\":34,\"weekends\":4,\"holidays\":0},{\"staff_id\":\"P37\",\"nights\":8,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P1\",\"nights\":24,\"weekends\":8,\"holidays\":2},{\"staff_id\":\"P34\",\"nights\":5,\"weekends\":14,\"holidays\":3},{\"staff_id\":\"P20\",\"nights\":17,\"weekends\":10,\"holidays\":0},{\"staff_id\":\"P10\",\"nights\":8,\"weekends\":17,\"holidays\":2}]}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 93,
+    "cache_write_tokens": 137,
+    "cache_read_tokens": 5436
+   },
+   "latency_s": 1.0850970419996884,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: de.\nQuestion:\nWie viele Feiertage hat P28 in diesem Jahr bisher gearbeitet?"
+  },
+  {
+   "request_key": "eeb0c010f7fc68144c19ec039df443c301448ca98753c18d0fdc5be9d3e8db63",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "P28 hat laut Belastungsnachweis (Stand 2026-10-20) bisher 2 Feiertage gearbeitet."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01BGqJiJPYb6CjTT7PDbryrV",
+     "name": "final_answer",
+     "input": {
+      "answer": "P28 hat in diesem Jahr laut Belastungsnachweis (Stand 2026-10-20) bisher 2 Feiertage gearbeitet.",
+      "value": "2",
+      "refused": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 192,
+    "cache_write_tokens": 950,
+    "cache_read_tokens": 5573
+   },
+   "latency_s": 1.2831653749999532,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"year\":2026,\"as_of\":\"2026-10-20\",\"distributions\":[{\"metric\":\"nights\",\"people\":23,\"mean\":17.09,\"median\":17.0,\"minimum\":0,\"maximum\":37},{\"metric\":\"weekends\",\"people\":23,\"mean\":9.78,\"median\":9.0,\"minimum\":2,\"maximum\":19},{\"metric\":\"holidays\",\"people\":23,\"mean\":1.09,\"median\":1.0,\"minimum\":0,\"maximum\":3}],\"people\":[{\"staff_id\":\"P28\",\"nights\":12,\"weekends\":19,\"holidays\":2},{\"staff_id\":\"P4\",\"nights\":14,\"weekends\":4,\"holidays\":3},{\"staff_id\":\"P43\",\"nights\":9,\"weekends\":2,\"holidays\":1},{\"staff_id\":\"P6\",\"nights\":18,\"weekends\":10,\"holidays\":1},{\"staff_id\":\"P31\",\"nights\":0,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P39\",\"nights\":24,\"weekends\":3,\"holidays\":2},{\"staff_id\":\"P25\",\"nights\":19,\"weekends\":19,\"holidays\":1},{\"staff_id\":\"P15\",\"nights\":37,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P27\",\"nights\":19,\"weekends\":7,\"holidays\":1},{\"staff_id\":\"P22\",\"nights\":12,\"weekends\":14,\"holidays\":2},{\"staff_id\":\"P14\",\"nights\":18,\"weekends\":11,\"holidays\":0},{\"staff_id\":\"P29\",\"nights\":22,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P16\",\"nights\":27,\"weekends\":9,\"holidays\":2},{\"staff_id\":\"P41\",\"nights\":16,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P3\",\"nights\":5,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P30\",\"nights\":16,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P18\",\"nights\":29,\"weekends\":15,\"holidays\":1},{\"staff_id\":\"P17\",\"nights\":34,\"weekends\":4,\"holidays\":0},{\"staff_id\":\"P37\",\"nights\":8,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P1\",\"nights\":24,\"weekends\":8,\"holidays\":2},{\"staff_id\":\"P34\",\"nights\":5,\"weekends\":14,\"holidays\":3},{\"staff_id\":\"P20\",\"nights\":17,\"weekends\":10,\"holidays\":0},{\"staff_id\":\"P10\",\"nights\":8,\"weekends\":17,\"holidays\":2}]}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 285,
+  "cache_write_tokens": 1087,
+  "cache_read_tokens": 11009
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 2.83,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5"
+ }
+}

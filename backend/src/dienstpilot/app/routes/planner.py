@@ -1243,6 +1243,100 @@ class Inbox(BaseModel):
     proposals: list[ProposalOut]
 
 
+class ChangeOut(BaseModel):
+    """A Planner's change to a published roster, with the reason given."""
+
+    change_id: str
+    date: date
+    shift_type: str
+    kind: str
+    staff_before: str | None
+    staff_after: str | None
+    reason: str
+    changed_at: datetime
+
+
+class DecisionOut(BaseModel):
+    """A decided leave request with the Planner's reason (staff id only)."""
+
+    request_id: str
+    staff_id: str
+    start_date: date
+    end_date: date
+    status: str
+    reason: str | None
+    decided_at: datetime | None
+
+
+class History(BaseModel):
+    """Why the roster looks as it does: changes and decisions with the reasons people wrote."""
+
+    roster_month: date
+    changes: list[ChangeOut]
+    decisions: list[DecisionOut]
+    proposals: list[ProposalOut]
+
+
+@router.get("/planner/history")
+def history(c: CtxDep, _: PlannerDep, month: Month) -> History:
+    """Return the free text behind a month: change reasons, decision reasons, proposals.
+
+    Read-only. The text is data the Planner or a copilot wrote earlier; readers treat it as
+    untrusted (the copilot delimits it).
+    """
+    m = parse_month(month)
+    dep = department(c)
+    end = month_end(m)
+    decided = [
+        r
+        for r in requests.leave_requests(c.session, list(dep.staff), overlapping=(m, end))
+        if r.status in ("approved", "declined")
+    ]
+    return History(
+        roster_month=m,
+        changes=[
+            ChangeOut(
+                change_id=ch.id,
+                date=ch.day,
+                shift_type=ch.shift_type,
+                kind=ch.kind,
+                staff_before=ch.staff_before,
+                staff_after=ch.staff_after,
+                reason=ch.reason,
+                changed_at=ch.changed_at,
+            )
+            for ch in planning.changes(c.session, m, end)
+        ],
+        decisions=[
+            DecisionOut(
+                request_id=r.id,
+                staff_id=r.staff_id,
+                start_date=r.start_date,
+                end_date=r.end_date,
+                status=r.status,
+                reason=r.decision_reason,
+                decided_at=r.decided_at,
+            )
+            for r in decided
+        ],
+        proposals=[
+            ProposalOut(
+                id=p.id,
+                source=p.source,
+                title=p.title,
+                body=p.body,
+                created_at=p.created_at,
+                roster_month=p.roster_month,
+                status=p.status,
+                kind=p.kind,
+                changes=p.changes,
+            )
+            for p in planning.proposals(c.session, dep.id)
+            if p.roster_month in (None, m)
+        ],
+    )
+
+
 @router.get("/planner/requests")
 def inbox(c: CtxDep, _: PlannerDep) -> Inbox:
     """W6: pending leave with computed impact, escalated swaps and cover, open proposals."""

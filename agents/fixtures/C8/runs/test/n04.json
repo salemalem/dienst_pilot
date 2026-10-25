@@ -1,0 +1,115 @@
+{
+ "task": "n04",
+ "label": "test",
+ "prompt_version": "c8-3",
+ "question": "On how many different days in November 2026 does Dr. Lea Lorenz work?",
+ "final": {
+  "answer": "P16 works on 7 different days in November 2026 (2, 3, 5, 24, 26, 27 and 30 November). Days 9–20 November are marked as leave.",
+  "value": "7",
+  "refused": false
+ },
+ "value_id": "7",
+ "served": "The AI answer could not be checked against the data and is therefore not shown. Sources queried: get_assignments_for(staff_id=P16, month=2026-11).",
+ "fallback": true,
+ "fallback_reason": "ungrounded numbers",
+ "ungrounded": [
+  "2.0",
+  "5.0",
+  "24.0",
+  "26.0",
+  "27.0",
+  "9.0"
+ ],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "get_assignments_for",
+   "args": {
+    "staff_id": "P16",
+    "month": "2026-11"
+   },
+   "is_error": false,
+   "result_chars": 2087
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "4928d9f0b7796a504107d7db8c8eb8627eb275eedbdc915ea80a9e5dcb0242c6",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "I'll look up P16's shifts for November 2026."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01BM6ko8eYzS6Rfc6K8KH3dn",
+     "name": "get_assignments_for",
+     "input": {
+      "staff_id": "P16",
+      "month": "2026-11"
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01BM6ko8eYzS6Rfc6K8KH3dn",
+     "content": "{\"staff_id\":\"P16\",\"roster_month\":\"2026-11-01\",\"totals\":{\"shifts\":7,\"days_worked\":7,\"weekend_shifts\":0,\"by_shift_type\":{\"frueh\":4,\"spaet\":3}},\"days\":[{\"date\":\"2026-11-02\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"5cbfb0f1-cfa3-519c-b696-7ec28c2b4692\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-03\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"a096e567-2982-5dfa-b5c9-932196f37b4e\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-05\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"e7b80773-2961-5fa5-8230-f5d0cb144c27\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-09\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-10\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-11\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-12\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-13\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-14\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-15\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-16\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-17\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-18\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-19\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-20\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-24\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"08e01aa1-f985-5713-a556-f93d292b8fab\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-26\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"c47c7ecf-7b50-5d23-8a90-fb9a962bfe69\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-27\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"f3cb5974-49b7-5c08-a141-f118c7ef9203\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-30\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"3a82f894-c8a4-51f1-96f5-f2ffab56364e\"],\"absent\":false,\"on_leave\":false}]}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 97,
+    "cache_write_tokens": 121,
+    "cache_read_tokens": 5436
+   },
+   "latency_s": 1.3558480419997068,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: en.\nQuestion:\nOn how many different days in November 2026 does P16 work?"
+  },
+  {
+   "request_key": "d0110107243aeefd57192875d59c6187ca7215ca733dde91406ae368e30d346b",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "The shift data lists 7 working days for P16 in November 2026 (Nov 2, 3, 5, 24, 26, 27 and 30). Days 9–20 are marked as leave, so no shifts are counted there."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_019TRphD1unNURQ9ZaDw3s4P",
+     "name": "final_answer",
+     "input": {
+      "answer": "P16 works on 7 different days in November 2026 (2, 3, 5, 24, 26, 27 and 30 November). Days 9–20 November are marked as leave.",
+      "value": "7",
+      "refused": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 218,
+    "cache_write_tokens": 1207,
+    "cache_read_tokens": 5557
+   },
+   "latency_s": 2.1246194160012237,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"staff_id\":\"P16\",\"roster_month\":\"2026-11-01\",\"totals\":{\"shifts\":7,\"days_worked\":7,\"weekend_shifts\":0,\"by_shift_type\":{\"frueh\":4,\"spaet\":3}},\"days\":[{\"date\":\"2026-11-02\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"5cbfb0f1-cfa3-519c-b696-7ec28c2b4692\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-03\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"a096e567-2982-5dfa-b5c9-932196f37b4e\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-05\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"e7b80773-2961-5fa5-8230-f5d0cb144c27\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-09\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-10\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-11\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-12\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-13\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-14\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-15\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-16\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-17\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-18\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-19\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-20\",\"shifts\":[],\"assignment_ids\":[],\"absent\":false,\"on_leave\":true},{\"date\":\"2026-11-24\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"08e01aa1-f985-5713-a556-f93d292b8fab\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-26\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"c47c7ecf-7b50-5d23-8a90-fb9a962bfe69\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-27\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"f3cb5974-49b7-5c08-a141-f118c7ef9203\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-30\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"3a82f894-c8a4-51f1-96f5-f2ffab56364e\"],\"absent\":false,\"on_leave\":false}]}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 315,
+  "cache_write_tokens": 1328,
+  "cache_read_tokens": 10993
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 3.75,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5"
+ }
+}

@@ -37,7 +37,9 @@ class ArqQueue:
         async def put() -> None:
             pool = await create_pool(self._settings, default_queue_name=self._queue)
             try:
-                job_id = f"{job}:{':'.join(kwargs.values())}"
+                # a bearer token travels as an argument but is never part of the job id
+                ident = [v for k, v in kwargs.items() if k != "token"]
+                job_id = f"{job}:{':'.join(ident)}"
                 await pool.enqueue_job(job, *kwargs.values(), _job_id=job_id)
             finally:
                 await pool.aclose()

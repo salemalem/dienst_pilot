@@ -80,7 +80,7 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["backend/tests", "agents/tests", "mcp_servers/tests", "synthdata/tests", "engine/validator/tests", "eval/tests", "ml/tests"]
-pythonpath = ["synthdata/tests", "mcp_servers/tests"]
+pythonpath = ["synthdata/tests", "mcp_servers/tests", "eval"]
 addopts = "-q -m 'not seeds'"
 markers = [
   "db: needs TEST_DATABASE_URL (a Postgres the tests may wipe)",

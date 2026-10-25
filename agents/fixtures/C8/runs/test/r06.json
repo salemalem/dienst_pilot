@@ -1,0 +1,142 @@
+{
+ "task": "r06",
+ "label": "test",
+ "prompt_version": "c8-3",
+ "question": "What is required before a published roster may be changed?",
+ "final": {
+  "answer": "Before a published roster is changed, only the planner may make the change, and it must come with a reason. The change may only affect future days. All affected staff must be notified, and the change must be recorded in the log.",
+  "citations": [
+   "bv-en:§6:1",
+   "bv-en:§6:2",
+   "sop-en:SOP-5:1",
+   "sop-en:SOP-5:3"
+  ],
+  "no_source": false
+ },
+ "value_id": null,
+ "served": "Before a published roster is changed, only the planner may make the change, and it must come with a reason. The change may only affect future days. All affected staff must be notified, and the change must be recorded in the log.",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "changes to a published roster requirements approval",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 1390
+  },
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "Änderung veröffentlichter Dienstplan Voraussetzungen",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 1423
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "e5583271d97b90b1d354732ac214302c797d93240c6882e7cbedfb4ce4f7e5fd",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "This is a rule question, so I'll search the rulebook first."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_016JoLDxjbZFmU7GyANDyxGd",
+     "name": "search_rules",
+     "input": {
+      "query": "changes to a published roster requirements approval",
+      "k": 5
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01P2sa15QYCj8TjktnixxEzy",
+     "name": "search_rules",
+     "input": {
+      "query": "Änderung veröffentlichter Dienstplan Voraussetzungen",
+      "k": 5
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_016JoLDxjbZFmU7GyANDyxGd",
+     "content": "{\"query\":\"changes to a published roster requirements approval\",\"found\":true,\"passages\":[{\"id\":\"bv-en:§6:1\",\"citation\":\"Example works agreement on duty scheduling (synthetic) § 6 Abs. 1 (draft 2026) [synthetic]\",\"text\":\"Only the planner changes a roster after publication, and must give a reason.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.6204},{\"id\":\"bv-en:§6:2\",\"citation\":\"Example works agreement on duty scheduling (synthetic) § 6 Abs. 2 (draft 2026) [synthetic]\",\"text\":\"All affected staff are notified.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5907},{\"id\":\"sop-en:SOP-5:3\",\"citation\":\"Department standard operating procedures (synthetic) SOP-5 Abs. 3 (SOP version 2026-10) [synthetic]\",\"text\":\"All affected people are notified, and the change is in the log.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5879},{\"id\":\"sop-en:SOP-5:1\",\"citation\":\"Department standard operating procedures (synthetic) SOP-5 Abs. 1 (SOP version 2026-10) [synthetic]\",\"text\":\"The planner changes only future days and gives a reason.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5845},{\"id\":\"bv-en:§2:1\",\"citation\":\"Example works agreement on duty scheduling (synthetic) § 2 Abs. 1 (draft 2026) [synthetic]\",\"text\":\"A roster becomes visible only after the planner has approved and published it.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5567}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    },
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01P2sa15QYCj8TjktnixxEzy",
+     "content": "{\"query\":\"Änderung veröffentlichter Dienstplan Voraussetzungen\",\"found\":true,\"passages\":[{\"id\":\"bv:§6:1\",\"citation\":\"Beispiel-Dienstvereinbarung zur Dienstplanung (synthetisch) § 6 Abs. 1 (Entwurf 2026) [synthetisch]\",\"text\":\"Änderungen nach der Veröffentlichung nimmt nur die Planung vor, mit verpflichtender Begründung.\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.6626},{\"id\":\"bv-en:§6:1\",\"citation\":\"Example works agreement on duty scheduling (synthetic) § 6 Abs. 1 (draft 2026) [synthetic]\",\"text\":\"Only the planner changes a roster after publication, and must give a reason.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.622},{\"id\":\"bv:§2:1\",\"citation\":\"Beispiel-Dienstvereinbarung zur Dienstplanung (synthetisch) § 2 Abs. 1 (Entwurf 2026) [synthetisch]\",\"text\":\"Ein Dienstplan wird erst sichtbar, wenn die Planung ihn freigegeben und veröffentlicht hat.\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.603},{\"id\":\"bv:§6:2\",\"citation\":\"Beispiel-Dienstvereinbarung zur Dienstplanung (synthetisch) § 6 Abs. 2 (Entwurf 2026) [synthetisch]\",\"text\":\"Alle betroffenen Beschäftigten werden benachrichtigt.\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.5926},{\"id\":\"bv-en:§6:2\",\"citation\":\"Example works agreement on duty scheduling (synthetic) § 6 Abs. 2 (draft 2026) [synthetic]\",\"text\":\"All affected staff are notified.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5511}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 190,
+    "cache_write_tokens": 117,
+    "cache_read_tokens": 5436
+   },
+   "latency_s": 1.2661480000006122,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: en.\nQuestion:\nWhat is required before a published roster may be changed?"
+  },
+  {
+   "request_key": "276c47f65c0f7b6d3db43343c5000332c7b34b1b3952a3b5e08a8ac3fb2e261f",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Based on the rulebook, a published roster may only be changed by the planner, and the change needs a stated reason. The SOP also limits changes to future days. All affected staff must be notified, and the change must be recorded in the log."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01U6PC9cPStpi5faSxq2BN13",
+     "name": "final_answer",
+     "input": {
+      "answer": "Before a published roster is changed, only the planner may make the change, and it must come with a reason. The change may only affect future days. All affected staff must be notified, and the change must be recorded in the log.",
+      "citations": [
+       "bv-en:§6:1",
+       "bv-en:§6:2",
+       "sop-en:SOP-5:1",
+       "sop-en:SOP-5:3"
+      ],
+      "no_source": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 272,
+    "cache_write_tokens": 1527,
+    "cache_read_tokens": 5553
+   },
+   "latency_s": 1.5823779170004855,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"query\":\"changes to a published roster requirements approval\",\"found\":true,\"passages\":[{\"id\":\"bv-en:§6:1\",\"citation\":\"Example works agreement on duty scheduling (synthetic) § 6 Abs. 1 (draft 2026) [synthetic]\",\"text\":\"Only the planner changes a roster after publication, and must give a reason.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.6204},{\"id\":\"bv-en:§6:2\",\"citation\":\"Example works agreement on duty scheduling (synthetic) § 6 Abs. 2 (draft 2026) [synthetic]\",\"text\":\"All affected staff are notified.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5907},{\"id\":\"sop-en:SOP-5:3\",\"citation\":\"Department standard operating procedures (synthetic) SOP-5 Abs. 3 (SOP version 2026-10) [synthetic]\",\"text\":\"All affected people are notified, and the change is in the log.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5879},{\"id\":\"sop-en:SOP-5:1\",\"citation\":\"Department standard operating procedures (synthetic) SOP-5 Abs. 1 (SOP version 2026-10) [synthetic]\",\"text\":\"The planner changes only future days and gives a reason.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5845},{\"id\":\"bv-en:§2:1\",\"citation\":\"Example works agreement on duty scheduling (synthetic) § 2 Abs. 1 (draft 2026) [synthetic]\",\"text\":\"A roster becomes visible only after the planner has approved and published it.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5567}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}\n{\"query\":\"Änderung veröffentlichter Dienstplan Voraussetzungen\",\"found\":true,\"passages\":[{\"id\":\"bv:§6:1\",\"citation\":\"Beispiel-Dienstvereinbarung zur Dienstplanung (synthetisch) § 6 Abs. 1 (Entwurf 2026) [synthetisch]\",\"text\":\"Änderungen nach der Veröffentlichung nimmt nur die Planung vor, mit verpflichtender Begründung.\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.6626},{\"id\":\"bv-en:§6:1\",\"citation\":\"Example works agreement on duty scheduling (synthetic) § 6 Abs. 1 (draft 2026) [synthetic]\",\"text\":\"Only the planner changes a roster after publication, and must give a reason.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.622},{\"id\":\"bv:§2:1\",\"citation\":\"Beispiel-Dienstvereinbarung zur Dienstplanung (synthetisch) § 2 Abs. 1 (Entwurf 2026) [synthetisch]\",\"text\":\"Ein Dienstplan wird erst sichtbar, wenn die Planung ihn freigegeben und veröffentlicht hat.\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.603},{\"id\":\"bv:§6:2\",\"citation\":\"Beispiel-Dienstvereinbarung zur Dienstplanung (synthetisch) § 6 Abs. 2 (Entwurf 2026) [synthetisch]\",\"text\":\"Alle betroffenen Beschäftigten werden benachrichtigt.\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.5926},{\"id\":\"bv-en:§6:2\",\"citation\":\"Example works agreement on duty scheduling (synthetic) § 6 Abs. 2 (draft 2026) [synthetic]\",\"text\":\"All affected staff are notified.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5511}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 462,
+  "cache_write_tokens": 1644,
+  "cache_read_tokens": 10989
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 3.13,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5"
+ }
+}

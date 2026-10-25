@@ -124,3 +124,21 @@ class AssignmentChange(Base):
     reason: Mapped[str] = mapped_column(Text)
     changed_by: Mapped[uuid.UUID]
     changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class CopilotRun(Base):
+    """One question to the planner copilot (C8) and what came back; runs as a background job."""
+
+    __tablename__ = "copilot_run"
+    __table_args__ = (
+        CheckConstraint("status IN ('queued','running','done','failed')", name="status"),
+    )
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    department_id: Mapped[uuid.UUID]
+    created_by: Mapped[uuid.UUID]  # the user the agent acted for (its tools used their token)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    question: Mapped[str] = mapped_column(String(500))
+    language: Mapped[str] = mapped_column(String(2))
+    status: Mapped[str] = mapped_column(String(10))
+    result: Mapped[dict[str, Any] | None] = mapped_column(JSONB)

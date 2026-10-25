@@ -25,6 +25,7 @@ COPY agents/pyproject.toml agents/pyproject.toml
 COPY agents/src agents/src
 COPY agents/rag agents/rag
 COPY agents/intake agents/intake
+COPY agents/copilot agents/copilot
 COPY agents/fixtures agents/fixtures
 COPY mcp_servers/pyproject.toml mcp_servers/pyproject.toml
 COPY synthdata/pyproject.toml synthdata/pyproject.toml

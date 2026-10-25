@@ -1,0 +1,171 @@
+{
+ "task": "w05",
+ "label": "dev-2",
+ "prompt_version": "c8-2",
+ "question": "Was passiert, wenn Dr. Rohan Mehta den Bereitschaftsdienst am 15.11.2026 an Dr. Hannah Schulz abgibt? Ist das regelkonform?",
+ "final": {
+  "answer": "Nein, die Übergabe ist nicht regelkonform. Der Prüfer meldet drei neue Verstöße: P37 fällt mit 73 % unter das Vertragsstundenband (80–110 %; 122,0 von 168,0 Stunden), P27 hätte am 16.11.2026 einen Freitag nach Bereitschaftsdienst nicht eingehalten (frueh) und die Mindestruhezeit unterschritten (-0,5 statt 11,0 Stunden). Die Schicht wäre dabei besetzt, aber die Verstöße sprechen gegen die Übergabe.",
+  "valid": false,
+  "violations": [
+   "contract_hours_band",
+   "free_day_after_on_call",
+   "min_rest"
+  ]
+ },
+ "value_id": null,
+ "served": "Die KI-Antwort konnte nicht gegen die Daten abgesichert werden und wird deshalb nicht angezeigt. Abgefragte Quellen: get_assignments_for(staff_id=P37, month=2026-11), run_what_if().",
+ "fallback": true,
+ "fallback_reason": "ungrounded numbers",
+ "ungrounded": [
+  "0.5"
+ ],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "get_assignments_for",
+   "args": {
+    "staff_id": "P37",
+    "month": "2026-11"
+   },
+   "is_error": false,
+   "result_chars": 2148
+  },
+  {
+   "name": "run_what_if",
+   "args": {
+    "changes": [
+     {
+      "assignment_id": "73623b35-7927-569f-8386-8873c3656c3f",
+      "new_staff_id": "P27"
+     }
+    ]
+   },
+   "is_error": false,
+   "result_chars": 518
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "034b1c4aa0880151894c5cb555a3bb1e3851b48e33d7a04d6d1c70d3fc505f40",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Ich prüfe zuerst die Schicht von P37 im November und lasse dann die Übergabe gegenprüfen."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01KX4Lyc9W98bVHKhGursYZy",
+     "name": "get_assignments_for",
+     "input": {
+      "staff_id": "P37",
+      "month": "2026-11"
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01KX4Lyc9W98bVHKhGursYZy",
+     "content": "{\"staff_id\":\"P37\",\"roster_month\":\"2026-11-01\",\"totals\":{\"shifts\":15,\"days_worked\":15,\"weekend_shifts\":3,\"by_shift_type\":{\"bereitschaft\":2,\"frueh\":9,\"spaet\":4}},\"days\":[{\"date\":\"2026-11-02\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"23da09b9-dd42-5dc0-9d38-476149810514\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-03\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"3153b636-df86-5a64-a413-8df22aad09d7\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-04\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"34058cd2-9b3c-5c5f-ad0f-ee851029d9f9\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-05\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"82d15765-9499-59e4-b49c-1f89deda734e\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-06\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"0c5fcba7-bab0-56dd-a2a8-69bb42ffe791\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-09\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"f65bb048-3683-5155-b4cb-a55724f5e14b\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-10\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"0b0393ec-aef6-569f-98aa-0868017d53f4\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-12\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"8770f834-204f-5316-bd23-db7ea5b28e61\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-13\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"480be66c-7653-58b6-a0f1-c068f7fdb12e\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-15\",\"shifts\":[\"bereitschaft\"],\"assignment_ids\":[\"73623b35-7927-569f-8386-8873c3656c3f\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-19\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"11f1173b-3ce5-5837-b19f-8f69594a6265\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-21\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"2161d2c2-5381-5574-b06d-d3bf1e30b1ef\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-22\",\"shifts\":[\"bereitschaft\"],\"assignment_ids\":[\"5395ceb3-47f4-5a29-ba06-062c4fa32055\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-24\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"e0092fbb-60bb-5b0f-a69e-ef4fba63e3a8\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-26\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"a2e2dfee-b005-5dc9-a36a-d81eaed7bc19\"],\"absent\":false,\"on_leave\":false}]}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 122,
+    "cache_write_tokens": 156,
+    "cache_read_tokens": 5377
+   },
+   "latency_s": 1.1700645000000804,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: de.\nQuestion:\nWas passiert, wenn P37 den Bereitschaftsdienst am 15.11.2026 an P27 abgibt? Ist das regelkonform?"
+  },
+  {
+   "request_key": "ee916a0371e84b38146d8f894a2d99ae37e49fadf8cc36b7501bc46c8a823b5e",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "The shift on 15.11. is the bereitschaft with assignment_id 73623b35-7927-569f-8386-8873c3656c3f. Now I run the what-if."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01WnKHm4swPVFXHV9tXpsc6i",
+     "name": "run_what_if",
+     "input": {
+      "changes": [
+       {
+        "assignment_id": "73623b35-7927-569f-8386-8873c3656c3f",
+        "new_staff_id": "P27"
+       }
+      ]
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01WnKHm4swPVFXHV9tXpsc6i",
+     "content": "{\"valid\":false,\"introduced\":[{\"rule\":\"contract_hours_band\",\"staff_id\":\"P37\",\"date\":\"2026-11-01\",\"params\":{\"percent\":73,\"low\":80,\"high\":110,\"hours\":122.0,\"contract_hours\":168.0}},{\"rule\":\"free_day_after_on_call\",\"staff_id\":\"P27\",\"date\":\"2026-11-16\",\"params\":{\"shifts\":[\"frueh\"],\"date\":\"2026-11-16\"}},{\"rule\":\"min_rest\",\"staff_id\":\"P27\",\"date\":\"2026-11-16\",\"params\":{\"shift\":\"frueh\",\"hours\":-0.5,\"required\":11.0,\"date\":\"2026-11-16\"}}],\"hours_delta\":{\"P27\":18.0,\"P37\":-18.0},\"uncovered\":[],\"validator_version\":\"c2-1.0.0\"}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 153,
+    "cache_write_tokens": 1321,
+    "cache_read_tokens": 5533
+   },
+   "latency_s": 1.3047994160006056,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"staff_id\":\"P37\",\"roster_month\":\"2026-11-01\",\"totals\":{\"shifts\":15,\"days_worked\":15,\"weekend_shifts\":3,\"by_shift_type\":{\"bereitschaft\":2,\"frueh\":9,\"spaet\":4}},\"days\":[{\"date\":\"2026-11-02\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"23da09b9-dd42-5dc0-9d38-476149810514\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-03\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"3153b636-df86-5a64-a413-8df22aad09d7\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-04\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"34058cd2-9b3c-5c5f-ad0f-ee851029d9f9\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-05\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"82d15765-9499-59e4-b49c-1f89deda734e\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-06\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"0c5fcba7-bab0-56dd-a2a8-69bb42ffe791\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-09\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"f65bb048-3683-5155-b4cb-a55724f5e14b\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-10\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"0b0393ec-aef6-569f-98aa-0868017d53f4\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-12\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"8770f834-204f-5316-bd23-db7ea5b28e61\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-13\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"480be66c-7653-58b6-a0f1-c068f7fdb12e\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-15\",\"shifts\":[\"bereitschaft\"],\"assignment_ids\":[\"73623b35-7927-569f-8386-8873c3656c3f\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-19\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"11f1173b-3ce5-5837-b19f-8f69594a6265\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-21\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"2161d2c2-5381-5574-b06d-d3bf1e30b1ef\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-22\",\"shifts\":[\"bereitschaft\"],\"assignment_ids\":[\"5395ceb3-47f4-5a29-ba06-062c4fa32055\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-24\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"e0092fbb-60bb-5b0f-a69e-ef4fba63e3a8\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-26\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"a2e2dfee-b005-5dc9-a36a-d81eaed7bc19\"],\"absent\":false,\"on_leave\":false}]}"
+  },
+  {
+   "request_key": "3b6e5cb19daef2983aeaa36ac0abaf1bb013279c81c4855cc210b7b45a8027d5",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Die Übergabe ist nicht regelkonform: Der Prüfer meldet drei neue Verstöße."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01NJwJoQCejrXtvVGrJKsiZx",
+     "name": "final_answer",
+     "input": {
+      "answer": "Nein, die Übergabe ist nicht regelkonform. Der Prüfer meldet drei neue Verstöße: P37 fällt mit 73 % unter das Vertragsstundenband (80–110 %; 122,0 von 168,0 Stunden), P27 hätte am 16.11.2026 einen Freitag nach Bereitschaftsdienst nicht eingehalten (frueh) und die Mindestruhezeit unterschritten (-0,5 statt 11,0 Stunden). Die Schicht wäre dabei besetzt, aber die Verstöße sprechen gegen die Übergabe.",
+      "valid": false,
+      "violations": [
+       "contract_hours_band",
+       "free_day_after_on_call",
+       "min_rest"
+      ]
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 365,
+    "cache_write_tokens": 426,
+    "cache_read_tokens": 6854
+   },
+   "latency_s": 2.1857335829990916,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"valid\":false,\"introduced\":[{\"rule\":\"contract_hours_band\",\"staff_id\":\"P37\",\"date\":\"2026-11-01\",\"params\":{\"percent\":73,\"low\":80,\"high\":110,\"hours\":122.0,\"contract_hours\":168.0}},{\"rule\":\"free_day_after_on_call\",\"staff_id\":\"P27\",\"date\":\"2026-11-16\",\"params\":{\"shifts\":[\"frueh\"],\"date\":\"2026-11-16\"}},{\"rule\":\"min_rest\",\"staff_id\":\"P27\",\"date\":\"2026-11-16\",\"params\":{\"shift\":\"frueh\",\"hours\":-0.5,\"required\":11.0,\"date\":\"2026-11-16\"}}],\"hours_delta\":{\"P27\":18.0,\"P37\":-18.0},\"uncovered\":[],\"validator_version\":\"c2-1.0.0\"}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 8,
+  "output_tokens": 640,
+  "cache_write_tokens": 1903,
+  "cache_read_tokens": 17764
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 5.1,
+  "prompt_sha": "007bc02af21920c92c214a01c7aad4b4fbdc4d24d055fcb67354e7c58596eb36",
+  "model": "claude-haiku-5-5",
+  "expected_alias_new_staff": "P27"
+ }
+}

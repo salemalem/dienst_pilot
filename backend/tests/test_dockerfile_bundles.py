@@ -22,3 +22,13 @@ def test_every_engine_bundle_directory_is_copied_into_the_image() -> None:
     for d in dirs:
         assert f"COPY {d} {d}" in dockerfile, f"{d} is not copied into the API image"
         assert (REPO / d / "champion" / "bundle.json").exists()
+
+
+def test_the_agents_verdict_files_the_engines_read_are_copied_into_the_image() -> None:
+    dockerfile = (REPO / "backend" / "Dockerfile").read_text()
+    for engine in ("c7", "c8"):
+        text = (ENGINES / f"{engine}.py").read_text()
+        for m in re.finditer(r'"agents" / "(\w+)" / "champion.json"', text):
+            d = f"agents/{m.group(1)}"
+            assert f"COPY {d} {d}" in dockerfile, f"{d} is not copied into the API image"
+            assert (REPO / d / "champion.json").exists()

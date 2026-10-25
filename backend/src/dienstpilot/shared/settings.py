@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     # The Anthropic key comes only from the environment or the git-ignored .env, never from code.
     # Without it C7 and C8 run as their labelled stand-ins (Phase 10).
     anthropic_api_key: SecretStr | None = None
+    # Where the MCP servers are (the copilot's tools; the compose service name inside Docker).
+    mcp_url: str = "http://localhost:8200"
     # The instant the demo clock shows unless an Administrator moves it (DEMO_MODE only).
     demo_now: datetime = DEMO_NOW
     # Registers the demo endpoints (PUT /demo/clock). On in the dev stack, off otherwise.

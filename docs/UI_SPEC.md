@@ -98,7 +98,7 @@ Persona: Dr. Thomas Brandt. Layout: left navigation, main canvas, collapsible co
 | W6 | Anfragen / Requests inbox | Leave requests with computed impact (coverage, who covers, overtime, leave taken vs colleagues); escalated swaps; copilot proposals | "Genehmigen" / "Approve", "Ablehnen mit Begründung" / "Decline with reason" |
 | W7 | Ausfälle / Absences live | Active cover cascades as timelines (asked, declined, timed out, accepted); escalations with ranked options and consequences | "Lücke geschlossen: Dr. Alvarez übernimmt" / "Gap closed: Dr. Alvarez is covering" |
 | W8 | Fairness und Compliance | Burden distribution per person, nights/weekends/holidays, rest compliance, overtime trend | "Verteilung Wochenenddienste 2026" / "Weekend duty distribution 2026" |
-| W9 | Copilot panel | Chat with citations to rule sources, what-if results, "Vorschlag erstellen" / "Create proposal"; never a publish button | "Warum hat Dr. Weber im Dezember zwei Wochenenden?" as sample question |
+| W9 | Copilot panel | Chat. Lookups and rule questions are answered by the labelled stand-in at once (citations to rule sources); what-ifs and drafting go to the AI agent as a job (the panel polls): labelled "KI-generiert" (and "Aufzeichnung einer echten Antwort" when replayed), the validator's verdict for a what-if, the sources it looked at (collapsed), a labelled fallback instead of any text whose numbers the data does not back; "Vorschlag erstellen" / "Create proposal"; never a publish button | Three sample questions: the stand-in's "Warum hat Dr. Weber im Dezember zwei Wochenenden?", a what-if and a drafting request |
 | W10 | Protokoll / Audit trail | Filterable event log: who requested, what was proposed, who approved, when; chain-verified indicator | "Protokoll vollständig und unverändert" / "Log complete and unaltered" |
 | W11 | Regeln und Stammdaten / Rules and master data | Admin: shift types, demand templates, qualifications, contracts, versioned rule sets | "Neue Regelversion ab 01.01.2027" / "New rule version from 1 Jan 2027" |
 | W12 | Aufsicht / Oversight | Read-only view for Klinikleitung and Betriebsrat: compliance, overtime, cost, fairness statistics, audit export | "Nur Lesezugriff" / "Read-only access" |
@@ -113,7 +113,7 @@ Persona: Dr. Thomas Brandt. Layout: left navigation, main canvas, collapsible co
 - **W8 and W12 for Oversight.** Fairness is only anonymous statistics (no names on W8). Hours per person (payroll, working-time records) are on W12.
 - **W10.** The chain indicator shows the tick and "Protokoll vollständig und unverändert" only when the last verification passed and is recent (36 hours of demo time); otherwise it says that the check is too old, that none has run, or where the chain is broken. "Jetzt prüfen" runs the verifier on demand. It never shows a tick it cannot back.
 - **W12 month end.** A section "Monatsabschluss": the prepared month-end documentation, the Planner's one-click confirmation and the payroll export (CSV) that stays locked until then. The explanatory text is marked as a placeholder until the copilot exists.
-- **W13.** The rulebook retrieval has a card of its own after C1 to C8 (kind "retrieval"): the summary line counts the eight numbered components only ("6 von 8 Komponenten gebaut, 2 Platzhalter", computed from the cards shown) and names the rulebook card after it with its own status, never adding it to the count; the card names the served method (vectors alone), shows the three methods side by side from `eval/results/rag.json`, and says that the pre-registered check failed for the hybrid. Cards are grouped by kind. Metrics come from `eval/results` through the API (C1, C2); the other components show a marked placeholder, and no model card exists yet.
+- **W13.** The rulebook retrieval has a card of its own after C1 to C8 (kind "retrieval"): the summary line counts the eight numbered components only ("6 von 8 Komponenten gebaut, 2 Platzhalter", computed from the cards shown) and names the rulebook card after it with its own status, never adding it to the count; the card names the served method (vectors alone), shows the three methods side by side from `eval/results/rag.json`, and says that the pre-registered check failed for the hybrid. Cards are grouped by kind. Metrics come from `eval/results` through the API (C1, C2); the other components show a marked placeholder, and no model card exists yet. The C8 card is "partly" built: the table shows each pre-registered gate with its count and pass or fail, which capabilities are released and which stay with the stand-in, and the cost of the evaluation; the summary line then reads "6 von 8 Komponenten gebaut, 1 teilweise, 1 Platzhalter".
 
 ## 5. Shift types (use these exact times)
 
@@ -142,8 +142,9 @@ Capture each in DE and EN, light theme; capture M2, M8 and W1 additionally in da
 8. W4 Roster editor with a rule message visible
 9. W7 Live cover cascade
 10. W7b Escalation to the Planner (all eligible candidates timed out, auto-approval policy still on)
-11. W9 Copilot answering with a rule citation
-12. W11 Rules and master data (Administrator, rule version 2026-1)
-13. W12 Oversight, read-only (Katrin Vogel)
-14. W13 AI transparency
-15. W10 Audit trail
+11. W9 Copilot answering with a rule citation (the stand-in)
+12. W9b Copilot answering a what-if (the AI agent, a recorded real answer, with the validator's verdict and its sources)
+13. W11 Rules and master data (Administrator, rule version 2026-1)
+14. W12 Oversight, read-only (Katrin Vogel)
+15. W13 AI transparency
+16. W10 Audit trail

@@ -1,0 +1,114 @@
+{
+ "task": "r03",
+ "label": "dev-3",
+ "prompt_version": "c8-3",
+ "question": "Welche Uhrzeiten gelten nach dem Arbeitszeitgesetz als Nachtzeit?",
+ "final": {
+  "answer": "Nach § 2 Abs. 3 ArbZG ist Nachtzeit die Zeit von 23 bis 6 Uhr. In Bäckereien und Konditoreien gilt abweichend die Zeit von 22 bis 5 Uhr.",
+  "citations": [
+   "arbzg:§2:3"
+  ],
+  "no_source": false,
+  "refused": false
+ },
+ "value_id": null,
+ "served": "Nach § 2 Abs. 3 ArbZG ist Nachtzeit die Zeit von 23 bis 6 Uhr. In Bäckereien und Konditoreien gilt abweichend die Zeit von 22 bis 5 Uhr.",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "Nachtzeit Arbeitszeitgesetz Uhrzeit 23 6 Uhr",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 2101
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "1522d08f4874b8b6650f4c2fde302167b817e7fd23b07b2fa19f0e53948d082c",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Ich suche die Regel im Arbeitszeitgesetz."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01Hvd5SE52XMtfup8yFmcaga",
+     "name": "search_rules",
+     "input": {
+      "query": "Nachtzeit Arbeitszeitgesetz Uhrzeit 23 6 Uhr",
+      "k": 5
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01Hvd5SE52XMtfup8yFmcaga",
+     "content": "{\"query\":\"Nachtzeit Arbeitszeitgesetz Uhrzeit 23 6 Uhr\",\"found\":true,\"passages\":[{\"id\":\"arbzg:§2:3\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 2 Abs. 3 (Stand 2024-12-31)\",\"text\":\"Nachtzeit im Sinne dieses Gesetzes ist die Zeit von 23 bis 6 Uhr, in Bäckereien und Konditoreien die Zeit von 22 bis 5 Uhr.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.7309},{\"id\":\"arbzg:§6:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 1 (Stand 2024-12-31)\",\"text\":\"Die Arbeitszeit der Nacht- und Schichtarbeitnehmer ist nach den gesicherten arbeitswissenschaftlichen Erkenntnissen über die menschengerechte Gestaltung der Arbeit festzulegen.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6851},{\"id\":\"arbzg:§6:2\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 2 (Stand 2024-12-31)\",\"text\":\"Die werktägliche Arbeitszeit der Nachtarbeitnehmer darf acht Stunden nicht überschreiten. Sie kann auf bis zu zehn Stunden nur verlängert werden, wenn abweichend von § 3 innerhalb von einem Kalendermonat oder innerhalb von vier Wochen im Durchschnitt acht Stunden werktäglich nicht überschritten werden. Für Zeiträume, in denen Nachtarbeitnehmer im Sinne des § 2 Abs. 5 Nr. 2 nicht zur Nachtarbeit herangezogen werden, findet § 3 Satz 2 Anwendung.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6467},{\"id\":\"arbzg:§6:5\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 5 (Stand 2024-12-31)\",\"text\":\"Soweit keine tarifvertraglichen Ausgleichsregelungen bestehen, hat der Arbeitgeber dem Nachtarbeitnehmer für die während der Nachtzeit geleisteten Arbeitsstunden eine angemessene Zahl bezahlter freier Tage oder einen angemessenen Zuschlag auf das ihm hierfür zustehende Bruttoarbeitsentgelt zu gewähren.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6151},{\"id\":\"arbzg:§6:6\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 6 (Stand 2024-12-31)\",\"text\":\"Es ist sicherzustellen, daß Nachtarbeitnehmer den gleichen Zugang zur betrieblichen Weiterbildung und zu aufstiegsfördernden Maßnahmen haben wie die übrigen Arbeitnehmer.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6114}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 127,
+    "cache_write_tokens": 143,
+    "cache_read_tokens": 5436
+   },
+   "latency_s": 1.1854548749997775,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: de.\nQuestion:\nWelche Uhrzeiten gelten nach dem Arbeitszeitgesetz als Nachtzeit?"
+  },
+  {
+   "request_key": "69e2de8ce3b86b63f3e0006be255c848c25ec674f61a44b89318c799c962edac",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Nach § 2 Abs. 3 ArbZG ist Nachtzeit die Zeit von 23 bis 6 Uhr. In Bäckereien und Konditoreien gilt abweichend die Zeit von 22 bis 5 Uhr."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01JrgA83t2FCKncdwkUraWaE",
+     "name": "final_answer",
+     "input": {
+      "answer": "Nach § 2 Abs. 3 ArbZG ist Nachtzeit die Zeit von 23 bis 6 Uhr. In Bäckereien und Konditoreien gilt abweichend die Zeit von 22 bis 5 Uhr.",
+      "citations": [
+       "arbzg:§2:3"
+      ],
+      "no_source": false,
+      "refused": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 301,
+    "cache_write_tokens": 1276,
+    "cache_read_tokens": 5579
+   },
+   "latency_s": 1.5741816660010954,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"query\":\"Nachtzeit Arbeitszeitgesetz Uhrzeit 23 6 Uhr\",\"found\":true,\"passages\":[{\"id\":\"arbzg:§2:3\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 2 Abs. 3 (Stand 2024-12-31)\",\"text\":\"Nachtzeit im Sinne dieses Gesetzes ist die Zeit von 23 bis 6 Uhr, in Bäckereien und Konditoreien die Zeit von 22 bis 5 Uhr.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.7309},{\"id\":\"arbzg:§6:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 1 (Stand 2024-12-31)\",\"text\":\"Die Arbeitszeit der Nacht- und Schichtarbeitnehmer ist nach den gesicherten arbeitswissenschaftlichen Erkenntnissen über die menschengerechte Gestaltung der Arbeit festzulegen.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6851},{\"id\":\"arbzg:§6:2\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 2 (Stand 2024-12-31)\",\"text\":\"Die werktägliche Arbeitszeit der Nachtarbeitnehmer darf acht Stunden nicht überschreiten. Sie kann auf bis zu zehn Stunden nur verlängert werden, wenn abweichend von § 3 innerhalb von einem Kalendermonat oder innerhalb von vier Wochen im Durchschnitt acht Stunden werktäglich nicht überschritten werden. Für Zeiträume, in denen Nachtarbeitnehmer im Sinne des § 2 Abs. 5 Nr. 2 nicht zur Nachtarbeit herangezogen werden, findet § 3 Satz 2 Anwendung.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6467},{\"id\":\"arbzg:§6:5\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 5 (Stand 2024-12-31)\",\"text\":\"Soweit keine tarifvertraglichen Ausgleichsregelungen bestehen, hat der Arbeitgeber dem Nachtarbeitnehmer für die während der Nachtzeit geleisteten Arbeitsstunden eine angemessene Zahl bezahlter freier Tage oder einen angemessenen Zuschlag auf das ihm hierfür zustehende Bruttoarbeitsentgelt zu gewähren.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6151},{\"id\":\"arbzg:§6:6\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 6 (Stand 2024-12-31)\",\"text\":\"Es ist sicherzustellen, daß Nachtarbeitnehmer den gleichen Zugang zur betrieblichen Weiterbildung und zu aufstiegsfördernden Maßnahmen haben wie die übrigen Arbeitnehmer.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6114}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 428,
+  "cache_write_tokens": 1419,
+  "cache_read_tokens": 11015
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 3.03,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5"
+ }
+}

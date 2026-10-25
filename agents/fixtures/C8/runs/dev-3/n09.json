@@ -1,0 +1,106 @@
+{
+ "task": "n09",
+ "label": "dev-3",
+ "prompt_version": "c8-3",
+ "question": "What is the highest number of weekends worked so far this year by any physician in the burden ledger?",
+ "final": {
+  "answer": "The highest number of weekends worked so far this year by any physician is 19 (ledger as of 2026-10-20).",
+  "value": "19",
+  "refused": false
+ },
+ "value_id": "19",
+ "served": "The highest number of weekends worked so far this year by any physician is 19 (ledger as of 2026-10-20).",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "get_burden_ledger",
+   "args": {
+    "year": 2026
+   },
+   "is_error": false,
+   "result_chars": 317
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "6a33ef9a7e55677a79aba1deb4f515170cdfd660688e04465d5ed80bca9a3b02",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Oversight users can read the burden ledger, but per-person names are not shown to oversight, so I'll pull the ledger and report the figure."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_0197AjxL4MVY3a2n2HQqbDiZ",
+     "name": "get_burden_ledger",
+     "input": {
+      "year": 2026
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_0197AjxL4MVY3a2n2HQqbDiZ",
+     "content": "{\"year\":2026,\"as_of\":\"2026-10-20\",\"distributions\":[{\"metric\":\"nights\",\"people\":23,\"mean\":17.09,\"median\":17.0,\"minimum\":0,\"maximum\":37},{\"metric\":\"weekends\",\"people\":23,\"mean\":9.78,\"median\":9.0,\"minimum\":2,\"maximum\":19},{\"metric\":\"holidays\",\"people\":23,\"mean\":1.09,\"median\":1.0,\"minimum\":0,\"maximum\":3}],\"people\":null}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 98,
+    "cache_write_tokens": 3992,
+    "cache_read_tokens": 0
+   },
+   "latency_s": 1.2473954999986745,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: oversight. Language: en.\nQuestion:\nWhat is the highest number of weekends worked so far this year by any physician in the burden ledger?"
+  },
+  {
+   "request_key": "af1b7719c2b95cc6d9f1029a751c37fd62dae6d1a0ec53138413d71f3fbacb15",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "The ledger shows a maximum of 19 weekends for any physician so far this year, as of 2026-10-20."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01L7hNpbVEZqBgdTgdhmMCBr",
+     "name": "final_answer",
+     "input": {
+      "answer": "The highest number of weekends worked so far this year by any physician is 19 (ledger as of 2026-10-20).",
+      "value": "19",
+      "refused": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 164,
+    "cache_write_tokens": 264,
+    "cache_read_tokens": 3992
+   },
+   "latency_s": 1.26708145900011,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"year\":2026,\"as_of\":\"2026-10-20\",\"distributions\":[{\"metric\":\"nights\",\"people\":23,\"mean\":17.09,\"median\":17.0,\"minimum\":0,\"maximum\":37},{\"metric\":\"weekends\",\"people\":23,\"mean\":9.78,\"median\":9.0,\"minimum\":2,\"maximum\":19},{\"metric\":\"holidays\",\"people\":23,\"mean\":1.09,\"median\":1.0,\"minimum\":0,\"maximum\":3}],\"people\":null}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 262,
+  "cache_write_tokens": 4256,
+  "cache_read_tokens": 3992
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 2.99,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5"
+ }
+}

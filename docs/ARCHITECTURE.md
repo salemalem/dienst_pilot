@@ -10,8 +10,8 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | — | Process design (roles, approvals, monthly cycle) | Domain design | Done, with clinical input |
 | — | System architecture (this document) | Design | Done |
 | — | Synthetic data generator (`synthdata/`) | Simulation | Prototype |
-| — | Events (outbox, Redis Streams, idempotent consumers, versioned schemas), hash-chained audit trail, durable workflows with demo-time timers, month-end report (`backend/src/dienstpilot/shared/`, `audit/`, `workflows/`; ADR-016, ADR-017) | Application | Built & tested on synthetic data (backend tests; one consumer so far; narrative text is a placeholder until C8) |
-| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-ins for C7 and C8), job worker | Application | Prototype |
+| — | Events (outbox, Redis Streams, idempotent consumers, versioned schemas), hash-chained audit trail, durable workflows with demo-time timers, month-end report (`backend/src/dienstpilot/shared/`, `audit/`, `workflows/`; ADR-016, ADR-017) | Application | Built & tested on synthetic data (backend tests; one consumer so far; the month-end narrative is a labelled placeholder) |
+| — | HTTP API for the screens (`backend/src/dienstpilot/app/`, stand-in for C7 and for the capabilities of C8 that did not pass), job worker | Application | Prototype |
 | C1 | Roster Optimizer (`engine/solver/`) | Constraint optimization | Built & evaluated on synthetic data (`eval/results/benchmark.json`) |
 | C2 | Rule and Compliance Validator (`engine/validator/`) | Deterministic | Built & evaluated on synthetic data (`eval/results/c2.json`) |
 | C3 | Absence Forecaster (`ml/`) | ML, time series | Built & evaluated on synthetic data (`eval/results/c3.json`). The served model is the seasonal-naive baseline: the LightGBM challenger did not meet the promotion rule (model card) |
@@ -21,7 +21,7 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | — | MCP servers (`mcp_servers/`: roster, planning, rules, forecast, notify) | Application | Built & tested on synthetic data (backend and mcp tests; thin wrappers over the REST API, ADR-018) |
 | — | Rulebook retrieval, RAG (`agents/`, `agents/rag/`) | Retrieval | Built & evaluated on synthetic data (`eval/results/rag.json`, 60 questions written for the prototype). Hybrid retrieval did not beat vectors alone (pre-registered check failed), so vectors alone are served; hybrid is a setting (model card `rag-rulebook.md`) |
 | C7 | Request Intake Agent (`agents/`, `backend/.../engines/c7.py`) | LLM, structured output | Built & evaluated on synthetic data (`eval/results/c7.json`). **The keyword stand-in is served:** the language model (`claude-haiku-5-5`) failed one pre-registered check (it followed an injected instruction once), so it is not promoted and the model was not switched (model card `c7-request-intake.md`) |
-| C8 | Planner Copilot | LLM agent, MCP tools, RAG | Designed |
+| C8 | Planner Copilot (`agents/src/dienstpilot_agents/copilot/`, `backend/.../engines/c8.py`) | LLM agent, MCP tools | Built & evaluated on synthetic data (`eval/results/c8.json`, 50 tasks, gates committed before the first call). **Partly served:** what-ifs and drafting passed their gates and are answered by the agent (`claude-haiku-5-5`, safety gates all passed); lookups (11 of 12) and rule questions (4 of 5) did not, so those stay with the keyword stand-in and the model was not switched (model card `c8-planner-copilot.md`, ADR-021). Variant summaries and the month-end narrative were not evaluated and are not served by the agent |
 | — | Staff app and planner dashboard | UI prototype | Designed |
 | — | Pilot with a clinic | Validation | Not started |
 
@@ -248,15 +248,17 @@ A pure function `validate(roster, ruleset) → list[Violation]`, implemented ind
 
 **Job.** A side panel in the planner dashboard that explains variants, answers questions ("Why does Dr. Weber have three weekends?"), runs what-ifs, cites rules, and drafts change reasons and announcements.
 
-**Method.** LangGraph agent on `claude-haiku-5-5` (Haiku for both agents: the phase has a hard budget of 5 euros; if C8 fails its pre-registered gates the stand-in stays, and the model is not changed afterwards). All data access goes through MCP tools (§10); there is no raw SQL. Rule questions go through RAG (§11). Variant summaries are generated from C1's metrics object.
+**Method.** LangGraph agent on `claude-haiku-5-5` (Haiku for both agents: the phase has a hard budget of 5 euros; if C8 fails its pre-registered gates the stand-in stays, and the model is not changed afterwards), thinking off, run as a background job with polling (ADR-021). All data access goes through the MCP tools of the signed-in user (§10); there is no raw SQL. Rule questions go through RAG (§11). A local `calculate` helper does arithmetic on numbers already in the question or in earlier tool results.
 
 **Guardrails.**
-- No approve or publish tool exists. The agent can create `Proposal` records that appear in the planner's inbox.
-- Numeric grounding check: every number in a generated summary must match a value in the source metrics, or the templated fallback text is shown instead.
-- Staff free text that reaches the context is delimited and treated as untrusted.
+- No approve or publish tool exists. The agent can create `Proposal` records (and announcement drafts) that appear in the planner's inbox.
+- People are aliases (`P1`, `P2`, ...) in everything sent to the model; names come back only on display. A scan of every outgoing text stops a run that would send a name, a person id, a persona key or a health word.
+- Numeric grounding check: every number and date in a generated answer must be in the question, in a tool result of the run or in a `calculate` result, or the labelled fallback (the sources queried, no model text) is shown instead.
+- Free text written by people (change reasons, decision reasons, proposals) reaches the context only through `get_history`, delimited and treated as untrusted.
 - Tool access mirrors the user's role: Oversight users get read-only tools.
+- Only capabilities whose gates passed reach the agent (`agents/copilot/champion.json`); questions are routed by keywords.
 
-**Evaluation.** A suite of 50 planner tasks with exact numeric checks and rubric grading, refusal tests (asking it to publish), and prompt-injection tests embedded in synthetic staff comments.
+**Evaluation.** 50 synthetic planner tasks (20 lookups, 8 rule questions, 6 what-ifs, 6 drafting tasks, 6 refusals, 4 injections), exact checks from independent SQL or from the validator, deterministic checklists for drafting, no model as judge; split stratified by kind into 20 dev and 30 test tasks; gates committed before the first call (`agents/copilot/RELEASE_GATES.md`); the test tasks run once. Result: safety gates passed, what-ifs and drafting passed, lookups and rule questions did not (model card `docs/model-cards/c8-planner-copilot.md`, `eval/results/c8.json`).
 
 ### 9.1 Deterministic workflows (deliberately not LLM agents)
 
@@ -265,9 +267,9 @@ A pure function `validate(roster, ruleset) → list[Violation]`, implemented ind
 | Sick-call cascade | `SicknessReported` | C2 finds eligible colleagues → C5 policy orders them → ask one at a time with 15-minute deadline → on accept, re-validate and update → escalate to Planner with ranked options if exhausted or if the only options involve overtime, external locum, or another department |
 | Swap approval | `SwapAccepted` | C2 re-validates both rosters; valid → auto-approve and notify Planner; invalid → escalate with the reason |
 | Request window | `RequestWindowOpened` | push to all staff; reminders at configurable intervals; progress shown to Planner |
-| Month-end | `MonthClosed` | hours, overtime, rest compliance, burden distribution, decision trail → payroll export and Oversight report; C8 writes a short narrative over the computed figures |
+| Month-end | `MonthClosed` | hours, overtime, rest compliance, burden distribution, decision trail → payroll export and Oversight report; a short narrative over the computed figures is planned (a labelled placeholder today) |
 
-Workflows are durable state machines persisted in Postgres (`workflow.instance`, `workflow.timer`). Timers are rows due in demo time; an arq cron on the worker, the API handlers and `PUT /demo/clock` fire what has become due, in order and exactly once, so a restart never loses a cascade in progress (ADR-017). Redis only wakes the worker up. The four workflows are persisted; the month-end narrative is a placeholder until C8.
+Workflows are durable state machines persisted in Postgres (`workflow.instance`, `workflow.timer`). Timers are rows due in demo time; an arq cron on the worker, the API handlers and `PUT /demo/clock` fire what has become due, in order and exactly once, so a restart never loses a cascade in progress (ADR-017). Redis only wakes the worker up. The four workflows are persisted; the month-end narrative is a labelled placeholder (the agent was not evaluated on it, so it does not write it).
 
 ```mermaid
 stateDiagram-v2
@@ -310,8 +312,8 @@ Each MCP server is a small module with its own ASGI app (the dev stack runs the 
 
 | Server | Tools | Notes |
 |---|---|---|
-| `roster` | `get_roster`, `get_assignments_for`, `get_burden_ledger`, `get_coverage` | read-only |
-| `planning` | `run_what_if(changes)`, `validate(changes)`, `create_proposal(changes, reason)` | proposals land in the Planner inbox; no publish tool exists |
+| `roster` | `get_roster`, `get_assignments_for`, `get_burden_ledger`, `get_coverage` | read-only; roster tools return totals (shifts, days worked, weekend shifts, shifts per type) so nobody counts by hand |
+| `planning` | `run_what_if(changes)`, `validate(changes)`, `get_variants(month)`, `get_history(month)`, `create_proposal(changes, reason)` | proposals land in the Planner inbox; no publish tool exists; `get_history` returns the free text behind a month (change reasons, decline reasons, proposals) and is the only way it reaches an agent, delimited as data |
 | `rules` | `search_rules(query)`, `get_rule(id)` | retrieval with citations (§11; vectors served) |
 | `forecast` | `get_absence_forecast(range)`, `get_cover_candidates(shift_id)` | wraps C3 and C5 |
 | `notify` | `draft_announcement(audience, text)` | drafts only; sending requires a human click |

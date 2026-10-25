@@ -1,0 +1,106 @@
+{
+ "task": "n08",
+ "label": "latency",
+ "prompt_version": "c8-2",
+ "question": "How many weekends has Dr. Marek Nowak worked so far this year?",
+ "final": {
+  "answer": "P3 has worked 17 weekends so far this year (burden ledger, as of 2026-10-20).",
+  "value": "P3",
+  "refused": false
+ },
+ "value_id": "184a5cf4-9843-5833-a685-7f28fdc213a7",
+ "served": "Dr. Marek Nowak has worked 17 weekends so far this year (burden ledger, as of 2026-10-20).",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "get_burden_ledger",
+   "args": {
+    "year": 2026
+   },
+   "is_error": false,
+   "result_chars": 1626
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "e4f5dfa25cb4640769b7030c76f8848b00ade759ee9e2615a6c90c15c1dba5e3",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "I'll check the burden ledger for this year."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01TiDQz1qKQyaZ3P1XsS8MA6",
+     "name": "get_burden_ledger",
+     "input": {
+      "year": 2026
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01TiDQz1qKQyaZ3P1XsS8MA6",
+     "content": "{\"year\":2026,\"as_of\":\"2026-10-20\",\"distributions\":[{\"metric\":\"nights\",\"people\":23,\"mean\":17.09,\"median\":17.0,\"minimum\":0,\"maximum\":37},{\"metric\":\"weekends\",\"people\":23,\"mean\":9.78,\"median\":9.0,\"minimum\":2,\"maximum\":19},{\"metric\":\"holidays\",\"people\":23,\"mean\":1.09,\"median\":1.0,\"minimum\":0,\"maximum\":3}],\"people\":[{\"staff_id\":\"P28\",\"nights\":12,\"weekends\":19,\"holidays\":2},{\"staff_id\":\"P4\",\"nights\":14,\"weekends\":4,\"holidays\":3},{\"staff_id\":\"P43\",\"nights\":9,\"weekends\":2,\"holidays\":1},{\"staff_id\":\"P6\",\"nights\":18,\"weekends\":10,\"holidays\":1},{\"staff_id\":\"P31\",\"nights\":0,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P39\",\"nights\":24,\"weekends\":3,\"holidays\":2},{\"staff_id\":\"P25\",\"nights\":19,\"weekends\":19,\"holidays\":1},{\"staff_id\":\"P15\",\"nights\":37,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P27\",\"nights\":19,\"weekends\":7,\"holidays\":1},{\"staff_id\":\"P22\",\"nights\":12,\"weekends\":14,\"holidays\":2},{\"staff_id\":\"P14\",\"nights\":18,\"weekends\":11,\"holidays\":0},{\"staff_id\":\"P29\",\"nights\":22,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P16\",\"nights\":27,\"weekends\":9,\"holidays\":2},{\"staff_id\":\"P41\",\"nights\":16,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P3\",\"nights\":5,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P30\",\"nights\":16,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P18\",\"nights\":29,\"weekends\":15,\"holidays\":1},{\"staff_id\":\"P17\",\"nights\":34,\"weekends\":4,\"holidays\":0},{\"staff_id\":\"P37\",\"nights\":8,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P1\",\"nights\":24,\"weekends\":8,\"holidays\":2},{\"staff_id\":\"P34\",\"nights\":5,\"weekends\":14,\"holidays\":3},{\"staff_id\":\"P20\",\"nights\":17,\"weekends\":10,\"holidays\":0},{\"staff_id\":\"P10\",\"nights\":8,\"weekends\":17,\"holidays\":2}]}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 68,
+    "cache_write_tokens": 0,
+    "cache_read_tokens": 5497
+   },
+   "latency_s": 0.8617610830006015,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: en.\nQuestion:\nHow many weekends has P3 worked so far this year?"
+  },
+  {
+   "request_key": "c83d2dfb506d70f7f5765673bae029d81af34e6afbfbf8b87928a04bc22961b1",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "P3 has 17 weekends so far this year, per the burden ledger as of 2026-10-20."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_012xr3fWHBuVNTWwjAShBhfM",
+     "name": "final_answer",
+     "input": {
+      "answer": "P3 has worked 17 weekends so far this year (burden ledger, as of 2026-10-20).",
+      "value": "P3",
+      "refused": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 158,
+    "cache_write_tokens": 0,
+    "cache_read_tokens": 6422
+   },
+   "latency_s": 1.1574031249983818,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"year\":2026,\"as_of\":\"2026-10-20\",\"distributions\":[{\"metric\":\"nights\",\"people\":23,\"mean\":17.09,\"median\":17.0,\"minimum\":0,\"maximum\":37},{\"metric\":\"weekends\",\"people\":23,\"mean\":9.78,\"median\":9.0,\"minimum\":2,\"maximum\":19},{\"metric\":\"holidays\",\"people\":23,\"mean\":1.09,\"median\":1.0,\"minimum\":0,\"maximum\":3}],\"people\":[{\"staff_id\":\"P28\",\"nights\":12,\"weekends\":19,\"holidays\":2},{\"staff_id\":\"P4\",\"nights\":14,\"weekends\":4,\"holidays\":3},{\"staff_id\":\"P43\",\"nights\":9,\"weekends\":2,\"holidays\":1},{\"staff_id\":\"P6\",\"nights\":18,\"weekends\":10,\"holidays\":1},{\"staff_id\":\"P31\",\"nights\":0,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P39\",\"nights\":24,\"weekends\":3,\"holidays\":2},{\"staff_id\":\"P25\",\"nights\":19,\"weekends\":19,\"holidays\":1},{\"staff_id\":\"P15\",\"nights\":37,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P27\",\"nights\":19,\"weekends\":7,\"holidays\":1},{\"staff_id\":\"P22\",\"nights\":12,\"weekends\":14,\"holidays\":2},{\"staff_id\":\"P14\",\"nights\":18,\"weekends\":11,\"holidays\":0},{\"staff_id\":\"P29\",\"nights\":22,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P16\",\"nights\":27,\"weekends\":9,\"holidays\":2},{\"staff_id\":\"P41\",\"nights\":16,\"weekends\":3,\"holidays\":0},{\"staff_id\":\"P3\",\"nights\":5,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P30\",\"nights\":16,\"weekends\":8,\"holidays\":1},{\"staff_id\":\"P18\",\"nights\":29,\"weekends\":15,\"holidays\":1},{\"staff_id\":\"P17\",\"nights\":34,\"weekends\":4,\"holidays\":0},{\"staff_id\":\"P37\",\"nights\":8,\"weekends\":17,\"holidays\":0},{\"staff_id\":\"P1\",\"nights\":24,\"weekends\":8,\"holidays\":2},{\"staff_id\":\"P34\",\"nights\":5,\"weekends\":14,\"holidays\":3},{\"staff_id\":\"P20\",\"nights\":17,\"weekends\":10,\"holidays\":0},{\"staff_id\":\"P10\",\"nights\":8,\"weekends\":17,\"holidays\":2}]}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 226,
+  "cache_write_tokens": 0,
+  "cache_read_tokens": 11919
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 2.55,
+  "prompt_sha": "007bc02af21920c92c214a01c7aad4b4fbdc4d24d055fcb67354e7c58596eb36",
+  "model": "claude-haiku-5-5"
+ }
+}

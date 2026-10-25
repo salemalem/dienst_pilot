@@ -217,7 +217,8 @@
     "nextMonth": "Next month",
     "synthetic": "Synthetic data",
     "engine": "Computed by",
-    "back": "Back"
+    "back": "Back",
+    "partial": "Partly"
   },
   "nav": {
     "group": {
@@ -262,7 +263,16 @@
     "proposalCreated": "Proposal created. You'll find it under Requests.",
     "question": "Question for the copilot",
     "send": "Send question",
-    "askFailed": "The question could not be answered. Rephrase it or try again."
+    "askFailed": "The question could not be answered. Rephrase it or try again.",
+    "sampleWhatIf": "What if Dr. Marek Nowak hands the late shift on 13 November 2026 to Dr. Aylin Kaya? Does that comply with the rules?",
+    "sampleDraft": "Write a one-sentence reason: Dr. Marek Nowak hands the late shift on 13 November 2026 to Dr. Aylin Kaya because he attends a training course.",
+    "working": "The assistant is working …",
+    "sources": "Sources",
+    "whatIfTitle": "Check by the validator",
+    "whatIfValid": "No rule violation found.",
+    "whatIfInvalid": "Rule violations found:",
+    "fallbackNote": "The AI answer could not be checked against the data and is therefore not shown.",
+    "runFailed": "The assistant could not answer the question. Try again."
   },
   "w1": {
     "title": "Overview",
@@ -991,7 +1001,23 @@
       "c7Promoted": "All seven checks of the pre-registered rule passed.",
       "c7NotPromoted": "Checks of the pre-registered rule not passed: {failed}. The model was not switched and the prompt was not changed afterwards.",
       "c7Cost": "Cost of this evaluation: {spent} US dollars (limit for all paid calls of the phase: {limit})",
-      "c7Note": "140 synthetic test utterances (German and English), scored once after the prompt was frozen; they are generated, not written by staff."
+      "c7Note": "140 synthetic test utterances (German and English), scored once after the prompt was frozen; they are generated, not written by staff.",
+      "c8Served": "Released (gates passed): {served}. The stand-in stays for: {standin}.",
+      "c8None": "nothing",
+      "c8Lookups": "Lookups (figures)",
+      "c8Rules": "Rule questions",
+      "c8WhatIfs": "What-ifs",
+      "c8Drafting": "Drafting",
+      "c8Injection": "Planted instructions followed",
+      "c8State": "Runs with a state change (publish, approve, decide, send)",
+      "c8Privacy": "Privacy findings in all texts sent",
+      "c8Gate": "Gate",
+      "c8Pass": "passed",
+      "c8Fail": "not passed",
+      "c8Cost": "Cost of the C8 evaluation runs: {spent} US dollars (limit for all paid calls of the phase: {limit})",
+      "c8Note": "30 synthetic test tasks, scored once after the prompt was frozen; every number and date must come from the data, otherwise the labelled fallback text is shown. Small sample: the figures are counts, not rates.",
+      "c8Failed": "Not passed: {failed}. The model was not switched and the prompt was not edited afterwards; the stand-in answers there.",
+      "value": "Value"
     },
     "group": {
       "rules": {
@@ -1029,7 +1055,10 @@
     "built": "built",
     "standIn": "stand-in",
     "trainedC7": "Not trained: a pre-trained language model with a fixed prompt",
-    "modelCardC7": "docs/model-cards/c7-request-intake.md"
+    "modelCardC7": "docs/model-cards/c7-request-intake.md",
+    "statusPartial": "{built} of {total} components built, {partial, plural, one {# partly} other {# partly}}, {standIn, plural, one {# stand-in} other {# stand-ins}}",
+    "partial": "partly",
+    "modelCardC8": "docs/model-cards/c8-planner-copilot.md"
   },
   "qualification": {
     "any": "no particular qualification",

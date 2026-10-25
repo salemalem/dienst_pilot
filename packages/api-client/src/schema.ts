@@ -782,6 +782,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/planner/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * History
+         * @description Return the free text behind a month: change reasons, decision reasons, proposals.
+         *
+         *     Read-only. The text is data the Planner or a copilot wrote earlier; readers treat it as
+         *     untrusted (the copilot delimits it).
+         */
+        get: operations["history_planner_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/planner/requests": {
         parameters: {
             query?: never;
@@ -993,9 +1016,32 @@ export interface paths {
         put?: never;
         /**
          * Ask
-         * @description W9: ask the copilot (stand-in). It reads; it cannot publish or approve anything.
+         * @description W9: ask the copilot. It reads and proposes; it cannot publish or approve anything.
+         *
+         *     What-ifs and drafting go to the agent (a background job, poll ``/copilot/runs/{id}``), when
+         *     its pre-registered gates released them; everything else is answered by the stand-in at once.
          */
         post: operations["ask_copilot_ask_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/copilot/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Copilot Run
+         * @description W9: poll an agent answer. Only the user who asked (in the same department) may read it.
+         */
+        get: operations["copilot_run_copilot_runs__run_id__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1344,20 +1390,103 @@ export interface components {
         };
         /**
          * AskOut
-         * @description The copilot's answer with figures and cited rules.
+         * @description The copilot's answer: at once (stand-in) or after polling ``/copilot/runs/{id}`` (agent).
          */
         AskOut: {
-            /** Answer */
+            /**
+             * Status
+             * @default done
+             * @enum {string}
+             */
+            status: "done" | "running" | "failed";
+            /** Run Id */
+            run_id?: string | null;
+            /**
+             * Answer
+             * @default
+             */
             answer: string;
             /** Figures */
-            figures: {
+            figures?: {
                 [key: string]: unknown;
             };
             /** Citations */
-            citations: string[];
-            /** Understood */
+            citations?: string[];
+            /**
+             * Understood
+             * @default true
+             */
             understood: boolean;
             engine: components["schemas"]["EngineLabel"];
+            /**
+             * Ai Generated
+             * @default false
+             */
+            ai_generated: boolean;
+            /**
+             * Replayed
+             * @default false
+             */
+            replayed: boolean;
+            /**
+             * Fallback
+             * @default false
+             */
+            fallback: boolean;
+            /** Fallback Reason */
+            fallback_reason?: string | null;
+            /** Sources */
+            sources?: components["schemas"]["AskSource"][];
+            what_if?: components["schemas"]["AskWhatIf"] | null;
+            /** Wrote */
+            wrote?: string[];
+            /**
+             * Note
+             * @description Which engine answered this kind of question, and why
+             */
+            note?: string | null;
+        };
+        /**
+         * AskSource
+         * @description One thing the agent looked at (a tool call, in words).
+         */
+        AskSource: {
+            /** Tool */
+            tool: string;
+            /** Label */
+            label: string;
+            /** Args */
+            args: {
+                [key: string]: string;
+            };
+        };
+        /**
+         * AskViolation
+         * @description One rule violation the validator found for a what-if.
+         */
+        AskViolation: {
+            /** Rule */
+            rule: string;
+            /** Date */
+            date: string;
+            /** Person */
+            person: string | null;
+        };
+        /**
+         * AskWhatIf
+         * @description What the validator (C2) said about the change asked for.
+         */
+        AskWhatIf: {
+            /** Valid */
+            valid: boolean;
+            /** Violations */
+            violations: components["schemas"]["AskViolation"][];
+            /** Uncovered */
+            uncovered: {
+                [key: string]: unknown;
+            }[];
+            /** Validator Version */
+            validator_version: string | null;
         };
         /**
          * AssignmentChange
@@ -1541,6 +1670,34 @@ export interface components {
             first_bad_seq?: number | null;
             /** Reason */
             reason?: string | null;
+        };
+        /**
+         * ChangeOut
+         * @description A Planner's change to a published roster, with the reason given.
+         */
+        ChangeOut: {
+            /** Change Id */
+            change_id: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Shift Type */
+            shift_type: string;
+            /** Kind */
+            kind: string;
+            /** Staff Before */
+            staff_before: string | null;
+            /** Staff After */
+            staff_after: string | null;
+            /** Reason */
+            reason: string;
+            /**
+             * Changed At
+             * Format: date-time
+             */
+            changed_at: string;
         };
         /**
          * ClockIn
@@ -1761,6 +1918,32 @@ export interface components {
             reason?: string | null;
         };
         /**
+         * DecisionOut
+         * @description A decided leave request with the Planner's reason (staff id only).
+         */
+        DecisionOut: {
+            /** Request Id */
+            request_id: string;
+            /** Staff Id */
+            staff_id: string;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /** Status */
+            status: string;
+            /** Reason */
+            reason: string | null;
+            /** Decided At */
+            decided_at: string | null;
+        };
+        /**
          * DemandOut
          * @description The demand rows of one example day.
          */
@@ -1931,6 +2114,23 @@ export interface components {
              * @constant
              */
             status: "ok";
+        };
+        /**
+         * History
+         * @description Why the roster looks as it does: changes and decisions with the reasons people wrote.
+         */
+        History: {
+            /**
+             * Roster Month
+             * Format: date
+             */
+            roster_month: string;
+            /** Changes */
+            changes: components["schemas"]["ChangeOut"][];
+            /** Decisions */
+            decisions: components["schemas"]["DecisionOut"][];
+            /** Proposals */
+            proposals: components["schemas"]["ProposalOut"][];
         };
         /**
          * HoursImpact
@@ -5050,6 +5250,39 @@ export interface operations {
             };
         };
     };
+    history_planner_history_get: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["History"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     inbox_planner_requests_get: {
         parameters: {
             query?: never;
@@ -5407,6 +5640,39 @@ export interface operations {
                 "application/json": components["schemas"]["AskIn"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AskOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    copilot_run_copilot_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {

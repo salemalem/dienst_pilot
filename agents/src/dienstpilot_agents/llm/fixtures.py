@@ -39,6 +39,7 @@ def save(directory: Path, request: LlmRequest, response: LlmResponse, meta: dict
             "stop_reason": response.stop_reason,
             "model": response.model,
             "usage": response.usage.__dict__,
+            **({"blocks": response.blocks} if response.blocks else {}),
         },
         "recorded": meta,
     }
@@ -72,6 +73,7 @@ class ReplayClient:
             model=r["model"],
             replayed=True,
             meta=doc["recorded"],
+            blocks=r.get("blocks", []),
         )
 
     def complete_many(self, requests: Sequence[LlmRequest], *, purpose: str) -> list[LlmResponse]:

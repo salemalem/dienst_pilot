@@ -1,0 +1,106 @@
+{
+ "task": "n20",
+ "label": "test",
+ "prompt_version": "c8-3",
+ "question": "Wie viele Spätdienste hat Dr. Erik Peters im November 2026?",
+ "final": {
+  "answer": "P39 hat im November 2026 drei Spätdienste (insgesamt 16 Schichten, davon 9 Frühdienste und 4 Nachtdienste).",
+  "value": "3"
+ },
+ "value_id": "3",
+ "served": "Dr. Erik Peters hat im November 2026 drei Spätdienste (insgesamt 16 Schichten, davon 9 Frühdienste und 4 Nachtdienste).",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "get_assignments_for",
+   "args": {
+    "staff_id": "P39",
+    "month": "2026-11"
+   },
+   "is_error": false,
+   "result_chars": 2258
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "a352afb2180fcf0690fa0fb6586a3e38a45e6370f53b43659127251bfb691215",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Ich rufe die Schichten von P39 für November 2026 ab."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01STeoDUqisNC5CNHYXnLghH",
+     "name": "get_assignments_for",
+     "input": {
+      "staff_id": "P39",
+      "month": "2026-11"
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01STeoDUqisNC5CNHYXnLghH",
+     "content": "{\"staff_id\":\"P39\",\"roster_month\":\"2026-11-01\",\"totals\":{\"shifts\":16,\"days_worked\":16,\"weekend_shifts\":0,\"by_shift_type\":{\"frueh\":9,\"nacht\":4,\"spaet\":3}},\"days\":[{\"date\":\"2026-11-02\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"0fd73bb3-0ca9-5198-9ee3-24feccbe05b1\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-03\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"a50e9ec5-ed0a-5634-9173-7a755bde9c5c\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-04\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"edb47f10-de08-5435-95ec-d5c43b94d601\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-06\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"02fc639d-afd0-56fe-a260-600a00d98bb9\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-09\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"c75db895-b05c-5333-83fe-24d6e6a1d87b\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-10\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"5a9566dd-efe3-504f-af2d-ed54d2219ae9\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-12\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"7cdddce7-eb40-5a3f-bb66-b9c6397027e2\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-13\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"e4db2b8e-6c74-58d5-8210-b9bbe98cea21\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-17\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"e4592e1d-fc2e-5f80-907b-dd321c315316\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-18\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"6b47ec0c-5c0a-51ef-b827-ddd86fe27ef7\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-19\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"93754c68-967a-5ab4-bdab-a7a063a7368c\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-20\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"000d8953-b318-5ec9-8c81-aa2b0e3cb3c6\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-24\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"1c727447-c21d-5c67-9054-d118ede466b3\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-26\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"4fe690df-5ffe-5a60-a903-768d6b2a2872\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-27\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"ee643f08-4a6a-5c32-b371-9095ecdfd144\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-30\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"14280a18-738e-55f6-8c4d-78f289de3d88\"],\"absent\":false,\"on_leave\":false}]}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 104,
+    "cache_write_tokens": 126,
+    "cache_read_tokens": 5436
+   },
+   "latency_s": 1.1061763750003593,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: de.\nQuestion:\nWie viele Spätdienste hat P39 im November 2026?"
+  },
+  {
+   "request_key": "7490de6dffa4b7f0d01363098a8eb8cdec59c852aae055c0a7416c3cd16b1276",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "P39 hat im November 2026 drei Spätdienste (spaet)."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_0121zTGP6UywPJNLLs9AkGwM",
+     "name": "final_answer",
+     "input": {
+      "answer": "P39 hat im November 2026 drei Spätdienste (insgesamt 16 Schichten, davon 9 Frühdienste und 4 Nachtdienste).",
+      "value": "3"
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 150,
+    "cache_write_tokens": 1377,
+    "cache_read_tokens": 5562
+   },
+   "latency_s": 1.133571041000323,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"staff_id\":\"P39\",\"roster_month\":\"2026-11-01\",\"totals\":{\"shifts\":16,\"days_worked\":16,\"weekend_shifts\":0,\"by_shift_type\":{\"frueh\":9,\"nacht\":4,\"spaet\":3}},\"days\":[{\"date\":\"2026-11-02\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"0fd73bb3-0ca9-5198-9ee3-24feccbe05b1\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-03\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"a50e9ec5-ed0a-5634-9173-7a755bde9c5c\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-04\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"edb47f10-de08-5435-95ec-d5c43b94d601\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-06\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"02fc639d-afd0-56fe-a260-600a00d98bb9\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-09\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"c75db895-b05c-5333-83fe-24d6e6a1d87b\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-10\",\"shifts\":[\"spaet\"],\"assignment_ids\":[\"5a9566dd-efe3-504f-af2d-ed54d2219ae9\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-12\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"7cdddce7-eb40-5a3f-bb66-b9c6397027e2\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-13\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"e4db2b8e-6c74-58d5-8210-b9bbe98cea21\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-17\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"e4592e1d-fc2e-5f80-907b-dd321c315316\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-18\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"6b47ec0c-5c0a-51ef-b827-ddd86fe27ef7\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-19\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"93754c68-967a-5ab4-bdab-a7a063a7368c\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-20\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"000d8953-b318-5ec9-8c81-aa2b0e3cb3c6\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-24\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"1c727447-c21d-5c67-9054-d118ede466b3\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-26\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"4fe690df-5ffe-5a60-a903-768d6b2a2872\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-27\",\"shifts\":[\"nacht\"],\"assignment_ids\":[\"ee643f08-4a6a-5c32-b371-9095ecdfd144\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-30\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"14280a18-738e-55f6-8c4d-78f289de3d88\"],\"absent\":false,\"on_leave\":false}]}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 254,
+  "cache_write_tokens": 1503,
+  "cache_read_tokens": 10998
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 2.5,
+  "prompt_sha": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+  "model": "claude-haiku-5-5"
+ }
+}
