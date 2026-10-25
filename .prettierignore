@@ -35,3 +35,5 @@ agents/rag/source/
 agents/rag/corpus/
 agents/intake/*.json
 eval/usage/
+eval/c8_tasks.json
+agents/copilot/frozen.json

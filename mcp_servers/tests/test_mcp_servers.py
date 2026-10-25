@@ -52,7 +52,7 @@ async def test_planner_sees_every_tool_oversight_only_reads() -> None:
         planner = {s: await tools_of(app, s, "tok-planner") for s in SERVERS}
         assert {n for s in planner.values() for n in s} == {
             "get_roster", "get_assignments_for", "get_burden_ledger", "get_coverage",
-            "run_what_if", "validate", "get_variants", "create_proposal",
+            "run_what_if", "validate", "get_variants", "get_history", "create_proposal",
             "search_rules", "get_rule", "get_absence_forecast", "get_cover_candidates",
             "draft_announcement",
         }  # fmt: skip
@@ -80,7 +80,7 @@ async def test_no_token_a_bad_token_and_staff_are_refused() -> None:
 async def test_every_tool_is_annotated_typed_and_cannot_publish_or_approve() -> None:
     specs = build(Backend("http://api"))
     names = [s.name for tools in specs.values() for s in tools]
-    assert len(names) == len(set(names)) == 13
+    assert len(names) == len(set(names)) == 14
     assert not [n for n in names if FORBIDDEN_NAMES.search(n)]
     async with running() as app:
         for server in SERVERS:

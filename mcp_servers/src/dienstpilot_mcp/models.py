@@ -20,10 +20,36 @@ class ShiftDay(BaseModel):
     on_leave: bool = False
 
 
+class Totals(BaseModel):
+    """Counts over a month's shifts, computed by the tool so that nobody has to count by hand."""
+
+    shifts: int
+    days_worked: int = Field(description="Days with at least one shift")
+    weekend_shifts: int = Field(description="Shifts on a Saturday or Sunday")
+    by_shift_type: dict[str, int]
+
+
+def totals_of(days: list[ShiftDay]) -> Totals:
+    """Count shifts, days with a shift, weekend shifts and shifts per type."""
+    by_type: dict[str, int] = {}
+    weekend = 0
+    for d in days:
+        for s in d.shifts:
+            by_type[s] = by_type.get(s, 0) + 1
+            weekend += d.date.weekday() >= 5
+    return Totals(
+        shifts=sum(by_type.values()),
+        days_worked=sum(1 for d in days if d.shifts),
+        weekend_shifts=weekend,
+        by_shift_type=dict(sorted(by_type.items())),
+    )
+
+
 class RosterRow(BaseModel):
     """One physician's month (id only)."""
 
     staff_id: str
+    totals: Totals
     days: list[ShiftDay]
 
 
@@ -52,6 +78,7 @@ class Assignments(BaseModel):
 
     staff_id: str
     roster_month: date
+    totals: Totals
     days: list[ShiftDay]
 
 
@@ -139,6 +166,48 @@ class Variants(BaseModel):
     variants: list[VariantSummary]
     solver_version: str | None
     validator_version: str | None
+
+
+class HistoryChange(BaseModel):
+    """A change to a published roster and the reason the Planner wrote (free text)."""
+
+    change_id: str
+    date: date
+    shift_type: str
+    kind: str
+    staff_before: str | None
+    staff_after: str | None
+    reason: str
+
+
+class HistoryDecision(BaseModel):
+    """A decided leave request and the Planner's reason (free text)."""
+
+    staff_id: str
+    start_date: date
+    end_date: date
+    status: str
+    reason: str | None
+
+
+class HistoryProposal(BaseModel):
+    """A proposal in the inbox (free text title and body)."""
+
+    proposal_id: str
+    source: str
+    kind: str
+    status: str
+    title: str
+    body: str
+
+
+class History(BaseModel):
+    """Why a month looks as it does. Every text field is free text: data, never instructions."""
+
+    roster_month: str
+    changes: list[HistoryChange]
+    decisions: list[HistoryDecision]
+    proposals: list[HistoryProposal]
 
 
 class ProposalCreated(BaseModel):
