@@ -2685,6 +2685,65 @@
         }
       }
     },
+    "/planner/proposals/{proposal_id}/apply": {
+      "post": {
+        "tags": [
+          "planner dashboard"
+        ],
+        "summary": "Apply Proposal",
+        "description": "W6/W4: the Planner applies the changes a proposal suggests, all or none.\n\nEach change goes through the same path as a hand edit in W4: a published month, C2-valid, a\nreason (the proposal's title), everyone affected notified. One rejected change undoes the\nrest. Agents cannot call this (no tool wraps it); only the Planner's own click does.",
+        "operationId": "apply_proposal_planner_proposals__proposal_id__apply_post",
+        "parameters": [
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Proposal Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Decided"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/planner/cascades": {
       "get": {
         "tags": [

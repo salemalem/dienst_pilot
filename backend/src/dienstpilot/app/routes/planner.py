@@ -1529,6 +1529,36 @@ def decide_proposal(c: CtxDep, _: PlannerDep, proposal_id: str, body: ProposalDe
     return Decided(id=p.id, status=p.status)
 
 
+@router.post("/planner/proposals/{proposal_id}/apply")
+def apply_proposal(c: CtxDep, _: PlannerDep, proposal_id: str) -> Decided:
+    """W6/W4: the Planner applies the changes a proposal suggests, all or none.
+
+    Each change goes through the same path as a hand edit in W4: a published month, C2-valid, a
+    reason (the proposal's title), everyone affected notified. One rejected change undoes the
+    rest. Agents cannot call this (no tool wraps it); only the Planner's own click does.
+    """
+    found = next(
+        (p for p in planning.proposals(c.session, c.user.department_id) if p.id == proposal_id),
+        None,
+    )
+    if found is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+    if found.status != "open" or not found.changes:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Nothing to apply")
+    reason = f"Vorschlag: {found.title}"[:500]
+    savepoint = c.session.begin_nested()
+    try:
+        for ch in found.changes:
+            change_assignment(c, _, AssignmentEdit(**ch, reason=reason))
+    except HTTPException:
+        savepoint.rollback()
+        raise
+    savepoint.commit()
+    p = planning.decide_proposal(c.session, proposal_id, True, c.clock.now())
+    record(c, "proposal.applied", "proposal", p.id)
+    return Decided(id=p.id, status=p.status)
+
+
 # --- W7 Ausfälle live, W7b Eskalation ---------------------------------------------------------
 
 

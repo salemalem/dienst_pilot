@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { asPersona } from "./helpers.ts";
+import { api, asPersona, login } from "./helpers.ts";
 
 test("W9: the copilot answers with a rule citation, is labelled a stand-in and can only propose", async ({
   page,
@@ -88,4 +88,44 @@ test("W11: the Planner's auto-approval policy is switchable and logged", async (
   await expect(swaps).not.toBeChecked();
   await page.getByText("Tausche automatisch freigeben").click();
   await expect(swaps).toBeChecked();
+});
+
+test("W6: a proposal with changes is applied by the Planner's own click, validated like a hand edit", async ({
+  page,
+}) => {
+  const token = await login("brandt");
+  type Grid = { rows: { cells: Record<string, { assignment_ids: string[] }> }[] };
+  const grid = await api<Grid>(token, "GET", "/roster?month=2026-11");
+  let change: { assignment_id: string; new_staff_id: string } | null = null;
+  for (const row of grid.rows) {
+    for (const [day, cell] of Object.entries(row.cells)) {
+      const id = day > "2026-11-05" ? cell.assignment_ids[0] : undefined;
+      if (!id || change) continue;
+      const cover = await api<{ candidates: string[] }>(
+        token,
+        "GET",
+        `/planner/cover-candidates?assignment_id=${id}`,
+      );
+      const candidate = cover.candidates[0];
+      if (!candidate) continue;
+      const trial = { assignment_id: id, new_staff_id: candidate };
+      const verdict = await api<{ valid: boolean }>(token, "POST", "/planner/what-if", {
+        changes: [trial],
+      });
+      if (verdict.valid) change = trial;
+    }
+    if (change) break;
+  }
+  if (!change) throw new Error("no C2-valid change found for the proposal");
+  await api(token, "POST", "/copilot/proposals", {
+    title: "Tausch aus dem Assistenten",
+    body: "Ein geprüfter Tausch.",
+    kind: "change",
+    changes: [change],
+  });
+  await asPersona(page, "brandt");
+  await page.goto("/de/anfragen");
+  await page.getByText("Tausch aus dem Assistenten").first().click();
+  await page.getByRole("button", { name: "Änderungen im Dienstplan übernehmen" }).click();
+  await expect(page.getByTestId("toast")).toContainText("Änderungen übernommen");
 });

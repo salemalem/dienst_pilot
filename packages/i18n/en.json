@@ -555,7 +555,11 @@
     "proposalAccept": "Accept as done",
     "proposalDismiss": "Dismiss",
     "proposalAccepted": "Proposal accepted",
-    "proposalDismissed": "Proposal dismissed"
+    "proposalDismissed": "Proposal dismissed",
+    "proposalApply": "Apply the changes to the roster",
+    "proposalApplied": "Changes applied; everyone affected has been notified",
+    "proposalApplyRefused": "The validator rejects the changes. Nothing was changed.",
+    "proposalChangesApply": "The proposal holds {count, plural, one {# change} other {# changes}}. When you apply them the validator checks each like a hand edit; if one fails, none is applied."
   },
   "w7": {
     "title": "Absences live",
