@@ -64,6 +64,7 @@ EN_LONG = re.compile(
 NUMBER = re.compile(r"(?<![\w.])(\d+(?:[.,]\d+)?)(?:\s?%)?(?![\w])")
 DE_SHORT = re.compile(rf"\b(\d{{1,2}})\.?\s+({_MONTH_WORD})\b", re.IGNORECASE)
 EN_SHORT = re.compile(rf"\b({_MONTH_WORD})\s+(\d{{1,2}})(?:st|nd|rd|th)?\b", re.IGNORECASE)
+DOT_SHORT = re.compile(r"(?<![\d.])(\d{1,2})\.(\d{1,2})\.(?!\d)")
 ORDINAL = re.compile(r"(?<![\w.,])(\d{1,2})\.(?=\s|,|$)")
 MonthDay = tuple[str, int, int]  # a day and month without a year: ("md", month, day)
 Value = float | date | MonthDay | tuple[str, int, int]
@@ -113,6 +114,14 @@ def extract(text: str) -> list[Value]:
 
         text = rx.sub(sub, text)
 
+    def dot_short(m: re.Match[str]) -> str:
+        d, mo = int(m.group(1)), int(m.group(2))
+        if 1 <= mo <= 12 and _date(2000, mo, d) is not None:
+            found.append(("md", mo, d))
+            return " "
+        return m.group(0)
+
+    text = DOT_SHORT.sub(dot_short, text)
     short(DE_SHORT, True)
     short(EN_SHORT, False)
     for m in NUMBER.finditer(text):

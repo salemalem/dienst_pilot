@@ -52,3 +52,9 @@ def test_date_formats_agree() -> None:
         "12. November 2026",
     ):
         assert extract(text) == [date(2026, 11, 12)], text
+
+
+def test_a_day_and_month_with_dots_is_a_date_not_a_decimal() -> None:
+    p = pool()
+    assert p.ungrounded("Am 12.11. und am 3.11.") == []
+    assert p.ungrounded("Am 13.11. ist es so.") == [("md", 11, 13)]
