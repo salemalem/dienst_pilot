@@ -3,11 +3,11 @@
 KI-gestützte Dienstplanung für Kliniken / AI-assisted duty scheduling for hospitals
 Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) and `UI_SPEC.md` (screens).
 
-> **Project status.** DienstPilot is a portfolio project, designed together with a physician. The prototype runs on a synthetic five-year dataset for a fictional department, "Klinik für Innere Medizin, Klinikum Musterstadt". No real hospital, patient or staff data is used. The status table below is updated only when a component is actually built and tested; all metrics are produced by the scripts in `eval/`.
+> **Project status.** DienstPilot is a portfolio project. The process was written from the duty-roster workflow of a hospital department and has not been validated in a clinic. The prototype runs on a synthetic five-year dataset for a fictional department, "Klinik für Innere Medizin, Klinikum Musterstadt". No real hospital, patient or staff data is used. The status table below is updated only when a component is actually built and tested; all metrics are produced by the scripts in `eval/`.
 
 | # | Component | Kind | Status |
 |---|---|---|---|
-| — | Process design (roles, approvals, monthly cycle) | Domain design | Done, with clinical input |
+| — | Process design (roles, approvals, monthly cycle) | Domain design | Written; not validated in a clinic (the pilot in §17.2 is not run) |
 | — | System architecture (this document) | Design | Done |
 | — | Synthetic data generator (`synthdata/`) | Simulation | Prototype |
 | — | Events (outbox, Redis Streams, idempotent consumers, versioned schemas), hash-chained audit trail, durable workflows with demo-time timers, month-end report (`backend/src/dienstpilot/shared/`, `audit/`, `workflows/`; ADR-016, ADR-017) | Application | Built & tested on synthetic data (backend tests; one consumer so far; the month-end narrative is a labelled placeholder) |
@@ -21,7 +21,7 @@ Version 0.2, October 2026. Companion to `PROCESS.md` (how the product is used) a
 | — | MCP servers (`mcp_servers/`: roster, planning, rules, forecast, notify) | Application | Built & tested on synthetic data (backend and mcp tests; thin wrappers over the REST API, ADR-018) |
 | — | Rulebook retrieval, RAG (`agents/`, `agents/rag/`) | Retrieval | Built & evaluated on synthetic data (`eval/results/rag.json`, 60 questions written for the prototype). Hybrid retrieval did not beat vectors alone (pre-registered check failed), so vectors alone are served; hybrid is a setting (model card `rag-rulebook.md`) |
 | C7 | Request Intake Agent (`agents/`, `backend/.../engines/c7.py`) | LLM, structured output | Built & evaluated on synthetic data (`eval/results/c7.json`). **The keyword stand-in is served:** the language model (`claude-haiku-5-5`) failed one pre-registered check (it followed an injected instruction once), so it is not promoted and the model was not switched (model card `c7-request-intake.md`) |
-| C8 | Planner Copilot (`agents/src/dienstpilot_agents/copilot/`, `backend/.../engines/c8.py`) | LLM agent, MCP tools | Built & evaluated on synthetic data (`eval/results/c8.json`, 50 tasks, gates committed before the first call). **Partly served:** what-ifs and drafting passed their gates and are answered by the agent (`claude-haiku-5-5`, safety gates all passed); lookups (11 of 12) and rule questions (4 of 5) did not, so those stay with the keyword stand-in and the model was not switched (model card `c8-planner-copilot.md`, ADR-021). Variant summaries and the month-end narrative were not evaluated and are not served by the agent |
+| C8 | Planner Copilot (`agents/src/dienstpilot_agents/copilot/`, `backend/.../engines/c8.py`) | LLM agent, MCP tools | Built & evaluated on synthetic data (`eval/results/c8.json`, 50 tasks, gates committed before the first call). **Partly served:** what-ifs and drafting passed their gates and are answered by the agent (`claude-haiku-5-5`, safety gates all passed); lookups and rule questions did not, so those stay with the keyword stand-in and the model was not switched (model card `c8-planner-copilot.md`, ADR-021). Variant summaries and the month-end narrative were not evaluated and are not served by the agent |
 | — | Staff app and planner dashboard | UI prototype | Designed |
 | — | Pilot with a clinic | Validation | Not started |
 
@@ -86,6 +86,8 @@ flowchart LR
   API --> ICS[[Calendar feed .ics]]
   MLS <--> REG[MLflow registry]
 ```
+
+Built in the prototype: the apps, the API, Postgres with pgvector, Redis, the worker, the ML components, the agents and the MCP servers, the Anthropic API call, and a local MLflow store for training (the API itself loads committed bundles). **Designed, not built:** the Caddy/TLS gateway, push notifications (FCM/APNs), the calendar feed, and the registry as a served service.
 
 ## 7. Bounded contexts
 
@@ -355,7 +357,7 @@ The agent service is an MCP client. The same servers can be connected to other M
 - **Stack:** Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2, Alembic; Next.js and Expo in TypeScript; OpenAPI-generated client shared by both apps.
 - **Testing:** unit tests; property-based tests for C1/C2; contract tests for event schemas; Playwright end-to-end tests for the leave, swap and sick-call flows; agent eval suites in CI on prompt changes.
 - **CI/CD:** GitHub Actions running lint, type checks, import-linter, tests and evals; container images built and deployed to the VPS via Docker Compose; migrations run as a release step.
-- **Observability:** OpenTelemetry traces across API, workers and agents; Prometheus metrics; Grafana dashboards; Loki logs. LLM calls are logged to an append-only ledger file (tokens, cost, run id; never prompt text) that the budget guard and `eval/cost_model.py` read, with OpenTelemetry spans (ADR-018, ADR-020).
+- **Observability:** built: LLM calls are logged to an append-only ledger file (tokens, cost, run id; never prompt text) that the budget guard and `eval/cost_model.py` read (ADR-018, ADR-020), and the audit trail records who did what. **Designed, not built:** OpenTelemetry traces across API, workers and agents, Prometheus metrics, Grafana dashboards and Loki logs.
 - **Architecture decision records** in `docs/adr/`:
   - ADR-001 Constraint optimization, not ML, for roster assignment
   - ADR-002 Modular monolith with enforced boundaries before microservices
@@ -369,8 +371,13 @@ The agent service is an MCP client. The same servers can be connected to other M
   - ADR-018 MCP servers as REST wrappers, the usage log instead of Langfuse, and the key in .env
   - ADR-019 The rulebook: corpus, chunking, local embeddings, hybrid retrieval and how CI runs without the model
   - ADR-020 A hard budget for paid calls, three LLM modes, and when C7 serves the model
+  - ADR-021 How C8 runs, what leaves the process, and what it may answer
+
+  ADR-002 to ADR-005 are design-phase decisions recorded in the sections that cite them (§5 and §9), not as separate files; the other ADRs are in `docs/adr/`.
 
 ## 15. Security and compliance
+
+This section is the design for a pilot. **Built in the prototype:** role- and department-scoped access (demo sign-in with personas), pseudonymous and minimal LLM context, no diagnosis field, the hash-chained audit trail. **Designed, not built:** OIDC single sign-on, encrypted secrets in the repo (sops + age), the German-hosted VPS with encrypted disks and backups, the works-council template.
 
 - **Hosting:** a single VPS in a German data centre; encrypted disks; encrypted off-site backups with regular restore drills.
 - **Access:** OIDC single sign-on, role-based and department-scoped access, least privilege for services, secrets encrypted in the repo (sops + age).
@@ -385,7 +392,7 @@ The agent service is an MCP client. The same servers can be connected to other M
 |---|---|
 | VPS in Germany, 8 vCPU / 32 GB (all services) | roughly €40–90 depending on provider and plan |
 | Backups and object storage | roughly €5 |
-| LLM usage (intake, copilot, summaries) | estimated 2–4 million tokens; computed by `eval/cost_model.py` against current API pricing |
+| LLM usage (intake and copilot) | a planning estimate of 2–4 million tokens, not measured at department scale; `eval/cost_model.py` reports the tokens and cost of the evaluation runs that were made |
 | Push notifications | provider free tiers |
 
 These are planning estimates; `eval/cost_model.py` recomputes them from measured token usage once the agents run.

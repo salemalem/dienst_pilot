@@ -145,7 +145,7 @@ Stated explicitly, because this is what a clinic will ask about first.
 
 - **Mobile app for all doctors.** Preferences, leave requests, the roster, swaps, sick reports, accepting cover. Designed to be usable in under two minutes, one-handed, between patients.
 - **Web dashboard for the planner and management.** Roster generation and review, approvals, rules, reports, audit trail. Used on a real screen because that is where planning is actually done.
-- **Nothing to install in the hospital.** No IT project on their side; data hosted in Germany, GDPR-compliant, with an export path so the clinic is never locked in.
+- **Nothing to install in the hospital (the design intent).** No IT project on their side; data to be hosted in Germany and handled under GDPR principles such as data minimisation, with exports so the clinic is not locked in. None of this is certified, reviewed or deployed: the prototype runs locally on synthetic data, and the payroll and audit exports are the only exports built so far.
 
 ### Suggested first step
 

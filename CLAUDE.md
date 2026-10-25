@@ -25,13 +25,13 @@ This repository is a **portfolio prototype**. It has to stay demonstrably real: 
 - **Backend:** Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2 + Alembic, PostgreSQL 16 with pgvector, Redis 7 (arq for jobs, Streams for events)
 - **Optimization:** Google OR-Tools CP-SAT
 - **ML:** polars/pandas, scikit-learn, LightGBM, statsmodels; MLflow (tracking + model registry, local SQLite store); dataset identity through the generator manifest hashes (ADR-012; no DVC)
-- **Agents:** LangGraph, Anthropic Python SDK, MCP Python SDK (Streamable HTTP transport). LLM calls are logged to an append-only ledger file (`eval/usage/ledger.jsonl`: tokens and cost, no prompt text) and traced with OpenTelemetry. Langfuse is not used: self-hosted it needs Postgres, ClickHouse, Redis and S3 storage, too heavy for one VPS (ADR-018)
+- **Agents:** LangGraph, Anthropic Python SDK, MCP Python SDK (Streamable HTTP transport). LLM calls are logged to an append-only ledger file (`eval/usage/ledger.jsonl`: tokens and cost, no prompt text) (OpenTelemetry tracing is designed, not built). Langfuse is not used: self-hosted it needs Postgres, ClickHouse, Redis and S3 storage, too heavy for one VPS (ADR-018)
 - **RAG:** pgvector + Postgres full-text search (hybrid), bge-m3 embeddings served locally (ONNX Runtime, int8 export)
 - **Planner dashboard:** Next.js (App Router), TypeScript strict, Tailwind, next-intl
 - **Staff mobile app:** Expo (React Native), TypeScript, i18next
 - **Shared:** OpenAPI → generated TypeScript client in `packages/api-client`
-- **Infra:** Docker Compose, Caddy, GitHub Actions; one Germany-hosted VPS
-- **Observability:** OpenTelemetry, Prometheus, Grafana, Loki
+- **Infra:** Docker Compose and GitHub Actions are built. Caddy and a Germany-hosted VPS are designed, not built
+- **Observability:** designed, not built: OpenTelemetry, Prometheus, Grafana, Loki (today: the LLM ledger and the audit trail)
 
 LLM models are configuration, never hard-coded: `LLM_MODEL_INTAKE` (default `claude-haiku-5-5`), `LLM_MODEL_COPILOT` (default `claude-haiku-5-5`: Haiku for both, because Phase 10 has a hard budget of 5 euros for all paid calls; ADR-020). Both agents run without extended thinking, with prompt caching, the Batch API for non-interactive runs, and every paid call is checked against the ledger-based budget guard (`eval/usage/ledger.jsonl`, limit 4.50 US dollars) before it is sent. Development and CI use recorded fixtures (`LLM_MODE=replay`); live calls are made only for the pre-registered eval runs and for recording screenshot fixtures. `eval/cost_model.py` reports spending and estimates. C8 runs as a LangGraph agent over the signed-in user's MCP tools (ADR-021): people are aliases in everything sent to the model, free text is delimited, every number must be grounded, and only the capabilities that passed `agents/copilot/RELEASE_GATES.md` are served (`agents/copilot/champion.json`). Tests run without a key.
 
@@ -75,7 +75,7 @@ dienstpilot/
 │   ├── api-client/
 │   ├── i18n/                de.json, en.json (single catalog for both apps)
 │   └── design-tokens/
-├── infra/                   compose files, Caddyfile, backups, dashboards
+├── infra/                   the dev compose file (Caddyfile, backups, dashboards: designed, not built)
 └── scripts/screenshots/     Playwright capture, DE/EN × light/dark
 ```
 

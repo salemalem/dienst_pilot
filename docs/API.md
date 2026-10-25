@@ -72,7 +72,7 @@ Every write records an audit event (`GET /audit/events`) and, where it has one, 
 | `POST /planner/windows/{month}/reminders`, `/close` | Planner | — (closing cancels the automatic reminders) |
 | `POST /planner/months/{month}/close` | Planner | Confirms the prepared month-end documentation: locks it and releases the payroll export |
 | `POST /audit/verify` | Planner, Oversight | — (verifies the hash chain now) |
-| `POST /copilot/proposals` | Planner | A proposal changes nothing; the Planner accepts or dismisses it |
+| `POST /copilot/proposals` | Planner | A proposal changes nothing by itself; the Planner accepts it, dismisses it, or applies its changes (`POST /planner/proposals/{id}/apply`: validated by C2, all or none) |
 | `POST /admin/rule-sets` | Administrator | A new version starts in the future; old rosters keep theirs |
 | `PUT /me/settings` | Everyone except Oversight | — |
 | `PUT /demo/clock` | Administrator, DEMO_MODE only | — |
