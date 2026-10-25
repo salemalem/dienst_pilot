@@ -89,6 +89,7 @@ eval: ## Validator eval, full benchmark (2025, about 10 min), ARCHITECTURE §17.
 	TEST_DATABASE_URL=$${TEST_DATABASE_URL:-postgresql+psycopg://dienstpilot:dienstpilot@localhost:5433/dienstpilot_test} uv run python eval/run_rag_eval.py
 	test ! -f eval/results/c7.json || uv run python eval/run_c7_eval.py report
 	uv run python eval/render_tables.py
+	uv run python eval/render_readme.py
 
 llm-cost: ## Spending of the paid LLM calls so far (the ledger) and the estimate of the C7 runs
 	uv run python eval/cost_model.py report

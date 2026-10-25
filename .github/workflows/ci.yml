@@ -37,6 +37,8 @@ jobs:
           test "$expected" = "$actual" || { echo "smoke benchmark changed: $expected -> $actual"; exit 1; }
       - name: ARCHITECTURE §17.1 table matches eval/results/benchmark.json
         run: uv run python eval/render_tables.py --check
+      - name: README results block matches eval/results/*.json
+        run: uv run python eval/render_readme.py --check
 
   seed:
     name: Seed loads into Postgres

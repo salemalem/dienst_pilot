@@ -863,7 +863,7 @@
   "w13": {
     "title": "AI transparency",
     "status": "{built} of {total} components built, {standIn, plural, one {# stand-in} other {# stand-ins}}",
-    "intro": "Eight components work in the roster. None can change the roster: only the Planner approves and publishes. The components whose figures come from eval/results are built; all others are marked as stand-ins until their scripts run.",
+    "intro": "Eight components work in the roster. None can change the roster: only the Planner approves and publishes. The components whose figures come from eval/results are built; a partly released component says which part is released; all others are marked as stand-ins until their scripts run.",
     "name": {
       "C1": "Roster optimizer",
       "C2": "Independent rule checker",
