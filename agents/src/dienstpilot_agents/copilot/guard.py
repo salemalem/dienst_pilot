@@ -84,7 +84,7 @@ class Aliases:
         if isinstance(value, list):
             return [self.alias_json(v) for v in value]
         if isinstance(value, dict):
-            return {k: self.alias_json(v) for k, v in value.items()}
+            return {self.to_model(k): self.alias_json(v) for k, v in value.items()}
         return value
 
     def findings(

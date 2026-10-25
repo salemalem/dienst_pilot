@@ -12,6 +12,7 @@ labelled. The model, the prompt and the limits (8 turns, 1,200 output tokens) ar
 
 import asyncio
 import json
+from collections.abc import Collection
 from dataclasses import dataclass, field
 from typing import Any, TypedDict
 
@@ -113,16 +114,25 @@ class State(TypedDict):
     ungrounded: list[str]
 
 
-def _texts(content: Any) -> str:
+RULE_TOOLS = ("search_rules", "get_rule")
+
+
+def _texts(content: Any, rule_results: Collection[str] = frozenset()) -> tuple[str, str]:
+    """Return (all new text, the part that is about people): rulebook passages are not personal."""
     if isinstance(content, str):
-        return content
-    parts: list[str] = []
+        return content, content
+    everything: list[str] = []
+    personal: list[str] = []
     for b in content:
+        text = ""
         if b.get("type") == "tool_result":
-            parts.append(_texts(b.get("content", "")))
+            text = _texts(b.get("content", ""))[0]
         elif b.get("type") == "text":
-            parts.append(b["text"])
-    return "\n".join(parts)
+            text = b["text"]
+        everything.append(text)
+        if b.get("tool_use_id") not in rule_results:
+            personal.append(text)
+    return "\n".join(everything), "\n".join(personal)
 
 
 def fallback_text(language: str, calls: list[ToolCall]) -> str:
@@ -154,14 +164,16 @@ async def run(
     mcp_tools = await toolbox.tools()
     tools = tools_for(mcp_tools)
     pool = Pool(question, today)
+    rule_results: set[str] = set()  # tool_use ids of rulebook results (not personal data)
     asked = aliases.to_model(question)
     first = (
         f"Today (demo clock): {today}. User role: {role}. Language: {language}.\nQuestion:\n{asked}"
     )
 
     async def think(state: State) -> dict[str, Any]:
-        new_text = _texts(state["messages"][-1]["content"])
-        findings = aliases.findings(new_text, PERSONA_KEYS)
+        new_text, personal = _texts(state["messages"][-1]["content"], rule_results)
+        findings = aliases.findings(new_text, PERSONA_KEYS, health=False)
+        findings += [f for f in aliases.findings(personal, ()) if f.kind == "health-word"]
         if len(state["messages"]) == 1:
             from dienstpilot_agents.copilot.prompt import SYSTEM
 
@@ -229,6 +241,7 @@ async def run(
         results = [r for r, _ in done]
         calls = [c for _, c in done]
         state["turns"][-1].tool_results = results
+        rule_results.update(b["id"] for b in uses if b["name"] in RULE_TOOLS)
         update: dict[str, Any] = {
             "messages": [*state["messages"], {"role": "user", "content": results}],
             "calls": [*state["calls"], *calls],

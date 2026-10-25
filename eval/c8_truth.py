@@ -118,6 +118,20 @@ def burden(w: World, year: int, as_of: date) -> dict[str, dict[str, int]]:
     return out
 
 
+def ledger_people(w: World, day: date) -> set[str]:
+    """Return the physicians the fairness ledger counts: a resident or specialist contract valid on
+    ``day`` and no rotation to another department that day (independent of the application)."""
+    rows = w.sql(
+        "SELECT DISTINCT c.staff_id FROM organization.contract c"
+        " WHERE c.role IN ('assistenzarzt', 'facharzt') AND c.valid_from <= :d"
+        " AND (c.valid_to IS NULL OR c.valid_to >= :d)"
+        " AND NOT EXISTS (SELECT 1 FROM organization.staff_rotation r WHERE r.staff_id = c.staff_id"
+        " AND r.start_date <= :d AND r.end_date >= :d)",
+        d=day,
+    )
+    return {str(r[0]) for r in rows}
+
+
 def as_of(w: World) -> Any:
     """Return the ledger's ``as_of`` date as the API states it (a fact of the seed, not a count)."""
     r = w.client.get("/fairness", headers={"Authorization": "Bearer " + w.token("brandt")})

@@ -119,3 +119,22 @@ paired outcomes where both were run.
 `docs/ARCHITECTURE.md` says **Built & evaluated on synthetic data** only for the capabilities
 whose gates passed, and names those that did not. Fifty synthetic tasks on one seeded department
 are a small sample: every figure in the model card is given with its count.
+
+## Amendments
+
+Each amendment is a commit that changes this file or the task suite after the gates were first
+committed (a9f5842). The results card names every one.
+
+1. **Population of two ledger tasks (n09, n10), found on dev task n09, before any test run.**
+   "Any physician" was ambiguous: the burden ledger counts only residents and specialists with a
+   contract valid on the as-of date and no rotation to another department that day (23 people);
+   the ground truth had counted everyone who held shifts (n09: 20 instead of 19). The two questions
+   now say "in the burden ledger" and the truth is restricted to that population by an independent
+   SQL definition (`c8_truth.ledger_people`). n10's expected value (37) did not change. No other
+   task, no split assignment and no gate changed. `sha256_tasks` changed; `sha256_split` did not.
+2. **Infrastructure fixes during dev runs (not amendments of the gates, listed for honesty).**
+   The first dev run was void: the dev index was empty (no rule passage was found) and the model
+   thinks by default unless told not to. A second run showed that tool results with ids as
+   dictionary keys leaked person ids to the privacy scan and that rulebook passages (which say
+   "Krankmeldung") must not be scanned for health words. The fixes are in code; the prompt did not
+   change (still c8-1).

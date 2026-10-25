@@ -78,7 +78,9 @@ def numbers(w: World) -> list[dict[str, Any]]:
     """The 20 lookups, with their values from the independent SQL."""
     sid = {k: truth.staff_id(w, n) for k, n in NAMES.items()}
     ao = truth.as_of(w)
-    b = truth.burden(w, 2026, ao)
+    everyone = truth.burden(w, 2026, ao)
+    pool = truth.ledger_people(w, ao)  # the ledger counts residents and specialists only
+    b = {k: v for k, v in everyone.items() if k in pool}
 
     def nights(k: str) -> int:
         return b.get(sid[k], {}).get("nights", 0)
@@ -146,14 +148,14 @@ def numbers(w: World) -> list[dict[str, Any]]:
             9,
             "vogel",
             "en",
-            "What is the highest number of weekends worked by any physician so far this year?",
+            "What is the highest number of weekends worked so far this year by any physician in the burden ledger?",
             max(v["weekends"] for v in b.values()),
         ),
         _number(
             10,
             "vogel",
             "de",
-            "Wie viele Nachtdienste hat die Person mit den meisten Nachtdiensten in diesem Jahr bisher?",
+            "Wie viele Nachtdienste hat die Person im Fairness-Ledger mit den meisten Nachtdiensten in diesem Jahr bisher?",
             max(v["nights"] for v in b.values()),
         ),
         _number(

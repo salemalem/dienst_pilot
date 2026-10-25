@@ -1,0 +1,104 @@
+{
+ "task": "r01",
+ "label": "dev-1",
+ "prompt_version": "c8-1",
+ "question": "Wie viele Nachtdienste in Folge darf ich einer Person höchstens zuteilen?",
+ "final": null,
+ "value_id": null,
+ "served": "Die KI-Antwort konnte nicht gegen die Daten abgesichert werden und wird deshalb nicht angezeigt. Abgefragte Quellen: search_rules(query=Nachtdienste in Folge maximal aufeinanderfolgende Nächte, k=5), search_rules(query=Anzahl aufeinanderfolgender Nachtschichten Begrenzung, k=5).",
+ "fallback": true,
+ "fallback_reason": "privacy",
+ "ungrounded": [],
+ "aborted": "privacy",
+ "findings": [
+  {
+   "kind": "health-word",
+   "what": "Krank"
+  }
+ ],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "Nachtdienste in Folge maximal aufeinanderfolgende Nächte",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 1977
+  },
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "Anzahl aufeinanderfolgender Nachtschichten Begrenzung",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 2919
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "38e5a343d8262c42f5d4a0f8520b4d11a822a0dfdae1bdfa75c65bfd1803d81c",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "Das ist eine Regelfrage, daher suche ich zuerst in der Rulebook."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01XDhwdVoGBjYVaHXPdHYW24",
+     "name": "search_rules",
+     "input": {
+      "query": "Nachtdienste in Folge maximal aufeinanderfolgende Nächte",
+      "k": 5
+     }
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_015AVWEkySzP33vF7x6WjWup",
+     "name": "search_rules",
+     "input": {
+      "query": "Anzahl aufeinanderfolgender Nachtschichten Begrenzung",
+      "k": 5
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01XDhwdVoGBjYVaHXPdHYW24",
+     "content": "{\"query\":\"Nachtdienste in Folge maximal aufeinanderfolgende Nächte\",\"found\":true,\"passages\":[{\"id\":\"regeln:Regel2:1\",\"citation\":\"Regelwerk der Abteilung (Annahmen des Prototyps) Regel 2 Abs. 1 (Regelversion 2026-1) [synthetisch]\",\"text\":\"Höchstens 3 Nachtdienste in Folge (Regel max_consecutive_nights). In der Regelversion 2021-1 waren es noch 4.\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.7408},{\"id\":\"rules:Rule2:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 2 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At most 3 night shifts in a row (rule max_consecutive_nights). In rule version 2021-1 it was still 4.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.6519},{\"id\":\"rules:Rule3:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 3 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At most 2 weekends with duty per person and month (rule max_weekends_per_month).\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5347},{\"id\":\"arbzg:§6:2\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 2 (Stand 2024-12-31)\",\"text\":\"Die werktägliche Arbeitszeit der Nachtarbeitnehmer darf acht Stunden nicht überschreiten. Sie kann auf bis zu zehn Stunden nur verlängert werden, wenn abweichend von § 3 innerhalb von einem Kalendermonat oder innerhalb von vier Wochen im Durchschnitt acht Stunden werktäglich nicht überschritten werden. Für Zeiträume, in denen Nachtarbeitnehmer im Sinne des § 2 Abs. 5 Nr. 2 nicht zur Nachtarbeit herangezogen werden, findet § 3 Satz 2 Anwendung.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.533},{\"id\":\"regeln:Regel3:2\",\"citation\":\"Regelwerk der Abteilung (Annahmen des Prototyps) Regel 3 Abs. 2 (Regelversion 2026-1) [synthetisch]\",\"text\":\"Höchstens 4 Bereitschaftsdienste im Krankenhaus pro Person und Monat (Regel max_on_call_per_month) und höchstens 10 Bereitschaften zu Hause (Regel max_on_call_home_per_month).\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.5329}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    },
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_015AVWEkySzP33vF7x6WjWup",
+     "content": "{\"query\":\"Anzahl aufeinanderfolgender Nachtschichten Begrenzung\",\"found\":true,\"passages\":[{\"id\":\"regeln:Regel2:1\",\"citation\":\"Regelwerk der Abteilung (Annahmen des Prototyps) Regel 2 Abs. 1 (Regelversion 2026-1) [synthetisch]\",\"text\":\"Höchstens 3 Nachtdienste in Folge (Regel max_consecutive_nights). In der Regelversion 2021-1 waren es noch 4.\",\"synthetic\":true,\"language\":\"de\",\"cosine\":0.6876},{\"id\":\"rules:Rule2:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 2 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At most 3 night shifts in a row (rule max_consecutive_nights). In rule version 2021-1 it was still 4.\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.6675},{\"id\":\"arbzg:§6:2\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 2 (Stand 2024-12-31)\",\"text\":\"Die werktägliche Arbeitszeit der Nachtarbeitnehmer darf acht Stunden nicht überschreiten. Sie kann auf bis zu zehn Stunden nur verlängert werden, wenn abweichend von § 3 innerhalb von einem Kalendermonat oder innerhalb von vier Wochen im Durchschnitt acht Stunden werktäglich nicht überschritten werden. Für Zeiträume, in denen Nachtarbeitnehmer im Sinne des § 2 Abs. 5 Nr. 2 nicht zur Nachtarbeit herangezogen werden, findet § 3 Satz 2 Anwendung.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5874},{\"id\":\"arbzg:§15:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 15 Abs. 1 (Stand 2024-12-31)\",\"text\":\"Die Aufsichtsbehörde kann 1. eine von den §§ 3, 6 Abs. 2 und § 11 Abs. 2 abweichende längere tägliche Arbeitszeit bewilligen a) für kontinuierliche Schichtbetriebe zur Erreichung zusätzlicher Freischichten, b) für Bau- und Montagestellen, 2. eine von den §§ 3, 6 Abs. 2 und § 11 Abs. 2 abweichende längere tägliche Arbeitszeit für Saison- und Kampagnebetriebe für die Zeit der Saison oder Kampagne bewilligen, wenn die Verlängerung der Arbeitszeit über acht Stunden werktäglich durch eine entsprechende Verkürzung der Arbeitszeit zu anderen Zeiten ausgeglichen wird, 3. eine von den §§ 5 und 11 Abs. 2 abweichende Dauer und Lage der Ruhezeit bei Arbeitsbereitschaft, Bereitschaftsdienst und Rufbereitschaft den Besonderheiten dieser Inanspruchnahmen im öffentlichen Dienst entsprechend bewilligen, 4. eine von den §§ 5 und 11 Abs. 2 abweichende Ruhezeit zur Herbeiführung eines regelmäßigen wöchentlichen Schichtwechsels zweimal innerhalb eines Zeitraums von drei Wochen bewilligen.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.5676},{\"id\":\"arbzg:§6:5\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 6 Abs. 5 (Stand 2024-12-31)\",\"text\":\"Soweit keine tarifvertraglichen Ausgleichsregelungen bestehen, hat der Arbeitgeber dem Nachtarbeitnehmer für die während der Nachtzeit geleisteten Arbeitsstunden eine angemessene Zahl bezahlter freier Tage oder einen angemessenen Zuschlag auf das ihm hierfür zustehende Bruttoarbeitsentgelt zu gewähren.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.56}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 221,
+    "cache_write_tokens": 138,
+    "cache_read_tokens": 5122
+   },
+   "latency_s": 1.357264041000235,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: de.\nQuestion:\nWie viele Nachtdienste in Folge darf ich einer Person höchstens zuteilen?"
+  }
+ ],
+ "usage": {
+  "input_tokens": 4,
+  "output_tokens": 221,
+  "cache_write_tokens": 138,
+  "cache_read_tokens": 5122
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 1.7,
+  "prompt_sha": "d7dc49c7528e64a74902959218bc87364320efd7a49073673f11e6e80aa82069",
+  "model": "claude-haiku-5-5"
+ }
+}

@@ -188,3 +188,37 @@ def test_aliases_map_ids_and_names_both_ways() -> None:
     assert A.to_model("Dr. Jonas Weber und Weber, " + WEBER) == f"{p} und {p}, {p}"
     assert A.from_model(f"{p} arbeitet") == "Dr. Jonas Weber arbeitet"
     assert A.ids_in({"staff_id": p, "list": [p, "x"]}) == {"staff_id": WEBER, "list": [WEBER, "x"]}
+
+
+def test_ids_used_as_dictionary_keys_become_aliases_too() -> None:
+    shown = A.alias_json({"hours_delta": {WEBER: 4.0}, "who": WEBER})
+    assert shown == {"hours_delta": {A.alias_of[WEBER]: 4.0}, "who": A.alias_of[WEBER]}
+
+
+@pytest.mark.anyio
+async def test_a_rulebook_passage_may_say_sick_leave_but_personal_text_may_not() -> None:
+    rule = FakeBox(
+        {
+            "search_rules": {
+                "fallback": False,
+                "passages": [
+                    {
+                        "id": "bv:§5:1",
+                        "text": "Bei einer Krankmeldung wird keine Diagnose gespeichert.",
+                    }
+                ],
+            }
+        }
+    )
+    model = Script(
+        [
+            [use("search_rules", {"query": "Krankmeldung Diagnose"})],
+            final(answer="Nein.", value=None, no_source=False),
+        ]
+    )
+    r = await ask(model, rule, "Wird bei einer Meldung etwas gespeichert?")
+    assert r.aborted is None and r.findings == []
+    box = FakeBox({"get_history": {"changes": [{"reason": "war krank"}]}})
+    model = Script([[use("get_history", {"month": "2026-11"})]])
+    r = await ask(model, box, "Warum wurde der Plan geändert?")
+    assert r.aborted == "privacy" and [f.kind for f in r.findings] == ["health-word"]

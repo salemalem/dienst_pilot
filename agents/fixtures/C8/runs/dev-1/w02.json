@@ -1,0 +1,137 @@
+{
+ "task": "w02",
+ "label": "dev-1",
+ "prompt_version": "c8-1",
+ "question": "What if Dr. Thomas Brandt hands the early shift on 07 November 2026 to Dr. Rohan Mehta? Does that comply with the rules?",
+ "final": null,
+ "value_id": null,
+ "served": "The AI answer could not be checked against the data and is therefore not shown. Sources queried: get_assignments_for(staff_id=P21, month=2026-11), run_what_if().",
+ "fallback": true,
+ "fallback_reason": "privacy",
+ "ungrounded": [],
+ "aborted": "privacy",
+ "findings": [
+  {
+   "kind": "person-id",
+   "what": "7e87b90f-6ae7-5675-b353-bd91c2fb49b8"
+  },
+  {
+   "kind": "person-id",
+   "what": "dbd32d66-6041-562c-af7e-4dc596ee01fa"
+  }
+ ],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "get_assignments_for",
+   "args": {
+    "staff_id": "P21",
+    "month": "2026-11"
+   },
+   "is_error": false,
+   "result_chars": 2994
+  },
+  {
+   "name": "run_what_if",
+   "args": {
+    "changes": [
+     {
+      "assignment_id": "13d607d9-59ef-5dbb-8d44-9aa306fcbb30",
+      "new_staff_id": "P37"
+     }
+    ]
+   },
+   "is_error": false,
+   "result_chars": 404
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "6f7e70ec1d0f8f23f6e02ec3acdf57df6c74c793a30c249526d00b806b3bd864",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "I'll find P21's assignment on 2026-11-07 first."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01SwYxrgarPYePkL96vAryku",
+     "name": "get_assignments_for",
+     "input": {
+      "staff_id": "P21",
+      "month": "2026-11"
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01SwYxrgarPYePkL96vAryku",
+     "content": "{\"staff_id\":\"P21\",\"roster_month\":\"2026-11-01\",\"totals\":{\"shifts\":25,\"days_worked\":20,\"weekend_shifts\":5,\"by_shift_type\":{\"frueh\":19,\"ruf\":6}},\"days\":[{\"date\":\"2026-11-01\",\"shifts\":[\"ruf\"],\"assignment_ids\":[\"1cceae81-b8a2-54c7-b779-e2cea9830a27\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-04\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"dc63ab73-f6be-5242-af58-61fd8447e606\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-05\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"e3202b5f-da50-5b2b-ac3e-5717d6277918\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-06\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"c3770ba6-2c26-53e3-bdc0-8f24422c32be\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-07\",\"shifts\":[\"frueh\",\"ruf\"],\"assignment_ids\":[\"13d607d9-59ef-5dbb-8d44-9aa306fcbb30\",\"98b9490a-8d2c-5040-9c12-1fac2de3ee97\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-08\",\"shifts\":[\"frueh\",\"ruf\"],\"assignment_ids\":[\"1b12fe6a-6298-5be8-9efe-ff4f9ebcbf9d\",\"6df6f46b-dfdc-52c3-b1d5-a8e7d4c4ef17\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-11\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"368ffbfb-bf78-5cf4-873c-676689eb771e\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-12\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"de16c09b-0d32-5f3a-8293-1d249f319bd3\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-13\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"206d825a-bf50-5932-85ef-5f4d6a80ada3\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-16\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"0976ede8-3854-5729-9763-84f8d35d7e48\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-17\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"a8dce917-2301-5ee9-b1fe-8a987b174a6f\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-18\",\"shifts\":[\"frueh\",\"ruf\"],\"assignment_ids\":[\"775d37e0-5095-578e-bc02-a92576b45767\",\"cbee68ac-5a34-5a8c-8261-7ebef62b4f92\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-19\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"e659a1af-09fb-57bb-8637-85f78991b08e\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-20\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"315b3c2a-c698-5c66-98e3-eda29104d3d2\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-23\",\"shifts\":[\"frueh\",\"ruf\"],\"assignment_ids\":[\"85a56cbe-9d32-5b7f-bbb5-a3a930622360\",\"4fd486be-d216-5e22-b4e4-0c96fc2a7b74\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-24\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"b264436a-8f49-5268-8895-958abddb6493\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-25\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"c0404480-a1dc-52c8-9c76-8211de114081\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-26\",\"shifts\":[\"frueh\",\"ruf\"],\"assignment_ids\":[\"83653497-7208-55d3-9fb1-9edd419fca1a\",\"b5621e9d-edd9-5919-9919-b63b3d6532bf\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-27\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"668dd402-7ef6-51dd-8372-5ec8c7215223\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-30\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"e6b1df3e-808c-5d1f-8cad-8921b48012b0\"],\"absent\":false,\"on_leave\":false}]}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 101,
+    "cache_write_tokens": 138,
+    "cache_read_tokens": 5122
+   },
+   "latency_s": 1.2221742090005137,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: en.\nQuestion:\nWhat if P21 hands the early shift on 07 November 2026 to P37? Does that comply with the rules?"
+  },
+  {
+   "request_key": "bf32a7cc1e609ff3ccbaa6c4b98303e731696e45a9cfb90f6aa7c484f1cf726b",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "On 2026-11-07 P21 holds the frueh shift 13d607d9-59ef-5dbb-8d44-9aa306fcbb30. Running the what-if now."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_017guooRrnihcavsr1HkEBhb",
+     "name": "run_what_if",
+     "input": {
+      "changes": [
+       {
+        "assignment_id": "13d607d9-59ef-5dbb-8d44-9aa306fcbb30",
+        "new_staff_id": "P37"
+       }
+      ]
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_017guooRrnihcavsr1HkEBhb",
+     "content": "{\"valid\":false,\"introduced\":[{\"rule\":\"max_weekends\",\"staff_id\":\"P37\",\"date\":\"2026-11-01\",\"params\":{\"weekends\":3,\"max\":2}},{\"rule\":\"min_rest\",\"staff_id\":\"P37\",\"date\":\"2026-11-07\",\"params\":{\"shift\":\"frueh\",\"hours\":9.5,\"required\":11.0,\"date\":\"2026-11-07\"}}],\"hours_delta\":{\"7e87b90f-6ae7-5675-b353-bd91c2fb49b8\":-8.0,\"dbd32d66-6041-562c-af7e-4dc596ee01fa\":8.0},\"uncovered\":[],\"validator_version\":\"c2-1.0.0\"}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 161,
+    "cache_write_tokens": 1807,
+    "cache_read_tokens": 5260
+   },
+   "latency_s": 1.8476956250015064,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"staff_id\":\"P21\",\"roster_month\":\"2026-11-01\",\"totals\":{\"shifts\":25,\"days_worked\":20,\"weekend_shifts\":5,\"by_shift_type\":{\"frueh\":19,\"ruf\":6}},\"days\":[{\"date\":\"2026-11-01\",\"shifts\":[\"ruf\"],\"assignment_ids\":[\"1cceae81-b8a2-54c7-b779-e2cea9830a27\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-04\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"dc63ab73-f6be-5242-af58-61fd8447e606\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-05\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"e3202b5f-da50-5b2b-ac3e-5717d6277918\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-06\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"c3770ba6-2c26-53e3-bdc0-8f24422c32be\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-07\",\"shifts\":[\"frueh\",\"ruf\"],\"assignment_ids\":[\"13d607d9-59ef-5dbb-8d44-9aa306fcbb30\",\"98b9490a-8d2c-5040-9c12-1fac2de3ee97\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-08\",\"shifts\":[\"frueh\",\"ruf\"],\"assignment_ids\":[\"1b12fe6a-6298-5be8-9efe-ff4f9ebcbf9d\",\"6df6f46b-dfdc-52c3-b1d5-a8e7d4c4ef17\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-11\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"368ffbfb-bf78-5cf4-873c-676689eb771e\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-12\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"de16c09b-0d32-5f3a-8293-1d249f319bd3\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-13\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"206d825a-bf50-5932-85ef-5f4d6a80ada3\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-16\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"0976ede8-3854-5729-9763-84f8d35d7e48\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-17\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"a8dce917-2301-5ee9-b1fe-8a987b174a6f\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-18\",\"shifts\":[\"frueh\",\"ruf\"],\"assignment_ids\":[\"775d37e0-5095-578e-bc02-a92576b45767\",\"cbee68ac-5a34-5a8c-8261-7ebef62b4f92\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-19\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"e659a1af-09fb-57bb-8637-85f78991b08e\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-20\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"315b3c2a-c698-5c66-98e3-eda29104d3d2\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-23\",\"shifts\":[\"frueh\",\"ruf\"],\"assignment_ids\":[\"85a56cbe-9d32-5b7f-bbb5-a3a930622360\",\"4fd486be-d216-5e22-b4e4-0c96fc2a7b74\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-24\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"b264436a-8f49-5268-8895-958abddb6493\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-25\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"c0404480-a1dc-52c8-9c76-8211de114081\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-26\",\"shifts\":[\"frueh\",\"ruf\"],\"assignment_ids\":[\"83653497-7208-55d3-9fb1-9edd419fca1a\",\"b5621e9d-edd9-5919-9919-b63b3d6532bf\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-27\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"668dd402-7ef6-51dd-8372-5ec8c7215223\"],\"absent\":false,\"on_leave\":false},{\"date\":\"2026-11-30\",\"shifts\":[\"frueh\"],\"assignment_ids\":[\"e6b1df3e-808c-5d1f-8cad-8921b48012b0\"],\"absent\":false,\"on_leave\":false}]}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 262,
+  "cache_write_tokens": 1945,
+  "cache_read_tokens": 10382
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 3.52,
+  "prompt_sha": "d7dc49c7528e64a74902959218bc87364320efd7a49073673f11e6e80aa82069",
+  "model": "claude-haiku-5-5",
+  "expected_alias_new_staff": "P37"
+ }
+}

@@ -58,7 +58,7 @@
    "w06"
   ]
  },
- "sha256_tasks": "e1b54c391031893653590ce47aadb2593e2ec4e43e72d204bc83dd11d70712ed",
+ "sha256_tasks": "afd99d22fdaa8bb7ac5e261f4a7b12fe62df4fd5d3b9ff2f7db36a32bb9ad655",
  "sha256_split": "cf07638b779807333e1db39198ca06f0a0488c5e949b395a3926fb16d69d749c",
  "tasks": [
   {
@@ -162,10 +162,10 @@
    "kind": "number",
    "persona": "vogel",
    "language": "en",
-   "question": "What is the highest number of weekends worked by any physician so far this year?",
+   "question": "What is the highest number of weekends worked so far this year by any physician in the burden ledger?",
    "expected": {
     "type": "number",
-    "value": 20
+    "value": 19
    },
    "split": "dev"
   },
@@ -174,7 +174,7 @@
    "kind": "number",
    "persona": "vogel",
    "language": "de",
-   "question": "Wie viele Nachtdienste hat die Person mit den meisten Nachtdiensten in diesem Jahr bisher?",
+   "question": "Wie viele Nachtdienste hat die Person im Fairness-Ledger mit den meisten Nachtdiensten in diesem Jahr bisher?",
    "expected": {
     "type": "number",
     "value": 37
