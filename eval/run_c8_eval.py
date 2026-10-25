@@ -250,7 +250,8 @@ def preflight(w: World) -> None:
 
 def live_client(run_id: str, purpose: str) -> AnthropicClient:
     """Return the live client (key from the settings, i.e. the git-ignored .env)."""
-    key = get_settings().anthropic_api_key
+    secret = get_settings().anthropic_api_key
+    key = secret.get_secret_value() if secret is not None else None
     if not key:
         raise SystemExit("ANTHROPIC_API_KEY is not set")
     return AnthropicClient(key, run_id=run_id, purpose=purpose)
@@ -272,6 +273,8 @@ async def run_set(ids: list[str], label: str, purpose: str) -> None:
                 rec = await run_task(w, suite[i], client, label)
             except LlmError as e:
                 raise SystemExit(f"stopped at {i}: {e}") from e
+            if str(rec["aborted"]).startswith("llm_error"):
+                raise SystemExit(f"stopped at {i} without recording it: {rec['aborted']}")
             (out / f"{i}.json").write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
             s = score(suite[i], rec)
             print(

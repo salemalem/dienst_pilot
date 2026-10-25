@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Scoring of recorded C8 runs: each kind of task, on hand-made records (not model output)."""
 
 from typing import Any
