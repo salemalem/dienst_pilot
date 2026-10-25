@@ -45,6 +45,16 @@ def _params(request: LlmRequest, ttl: str | None = None) -> dict[str, Any]:
             {"name": t.name, "description": t.description, "input_schema": t.input_schema}
             for t in request.tools
         ]
+    if request.cache_last_message and params["messages"]:
+        last = dict(params["messages"][-1])
+        content = last["content"]
+        blocks = [{"type": "text", "text": content}] if isinstance(content, str) else list(content)
+        blocks[-1] = {
+            **blocks[-1],
+            "cache_control": {"type": "ephemeral", **({"ttl": ttl} if ttl else {})},
+        }
+        last["content"] = blocks
+        params["messages"] = [*params["messages"][:-1], last]
     if request.force_tool:
         params["tool_choice"] = {"type": "tool", "name": request.force_tool}
     return params
@@ -62,11 +72,21 @@ def _usage(u: Any) -> Usage:
 def _response(request: LlmRequest, message: Any, latency: float | None) -> LlmResponse:
     tool_input = None
     text = ""
+    blocks: list[dict[str, Any]] = []
     for block in message.content:
         if block.type == "tool_use":
             tool_input = dict(block.input)
+            blocks.append(
+                {
+                    "type": "tool_use",
+                    "id": getattr(block, "id", ""),
+                    "name": getattr(block, "name", ""),
+                    "input": dict(block.input),
+                }
+            )
         elif block.type == "text":
             text += block.text
+            blocks.append({"type": "text", "text": block.text})
     return LlmResponse(
         request_key=request.key,
         tool_input=tool_input,
@@ -75,6 +95,7 @@ def _response(request: LlmRequest, message: Any, latency: float | None) -> LlmRe
         usage=_usage(message.usage),
         model=str(message.model),
         latency_s=latency,
+        blocks=blocks,
     )
 
 
