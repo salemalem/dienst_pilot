@@ -37,3 +37,4 @@ agents/intake/*.json
 eval/usage/
 eval/c8_tasks.json
 agents/copilot/frozen.json
+agents/copilot/champion.json

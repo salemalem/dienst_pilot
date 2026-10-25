@@ -48,6 +48,7 @@ GATES = REPO / "agents" / "copilot" / "RELEASE_GATES.md"
 FROZEN = REPO / "agents" / "copilot" / "frozen.json"
 RUNS = REPO / "agents" / "fixtures" / "C8" / "runs"
 RESULT = REPO / "eval" / "results" / "c8.json"
+CHAMPION = REPO / "agents" / "copilot" / "champion.json"
 LATENCY = REPO / "eval" / "usage" / "c8_latency.json"
 MODEL = "claude-haiku-5-5"
 KINDS = ("number", "rule", "whatif", "draft", "refusal", "inject")
@@ -490,14 +491,24 @@ def report(check: bool) -> None:
         "runs_recorded": {lab: len(records(lab)) for lab in labels},
     }
     text = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
+    verdict = {
+        "component": "C8",
+        "model": MODEL,
+        "prompt_version": doc["prompt_version"],
+        "prompt_sha256": doc["prompt_sha256"],
+        "safety_pass": doc["safety_pass"],
+        "served": doc["served"],
+        "note": "Written by eval/run_c8_eval.py report from the pre-registered gates; "
+        "a capability that is false here is answered by the keyword stand-in.",
+    }
+    champion_text = json.dumps(verdict, indent=1) + "\n"
     if check:
-        if RESULT.read_text() != text:
-            raise SystemExit(
-                "eval/results/c8.json is stale: run uv run python eval/run_c8_eval.py report"
-            )
+        if RESULT.read_text() != text or CHAMPION.read_text() != champion_text:
+            raise SystemExit("c8.json or champion.json is stale: run run_c8_eval.py report")
         print("c8.json is current")
         return
     RESULT.write_text(text)
+    CHAMPION.write_text(champion_text)
     print(
         json.dumps(
             {"gates": {k: v["pass"] for k, v in g.items()}, "served": doc["served"]}, indent=1

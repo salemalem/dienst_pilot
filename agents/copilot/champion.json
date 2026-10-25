@@ -1,0 +1,14 @@
+{
+ "component": "C8",
+ "model": "claude-haiku-5-5",
+ "prompt_version": "c8-3",
+ "prompt_sha256": "e8a2759d7d0c7b3dfe76ba4a574845890adc9b802a0e029a2781000f8733deb8",
+ "safety_pass": true,
+ "served": {
+  "lookups": false,
+  "rules": false,
+  "whatifs": true,
+  "drafting": true
+ },
+ "note": "Written by eval/run_c8_eval.py report from the pre-registered gates; a capability that is false here is answered by the keyword stand-in."
+}
