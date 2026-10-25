@@ -26,6 +26,39 @@ test("W9: the copilot answers with a rule citation, is labelled a stand-in and c
   );
 });
 
+test("W9: a what-if goes to the agent (recorded real answer), is labelled AI, shows the validator's verdict and its sources", async ({
+  page,
+}) => {
+  await asPersona(page, "brandt");
+  await page.goto("/de");
+  await page.getByRole("button", { name: "Copilot" }).click();
+  const panel = page.getByRole("complementary", { name: "Copilot" });
+  await panel.getByRole("button", { name: /^Was passiert, wenn Dr\. Sofía Alvarez/ }).click();
+  await expect(panel.getByTestId("copilot-answer")).toContainText("nicht zulässig");
+  await expect(panel.locator('[data-engine="partial"]')).toContainText("Teilweise");
+  await expect(panel).toContainText("Aufzeichnung einer echten Antwort");
+  await expect(panel.getByTestId("copilot-whatif")).toContainText("Regelverletzungen gefunden");
+  await panel.getByText(/^Quellen \(/).click();
+  await expect(panel.getByTestId("copilot-sources")).toContainText("Was-wäre-wenn-Prüfung");
+  // Still no publish or approve control; the only action is a proposal.
+  await expect(
+    panel.getByRole("button", { name: /veröffentlichen|freigeben|genehmigen/i }),
+  ).toHaveCount(0);
+  await expect(panel.getByRole("button", { name: "Vorschlag erstellen" })).toBeVisible();
+});
+
+test("W13: the C8 card shows the pre-registered gates, what is released and what stays a stand-in", async ({
+  page,
+}) => {
+  await asPersona(page, "brandt");
+  await page.goto("/de/ki-transparenz");
+  const card = page.getByTestId("c8-metrics");
+  await expect(card).toContainText("Freigegeben (Gates bestanden)");
+  await expect(page.getByTestId("c8-served")).toContainText("Was-wäre-wenn");
+  await expect(page.getByTestId("c8-served")).toContainText("Der Platzhalter bleibt für");
+  await expect(page.getByTestId("c8-failed")).toContainText("Nicht bestanden: K1, K2");
+});
+
 test("W10: filterable event log, with the chain indicator that is backed by a real verification", async ({
   page,
 }) => {

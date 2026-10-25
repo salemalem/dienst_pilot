@@ -311,6 +311,7 @@ def run_copilot(
     except Exception as e:  # a model or tool failure must never leave the run hanging
         log.warning("copilot run %s failed: %s", run_id, e)
         planning.finish_copilot_run(session, run_id, "failed", {"error": type(e).__name__}, now)
+    session.commit()
 
 
 JOBS: dict[str, Callable[..., None]] = {

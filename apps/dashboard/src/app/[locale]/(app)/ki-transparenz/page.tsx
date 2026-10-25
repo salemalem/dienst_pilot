@@ -506,6 +506,120 @@ function C7Metrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
   );
 }
 
+type C8Gate = { pass: boolean; [key: string]: unknown };
+
+function C8Metrics({ m }: { m: Metrics }): ReactNode {
+  const t = useTranslations("w13");
+  const g = m.gates as Record<string, C8Gate> | undefined;
+  const served = m.served as Record<string, boolean> | undefined;
+  const cost = m.cost as { c8_eval_usd?: number; phase_limit_usd?: number } | undefined;
+  const fmt = useFmt();
+  if (!g || !served) return null;
+  const n = (gate: string, key: string): number => Number(g[gate]?.[key] ?? 0);
+  const rows: { key: string; label: string; value: string; gate: string }[] = [
+    {
+      key: "K1",
+      label: t("m.c8Lookups"),
+      value: `${String(n("K1_lookups", "correct"))} / ${String(n("K1_lookups", "of"))}`,
+      gate: "K1_lookups",
+    },
+    {
+      key: "K2",
+      label: t("m.c8Rules"),
+      value: `${String(n("K2_rules", "correct"))} / ${String(n("K2_rules", "of"))}`,
+      gate: "K2_rules",
+    },
+    {
+      key: "K3",
+      label: t("m.c8WhatIfs"),
+      value: `${String(n("K3_whatifs", "correct"))} / ${String(n("K3_whatifs", "of"))}`,
+      gate: "K3_whatifs",
+    },
+    {
+      key: "K4",
+      label: t("m.c8Drafting"),
+      value: `${String(n("K4_drafting", "correct"))} / ${String(n("K4_drafting", "of"))}`,
+      gate: "K4_drafting",
+    },
+    {
+      key: "S1",
+      label: t("m.c8Injection"),
+      value: String(n("S1_injection", "followed")),
+      gate: "S1_injection",
+    },
+    {
+      key: "S2",
+      label: t("m.c8State"),
+      value: String(n("S2_no_publish_or_approve", "runs_with_state_change")),
+      gate: "S2_no_publish_or_approve",
+    },
+    {
+      key: "S3",
+      label: t("m.c8Privacy"),
+      value: String(n("S3_privacy", "findings")),
+      gate: "S3_privacy",
+    },
+  ];
+  const names: Record<string, string> = {
+    lookups: t("m.c8Lookups"),
+    rules: t("m.c8Rules"),
+    whatifs: t("m.c8WhatIfs"),
+    drafting: t("m.c8Drafting"),
+  };
+  const on = Object.keys(names).filter((k) => served[k]);
+  const off = Object.keys(names).filter((k) => !served[k]);
+  const failed = rows.filter((r) => !g[r.gate]?.pass).map((r) => r.key);
+  return (
+    <div className="flex flex-col gap-2" data-testid="c8-metrics">
+      <p className="caption m-0 text-ink-muted">
+        {t("evalSource", { source: "eval/results/c8.json", months: "" })}
+      </p>
+      <p className="body-strong m-0" data-testid="c8-served">
+        {t("m.c8Served", {
+          served: on.length ? on.map((k) => names[k]).join(", ") : t("m.c8None"),
+          standin: off.length ? off.map((k) => names[k]).join(", ") : t("m.c8None"),
+        })}
+      </p>
+      <Table label={t("m.label")}>
+        <thead>
+          <tr>
+            <th scope="col">{t("m.metric")}</th>
+            <th scope="col" className="text-right">
+              {t("m.value")}
+            </th>
+            <th scope="col">{t("m.c8Gate")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.key}>
+              <td>{r.label}</td>
+              <td className="num-time text-right">{r.value}</td>
+              <td>
+                {r.key} · {g[r.gate]?.pass ? t("m.c8Pass") : t("m.c8Fail")}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+      {failed.length > 0 ? (
+        <p className="caption m-0 text-ink-muted" data-testid="c8-failed">
+          {t("m.c8Failed", { failed: failed.join(", ") })}
+        </p>
+      ) : null}
+      {cost?.c8_eval_usd !== undefined ? (
+        <p className="caption m-0 text-ink-muted">
+          {t("m.c8Cost", {
+            spent: fmt.number(cost.c8_eval_usd, 3),
+            limit: fmt.number(cost.phase_limit_usd ?? 0, 2),
+          })}
+        </p>
+      ) : null}
+      <p className="caption m-0 text-ink-muted">{t("m.c8Note")}</p>
+    </div>
+  );
+}
+
 type RagMode = { "recall@5": number; mrr: number };
 
 function RagMetrics({ m, fmt }: { m: Metrics; fmt: Fmt }): ReactNode {
@@ -655,6 +769,8 @@ function Card({ c }: { c: Component }): ReactNode {
         <C6Metrics m={metrics} fmt={fmt} />
       ) : metrics && c.component === "C7" ? (
         <C7Metrics m={metrics} fmt={fmt} />
+      ) : metrics && c.component === "C8" ? (
+        <C8Metrics m={metrics} />
       ) : metrics && c.component === "RAG" ? (
         <RagMetrics m={metrics} fmt={fmt} />
       ) : (
@@ -684,11 +800,13 @@ const GROUPS = [
 function statusLine(list: Component[], t: ReturnType<typeof useTranslations<"w13">>): string {
   const numbered = list.filter((c) => /^C\d$/.test(c.component));
   const extras = list.filter((c) => !/^C\d$/.test(c.component));
-  const line = t("status", {
+  const partial = numbered.filter((c) => c.implementation === "partial").length;
+  const counts = {
     built: numbered.filter((c) => c.implementation === "built").length,
     total: numbered.length,
     standIn: numbered.filter((c) => c.implementation === "stand-in").length,
-  });
+  };
+  const line = partial > 0 ? t("statusPartial", { ...counts, partial }) : t("status", counts);
   if (extras.length === 0) return line;
   const names = extras
     .map(

@@ -230,7 +230,7 @@
   "drafting": true
  },
  "cost": {
-  "c8_total_usd": 0.1445,
+  "c8_eval_usd": 0.1434,
   "test": {
    "calls": 65,
    "usd": 0.0211,

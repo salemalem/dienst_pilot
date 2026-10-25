@@ -217,7 +217,8 @@
     "nextMonth": "Nächster Monat",
     "synthetic": "Synthetische Daten",
     "engine": "Berechnet von",
-    "back": "Zurück"
+    "back": "Zurück",
+    "partial": "Teilweise"
   },
   "nav": {
     "group": {
@@ -262,7 +263,16 @@
     "proposalCreated": "Vorschlag erstellt. Sie finden ihn unter Anfragen.",
     "question": "Frage an den Copilot",
     "send": "Frage senden",
-    "askFailed": "Die Frage konnte nicht beantwortet werden. Formulieren Sie sie neu oder versuchen Sie es erneut."
+    "askFailed": "Die Frage konnte nicht beantwortet werden. Formulieren Sie sie neu oder versuchen Sie es erneut.",
+    "sampleWhatIf": "Was passiert, wenn Dr. Sofía Alvarez den Spätdienst am 09.11.2026 an Dr. Marek Nowak abgibt?",
+    "sampleDraft": "Formuliere eine kurze Begründung für die Änderung: Dr. Marek Nowak gibt den Spätdienst am 13.11.2026 an Dr. Aylin Kaya ab, weil er an einer Fortbildung teilnimmt.",
+    "working": "Der Assistent arbeitet …",
+    "sources": "Quellen",
+    "whatIfTitle": "Prüfung durch den Validator",
+    "whatIfValid": "Keine Regelverletzung gefunden.",
+    "whatIfInvalid": "Regelverletzungen gefunden:",
+    "fallbackNote": "Die KI-Antwort konnte nicht gegen die Daten abgesichert werden und wird deshalb nicht angezeigt.",
+    "runFailed": "Der Assistent konnte die Frage nicht beantworten. Versuchen Sie es erneut."
   },
   "w1": {
     "title": "Übersicht",
@@ -991,7 +1001,23 @@
       "c7Promoted": "Alle sieben Prüfungen der vorab festgelegten Regel bestanden.",
       "c7NotPromoted": "Nicht bestandene Prüfungen der vorab festgelegten Regel: {failed}. Das Modell wurde nicht gewechselt und der Text der Anweisung nicht nachträglich geändert.",
       "c7Cost": "Kosten dieser Auswertung: {spent} US-Dollar (Grenze für alle bezahlten Aufrufe der Phase: {limit})",
-      "c7Note": "140 synthetische Testsätze (Deutsch und Englisch), einmal bewertet, nachdem die Anweisung eingefroren war; die Sätze sind erzeugt, nicht von Beschäftigten geschrieben."
+      "c7Note": "140 synthetische Testsätze (Deutsch und Englisch), einmal bewertet, nachdem die Anweisung eingefroren war; die Sätze sind erzeugt, nicht von Beschäftigten geschrieben.",
+      "c8Served": "Freigegeben (Gates bestanden): {served}. Der Platzhalter bleibt für: {standin}.",
+      "c8None": "nichts",
+      "c8Lookups": "Auskünfte (Zahlen)",
+      "c8Rules": "Regelfragen",
+      "c8WhatIfs": "Was-wäre-wenn",
+      "c8Drafting": "Entwürfe",
+      "c8Injection": "Eingeschleuste Anweisungen befolgt",
+      "c8State": "Läufe mit Zustandsänderung (Veröffentlichen, Freigeben, Entscheiden, Senden)",
+      "c8Privacy": "Datenschutz-Funde in allen gesendeten Texten",
+      "c8Gate": "Gate",
+      "c8Pass": "bestanden",
+      "c8Fail": "nicht bestanden",
+      "c8Cost": "Kosten der C8-Auswertungsläufe: {spent} US-Dollar (Grenze für alle bezahlten Aufrufe der Phase: {limit})",
+      "c8Note": "30 synthetische Testaufgaben, einmal bewertet, nachdem die Anweisung eingefroren war; Zahl und Datum müssen aus den Daten stammen, sonst erscheint der gekennzeichnete Ersatztext. Kleine Stichprobe: die Zahlen sind Anzahlen, keine Quoten.",
+      "c8Failed": "Nicht bestanden: {failed}. Das Modell wurde nicht gewechselt und die Anweisung nicht nachträglich geändert; dort antwortet der Platzhalter.",
+      "value": "Wert"
     },
     "group": {
       "rules": {
@@ -1029,7 +1055,9 @@
     "built": "gebaut",
     "standIn": "Platzhalter",
     "trainedC7": "Nicht trainiert: ein vortrainiertes Sprachmodell mit festem Prompt",
-    "modelCardC7": "docs/model-cards/c7-request-intake.md"
+    "modelCardC7": "docs/model-cards/c7-request-intake.md",
+    "statusPartial": "{built} von {total} Komponenten gebaut, {partial, plural, one {# teilweise} other {# teilweise}}, {standIn, plural, one {# Platzhalter} other {# Platzhalter}}",
+    "partial": "teilweise"
   },
   "qualification": {
     "any": "ohne besondere Qualifikation",

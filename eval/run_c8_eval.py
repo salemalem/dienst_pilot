@@ -387,14 +387,14 @@ def gates(
     return g
 
 
-def cost_of(prefix: str) -> dict[str, Any]:
-    """Sum the ledger lines of C8 runs whose run id starts with ``prefix``."""
+def cost_of(purposes: tuple[str, ...]) -> dict[str, Any]:
+    """Sum the ledger lines of C8 evaluation runs (dev, latency, test), not the later recordings."""
     rows = [
         json.loads(line)
         for line in Path(REPO / "eval" / "usage" / "ledger.jsonl").read_text().splitlines()
         if line.strip()
     ]
-    mine = [r for r in rows if r["component"] == "C8" and r["run_id"].startswith(prefix)]
+    mine = [r for r in rows if r["component"] == "C8" and r["purpose"] in purposes]
     return {
         "calls": len(mine),
         "usd": round(sum(r["cost_usd"] for r in mine), 4),
@@ -463,8 +463,8 @@ def report(check: bool) -> None:
             )
         },
         "cost": {
-            "c8_total_usd": cost_of("c8-")["usd"],
-            "test": cost_of("c8-test"),
+            "c8_eval_usd": cost_of(("dev", "latency", "test"))["usd"],
+            "test": cost_of(("test",)),
             "phase_limit_usd": LIMIT_USD,
         },
         "runs_recorded": {lab: len(records(lab)) for lab in labels},
@@ -496,6 +496,39 @@ def report(check: bool) -> None:
 
 
 # --- stand-in and freeze -----------------------------------------------------------------------
+
+
+async def record_demo() -> None:
+    """PAID, a few calls: record real answers to the demo questions for replay mode."""
+    from dienstpilot_agents.copilot.outcome import DEMO_DIR, demo_key
+
+    doc = json.loads((REPO / "eval" / "c8_demo_questions.json").read_text(encoding="utf-8"))
+    DEMO_DIR.mkdir(parents=True, exist_ok=True)
+    client = live_client("c8-demo", "recording")
+    async with world() as w:
+        preflight(w)
+    for q in doc["questions"]:
+        target = DEMO_DIR / f"{demo_key(doc['role'], q['language'], q['question'])}.json"
+        if target.exists():
+            print("already recorded:", q["question"][:60])
+            continue
+        async with world() as w:
+            task = {
+                "id": "demo",
+                "kind": "demo",
+                "persona": "brandt",
+                "language": q["language"],
+                "question": q["question"],
+                "expected": {},
+            }
+            rec = await run_task(w, task, client, "demo")
+        rec.pop("meta", None)
+        rec.pop("state_diff", None)
+        rec["role"], rec["language"] = doc["role"], q["language"]
+        target.write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
+        print(
+            f"recorded ({'fallback' if rec['fallback'] else 'ok'}): {q['question'][:60]} | spent ${Ledger().total_usd():.4f}"
+        )
 
 
 async def standin() -> None:
@@ -557,7 +590,8 @@ def main() -> None:
     logging.disable(logging.CRITICAL)
     ap = argparse.ArgumentParser()
     ap.add_argument(
-        "command", choices=["estimate", "standin", "dev", "latency", "freeze", "test", "report"]
+        "command",
+        choices=["estimate", "standin", "dev", "latency", "freeze", "test", "report", "record"],
     )
     ap.add_argument("--label", default="dev-1")
     ap.add_argument("--check", action="store_true")
@@ -565,6 +599,8 @@ def main() -> None:
     os.environ.setdefault("LLM_MODE", "live")
     if a.command == "estimate":
         estimate()
+    elif a.command == "record":
+        asyncio.run(record_demo())
     elif a.command == "standin":
         asyncio.run(standin())
     elif a.command == "dev":

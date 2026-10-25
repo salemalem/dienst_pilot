@@ -118,7 +118,7 @@ class C8Copilot(Copilot):
         caps = ", ".join(sorted(self.served))
         return EngineInfo(
             "C8",
-            "built",
+            "partial",
             f"{PROMPT_VERSION}+{self._settings.llm_model_copilot}",
             f"LangGraph agent ({self._settings.llm_model_copilot}, {how}) for {caps}; keyword "
             "stand-in for the rest. It reads and proposes only; nothing it writes is applied.",
