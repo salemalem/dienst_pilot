@@ -82,9 +82,7 @@ def oracle(root: Path, test_year: int) -> dict[str, float]:
     p, y = [], []
     for r in off.filter(pl.col("asked_at").dt.year() == test_year).iter_rows(named=True):
         day, sh = what[shift_of[r["cascade_id"]]]
-        recent = sum(
-            1 for d, t in covers[r["staff_id"]] if t < r["asked_at"] and 0 <= (day - d).days <= 30
-        )
+        recent = sum(1 for d, t in covers[r["staff_id"]] if t < r["asked_at"] and 0 <= (day - d).days <= 30)
         p.append(p_accept_true(lat[r["staff_id"]], day, sh, recent))
         y.append(1.0 if r["response"] == "accepted" else 0.0)
     return {"auc_of_true_probability": auc(np.array(y), np.array(p)), "offers": float(len(y))}
@@ -134,12 +132,7 @@ def main() -> None:
                 mlflow.artifacts.download_artifacts(run_id=mv.run_id, artifact_path="cv.json")
             ).read_text()
         )
-        cands[kind] = {
-            "version": int(mv.version),
-            "dir": bdir,
-            "bundle": load_bundle(bdir),
-            "cv": cv,
-        }
+        cands[kind] = {"version": int(mv.version), "dir": bdir, "bundle": load_bundle(bdir), "cv": cv}
 
     # --- the held-out 2025 test, scored once ---------------------------------------------------
     table = load(args.data, through=TEST_END)
@@ -184,11 +177,7 @@ def main() -> None:
             "floor": MIN_AUC,
             "passed": g["auc"] > b["auc"] and g["auc"] >= MIN_AUC,
         },
-        "ece_at_most_ceiling": {
-            "learner": g["ece"],
-            "ceiling": MAX_ECE,
-            "passed": g["ece"] <= MAX_ECE,
-        },
+        "ece_at_most_ceiling": {"learner": g["ece"], "ceiling": MAX_ECE, "passed": g["ece"] <= MAX_ECE},
     }
     promoted = all(v["passed"] for v in checks.values())
     champion = "lightgbm" if promoted else best
@@ -222,12 +211,8 @@ def main() -> None:
 
     policies: dict[str, replay.Orderer] = {
         "fairness_first_champion": fairness_first(pol.BUCKET_WIDTH),
-        "stand_in": lambda c: sorted(
-            c, key=lambda x: (x.covers_last_90_days, x.hours_ratio, x.staff_id)
-        ),
-        "most_reliable_first": lambda c: sorted(
-            c, key=lambda x: (-rel.get(x.staff_id, 0.5), x.staff_id)
-        ),
+        "stand_in": lambda c: sorted(c, key=lambda x: (x.covers_last_90_days, x.hours_ratio, x.staff_id)),
+        "most_reliable_first": lambda c: sorted(c, key=lambda x: (-rel.get(x.staff_id, 0.5), x.staff_id)),
         "fairness_first_exact_buckets_sensitivity": fairness_first(1),
     }
     runs: dict[str, list[dict[str, Any]]] = {k: [] for k in policies}
@@ -238,15 +223,11 @@ def main() -> None:
     metric_names = [k for k in runs["stand_in"][0] if k != "cascades"]
     replay_doc: dict[str, Any] = {
         "replicates": REPLICATES,
-        "sick_call_cascades_per_replicate": {
-            k: [r["cascades"] for r in v] for k, v in runs.items()
-        },
+        "sick_call_cascades_per_replicate": {k: [r["cascades"] for r in v] for k, v in runs.items()},
         "population_for_gini": len(world.population),
         "max_asks": replay.MAX_ASKS,
         "window_minutes": replay.WINDOW_MIN,
-        "policies": {
-            k: {m: _interval([r[m] for r in v]) for m in metric_names} for k, v in runs.items()
-        },
+        "policies": {k: {m: _interval([r[m] for r in v]) for m in metric_names} for k, v in runs.items()},
         "paired_difference_to_stand_in": {
             k: {
                 m: _interval([a[m] - s[m] for a, s in zip(v, runs["stand_in"], strict=True)])

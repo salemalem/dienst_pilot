@@ -96,9 +96,7 @@ def load_latents(root: Path) -> dict[str, Latent]:
                 if wd >= 5:
                     v -= float(r["weekend_aversion"])
                 aff[wd, si] = v
-        out[r["staff_id"]] = Latent(
-            float(r["cover_willingness"]), float(r["cover_load_decay"]), aff
-        )
+        out[r["staff_id"]] = Latent(float(r["cover_willingness"]), float(r["cover_load_decay"]), aff)
     return out
 
 
@@ -184,9 +182,7 @@ class World:
             s
             for s, p in d.people.items()
             if any(
-                c[0] in COVER_ROLES
-                and c[2] <= date(2025, 12, 31)
-                and (c[3] is None or c[3] >= date(2025, 1, 1))
+                c[0] in COVER_ROLES and c[2] <= date(2025, 12, 31) and (c[3] is None or c[3] >= date(2025, 1, 1))
                 for c in p.contracts
             )
         ]
@@ -272,7 +268,11 @@ def _needs(w: World, holder: str | None, day: date, shift: str) -> set[str]:
 
 def _absent(w: World, day: date, now: datetime) -> set[str]:
     """Return who is absent on ``day``: sick reports up to the end of ``now``'s calendar day."""
-    return {s for s, a, b, rep in w.absences if a <= day <= b and _naive(rep).date() <= now.date()}
+    return {
+        s
+        for s, a, b, rep in w.absences
+        if a <= day <= b and _naive(rep).date() <= now.date()
+    }
 
 
 def quick_filter(w: World, st: State, aid: str, now: datetime) -> list[str]:
@@ -314,7 +314,9 @@ def c2_pool(w: World, st: State, aid: str, now: datetime, people: list[str]) -> 
     inputs: dict[date, MonthInput] = {}
     months = {m for m in months if m in w.facts}
     for m in sorted(months):
-        blocked: dict[str, set[date]] = {s: set(v) for s, v in w.unavailable.get(m, {}).items()}
+        blocked: dict[str, set[date]] = {
+            s: set(v) for s, v in w.unavailable.get(m, {}).items()
+        }
         for s, a, b, rep in w.absences:
             if _naive(rep) <= now and b >= m and a <= month_end(m):
                 lo, hi = max(a, m - timedelta(days=7)), min(b, month_end(m))
@@ -371,7 +373,9 @@ def features(w: World, st: State, p: str, aid: str, now: datetime) -> CoverFeatu
     )
 
 
-def run(w: World, order: Orderer, champion: Bundle, replicate: int, policy_name: str) -> Metrics:
+def run(
+    w: World, order: Orderer, champion: Bundle, replicate: int, policy_name: str
+) -> Metrics:
     """Replay the 2025 sick calls once under one ordering policy."""
     st = State(w)
     m = Metrics()
@@ -386,9 +390,7 @@ def run(w: World, order: Orderer, champion: Bundle, replicate: int, policy_name:
             shift = w.assign[aid][2]
             if shift not in ROLE_SHIFTS.get("facharzt", set()) | {"ruf"}:
                 continue
-            start = (
-                datetime.combine(day, w.types[shift].start or time(0)) if shift in w.types else None
-            )
+            start = datetime.combine(day, w.types[shift].start or time(0)) if shift in w.types else None
             if start is not None and start <= now:
                 continue  # already started: the Planner handles it directly
             m.cascades += 1
@@ -435,12 +437,8 @@ def summarise(m: Metrics, population: list[str]) -> dict[str, Any]:
         "cascades": m.cascades,
         "escalation_rate": m.escalated / m.cascades if m.cascades else 0.0,
         "contacted_per_filled_gap": m.asks_filled / m.filled if m.filled else float("nan"),
-        "time_to_fill_mean_min": float(np.mean(m.minutes_filled))
-        if m.minutes_filled
-        else float("nan"),
-        "time_to_fill_median_min": float(np.median(m.minutes_filled))
-        if m.minutes_filled
-        else float("nan"),
+        "time_to_fill_mean_min": float(np.mean(m.minutes_filled)) if m.minutes_filled else float("nan"),
+        "time_to_fill_median_min": float(np.median(m.minutes_filled)) if m.minutes_filled else float("nan"),
         "cover_burden_gini": gini([float(m.covers.get(p, 0)) for p in population]),
         "covers_total": m.filled,
     }

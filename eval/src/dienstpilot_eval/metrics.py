@@ -46,17 +46,13 @@ def measure(md: MonthData, roster: tuple[Assignment, ...]) -> RosterMetrics:
         c = p.contract_on(last) or p.contract_on(first)
         if c is None or c[0] not in ("facharzt", "assistenzarzt"):
             continue
-        if not any(
-            p.contract_on(first + timedelta(days=i)) and not p.rotating(first + timedelta(days=i))
-            for i in range((last - first).days + 1)
-        ):
+        if not any(p.contract_on(first + timedelta(days=i)) and not p.rotating(first + timedelta(days=i))
+                   for i in range((last - first).days + 1)):
             continue
         n0, w0, h0 = md.ytd.get(sid, (0, 0, 0))
         mine = [a for a in roster if a.staff_id == sid]
         nights = sum(a.shift_type == "nacht" for a in mine)
-        weekends = len(
-            {a.day - timedelta(days=a.day.weekday() - 5) for a in mine if a.day.weekday() >= 5}
-        )
+        weekends = len({a.day - timedelta(days=a.day.weekday() - 5) for a in mine if a.day.weekday() >= 5})
         hol = len({a.day for a in mine if a.day in md.month.holidays and a.shift_type in WORKING})
         loads.append(n0 + nights + w0 + weekends + h0 + hol)
     overtime = 0.0
@@ -65,32 +61,14 @@ def measure(md: MonthData, roster: tuple[Assignment, ...]) -> RosterMetrics:
         target, credit, _, _ = contract_target(md.month, p, first, last)
         if target <= 0:
             continue
-        hours = sum(
-            float(rules["bereitschaft_credited_hours"])
-            if a.shift_type == "bereitschaft"
-            else md.month.shift_types[a.shift_type].net_hours
-            if a.shift_type in WORKING
-            else 0.0
-            for a in roster
-            if a.staff_id == sid
-        )
+        hours = sum(float(rules["bereitschaft_credited_hours"]) if a.shift_type == "bereitschaft"
+                    else md.month.shift_types[a.shift_type].net_hours if a.shift_type in WORKING else 0.0
+                    for a in roster if a.staff_id == sid)
         overtime += max(0.0, hours + credit - target)
     nights_held = {(a.staff_id, a.day) for a in (*md.history, *roster) if a.shift_type == "nacht"}
-    isolated = sum(
-        1
-        for a in roster
-        if a.shift_type == "nacht"
-        and (a.staff_id, a.day - timedelta(days=1)) not in nights_held
-        and (a.staff_id, a.day + timedelta(days=1)) not in nights_held
-    )
-    return RosterMetrics(
-        len(violations),
-        dict(Counter(v.rule for v in violations)),
-        len(md.wishes),
-        granted,
-        important,
-        important_granted,
-        (max(loads) - min(loads)) if loads else 0,
-        round(overtime, 2),
-        isolated,
-    )
+    isolated = sum(1 for a in roster if a.shift_type == "nacht"
+                   and (a.staff_id, a.day - timedelta(days=1)) not in nights_held
+                   and (a.staff_id, a.day + timedelta(days=1)) not in nights_held)
+    return RosterMetrics(len(violations), dict(Counter(v.rule for v in violations)), len(md.wishes), granted,
+                         important, important_granted, (max(loads) - min(loads)) if loads else 0, round(overtime, 2),
+                         isolated)

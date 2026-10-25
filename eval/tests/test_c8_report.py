@@ -79,10 +79,8 @@ def test_no_text_sent_to_the_model_in_any_recorded_run_holds_a_name_an_id_or_a_h
 def test_a_failed_or_privacy_stopped_run_never_has_a_model_answer_shown() -> None:
     for rec in r.records("test").values():
         if rec["aborted"]:
-            assert (
-                rec["fallback"]
-                and "nicht gegen die Daten" in rec["served"]
-                or "could not be checked" in rec["served"]
+            assert rec["fallback"] and (
+                "nicht gegen die Daten" in rec["served"] or "could not be checked" in rec["served"]
             )
 
 

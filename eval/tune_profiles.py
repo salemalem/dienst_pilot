@@ -56,14 +56,8 @@ METRICS = (  # (name, higher is better)
 
 def evaluate(data: Data, profile: Profile, cfg: Config) -> dict[str, Any]:
     """Return the totals of one candidate over the tuning months."""
-    totals = {
-        "wishes_total": 0,
-        "wishes_granted": 0,
-        "important_total": 0,
-        "important_granted": 0,
-        "overtime_hours": 0.0,
-        "hard_violations": 0,
-    }
+    totals = {"wishes_total": 0, "wishes_granted": 0, "important_total": 0, "important_granted": 0,
+              "overtime_hours": 0.0, "hard_violations": 0}
     spreads, statuses = [], []
     for m in TUNING:
         md = data.month(m)
@@ -75,13 +69,8 @@ def evaluate(data: Data, profile: Profile, cfg: Config) -> dict[str, Any]:
         v = result.variants[0]
         statuses.append(v.status)
         r = measure(md, tuple(Assignment(*a) for a in v.assignments))
-        for k in (
-            "wishes_total",
-            "wishes_granted",
-            "important_total",
-            "important_granted",
-            "hard_violations",
-        ):
+        for k in ("wishes_total", "wishes_granted", "important_total", "important_granted",
+                  "hard_violations"):
             totals[k] += getattr(r, k)
         totals["overtime_hours"] += r.overtime_hours
         spreads.append(r.burden_spread)
@@ -90,13 +79,9 @@ def evaluate(data: Data, profile: Profile, cfg: Config) -> dict[str, Any]:
         "statuses": statuses,
         "hard_violations": totals["hard_violations"],
         "wishes_granted_rate": round(totals["wishes_granted"] / totals["wishes_total"], 4)
-        if totals["wishes_total"]
-        else 1.0,
-        "important_wishes_granted_rate": round(
-            totals["important_granted"] / totals["important_total"], 4
-        )
-        if totals["important_total"]
-        else 1.0,
+        if totals["wishes_total"] else 1.0,
+        "important_wishes_granted_rate": round(totals["important_granted"] / totals["important_total"], 4)
+        if totals["important_total"] else 1.0,
         "burden_spread_mean": round(sum(spreads) / len(spreads), 3) if spreads else None,
         "overtime_hours": round(totals["overtime_hours"], 2),
     }
@@ -145,11 +130,7 @@ def main(argv: list[str] | None = None) -> int:
     out = RESULTS / "tuning.json"
     out.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     current = asdict(next(p for p in PROFILES if p.name == "balanced"))
-    note = (
-        "matches PROFILES"
-        if current == doc["chosen"]
-        else "UPDATE PROFILES in dienstpilot_solver.model"
-    )
+    note = "matches PROFILES" if current == doc["chosen"] else "UPDATE PROFILES in dienstpilot_solver.model"
     print(f"wrote {out}: chosen {doc['chosen']} ({note})")
     return 0
 

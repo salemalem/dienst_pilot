@@ -633,16 +633,12 @@ def main(argv: list[str]) -> int:
     sr, er = card_rag.index(RAG_START), card_rag.index(RAG_END) + len(RAG_END)
     new_card_rag = card_rag[:sr] + rag_tables(rag) + card_rag[er:]
     if "--check" in argv:
-        if (
-            new_card_rag != card_rag
-            or new_card_c7 != card_c7
-            or (
-                new != text
-                or new_card != card
-                or new_card4 != card4
-                or new_card5 != card5
-                or new_card6 != card6
-            )
+        if new_card_rag != card_rag or new_card_c7 != card_c7 or (
+            new != text
+            or new_card != card
+            or new_card4 != card4
+            or new_card5 != card5
+            or new_card6 != card6
         ):
             print(
                 "docs/ARCHITECTURE.md §17.1 or a model card is out of date; run eval/render_tables.py"

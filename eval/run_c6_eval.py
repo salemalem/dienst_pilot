@@ -88,10 +88,7 @@ def _bootstrap(test: Any, yes_a: np.ndarray, yes_b: np.ndarray) -> list[float]:
     diffs = []
     for _ in range(BOOTSTRAP):
         idx = np.concatenate(
-            [
-                rng.choice(by[months[i]], len(by[months[i]]))
-                for i in rng.integers(0, len(months), len(months))
-            ]
+            [rng.choice(by[months[i]], len(by[months[i]])) for i in rng.integers(0, len(months), len(months))]
         )
         diffs.append(_precision(test.y[idx], yes_a[idx]) - _precision(test.y[idx], yes_b[idx]))
     return [float(np.percentile(diffs, 2.5)), float(np.percentile(diffs, 97.5))]
@@ -170,20 +167,11 @@ def main() -> None:
     cands: dict[str, dict[str, Any]] = {}
     for kind in KINDS:
         mv = client.get_model_version_by_alias(REGISTERED_MODEL, f"candidate-{kind}")
-        bdir = Path(
-            mlflow.artifacts.download_artifacts(artifact_uri=mv.source, dst_path=str(work / kind))
-        )
+        bdir = Path(mlflow.artifacts.download_artifacts(artifact_uri=mv.source, dst_path=str(work / kind)))
         cv = json.loads(
-            Path(
-                mlflow.artifacts.download_artifacts(run_id=mv.run_id, artifact_path="cv.json")
-            ).read_text()
+            Path(mlflow.artifacts.download_artifacts(run_id=mv.run_id, artifact_path="cv.json")).read_text()
         )
-        cands[kind] = {
-            "version": int(mv.version),
-            "dir": bdir,
-            "bundle": load_bundle(bdir),
-            "cv": cv,
-        }
+        cands[kind] = {"version": int(mv.version), "dir": bdir, "bundle": load_bundle(bdir), "cv": cv}
 
     # --- the held-out 2025 test, scored once ---------------------------------------------------
     test = load(LABELS, "test")
@@ -297,9 +285,7 @@ def main() -> None:
         },
         "cv_2022_2024": {k: cands[k]["cv"] for k in KINDS},
         "test_2025": test_doc,
-        "test_auc_pooled": {
-            k: auc(test.y, cands[k]["bundle"].score(test.x)) for k in ("logistic", "lightgbm")
-        },
+        "test_auc_pooled": {k: auc(test.y, cands[k]["bundle"].score(test.x)) for k in ("logistic", "lightgbm")},
         "promotion": {"rule_file": "ml/leave_surrogate/PROMOTION_RULE.md", "checks": checks},
         "latency_full_hint_path": lat,
         "latency_endpoint_end_to_end": endpoint,
@@ -324,11 +310,7 @@ def main() -> None:
         ],
     }
     # The results hash covers the reproducible numbers (not the wall-clock latency or the versions).
-    stable = {
-        k: v
-        for k, v in doc.items()
-        if k not in ("versions", "latency_full_hint_path", "latency_endpoint_end_to_end")
-    }
+    stable = {k: v for k, v in doc.items() if k not in ("versions", "latency_full_hint_path", "latency_endpoint_end_to_end")}
     stable["promotion"] = {
         "rule_file": doc["promotion"]["rule_file"],
         "checks": {k: {a: b for a, b in v.items() if "ms" not in a} for k, v in checks.items()},
