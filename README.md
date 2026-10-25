@@ -154,4 +154,4 @@ Checks: `make lint`, `make test`, `make e2e`, `make eval` (the full benchmark ta
 
 ## Licence
 
-Not decided yet. Until a licence file is added, all rights are reserved. Third-party material: the Atkinson Hyperlegible Next font (SIL Open Font Licence 1.1, copy in `design/reference/`) and the text of the Working Hours Act (ArbZG) used for rule search; see `agents/rag/` for its source.
+Not decided yet. Until a licence file is added, all rights are reserved. Third-party material (the Atkinson Hyperlegible Next font under the SIL Open Font Licence, the text of the Working Hours Act, the embedding model) is listed in [THIRD_PARTY.md](THIRD_PARTY.md).
