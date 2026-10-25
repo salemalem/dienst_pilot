@@ -85,6 +85,11 @@ def _days(row: dict[str, Any]) -> list[m.ShiftDay]:
     ]
 
 
+def _row(x: dict[str, Any]) -> m.RosterRow:
+    days = _days(x)
+    return m.RosterRow(staff_id=x["staff_id"], totals=m.totals_of(days), days=days)
+
+
 def build(b: Backend) -> dict[str, list[ToolSpec]]:
     """Return the tools of every server, bound to a backend."""
 
@@ -95,7 +100,7 @@ def build(b: Backend) -> dict[str, list[ToolSpec]]:
             roster_month=r["roster_month"],
             status=r["status"],
             rule_set_version=r["rule_set_version"],
-            rows=[m.RosterRow(staff_id=x["staff_id"], days=_days(x)) for x in r["rows"]],
+            rows=[_row(x) for x in r["rows"]],
             coverage=[m.CoverageRow(**c) for c in r["coverage"]],
         )
 
@@ -105,10 +110,12 @@ def build(b: Backend) -> dict[str, list[ToolSpec]]:
         """Return one physician's shifts in a month."""
         r = await b.get("/roster", month=month)
         row = next((x for x in r["rows"] if x["staff_id"] == staff_id), None)
+        days = [] if row is None else _days(row)
         return m.Assignments(
             staff_id=staff_id,
             roster_month=r["roster_month"],
-            days=[] if row is None else _days(row),
+            totals=m.totals_of(days),
+            days=days,
         )
 
     async def get_burden_ledger(year: int | None = None) -> m.BurdenLedger:
@@ -206,6 +213,46 @@ def build(b: Backend) -> dict[str, list[ToolSpec]]:
             ],
             solver_version=None if run is None else run["solver_version"],
             validator_version=None if run is None else run["validator_version"],
+        )
+
+    async def get_history(month: str = Field(pattern=MONTH)) -> m.History:
+        """Return why a month looks as it does: changes, leave decisions, proposals (free text)."""
+        r = await b.get("/planner/history", month=month)
+        return m.History(
+            roster_month=r["roster_month"][:7],
+            changes=[
+                m.HistoryChange(
+                    change_id=x["change_id"],
+                    date=x["date"],
+                    shift_type=x["shift_type"],
+                    kind=x["kind"],
+                    staff_before=x["staff_before"],
+                    staff_after=x["staff_after"],
+                    reason=x["reason"],
+                )
+                for x in r["changes"]
+            ],
+            decisions=[
+                m.HistoryDecision(
+                    staff_id=x["staff_id"],
+                    start_date=x["start_date"],
+                    end_date=x["end_date"],
+                    status=x["status"],
+                    reason=x["reason"],
+                )
+                for x in r["decisions"]
+            ],
+            proposals=[
+                m.HistoryProposal(
+                    proposal_id=x["id"],
+                    source=x["source"],
+                    kind=x["kind"],
+                    status=x["status"],
+                    title=x["title"],
+                    body=x["body"],
+                )
+                for x in r["proposals"]
+            ],
         )
 
     async def create_proposal(
@@ -326,6 +373,7 @@ def build(b: Backend) -> dict[str, list[ToolSpec]]:
             t("run_what_if", run_what_if, READERS),
             t("validate", validate, PLANNER),
             t("get_variants", get_variants, PLANNER),
+            t("get_history", get_history, PLANNER),
             t("create_proposal", create_proposal, PLANNER, write=True),
         ],
         "rules": [t("search_rules", search_rules, READERS), t("get_rule", get_rule, READERS)],

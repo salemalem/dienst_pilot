@@ -1,0 +1,56 @@
+{
+ "role": "planner",
+ "language": "en",
+ "question": "Write a one-sentence reason: Dr. Marek Nowak hands the late shift on 13 November 2026 to Dr. Aylin Kaya because he attends a training course.",
+ "final": {
+  "answer": "Suggested reason: \"P3 hands the late shift on 13 November 2026 to P4 because P3 attends a training course.\" This is returned as text only and has not been saved or sent.",
+  "refused": false
+ },
+ "value_id": null,
+ "served": "Suggested reason: \"Dr. Marek Nowak hands the late shift on 13 November 2026 to Dr. Aylin Kaya because Dr. Marek Nowak attends a training course.\" This is returned as text only and has not been saved or sent.",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "calls": [],
+ "turns": [
+  {
+   "request_key": "7ea5550ffd5515fc7fe51d4484a26952a2e9ee216dd02a8302a9c61aad9966a9",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "The user asks me to write a one-sentence reason for a swap. This is drafting wording; per the rules, I return it in the answer and do not save it unless asked. The reason mentions a training course, which is not a personal/medical reason, so it is fine to include. I don't need tools for this since the facts are given.\n\nDraft: \"P3 hands the late shift on 13 November 2026 to P4 because P3 attends a training course.\""
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01NmaDsNRaVFDwJygLZ4LWJD",
+     "name": "final_answer",
+     "input": {
+      "answer": "Suggested reason: \"P3 hands the late shift on 13 November 2026 to P4 because P3 attends a training course.\" This is returned as text only and has not been saved or sent.",
+      "refused": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 261,
+    "cache_write_tokens": 145,
+    "cache_read_tokens": 5436
+   },
+   "latency_s": 1.7038678330009134,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: en.\nQuestion:\nWrite a one-sentence reason: P3 hands the late shift on 13 November 2026 to P4 because he attends a training course."
+  }
+ ],
+ "usage": {
+  "input_tokens": 4,
+  "output_tokens": 261,
+  "cache_write_tokens": 145,
+  "cache_read_tokens": 5436
+ },
+ "task": "demo",
+ "label": "demo",
+ "prompt_version": "c8-3"
+}

@@ -74,6 +74,11 @@ async def check_leave(ctx: dict[str, Any], check_id: str, department_id: str) ->
     )
 
 
+async def run_copilot(ctx: dict[str, Any], run_id: str, role: str, token: str) -> None:
+    """C8: answer a planner's question with the agent (tools through MCP, as that user)."""
+    await asyncio.to_thread(_run, "run_copilot", {"run_id": run_id, "role": role, "token": token})
+
+
 def _tick() -> None:
     clock = _clock()
     factory = _factory()
@@ -121,7 +126,7 @@ async def startup(ctx: dict[str, Any]) -> None:
 class WorkerSettings:
     """arq settings."""
 
-    functions: ClassVar[list[Any]] = [run_roster, check_leave]
+    functions: ClassVar[list[Any]] = [run_roster, check_leave, run_copilot]
     cron_jobs: ClassVar[list[Any]] = [
         cron(tick, second=set(range(60)), run_at_startup=True, unique=True, timeout=30)
     ]

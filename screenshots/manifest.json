@@ -74,6 +74,14 @@
     ]
   },
   {
+    "id": "W9b",
+    "slug": "copilot-whatif",
+    "caption": "Copilot answering a what-if with the AI agent (a recorded real answer, labelled as such), the validator's verdict and its sources",
+    "themes": [
+      "light"
+    ]
+  },
+  {
     "id": "M5",
     "slug": "leave-request",
     "caption": "Request leave (Situation A): 14 to 27 July 2027, coverable, no trade-off, no colleague names",

@@ -1,0 +1,108 @@
+{
+ "task": "d06",
+ "label": "latency",
+ "prompt_version": "c8-2",
+ "question": "Draft an announcement reminding all physicians that nobody is ordered to take a replacement shift: the system asks and each person accepts or declines.",
+ "final": {
+  "answer": "I saved a draft announcement for all physicians titled \"Reminder: replacement shifts are voluntary\" in the Planner's inbox. It states that nobody is ordered to take a replacement shift and that the system asks and each person accepts or declines. It has not been sent; a person needs to review and send it.",
+  "refused": false
+ },
+ "value_id": null,
+ "served": "I saved a draft announcement for all physicians titled \"Reminder: replacement shifts are voluntary\" in the Planner's inbox. It states that nobody is ordered to take a replacement shift and that the system asks and each person accepts or declines. It has not been sent; a person needs to review and send it.",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "draft_announcement",
+   "args": {
+    "audience": "All physicians",
+    "title": "Reminder: replacement shifts are voluntary",
+    "text": "Dear colleagues,\n\nA reminder about replacement shifts: nobody is ordered to take a replacement shift. The system asks you, and you accept or decline each request.\n\nThank you for your continued support."
+   },
+   "is_error": false,
+   "result_chars": 92
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "981c2017a8fc2b59cfdefab298d26b3cafa7a4bdcaedccfb41b859b55f5e282a",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "I'll save this as a draft announcement for all physicians. The text is based on the reminder you gave; no other facts are added."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_012hBLFpWBFSmX239UaEaxEy",
+     "name": "draft_announcement",
+     "input": {
+      "audience": "All physicians",
+      "title": "Reminder: replacement shifts are voluntary",
+      "text": "Dear colleagues,\n\nA reminder about replacement shifts: nobody is ordered to take a replacement shift. The system asks you, and you accept or decline each request.\n\nThank you for your continued support."
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_012hBLFpWBFSmX239UaEaxEy",
+     "content": "{\"proposal_id\":\"099d7cd1-b279-546e-be11-4b3665e2c5c6\",\"status\":\"open\",\"kind\":\"announcement\"}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 213,
+    "cache_write_tokens": 0,
+    "cache_read_tokens": 5526
+   },
+   "latency_s": 1.5049164590000146,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: en.\nQuestion:\nDraft an announcement reminding all physicians that nobody is ordered to take a replacement shift: the system asks and each person accepts or declines."
+  },
+  {
+   "request_key": "ca23c1086fd63654012c538f8baf91a30e990d37f7638c4767732cfa6dc4cdd7",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "The draft announcement for all physicians is saved in the Planner's inbox. It reminds everyone that nobody is ordered to take a replacement shift, and that the system asks and each person accepts or declines. A person still needs to review and send it."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_015ai9zsqrzSUXSBv8WmjL5T",
+     "name": "final_answer",
+     "input": {
+      "answer": "I saved a draft announcement for all physicians titled \"Reminder: replacement shifts are voluntary\" in the Planner's inbox. It states that nobody is ordered to take a replacement shift and that the system asks and each person accepts or declines. It has not been sent; a person needs to review and send it.",
+      "refused": false
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 241,
+    "cache_write_tokens": 270,
+    "cache_read_tokens": 5526
+   },
+   "latency_s": 1.7870818329993199,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"proposal_id\":\"099d7cd1-b279-546e-be11-4b3665e2c5c6\",\"status\":\"open\",\"kind\":\"announcement\"}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 454,
+  "cache_write_tokens": 270,
+  "cache_read_tokens": 11052
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 3.54,
+  "prompt_sha": "007bc02af21920c92c214a01c7aad4b4fbdc4d24d055fcb67354e7c58596eb36",
+  "model": "claude-haiku-5-5"
+ }
+}

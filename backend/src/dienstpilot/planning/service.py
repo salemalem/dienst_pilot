@@ -596,3 +596,86 @@ def changes_for(session: Session, staff_id: str) -> list[Change]:
         (m.AssignmentChange.staff_before == sid) | (m.AssignmentChange.staff_after == sid)
     )
     return [_change(c) for c in session.scalars(q.order_by(m.AssignmentChange.changed_at.desc()))]
+
+
+# --- copilot runs (C8) -------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class CopilotRun:
+    """A question to the copilot and its outcome."""
+
+    id: str
+    department_id: str
+    created_by: str
+    created_at: datetime
+    finished_at: datetime | None
+    question: str
+    language: str
+    status: str
+    result: dict[str, Any] | None
+
+
+def _copilot_run(r: m.CopilotRun) -> CopilotRun:
+    return CopilotRun(
+        str(r.id),
+        str(r.department_id),
+        str(r.created_by),
+        r.created_at,
+        r.finished_at,
+        r.question,
+        r.language,
+        r.status,
+        None if r.result is None else dict(r.result),
+    )
+
+
+def create_copilot_run(
+    session: Session,
+    *,
+    department_id: str,
+    created_by: str,
+    question: str,
+    language: str,
+    now: datetime,
+) -> str:
+    """Queue a copilot question and return its id."""
+    r = m.CopilotRun(
+        id=uuid.uuid4(),
+        department_id=uuid.UUID(department_id),
+        created_by=uuid.UUID(created_by),
+        created_at=now,
+        question=question,
+        language=language,
+        status="queued",
+    )
+    session.add(r)
+    session.flush()
+    return str(r.id)
+
+
+def finish_copilot_run(
+    session: Session, run_id: str, status: str, result: dict[str, Any], now: datetime
+) -> None:
+    """Store the outcome of a copilot run."""
+    r = session.get(m.CopilotRun, uuid.UUID(run_id))
+    if r is None:
+        raise KeyError(run_id)
+    r.status, r.result, r.finished_at = status, result, now
+
+
+def start_copilot_run(session: Session, run_id: str) -> None:
+    """Mark a queued run as running."""
+    r = session.get(m.CopilotRun, uuid.UUID(run_id))
+    if r is None:
+        raise KeyError(run_id)
+    r.status = "running"
+
+
+def copilot_run(session: Session, run_id: str) -> CopilotRun | None:
+    """Return one copilot run."""
+    try:
+        r = session.get(m.CopilotRun, uuid.UUID(run_id))
+    except ValueError:
+        return None
+    return None if r is None else _copilot_run(r)

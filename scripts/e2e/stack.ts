@@ -16,6 +16,8 @@ const env = {
   REDIS_URL,
   DEMO_MODE: "true",
   DIENSTPILOT_SEED_DIR: SEED_DIR,
+  // Never the network: the copilot answers the demo questions from recorded real responses.
+  LLM_MODE: "replay",
 };
 
 function run(cmd: string, args: string[], cwd = ROOT): void {

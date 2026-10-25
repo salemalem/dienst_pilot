@@ -1,0 +1,116 @@
+{
+ "task": "r04",
+ "label": "latency",
+ "prompt_version": "c8-2",
+ "question": "How many Sundays per year must an employee have off?",
+ "final": {
+  "answer": "At least 15 Sundays per year must remain free of work for employees (ArbZG § 11 Abs. 1). Section 12 Abs. 2 allows lower minimums only for certain listed sectors, such as facilities under § 10 Abs. 1 Nr. 2, 3, 4 and 10, which require at least 10.",
+  "citations": [
+   "arbzg:§11:1",
+   "arbzg:§12:2"
+  ],
+  "no_source": false,
+  "value": "15"
+ },
+ "value_id": "15",
+ "served": "At least 15 Sundays per year must remain free of work for employees (ArbZG § 11 Abs. 1). Section 12 Abs. 2 allows lower minimums only for certain listed sectors, such as facilities under § 10 Abs. 1 Nr. 2, 3, 4 and 10, which require at least 10.",
+ "fallback": false,
+ "fallback_reason": null,
+ "ungrounded": [],
+ "aborted": null,
+ "findings": [],
+ "state_diff": {},
+ "calls": [
+  {
+   "name": "search_rules",
+   "args": {
+    "query": "how many Sundays per year must an employee have off",
+    "k": 5
+   },
+   "is_error": false,
+   "result_chars": 3136
+  }
+ ],
+ "turns": [
+  {
+   "request_key": "3d5c9484f2ff920602dead0d8503c716584e3f91663a89958590cb48b2d269bc",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "This is a rule question, so I'll search the rulebook first."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_01TnrBJBzGwsTVoaq9GRbMKG",
+     "name": "search_rules",
+     "input": {
+      "query": "how many Sundays per year must an employee have off",
+      "k": 5
+     }
+    }
+   ],
+   "tool_results": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "toolu_01TnrBJBzGwsTVoaq9GRbMKG",
+     "content": "{\"query\":\"how many Sundays per year must an employee have off\",\"found\":true,\"passages\":[{\"id\":\"arbzg:§11:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 11 Abs. 1 (Stand 2024-12-31)\",\"text\":\"Mindestens 15 Sonntage im Jahr müssen beschäftigungsfrei bleiben.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6526},{\"id\":\"arbzg:§11:3\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 11 Abs. 3 (Stand 2024-12-31)\",\"text\":\"Werden Arbeitnehmer an einem Sonntag beschäftigt, müssen sie einen Ersatzruhetag haben, der innerhalb eines den Beschäftigungstag einschließenden Zeitraums von zwei Wochen zu gewähren ist. Werden Arbeitnehmer an einem auf einen Werktag fallenden Feiertag beschäftigt, müssen sie einen Ersatzruhetag haben, der innerhalb eines den Beschäftigungstag einschließenden Zeitraums von acht Wochen zu gewähren ist.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6075},{\"id\":\"arbzg:§12:2\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 12 Abs. 2 (Stand 2024-12-31)\",\"text\":\"1. abweichend von § 11 Abs. 1 die Anzahl der beschäftigungsfreien Sonntage in den Einrichtungen des § 10 Abs. 1 Nr. 2, 3, 4 und 10 auf mindestens zehn Sonntage, im Rundfunk, in Theaterbetrieben, Orchestern sowie bei Schaustellungen auf mindestens acht Sonntage, in Filmtheatern und in der Tierhaltung auf mindestens sechs Sonntage im Jahr zu verringern, 2. abweichend von § 11 Abs. 3 den Wegfall von Ersatzruhetagen für auf Werktage fallende Feiertage zu vereinbaren oder Arbeitnehmer innerhalb eines festzulegenden Ausgleichszeitraums beschäftigungsfrei zu stellen, 3. abweichend von § 11 Abs. 1 bis 3 in der Seeschiffahrt die den Arbeitnehmern nach diesen Vorschriften zustehenden freien Tage zusammenhängend zu geben, 4. abweichend von § 11 Abs. 2 die Arbeitszeit in vollkontinuierlichen Schichtbetrieben an Sonn- und Feiertagen auf bis zu zwölf Stunden zu verlängern, wenn dadurch zusätzliche freie Schichten an Sonn- und Feiertagen erreicht werden. § 7 Abs. 3 bis 6 findet Anwendung.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.596},{\"id\":\"arbzg:§13:3\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 13 Abs. 3 (Stand 2024-12-31)\",\"text\":\"Die Aufsichtsbehörde kann 1. feststellen, ob eine Beschäftigung nach § 10 zulässig ist, 2. abweichend von § 9 bewilligen, Arbeitnehmer zu beschäftigen a) im Handelsgewerbe an bis zu zehn Sonn- und Feiertagen im Jahr, an denen besondere Verhältnisse einen erweiterten Geschäftsverkehr erforderlich machen, b) an bis zu fünf Sonn- und Feiertagen im Jahr, wenn besondere Verhältnisse zur Verhütung eines unverhältnismäßigen Schadens dies erfordern, c) an einem Sonntag im Jahr zur Durchführung einer gesetzlich vorgeschriebenen Inventur, und Anordnungen über die Beschäftigungszeit unter Berücksichtigung der für den öffentlichen Gottesdienst bestimmten Zeit treffen.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.573},{\"id\":\"rules:Rule3:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 3 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At most 2 weekends with duty per person and month (rule max_weekends_per_month).\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5597}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}",
+     "is_error": false
+    }
+   ],
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 102,
+    "cache_write_tokens": 0,
+    "cache_read_tokens": 5496
+   },
+   "latency_s": 0.9655010000005859,
+   "model": "claude-haiku-5-5",
+   "new_text": "Today (demo clock): 2026-10-25. User role: planner. Language: en.\nQuestion:\nHow many Sundays per year must an employee have off?"
+  },
+  {
+   "request_key": "aacb6e2196f506bd60641b1f334e6e2384d224a8574be3995a735ff4533ea56e",
+   "blocks": [
+    {
+     "type": "text",
+     "text": "The rulebook answers this directly. Under ArbZG § 11 Abs. 1, at least 15 Sundays per year must remain free of work.\n\nNote that § 12 Abs. 2 allows lower minimums for certain sectors (for example, at least 10 Sundays in the facilities listed there), but the general rule for this department is 15."
+    },
+    {
+     "type": "tool_use",
+     "id": "toolu_012rxn3FDUy7V4eGuVxuL4Vx",
+     "name": "final_answer",
+     "input": {
+      "answer": "At least 15 Sundays per year must remain free of work for employees (ArbZG § 11 Abs. 1). Section 12 Abs. 2 allows lower minimums only for certain listed sectors, such as facilities under § 10 Abs. 1 Nr. 2, 3, 4 and 10, which require at least 10.",
+      "citations": [
+       "arbzg:§11:1",
+       "arbzg:§12:2"
+      ],
+      "no_source": false,
+      "value": "15"
+     }
+    }
+   ],
+   "tool_results": [],
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 353,
+    "cache_write_tokens": 1710,
+    "cache_read_tokens": 5496
+   },
+   "latency_s": 2.025256042001274,
+   "model": "claude-haiku-5-5",
+   "new_text": "{\"query\":\"how many Sundays per year must an employee have off\",\"found\":true,\"passages\":[{\"id\":\"arbzg:§11:1\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 11 Abs. 1 (Stand 2024-12-31)\",\"text\":\"Mindestens 15 Sonntage im Jahr müssen beschäftigungsfrei bleiben.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6526},{\"id\":\"arbzg:§11:3\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 11 Abs. 3 (Stand 2024-12-31)\",\"text\":\"Werden Arbeitnehmer an einem Sonntag beschäftigt, müssen sie einen Ersatzruhetag haben, der innerhalb eines den Beschäftigungstag einschließenden Zeitraums von zwei Wochen zu gewähren ist. Werden Arbeitnehmer an einem auf einen Werktag fallenden Feiertag beschäftigt, müssen sie einen Ersatzruhetag haben, der innerhalb eines den Beschäftigungstag einschließenden Zeitraums von acht Wochen zu gewähren ist.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.6075},{\"id\":\"arbzg:§12:2\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 12 Abs. 2 (Stand 2024-12-31)\",\"text\":\"1. abweichend von § 11 Abs. 1 die Anzahl der beschäftigungsfreien Sonntage in den Einrichtungen des § 10 Abs. 1 Nr. 2, 3, 4 und 10 auf mindestens zehn Sonntage, im Rundfunk, in Theaterbetrieben, Orchestern sowie bei Schaustellungen auf mindestens acht Sonntage, in Filmtheatern und in der Tierhaltung auf mindestens sechs Sonntage im Jahr zu verringern, 2. abweichend von § 11 Abs. 3 den Wegfall von Ersatzruhetagen für auf Werktage fallende Feiertage zu vereinbaren oder Arbeitnehmer innerhalb eines festzulegenden Ausgleichszeitraums beschäftigungsfrei zu stellen, 3. abweichend von § 11 Abs. 1 bis 3 in der Seeschiffahrt die den Arbeitnehmern nach diesen Vorschriften zustehenden freien Tage zusammenhängend zu geben, 4. abweichend von § 11 Abs. 2 die Arbeitszeit in vollkontinuierlichen Schichtbetrieben an Sonn- und Feiertagen auf bis zu zwölf Stunden zu verlängern, wenn dadurch zusätzliche freie Schichten an Sonn- und Feiertagen erreicht werden. § 7 Abs. 3 bis 6 findet Anwendung.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.596},{\"id\":\"arbzg:§13:3\",\"citation\":\"Arbeitszeitgesetz (ArbZG) § 13 Abs. 3 (Stand 2024-12-31)\",\"text\":\"Die Aufsichtsbehörde kann 1. feststellen, ob eine Beschäftigung nach § 10 zulässig ist, 2. abweichend von § 9 bewilligen, Arbeitnehmer zu beschäftigen a) im Handelsgewerbe an bis zu zehn Sonn- und Feiertagen im Jahr, an denen besondere Verhältnisse einen erweiterten Geschäftsverkehr erforderlich machen, b) an bis zu fünf Sonn- und Feiertagen im Jahr, wenn besondere Verhältnisse zur Verhütung eines unverhältnismäßigen Schadens dies erfordern, c) an einem Sonntag im Jahr zur Durchführung einer gesetzlich vorgeschriebenen Inventur, und Anordnungen über die Beschäftigungszeit unter Berücksichtigung der für den öffentlichen Gottesdienst bestimmten Zeit treffen.\",\"synthetic\":false,\"language\":\"de\",\"cosine\":0.573},{\"id\":\"rules:Rule3:1\",\"citation\":\"Department rulebook (prototype assumptions) Rule 3 Abs. 1 (rule version 2026-1) [synthetic]\",\"text\":\"At most 2 weekends with duty per person and month (rule max_weekends_per_month).\",\"synthetic\":true,\"language\":\"en\",\"cosine\":0.5597}],\"mode\":\"vector\",\"configured\":\"vector\",\"fallback\":false}"
+  }
+ ],
+ "usage": {
+  "input_tokens": 6,
+  "output_tokens": 455,
+  "cache_write_tokens": 1710,
+  "cache_read_tokens": 10992
+ },
+ "meta": {
+  "allowed_aliases": [],
+  "wall_s": 3.27,
+  "prompt_sha": "007bc02af21920c92c214a01c7aad4b4fbdc4d24d055fcb67354e7c58596eb36",
+  "model": "claude-haiku-5-5"
+ }
+}

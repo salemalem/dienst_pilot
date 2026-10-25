@@ -28,7 +28,9 @@ export function EngineBadge({ engine }: { engine: EngineLabel }): ReactNode {
       data-engine={engine.implementation}
     >
       {standIn ? <PencilLine {...ICON} size={12} /> : null}
-      {engine.component} · {standIn ? t("standIn") : t("built")} · {engine.version}
+      {engine.component} ·{" "}
+      {standIn ? t("standIn") : engine.implementation === "partial" ? t("partial") : t("built")} ·{" "}
+      {engine.version}
     </span>
   );
 }

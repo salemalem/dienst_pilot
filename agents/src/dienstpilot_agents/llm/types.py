@@ -54,11 +54,16 @@ class LlmRequest:
     prompt_version: str
     tools: tuple[Tool, ...] = ()
     force_tool: str | None = None
+    cache_last_message: bool = False  # multi-turn tool loops: cache the conversation so far
 
     def canonical(self) -> dict[str, Any]:
         """Return everything that shapes the answer, as plain JSON data."""
         d = asdict(self)
         d["format"] = FORMAT
+        if not d["cache_last_message"]:
+            del d[
+                "cache_last_message"
+            ]  # keeps the keys of recordings made before the field existed
         return d
 
     @property
@@ -98,6 +103,7 @@ class LlmResponse:
     replayed: bool = False
     latency_s: float | None = None
     meta: dict[str, Any] = field(default_factory=dict)
+    blocks: list[dict[str, Any]] = field(default_factory=list)  # the assistant's content blocks
 
 
 class LlmClient(Protocol):

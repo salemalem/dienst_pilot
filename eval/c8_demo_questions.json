@@ -1,0 +1,22 @@
+{
+  "note": "Questions whose real answers are recorded for the replay mode (screenshots, e2e). Not part of the 50 evaluation tasks.",
+  "role": "planner",
+  "questions": [
+    {
+      "language": "de",
+      "question": "Was passiert, wenn Dr. Sofía Alvarez den Spätdienst am 09.11.2026 an Dr. Marek Nowak abgibt?"
+    },
+    {
+      "language": "en",
+      "question": "What if Dr. Marek Nowak hands the late shift on 13 November 2026 to Dr. Aylin Kaya? Does that comply with the rules?"
+    },
+    {
+      "language": "de",
+      "question": "Formuliere eine kurze Begründung für die Änderung: Dr. Marek Nowak gibt den Spätdienst am 13.11.2026 an Dr. Aylin Kaya ab, weil er an einer Fortbildung teilnimmt."
+    },
+    {
+      "language": "en",
+      "question": "Write a one-sentence reason: Dr. Marek Nowak hands the late shift on 13 November 2026 to Dr. Aylin Kaya because he attends a training course."
+    }
+  ]
+}

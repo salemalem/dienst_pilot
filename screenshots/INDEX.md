@@ -15,6 +15,7 @@ Contact sheets: [Deutsch](de/contact-sheet.png), [English](en/contact-sheet.png)
 | W3 | [de](de/light/W3-variants.png) · [en](en/light/W3-variants.png) | – | Variant comparison from a real solver run (a trial run while the request window is open) |
 | W4 | [de](de/light/W4-roster-editor.png) · [en](en/light/W4-roster-editor.png) | – | Roster editor with a rule message visible (11-hour rest period) and its fix |
 | W9 | [de](de/light/W9-copilot.png) · [en](en/light/W9-copilot.png) | – | Copilot answering with a rule citation (a stand-in, labelled as such) |
+| W9b | [de](de/light/W9b-copilot-whatif.png) · [en](en/light/W9b-copilot-whatif.png) | – | Copilot answering a what-if with the AI agent (a recorded real answer, labelled as such), the validator's verdict and its sources |
 | M5 | [de](de/light/M5-leave-request.png) · [en](en/light/M5-leave-request.png) | – | Request leave (Situation A): 14 to 27 July 2027, coverable, no trade-off, no colleague names |
 | M6 | [de](de/light/M6-exchange-offer.png) · [en](en/light/M6-exchange-offer.png) | – | Exchange offer (Situation B): Dr. Mehta's Saturday early shift, offered only as an exchange |
 | M7 | [de](de/light/M7-sick-report.png) · [en](en/light/M7-sick-report.png) | – | Sick report (Situation C) at 06:40: one tap, no diagnosis, cover is being organised |

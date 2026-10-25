@@ -58,12 +58,10 @@ test("W13: every component with its real status; none can change the roster", as
       "data-implementation",
       "built",
     );
-  for (const c of ["C7", "C8"])
-    await expect(page.getByTestId(`component-${c}`)).toHaveAttribute(
-      "data-implementation",
-      "stand-in",
-    );
-  await expect(page.getByTestId("component-C8").getByTestId("metric-placeholder")).toBeVisible();
+  await expect(page.getByTestId("component-C7")).toHaveAttribute("data-implementation", "stand-in");
+  // C8 was evaluated: what-ifs and drafting passed their gates, lookups and rules did not.
+  await expect(page.getByTestId("component-C8")).toHaveAttribute("data-implementation", "partial");
+  await expect(page.getByTestId("component-C8").getByTestId("c8-metrics")).toBeVisible();
   // C7 was evaluated; the language model did not meet its pre-registered rule, so the stand-in is
   // served and the card says so, with the measured results.
   await expect(page.getByTestId("c7-served")).toContainText("Stichwort-Platzhalter");
@@ -79,10 +77,13 @@ test("W13: every component with its real status; none can change the roster", as
   const standIns = await page
     .locator('[data-testid^="component-C"][data-implementation="stand-in"]')
     .count();
+  const partly = await page
+    .locator('[data-testid^="component-C"][data-implementation="partial"]')
+    .count();
   expect(numbered).toBe(8);
   await expect(
     page.getByText(
-      `${String(built)} von ${String(numbered)} Komponenten gebaut, ${String(standIns)} Platzhalter`,
+      `${String(built)} von ${String(numbered)} Komponenten gebaut, ${String(partly)} teilweise, ${String(standIns)} Platzhalter`,
     ),
   ).toBeVisible();
   await expect(page.getByText("Zusätzlich, ohne Nummer: Regelwerk-Suche (gebaut)")).toBeVisible();

@@ -261,3 +261,19 @@ def test_the_committed_ledger_is_consistent_and_within_the_budget() -> None:
         running = round(running + e.cost_usd, 6)
         assert e.cumulative_usd == pytest.approx(running, abs=1e-5)
     assert lg.total_usd() <= LIMIT_USD
+
+
+def test_tool_loops_disable_thinking_explicitly_and_forced_calls_send_none() -> None:
+    from dienstpilot_agents.llm.anthropic_client import _params
+    from dienstpilot_agents.llm.types import LlmRequest, SystemBlock
+
+    base = {
+        "component": "C8", "model": "m", "system": (SystemBlock("s", cache=True),),
+        "messages": ({"role": "user", "content": "q"},), "max_tokens": 10, "prompt_version": "v",
+    }  # fmt: skip
+    loop = _params(LlmRequest(**base, cache_last_message=True))  # type: ignore[arg-type]
+    assert loop["thinking"] == {"type": "disabled"}
+    last = loop["messages"][-1]["content"][-1]
+    assert last["cache_control"] == {"type": "ephemeral"}  # the conversation so far is cached
+    forced = _params(LlmRequest(**base, force_tool="t"))  # type: ignore[arg-type]
+    assert "thinking" not in forced
