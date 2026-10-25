@@ -19,7 +19,9 @@ def seed_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
     if given:
         return Path(given)
     out = tmp_path_factory.mktemp("seed") / "v1"
-    subprocess.run([sys.executable, "-m", "synthdata", "generate", "--out", str(out)], check=True, cwd=REPO)
+    subprocess.run(
+        [sys.executable, "-m", "synthdata", "generate", "--out", str(out)], check=True, cwd=REPO
+    )
     return out
 
 

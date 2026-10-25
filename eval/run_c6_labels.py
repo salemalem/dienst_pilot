@@ -69,7 +69,9 @@ def _summary(rows: dict[str, dict[str, Any]]) -> dict[str, Any]:
     return out
 
 
-def generate(split: str, procs: int, workers: int, pilot: int | None, per_month: int | None) -> None:
+def generate(
+    split: str, procs: int, workers: int, pilot: int | None, per_month: int | None
+) -> None:
     """Fill ``labels/<split>.jsonl`` (all requests, or the pilot head); resumable."""
     from dienstpilot_eval.c6_labels import pilot_order, specs
 
@@ -80,16 +82,24 @@ def generate(split: str, procs: int, workers: int, pilot: int | None, per_month:
     if pilot:
         todo = todo[:pilot]
     todo = [s for s in todo if s.id not in rows]
-    print(f"{split}: {len(rows)} done, {len(todo)} to do, {procs} processes x {workers} workers", flush=True)
+    print(
+        f"{split}: {len(rows)} done, {len(todo)} to do, {procs} processes x {workers} workers",
+        flush=True,
+    )
     t0 = time.perf_counter()
-    with mp.get_context("spawn").Pool(procs, _init, (workers,)) as pool, path.open("a", encoding="utf-8") as f:
+    with (
+        mp.get_context("spawn").Pool(procs, _init, (workers,)) as pool,
+        path.open("a", encoding="utf-8") as f,
+    ):
         for i, r in enumerate(pool.imap_unordered(_one, todo, chunksize=1), 1):
             rows[r["id"]] = r
             f.write(json.dumps(r, sort_keys=True) + "\n")
             f.flush()
             if i % 25 == 0 or i == len(todo):
                 dt = time.perf_counter() - t0
-                print(f"  {i}/{len(todo)}  {dt:.0f}s  eta {dt / i * (len(todo) - i):.0f}s", flush=True)
+                print(
+                    f"  {i}/{len(todo)}  {dt:.0f}s  eta {dt / i * (len(todo) - i):.0f}s", flush=True
+                )
     _write_sorted(path, rows)
     print(json.dumps(_summary(rows), indent=1))
 
@@ -110,9 +120,16 @@ def fidelity(n: int) -> None:
         if got.outcome != rows[k]["outcome"]:
             differ.append({"id": k, "stored": rows[k]["outcome"], "exact": got.outcome})
         print(f"  {i}/{n} differ so far {len(differ)}", flush=True)
-    doc = {"config": "CHECK_CONFIG (workers=8) against labels solved with workers=2",
-           "n": n, "differ": len(differ), "share": len(differ) / n, "details": differ}
-    (OUT / "fidelity.json").write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    doc = {
+        "config": "CHECK_CONFIG (workers=8) against labels solved with workers=2",
+        "n": n,
+        "differ": len(differ),
+        "share": len(differ) / n,
+        "details": differ,
+    }
+    (OUT / "fidelity.json").write_text(
+        json.dumps(doc, indent=1, sort_keys=True) + "\n", encoding="utf-8"
+    )
     print(json.dumps(doc, indent=1))
 
 
@@ -137,10 +154,19 @@ def seal() -> None:
     from dienstpilot_eval.c6_labels import SEED, VERSIONS
 
     manifest = hashlib.sha256((ROOT / "manifest.json").read_bytes()).hexdigest()
-    files = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(OUT.glob("*.jsonl"))}
-    meta = {"seed": SEED, "versions": VERSIONS, "dataset_manifest_sha256": manifest, "files": files,
-            "summary": {s: _summary(_read(OUT / f"{s}.jsonl")) for s in ("train", "test")}}
-    (OUT / "meta.json").write_text(json.dumps(meta, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    files = {
+        p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(OUT.glob("*.jsonl"))
+    }
+    meta = {
+        "seed": SEED,
+        "versions": VERSIONS,
+        "dataset_manifest_sha256": manifest,
+        "files": files,
+        "summary": {s: _summary(_read(OUT / f"{s}.jsonl")) for s in ("train", "test")},
+    }
+    (OUT / "meta.json").write_text(
+        json.dumps(meta, indent=1, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
 
 if __name__ == "__main__":

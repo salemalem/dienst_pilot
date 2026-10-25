@@ -45,21 +45,35 @@ def run(root: Path, months: list[date], cfg: Config) -> dict[str, Any]:
         baseline = measure(md, md.published)
         result = solve(to_problem(md), cfg)
         if result.status != "ok":
-            per_month.append({"month": m.isoformat(), "baseline": asdict(baseline), "c1": None,
-                              "c1_status": result.status})
+            per_month.append(
+                {
+                    "month": m.isoformat(),
+                    "baseline": asdict(baseline),
+                    "c1": None,
+                    "c1_status": result.status,
+                }
+            )
             continue
         chosen = next((v for v in result.variants if v.profile == RECOMMENDED), result.variants[0])
         c1 = measure(md, tuple(Assignment(*a) for a in chosen.assignments))
         month_breaches = breaches.filter(pl.col("date").dt.strftime("%Y-%m") == m.strftime("%Y-%m"))
-        per_month.append({
-            "month": m.isoformat(),
-            "baseline": asdict(baseline),
-            "baseline_in_month_violations": month_breaches.height,
-            "c1": asdict(c1),
-            "c1_variant": {"label": chosen.label, "profile": chosen.profile, "status": chosen.status},
-            "c1_variants": len(result.variants),
-        })
-        timing.append({"month": m.isoformat(), "wall_seconds": [v.wall_seconds for v in result.variants]})
+        per_month.append(
+            {
+                "month": m.isoformat(),
+                "baseline": asdict(baseline),
+                "baseline_in_month_violations": month_breaches.height,
+                "c1": asdict(c1),
+                "c1_variant": {
+                    "label": chosen.label,
+                    "profile": chosen.profile,
+                    "status": chosen.status,
+                },
+                "c1_variants": len(result.variants),
+            }
+        )
+        timing.append(
+            {"month": m.isoformat(), "wall_seconds": [v.wall_seconds for v in result.variants]}
+        )
 
     def total(side: str, key: str) -> float:
         return sum(p[side][key] for p in per_month if p.get(side))
@@ -73,21 +87,30 @@ def run(root: Path, months: list[date], cfg: Config) -> dict[str, Any]:
             "hard_violations": int(total(side, "hard_violations")),
             "wishes_granted_rate": rate(side, "wishes_granted", "wishes_total"),
             "important_wishes_granted_rate": rate(side, "important_granted", "important_total"),
-            "burden_spread_mean": round(statistics.mean(p[side]["burden_spread"] for p in per_month if p.get(side)), 2),
+            "burden_spread_mean": round(
+                statistics.mean(p[side]["burden_spread"] for p in per_month if p.get(side)), 2
+            ),
             "overtime_hours": round(total(side, "overtime_hours"), 2),
             "isolated_nights": int(total(side, "isolated_nights")),
         }
         for side in ("baseline", "c1")
     }
-    summary["baseline"]["in_month_violations"] = sum(p.get("baseline_in_month_violations", 0) for p in per_month)
+    summary["baseline"]["in_month_violations"] = sum(
+        p.get("baseline_in_month_violations", 0) for p in per_month
+    )
     walls = [w for t in timing for w in t["wall_seconds"]]
     doc: dict[str, Any] = {
         "description": "Manual-planner baseline vs C1 (recommended variant) on held-out months of the synthetic data.",
         "dataset": {"seed": manifest["seed"], "generator_version": manifest["generator_version"]},
         "versions": {"solver": SOLVER_VERSION, "validator": VALIDATOR_VERSION},
-        "config": {"deterministic_time_per_variant": cfg.deterministic_time, "workers": cfg.workers,
-                   "seed": cfg.seed, "variants": cfg.variants, "recommended_profile": RECOMMENDED,
-                   "profiles": [asdict(p) for p in cfg.profiles]},
+        "config": {
+            "deterministic_time_per_variant": cfg.deterministic_time,
+            "workers": cfg.workers,
+            "seed": cfg.seed,
+            "variants": cfg.variants,
+            "recommended_profile": RECOMMENDED,
+            "profiles": [asdict(p) for p in cfg.profiles],
+        },
         "held_out_months": [m.isoformat() for m in months],
         "tuning_months": [m.isoformat() for m in TUNING],
         "limitations": [
@@ -100,7 +123,9 @@ def run(root: Path, months: list[date], cfg: Config) -> dict[str, Any]:
         "summary": summary,
         "per_month": per_month,
     }
-    doc["results_sha256"] = hashlib.sha256(json.dumps(doc, sort_keys=True, default=str).encode()).hexdigest()
+    doc["results_sha256"] = hashlib.sha256(
+        json.dumps(doc, sort_keys=True, default=str).encode()
+    ).hexdigest()
     doc["timing"] = {
         "note": "Wall-clock seconds per variant on the machine that ran the benchmark; not reproducible.",
         "median_seconds_per_variant": round(statistics.median(walls), 2) if walls else None,
@@ -123,7 +148,9 @@ def main(argv: list[str] | None = None) -> int:
         doc = run(args.data, HELD_OUT, Config(deterministic_time=20.0))
         out = RESULTS / "benchmark.json"
     RESULTS.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(doc, indent=2, ensure_ascii=False, default=str) + "\n", encoding="utf-8")
+    out.write_text(
+        json.dumps(doc, indent=2, ensure_ascii=False, default=str) + "\n", encoding="utf-8"
+    )
     if not args.smoke:  # the summary the transparency screen (W13) shows for C1
         c1 = {
             "component": "C1",
@@ -135,7 +162,9 @@ def main(argv: list[str] | None = None) -> int:
             "median_seconds_per_variant": doc["timing"]["median_seconds_per_variant"],
             "limitations": doc["limitations"],
         }
-        (RESULTS / "c1.json").write_text(json.dumps(c1, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        (RESULTS / "c1.json").write_text(
+            json.dumps(c1, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
     print(f"wrote {out} ({len(doc['per_month'])} months)")
     return 0
 

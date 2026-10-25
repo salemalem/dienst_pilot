@@ -29,7 +29,13 @@ from dienstpilot_eval.inputs import Data, month_end
 
 REPO = Path(__file__).resolve().parents[1]
 RESULTS = REPO / "eval" / "results"
-CHANGE_MONTHS = [date(2024, 3, 1), date(2025, 7, 1), date(2025, 12, 1), date(2026, 10, 1), date(2026, 11, 1)]
+CHANGE_MONTHS = [
+    date(2024, 3, 1),
+    date(2025, 7, 1),
+    date(2025, 12, 1),
+    date(2026, 10, 1),
+    date(2026, 11, 1),
+]
 CHANGES = 300
 SHIFTS = ("frueh", "spaet", "nacht", "bereitschaft", "ruf")
 
@@ -50,11 +56,18 @@ def _days(m: date) -> list[date]:
 
 def _random_change(rng: random.Random, inp: MonthInput) -> MonthInput:
     m = inp.month
-    in_month = sorted((a for a in inp.assignments if a.day >= m), key=lambda a: (a.day, a.staff_id, a.shift_type))
+    in_month = sorted(
+        (a for a in inp.assignments if a.day >= m), key=lambda a: (a.day, a.staff_id, a.shift_type)
+    )
     staff = sorted({a.staff_id for a in in_month})
     removes = set(rng.sample(in_month, rng.randint(0, 4)))
-    adds = [Assignment(rng.choice(staff), rng.choice(_days(m)), rng.choice(SHIFTS)) for _ in range(rng.randint(0, 4))]
-    return replace(inp, assignments=tuple(a for a in inp.assignments if a not in removes) + tuple(adds))
+    adds = [
+        Assignment(rng.choice(staff), rng.choice(_days(m)), rng.choice(SHIFTS))
+        for _ in range(rng.randint(0, 4))
+    ]
+    return replace(
+        inp, assignments=tuple(a for a in inp.assignments if a not in removes) + tuple(adds)
+    )
 
 
 def run(root: Path) -> dict[str, Any]:

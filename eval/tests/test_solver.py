@@ -25,14 +25,18 @@ def _passes_c2(md: MonthData, assignments: tuple[tuple[str, date, str], ...]) ->
     return sorted({v.rule for v in validate(inp)})
 
 
-@settings(max_examples=12, deadline=None, suppress_health_check=[HealthCheck.function_scoped_fixture])
+@settings(
+    max_examples=12, deadline=None, suppress_health_check=[HealthCheck.function_scoped_fixture]
+)
 @given(st.sampled_from(MONTHS), st.data())
 def test_every_solver_output_passes_c2(data: Data, m: date, draw: st.DataObject) -> None:
     md = data.month(m)
     staff = sorted({a.staff_id for a in md.published})
     days = sorted({a.day for a in md.published})
     # Perturb the month: extra "kann nicht" days for a few people.
-    extra = draw.draw(st.lists(st.tuples(st.sampled_from(staff), st.sampled_from(days)), max_size=6))
+    extra = draw.draw(
+        st.lists(st.tuples(st.sampled_from(staff), st.sampled_from(days)), max_size=6)
+    )
     blocked = dict(md.month.blocked)
     for s, d in extra:
         blocked[s] = frozenset(blocked.get(s, frozenset()) | {d})
@@ -86,7 +90,9 @@ def test_runs_are_reproducible_across_processes(seed_root: Path) -> None:
         r = subprocess.run(
             [sys.executable, "-c", _IN_A_FRESH_PROCESS, str(seed_root)],
             env={**os.environ, "PYTHONHASHSEED": hash_seed},
-            capture_output=True, text=True, check=True,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         out.append(r.stdout.strip())
     assert out[0] == out[1]
@@ -101,7 +107,9 @@ def test_infeasibility_is_explained_with_a_coverage_sentence(data: Data) -> None
     assert res.status == "infeasible"
     keys = {(e.key, e.params.get("date")) for e in res.explanations}
     assert ("infeasible.coverage", day.isoformat()) in keys
-    assert all(e.params.get("available") == 0 for e in res.explanations if e.key == "infeasible.coverage")
+    assert all(
+        e.params.get("available") == 0 for e in res.explanations if e.key == "infeasible.coverage"
+    )
 
 
 @pytest.mark.parametrize("m", [date(2026, 11, 1)])
@@ -112,13 +120,16 @@ def test_commitments_bind(data: Data, m: date) -> None:
 
     res = solve(to_problem(md, commitments=(Commitment(kaya, 2),)), FAST)
     assert res.status == "ok"
-    weekends = {d - timedelta(days=d.weekday() - 5) for s, d, _ in res.variants[0].assignments
-                if s == kaya and d.weekday() >= 5}
+    weekends = {
+        d - timedelta(days=d.weekday() - 5)
+        for s, d, _ in res.variants[0].assignments
+        if s == kaya and d.weekday() >= 5
+    }
     assert len(weekends) >= 2
 
 
 def test_a_soft_avoid_never_blocks_and_only_moves_the_objective(data: Data) -> None:
-    """"Rather not Spätdienst" on some days: same hard inputs, still valid, and the shift is
+    """ "Rather not Spätdienst" on some days: same hard inputs, still valid, and the shift is
     assigned to that person no more often than before."""
     md = data.month(date(2025, 3, 1))
     base = to_problem(md)

@@ -13,7 +13,9 @@ from dienstpilot_eval.inputs import Data
 from dienstpilot_eval.compare import from_checker, from_validator
 
 
-def test_validator_and_checker_agree_on_every_published_month(data: Data, checker: ModuleType) -> None:
+def test_validator_and_checker_agree_on_every_published_month(
+    data: Data, checker: ModuleType
+) -> None:
     ds = checker.Dataset(data.root)
     disagreements = {}
     months = sorted(data.published_at)
