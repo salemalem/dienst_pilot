@@ -163,6 +163,25 @@ export default function RequestsPage(): ReactNode {
     q.reload();
   });
 
+  const applyProposal = useAction(async (id: string) => {
+    try {
+      await unwrap(
+        api.POST("/planner/proposals/{proposal_id}/apply", {
+          params: { path: { proposal_id: id } },
+        }),
+      );
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 422) {
+        toast.show(t("proposalApplyRefused"));
+        return;
+      }
+      throw e;
+    }
+    toast.show(t("proposalApplied"));
+    setSelected(null);
+    q.reload();
+  });
+
   const reasonText = (r: string | null): string | null =>
     r && te.has(r as "overtime") ? te(r as "overtime") : r;
 
@@ -412,8 +431,23 @@ export default function RequestsPage(): ReactNode {
                         date: fmt.date(current.data.created_at),
                       }),
                     },
-                    { text: t("proposalChangesNothing") },
+                    {
+                      text: current.data.changes?.length
+                        ? t("proposalChangesApply", { count: current.data.changes.length })
+                        : t("proposalChangesNothing"),
+                    },
                   ]}
+                  actions={
+                    current.data.changes?.length ? (
+                      <Button
+                        variant="primary"
+                        disabled={applyProposal.pending}
+                        onClick={() => void applyProposal.run(current.id)}
+                      >
+                        {t("proposalApply")}
+                      </Button>
+                    ) : undefined
+                  }
                   accept={t("proposalAccept")}
                   onAccept={() => void decideProposal.run(current.id, true)}
                   dismiss={t("proposalDismiss")}

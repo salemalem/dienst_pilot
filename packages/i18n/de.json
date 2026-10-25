@@ -545,7 +545,11 @@
     "proposalAccept": "Als erledigt übernehmen",
     "proposalDismiss": "Verwerfen",
     "proposalAccepted": "Vorschlag übernommen",
-    "proposalDismissed": "Vorschlag verworfen"
+    "proposalDismissed": "Vorschlag verworfen",
+    "proposalApply": "Änderungen im Dienstplan übernehmen",
+    "proposalApplied": "Änderungen übernommen; alle Betroffenen sind benachrichtigt",
+    "proposalApplyRefused": "Der Validator lehnt die Änderungen ab. Es wurde nichts geändert.",
+    "proposalChangesApply": "Der Vorschlag enthält {count, plural, one {# Änderung} other {# Änderungen}}. Beim Übernehmen prüft der Validator jede wie eine Änderung von Hand; scheitert eine, wird keine übernommen."
   },
   "w7": {
     "title": "Ausfälle live",

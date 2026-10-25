@@ -862,6 +862,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/planner/proposals/{proposal_id}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply Proposal
+         * @description W6/W4: the Planner applies the changes a proposal suggests, all or none.
+         *
+         *     Each change goes through the same path as a hand edit in W4: a published month, C2-valid, a
+         *     reason (the proposal's title), everyone affected notified. One rejected change undoes the
+         *     rest. Agents cannot call this (no tool wraps it); only the Planner's own click does.
+         */
+        post: operations["apply_proposal_planner_proposals__proposal_id__apply_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/planner/cascades": {
         parameters: {
             query?: never;
@@ -5171,6 +5195,39 @@ export interface operations {
                 "application/json": components["schemas"]["ProposalDecision"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Decided"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apply_proposal_planner_proposals__proposal_id__apply_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                proposal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
