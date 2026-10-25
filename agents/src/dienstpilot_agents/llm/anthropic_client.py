@@ -1,6 +1,7 @@
 """The live adapter: the only module that imports the Anthropic SDK.
 
-No extended thinking and no sampling parameters are sent. The system prompt and the tool
+No sampling parameters are sent, and thinking is explicitly disabled for tool loops (a model may
+think by default; forced-tool calls never think). The system prompt and the tool
 definitions are cached (``cache_control`` on the last system block); work nobody waits for goes
 through the Batch API at half price. Before every call the budget guard looks at the ledger, and
 every answer is written to it.
@@ -55,6 +56,9 @@ def _params(request: LlmRequest, ttl: str | None = None) -> dict[str, Any]:
         }
         last["content"] = blocks
         params["messages"] = [*params["messages"][:-1], last]
+    if not request.force_tool:
+        # A model may think by default; the project rule is no extended thinking (ADR-020).
+        params["thinking"] = {"type": "disabled"}
     if request.force_tool:
         params["tool_choice"] = {"type": "tool", "name": request.force_tool}
     return params

@@ -153,7 +153,7 @@ async def run(
     """Answer one question. Never raises for model or tool trouble: it returns what happened."""
     mcp_tools = await toolbox.tools()
     tools = tools_for(mcp_tools)
-    pool = Pool(question)
+    pool = Pool(question, today)
     asked = aliases.to_model(question)
     first = (
         f"Today (demo clock): {today}. User role: {role}. Language: {language}.\nQuestion:\n{asked}"
@@ -225,7 +225,7 @@ async def run(
 
     async def act(state: State) -> dict[str, Any]:
         uses = [b for b in state["turns"][-1].blocks if b["type"] == "tool_use"]
-        done = await asyncio.gather(*(run_tool(b) for b in uses))
+        done = [await run_tool(b) for b in uses]  # one after the other: deterministic
         results = [r for r, _ in done]
         calls = [c for _, c in done]
         state["turns"][-1].tool_results = results

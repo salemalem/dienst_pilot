@@ -64,8 +64,9 @@ EN_LONG = re.compile(
 NUMBER = re.compile(r"(?<![\w.])(\d+(?:[.,]\d+)?)(?:\s?%)?(?![\w])")
 DE_SHORT = re.compile(rf"\b(\d{{1,2}})\.?\s+({_MONTH_WORD})\b", re.IGNORECASE)
 EN_SHORT = re.compile(rf"\b({_MONTH_WORD})\s+(\d{{1,2}})(?:st|nd|rd|th)?\b", re.IGNORECASE)
+ORDINAL = re.compile(r"(?<![\w.,])(\d{1,2})\.(?=\s|,|$)")
 MonthDay = tuple[str, int, int]  # a day and month without a year: ("md", month, day)
-Value = float | date | MonthDay
+Value = float | date | MonthDay | tuple[str, int, int]
 
 
 def _date(y: int, m: int, d: int) -> date | None:
@@ -115,7 +116,15 @@ def extract(text: str) -> list[Value]:
     short(DE_SHORT, True)
     short(EN_SHORT, False)
     for m in NUMBER.finditer(text):
-        found.append(float(m.group(1).replace(",", ".")))
+        n = float(m.group(1).replace(",", "."))
+        token_end = m.end()
+        ordinal = (
+            m.group(1).isdigit()
+            and 1 <= n <= 31
+            and text[token_end : token_end + 1] == "."
+            and (len(text) == token_end + 1 or text[token_end + 1] in " ,")
+        )
+        found.append(("ord", int(n), 0) if ordinal else n)
     return found
 
 
@@ -146,10 +155,13 @@ def values_in(data: Any) -> list[Value]:
 class Pool:
     """The numbers and dates an answer may use."""
 
-    def __init__(self, question: str) -> None:
-        """Start with what the question itself says."""
+    def __init__(self, question: str, today: str | None = None) -> None:
+        """Start with what the question says, and today's date (the model is told it)."""
         self._values: set[Value] = set()
+        self._days: set[int] = set()
         self.add(extract(question))
+        if today:
+            self.add([date.fromisoformat(today)])
 
     def add(self, values: list[Value]) -> None:
         """Add grounded values."""
@@ -158,6 +170,7 @@ class Pool:
             if isinstance(v, date):
                 self._values.add(float(v.year))
                 self._values.add(("md", v.month, v.day))
+                self._days.add(v.day)
 
     def add_result(self, data: Any) -> None:
         """Add everything a tool result says."""
@@ -171,7 +184,11 @@ class Pool:
         """Return the numbers and dates in ``text`` that nothing in the pool backs."""
         bad: list[Value] = []
         for v in extract(text):
-            if isinstance(v, (date, tuple)):
+            if isinstance(v, tuple) and v[0] == "ord":
+                # "the 12." (a day in a list of dates) or a number at the end of a sentence
+                if v[1] not in self._days and not self.knows(float(v[1])):
+                    bad.append(float(v[1]))
+            elif isinstance(v, (date, tuple)):
                 if v not in self._values:
                     bad.append(v)
             elif not self.knows(v):

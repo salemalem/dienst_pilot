@@ -161,30 +161,26 @@ def _day(setup: dict[str, Any]) -> Any:
 
 
 async def run_task(w: World, t: dict[str, Any], client: Any, label: str) -> dict[str, Any]:
-    """Run one task inside a savepoint, score nothing yet, and return its record."""
+    """Run one task in the given world (rolled back by the caller) and return its record."""
     names = staff_names(w)
     aliases = Aliases(names)
-    savepoint = w.conn.begin_nested()
-    try:
-        if t.get("setup"):
-            plant(w, t["setup"])
-        before = snapshot(w)
-        toolbox = McpToolbox(lambda server: w.mcp_client(server, t["persona"]))
-        started = time.perf_counter()
-        res = await agent.run(
-            question=t["question"],
-            language=t["language"],
-            role="oversight" if t["persona"] == "vogel" else "planner",
-            today="2026-10-25",
-            model=MODEL,
-            client=client,
-            toolbox=toolbox,
-            aliases=aliases,
-        )
-        wall = time.perf_counter() - started
-        after = snapshot(w)
-    finally:
-        savepoint.rollback()
+    if t.get("setup"):
+        plant(w, t["setup"])
+    before = snapshot(w)
+    toolbox = McpToolbox(lambda server: w.mcp_client(server, t["persona"]))
+    started = time.perf_counter()
+    res = await agent.run(
+        question=t["question"],
+        language=t["language"],
+        role="oversight" if t["persona"] == "vogel" else "planner",
+        today="2026-10-25",
+        model=MODEL,
+        client=client,
+        toolbox=toolbox,
+        aliases=aliases,
+    )
+    wall = time.perf_counter() - started
+    after = snapshot(w)
     diff = {
         k: [before.get(k, 0), after.get(k, 0)]
         for k in set(before) | set(after)
@@ -241,9 +237,9 @@ def preflight(w: World) -> None:
     r = w.client.get(
         "/rules/search?q=Ruhezeit&k=3", headers={"Authorization": "Bearer " + w.token("brandt")}
     ).json()
-    if r.get("fallback") or r.get("mode") != "vector":
+    if r.get("fallback") or r.get("mode") != "vector" or not r.get("passages"):
         raise SystemExit(
-            f"stop: rule search is in degraded mode (mode={r.get('mode')}, fallback={r.get('fallback')})."
+            f"stop: rule search is in degraded mode (mode={r.get('mode')}, fallback={r.get('fallback')}, passages={len(r.get('passages', []))})."
             " Set BGE_M3_DIR to the bge-m3 files (see CLAUDE.md) and try again."
         )
 
@@ -265,10 +261,11 @@ async def run_set(ids: list[str], label: str, purpose: str) -> None:
     client = live_client(f"c8-{label}", purpose)
     async with world() as w:
         preflight(w)
-        for i in ids:
-            if (out / f"{i}.json").exists():
-                print(f"{i}: already recorded, skipped")
-                continue
+    for i in ids:
+        if (out / f"{i}.json").exists():
+            print(f"{i}: already recorded, skipped")
+            continue
+        async with world() as w:  # every task gets its own transaction, rolled back afterwards
             try:
                 rec = await run_task(w, suite[i], client, label)
             except LlmError as e:
