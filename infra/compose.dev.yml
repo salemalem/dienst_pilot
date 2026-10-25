@@ -74,6 +74,10 @@ services:
       DATABASE_URL: postgresql+psycopg://dienstpilot:dienstpilot@postgres:5432/dienstpilot
       REDIS_URL: redis://redis:6379/0
       DEMO_MODE: "true"
+      MCP_URL: http://mcp:8200
+    env_file:
+      - path: ../.env
+        required: false
     command: arq dienstpilot.worker.WorkerSettings
     volumes: ["../backend/src:/app/backend/src"]
     depends_on:

@@ -8,10 +8,9 @@ from dienstpilot.engines.c4 import C4PreferenceLearner
 from dienstpilot.engines.c5 import C5CoverRanker
 from dienstpilot.engines.c6 import C6LeaveFeasibility
 from dienstpilot.engines.c7 import build_intake
-from dienstpilot.engines.standins import CopilotStandIn
+from dienstpilot.engines.c8 import C8Copilot, build_copilot
 from dienstpilot.shared.ports import (
     AbsenceForecaster,
-    Copilot,
     CoverRanker,
     EngineInfo,
     IntakeParser,
@@ -34,7 +33,7 @@ class Engines:
     cover_ranker: CoverRanker
     leave: LeaveFeasibility
     intake: IntakeParser
-    copilot: Copilot
+    copilot: C8Copilot
 
     def infos(self) -> list[EngineInfo]:
         """Return the descriptions of C1–C8, in order."""
@@ -54,7 +53,7 @@ class Engines:
 
 
 def default_engines() -> Engines:
-    """Return the current set: C1 to C6 built, stand-ins for C7 and C8."""
+    """Return the current set: C1 to C6 built; C7 and C8 as far as their gates let them."""
     return Engines(
         CpSatOptimizer(),
         RuleValidator(),
@@ -63,5 +62,5 @@ def default_engines() -> Engines:
         C5CoverRanker(),
         C6LeaveFeasibility(),
         build_intake(get_settings()),
-        CopilotStandIn(),
+        build_copilot(get_settings()),
     )

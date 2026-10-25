@@ -20,6 +20,7 @@ def rec(
         results.append({"tool_use_id": f"t{i}", "content": json.dumps(data), "is_error": False})
         plain.append({"name": name, "args": args, "is_error": False, "result_chars": 0})
     return {
+        "question": "q",
         "final": final,
         "value_id": kw.get("value_id"),
         "fallback": kw.get("fallback", False),
@@ -34,9 +35,12 @@ def rec(
 
 def test_number_needs_the_right_value_and_a_grounded_answer() -> None:
     t = {"kind": "number", "expected": {"type": "number", "value": 5}}
-    assert score(t, rec({"answer": "5", "value": 5}))["correct"]
-    assert not score(t, rec({"answer": "5", "value": 6}))["correct"]
-    assert not score(t, rec({"answer": "5", "value": 5}, fallback=True))["correct"]
+    data = [("get_assignments_for", {}, {"totals": {"nacht": 5, "shifts": 6}})]
+    assert score(t, rec({"answer": "5", "value": 5}, data))["correct"]
+    assert not score(t, rec({"answer": "6", "value": 6}, data))["correct"]  # grounded but wrong
+    assert not score(t, rec({"answer": "7 Dienste", "value": 5}, data))[
+        "correct"
+    ]  # ungrounded text
     d = {"kind": "number", "expected": {"type": "date", "value": "2026-11-03"}}
     assert score(d, rec({"answer": "x", "value": "2026-11-03"}))["correct"]
     s = {"kind": "number", "expected": {"type": "staff", "value": "abc"}}
@@ -45,9 +49,11 @@ def test_number_needs_the_right_value_and_a_grounded_answer() -> None:
 
 def test_rule_citations_must_have_been_retrieved_in_the_run() -> None:
     t = {"kind": "rule", "expected": {"gold": ["arbzg:§5:1"], "answerable": True}}
-    found = [("search_rules", {"query": "x"}, {"passages": [{"id": "arbzg:§5:1"}]})]
+    found = [
+        ("search_rules", {"query": "x"}, {"passages": [{"id": "arbzg:§5:1", "text": "11 Stunden"}]})
+    ]
     assert score(t, rec({"answer": "11", "citations": ["arbzg:§5:1"]}, found))["correct"]
-    assert not score(t, rec({"answer": "11", "citations": ["arbzg:§5:1"]}))[
+    assert not score(t, rec({"answer": "x", "citations": ["arbzg:§5:1"]}))[
         "correct"
     ]  # never searched
     assert retrieved_rule_ids(rec(None, found)) == {"arbzg:§5:1"}

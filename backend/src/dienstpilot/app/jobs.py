@@ -4,6 +4,8 @@ Each job takes a session, the engines and the clock, so the arq worker and the t
 same code. Every variant is checked by the validator (C2) before it is stored.
 """
 
+import asyncio
+import logging
 from collections.abc import Callable
 from dataclasses import asdict
 from datetime import date
@@ -270,4 +272,49 @@ def _coverability(
     )
 
 
-JOBS: dict[str, Callable[..., None]] = {"run_roster": run_roster, "check_leave": check_leave}
+log = logging.getLogger(__name__)
+
+
+def run_copilot(
+    session: Session, engines: Engines, clock: Clock, *, run_id: str, role: str, token: str
+) -> None:
+    """C8: answer one question with the agent (its tools use the asking user's token)."""
+    run = planning.copilot_run(session, run_id)
+    if run is None or run.status != "queued":
+        return
+    planning.start_copilot_run(session, run_id)
+    session.commit()
+    staff = {s.id: s.display_name for s in organization.staff(session, run.department_id)}
+    now = clock.now()
+    try:
+        out = asyncio.run(
+            engines.copilot.answer(
+                question=run.question,
+                language=run.language,
+                role=role,
+                today=clock.today().isoformat(),
+                staff=staff,
+                token=token,
+            )
+        )
+        result: dict[str, Any] = {
+            "answer": out.answer,
+            "fallback": out.fallback,
+            "fallback_reason": out.fallback_reason,
+            "sources": out.sources,
+            "what_if": out.what_if,
+            "citations": out.citations,
+            "wrote": out.wrote,
+            "replayed": engines.copilot.replayed,
+        }
+        planning.finish_copilot_run(session, run_id, "done", result, now)
+    except Exception as e:  # a model or tool failure must never leave the run hanging
+        log.warning("copilot run %s failed: %s", run_id, e)
+        planning.finish_copilot_run(session, run_id, "failed", {"error": type(e).__name__}, now)
+
+
+JOBS: dict[str, Callable[..., None]] = {
+    "run_roster": run_roster,
+    "check_leave": check_leave,
+    "run_copilot": run_copilot,
+}

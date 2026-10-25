@@ -24,6 +24,7 @@ QUERIES = {
     "/roster": "?month=2026-11",
     "/me/roster": "?month=2026-11",
     "/planner/runs": "?month=2026-12",
+    "/planner/history": "?month=2026-11",
     "/compliance/hours": "?month=2026-10",
     "/rules/search": "?q=Ruhezeit",
 }

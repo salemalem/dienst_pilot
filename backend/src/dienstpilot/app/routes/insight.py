@@ -5,13 +5,14 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response, status
 from pydantic import BaseModel, Field
 
 from dienstpilot.app.common import EngineLabel, department, label, record, settle_timers
 from dienstpilot.app.context import CtxDep
-from dienstpilot.app.deps import AdminDep, MasterDataReaderDep, OversightReaderDep, PlannerDep
+from dienstpilot.app.deps import AdminDep, Ctx, MasterDataReaderDep, OversightReaderDep, PlannerDep
 from dienstpilot.app.privacy import audit_payload_for
+from dienstpilot.app.queue import QueueDep
 from dienstpilot.app.roster import approved_leave_days, effective, hours_for, month_end, month_start
 from dienstpilot.app.routes.planner import (
     AssignmentChange,
@@ -40,19 +41,54 @@ class AskIn(BaseModel):
     language: Literal["de", "en"] = "de"
 
 
+class AskSource(BaseModel):
+    """One thing the agent looked at (a tool call, in words)."""
+
+    tool: str
+    label: str
+    args: dict[str, str]
+
+
+class AskViolation(BaseModel):
+    """One rule violation the validator found for a what-if."""
+
+    rule: str
+    date: str
+    person: str | None
+
+
+class AskWhatIf(BaseModel):
+    """What the validator (C2) said about the change asked for."""
+
+    valid: bool
+    violations: list[AskViolation]
+    uncovered: list[dict[str, Any]]
+    validator_version: str | None
+
+
 class AskOut(BaseModel):
-    """The copilot's answer with figures and cited rules."""
+    """The copilot's answer: at once (stand-in) or after polling ``/copilot/runs/{id}`` (agent)."""
 
-    answer: str
-    figures: dict[str, Any]
-    citations: list[str]
-    understood: bool
+    status: Literal["done", "running", "failed"] = "done"
+    run_id: str | None = None
+    answer: str = ""
+    figures: dict[str, Any] = Field(default_factory=dict)
+    citations: list[str] = Field(default_factory=list)
+    understood: bool = True
     engine: EngineLabel
+    ai_generated: bool = False
+    replayed: bool = False
+    fallback: bool = False
+    fallback_reason: str | None = None
+    sources: list[AskSource] = Field(default_factory=list)
+    what_if: AskWhatIf | None = None
+    wrote: list[str] = Field(default_factory=list)
+    note: str | None = Field(
+        None, description="Which engine answered this kind of question, and why"
+    )
 
 
-@router.post("/copilot/ask")
-def ask(c: CtxDep, _: OversightReaderDep, body: AskIn) -> AskOut:
-    """W9: ask the copilot (stand-in). It reads; it cannot publish or approve anything."""
+def _standin_facts(c: Ctx) -> CopilotFacts:
     dep = department(c)
     today = c.clock.today()
     months = planning.published_months(c.session)[-4:]  # the last four published months
@@ -74,7 +110,7 @@ def ask(c: CtxDep, _: OversightReaderDep, body: AskIn) -> AskOut:
                     p, m, shifts, leave.get(p.id, set()), holidays, rules, types, c.clock.now()
                 ).planned_hours
     rs = organization.rules_for(c.session, today)
-    facts = CopilotFacts(
+    return CopilotFacts(
         {p.id: p.display_name for p in dep.staff.values()},
         weekends,
         hours,
@@ -83,14 +119,91 @@ def ask(c: CtxDep, _: OversightReaderDep, body: AskIn) -> AskOut:
         rs.version,
         month_start(today),
     )
-    a = c.engines.copilot.ask(body.question, body.language, facts)
+
+
+def _agent_out(run: planning.CopilotRun, engine: EngineLabel) -> AskOut:
+    if run.status in ("queued", "running"):
+        return AskOut(status="running", run_id=run.id, engine=engine, ai_generated=True)
+    r = run.result or {}
+    if run.status == "failed":
+        return AskOut(
+            status="failed",
+            run_id=run.id,
+            engine=engine,
+            ai_generated=True,
+            answer="",
+            fallback_reason=str(r.get("error", "failed")),
+        )
+    return AskOut(
+        status="done",
+        run_id=run.id,
+        answer=r["answer"],
+        citations=r["citations"],
+        engine=engine,
+        ai_generated=True,
+        replayed=bool(r["replayed"]),
+        fallback=bool(r["fallback"]),
+        fallback_reason=r["fallback_reason"],
+        sources=[AskSource(**x) for x in r["sources"]],
+        what_if=None if r["what_if"] is None else AskWhatIf(**r["what_if"]),
+        wrote=r["wrote"],
+    )
+
+
+@router.post("/copilot/ask")
+def ask(
+    c: CtxDep,
+    user: OversightReaderDep,
+    queue: QueueDep,
+    body: AskIn,
+    response: Response,
+    authorization: Annotated[str | None, Header()] = None,
+) -> AskOut:
+    """W9: ask the copilot. It reads and proposes; it cannot publish or approve anything.
+
+    What-ifs and drafting go to the agent (a background job, poll ``/copilot/runs/{id}``), when
+    its pre-registered gates released them; everything else is answered by the stand-in at once.
+    """
+    copilot = c.engines.copilot
+    cap = copilot.serves(body.question, user.role, body.language)
+    if cap is not None and authorization:
+        run_id = planning.create_copilot_run(
+            c.session,
+            department_id=c.user.department_id,
+            created_by=c.user.id,
+            question=body.question,
+            language=body.language,
+            now=c.clock.now(),
+        )
+        c.session.commit()  # the worker must find the row
+        record(c, "copilot.asked", "copilot_run", run_id, payload={"capability": cap})
+        queue.enqueue(
+            "run_copilot", run_id=run_id, role=user.role, token=authorization.split(" ", 1)[1]
+        )
+        c.session.expire_all()
+        run = planning.copilot_run(c.session, run_id)
+        assert run is not None
+        if run.status in ("queued", "running"):
+            response.status_code = status.HTTP_202_ACCEPTED
+        return _agent_out(run, label(copilot.info))
+    a = copilot.ask(body.question, body.language, _standin_facts(c))
     return AskOut(
         answer=a.answer,
         figures=a.figures,
         citations=a.citations,
         understood=a.understood,
-        engine=label(c.engines.copilot.info),
+        engine=label(copilot.standin_info),
+        note=copilot.info.note,
     )
+
+
+@router.get("/copilot/runs/{run_id}")
+def copilot_run(c: CtxDep, user: OversightReaderDep, run_id: str) -> AskOut:
+    """W9: poll an agent answer. Only the user who asked (in the same department) may read it."""
+    run = planning.copilot_run(c.session, run_id)
+    if run is None or run.created_by != c.user.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+    return _agent_out(run, label(c.engines.copilot.info))
 
 
 class ProposalIn(BaseModel):

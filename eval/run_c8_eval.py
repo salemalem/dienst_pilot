@@ -34,6 +34,7 @@ from c8_harness import World, world
 from dienstpilot.shared.settings import get_settings
 from dienstpilot_agents.copilot import agent
 from dienstpilot_agents.copilot.guard import Aliases
+from dienstpilot_agents.copilot.outcome import record
 from dienstpilot_agents.copilot.prompt import MAX_TOKENS, MAX_TURNS, PROMPT_VERSION, SYSTEM
 from dienstpilot_agents.copilot.scoring import score
 from dienstpilot_agents.copilot.tools import CALCULATE, FINAL_ANSWER, McpToolbox
@@ -165,6 +166,7 @@ async def run_task(w: World, t: dict[str, Any], client: Any, label: str) -> dict
     """Run one task in the given world (rolled back by the caller) and return its record."""
     names = staff_names(w)
     aliases = Aliases(names)
+    role = "oversight" if t["persona"] == "vogel" else "planner"
     if t.get("setup"):
         plant(w, t["setup"])
     before = snapshot(w)
@@ -197,40 +199,17 @@ async def run_task(w: World, t: dict[str, Any], client: Any, label: str) -> dict
     }
     if "new_staff_id" in exp:
         meta["expected_alias_new_staff"] = aliases.alias_of[exp["new_staff_id"]]
-    usage = {
-        k: sum(turn.usage[k] for turn in res.turns)
-        for k in ("input_tokens", "output_tokens", "cache_write_tokens", "cache_read_tokens")
-    }
-    return {
-        "task": t["id"],
-        "label": label,
-        "prompt_version": PROMPT_VERSION,
-        "question": t["question"],
-        "final": res.final,
-        "value_id": res.value_id,
-        "served": res.served,
-        "fallback": res.fallback,
-        "fallback_reason": res.fallback_reason,
-        "ungrounded": res.ungrounded,
-        "aborted": res.aborted,
-        "findings": [f.__dict__ for f in res.findings],
-        "state_diff": {k: v for k, v in diff.items() if not k.startswith("proposal")},
-        "calls": [c.__dict__ for c in res.calls],
-        "turns": [
-            {
-                "request_key": x.request_key,
-                "blocks": x.blocks,
-                "tool_results": x.tool_results,
-                "usage": x.usage,
-                "latency_s": x.latency_s,
-                "model": x.model,
-                "new_text": x.new_text,
-            }
-            for x in res.turns
-        ],
-        "usage": usage,
-        "meta": meta,
-    }
+    rec = record(res, role=role, language=t["language"])
+    rec.update(
+        {
+            "task": t["id"],
+            "label": label,
+            "prompt_version": PROMPT_VERSION,
+            "state_diff": {k: v for k, v in diff.items() if not k.startswith("proposal")},
+            "meta": meta,
+        }
+    )
+    return rec
 
 
 def preflight(w: World) -> None:
